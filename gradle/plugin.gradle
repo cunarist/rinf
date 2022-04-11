@@ -1,0 +1,140 @@
+import java.nio.file.Paths
+import org.apache.tools.ant.taskdefs.condition.Os
+
+ToolboxPlugin.file = buildscript.sourceFile
+
+apply plugin: ToolboxPlugin
+
+class ToolboxExtension {
+    String manifestDir; // Relative path to folder containing Cargo.toml
+    String libname; // Library name within Cargo.toml. Must be a cdylib
+}
+
+abstract class ToolboxCargoBuildTask extends DefaultTask {
+
+    @Input
+    String buildMode
+
+    @Input
+    String buildDir
+
+    @Input
+    String outputDir
+
+    @Input
+    String ndkVersion
+
+    @Input
+    String ndkDirectory
+
+    @Input
+    int compileSdkVersion;
+
+    @Input
+    int minSdkVersion;
+
+    @Input
+    String pluginFile
+
+    @Input
+    List<String> targetPlatforms
+
+    @TaskAction
+    def build() {
+        if (project.toolbox.manifestDir == null) {
+            throw new GradleException("Property 'manifestDir' must be set on toolbox extension");
+        }
+        if (project.toolbox.libname == null) {
+            throw new GradleException("Property 'libname' must be set on toolbox extension");
+        }
+
+        def executableName = Os.isFamily(Os.FAMILY_WINDOWS) ? "run_rust_tool.cmd" : "run_rust_tool.sh"
+        def path = Paths.get(new File(pluginFile).parent, "..", executableName);
+
+        def manifestDir = Paths.get(project.buildscript.sourceFile.parent, project.toolbox.manifestDir)
+
+        project.exec {
+            executable path
+            args "build_android"
+            environment "TOOLBOX_TOOL_TEMP_DIR", "${buildDir}/rust_tool"
+            environment "TOOLBOX_MANIFEST_DIR", manifestDir
+            environment "TOOLBOX_LIB_NAME", project.toolbox.libname
+            environment "TOOLBOX_BUILD_MODE", buildMode
+            environment "TOOLBOX_BUILD_DIR", buildDir
+            environment "TOOLBOX_OUTPUT_DIR", outputDir
+            environment "TOOLBOX_NDK_VERSION", ndkVersion
+            environment "TOOLBOX_NDK_DIR", ndkDirectory
+            environment "TOOLBOX_COMPILE_SDK_VERSION", compileSdkVersion
+            environment "TOOLBOX_MIN_SDK_VERSION", minSdkVersion
+            environment "TOOLBOX_TARGET_PLATFORMS", targetPlatforms.join(",")
+        }
+    }
+}
+
+class ToolboxPlugin implements Plugin<Project> {
+
+    static String file;
+
+    private Plugin findFlutterPlugin(Project rootProject) {
+        _findFlutterPlugin(rootProject.childProjects)
+    }
+
+    private Plugin _findFlutterPlugin(Map projects) {
+        for (project in projects) {
+            for (plugin in project.value.getPlugins()) {
+                if (plugin.class.name == "FlutterPlugin") {
+                    return plugin;
+                }
+            }
+            return _findFlutterPlugin(project.childProjects);
+        }
+        return null;
+    }
+
+    @Override
+    void apply(Project project) {
+        def plugin = findFlutterPlugin(project.rootProject);
+
+        project.extensions.create("toolbox", ToolboxExtension)
+
+        if (plugin == null) {
+            print("Flutter plugin not found, Toolbox plugin will not be applied.")
+            return;
+        }
+
+        def cargoBuildDir = "${project.buildDir}/build"
+
+        plugin.project.android.applicationVariants.all { variant ->
+
+            def cargoOutputDir = "${project.buildDir}/jniLibs/${variant.name}";
+            def jniLibs = plugin.project.android.sourceSets.getByName(variant.name).jniLibs;
+            jniLibs.srcDir(new File(cargoOutputDir))
+
+            def platforms = plugin.getTargetPlatforms().collect()
+
+            // Same thing addFlutterDependencies does in flutter.gradle
+            if (variant.name == "debug") {
+                platforms.add("android-x86")
+                platforms.add("android-x64")
+            }
+
+            def taskName = "toolboxCargoBuild${variant.name.capitalize()}";
+            def task = project.tasks.create(taskName, ToolboxCargoBuildTask.class) {
+                buildMode = variant.name
+                buildDir = cargoBuildDir
+                outputDir = cargoOutputDir
+                ndkVersion = plugin.project.android.ndkVersion
+                ndkDirectory = plugin.project.android.ndkDirectory
+                minSdkVersion = plugin.project.android.defaultConfig.minSdkVersion.apiLevel as int
+                compileSdkVersion = plugin.project.android.compileSdkVersion.substring(8) as int
+                targetPlatforms = platforms
+                pluginFile = ToolboxPlugin.file
+            }
+            project.tasks.whenTaskAdded { newTask ->
+                if (newTask.name == "javaPreCompile${variant.name.capitalize()}") {
+                    newTask.dependsOn task
+                }
+            }
+        }
+    }
+}
