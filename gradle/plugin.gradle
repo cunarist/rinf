@@ -106,19 +106,29 @@ class ToolboxPlugin implements Plugin<Project> {
 
         plugin.project.android.applicationVariants.all { variant ->
 
-            def cargoOutputDir = "${project.buildDir}/jniLibs/${variant.name}";
-            def jniLibs = plugin.project.android.sourceSets.getByName(variant.name).jniLibs;
+            final buildType = variant.buildType.name
+
+            def cargoOutputDir = "${project.buildDir}/jniLibs/${buildType}";
+            def jniLibs = plugin.project.android.sourceSets.getByName(buildType).jniLibs;
             jniLibs.srcDir(new File(cargoOutputDir))
 
             def platforms = plugin.getTargetPlatforms().collect()
 
             // Same thing addFlutterDependencies does in flutter.gradle
-            if (variant.name == "debug") {
+            if (buildType == "debug") {
                 platforms.add("android-x86")
                 platforms.add("android-x64")
             }
 
-            def taskName = "toolboxCargoBuild${variant.name.capitalize()}";
+            def taskName = "toolboxCargoBuild${buildType.capitalize()}";
+            if (project.tasks.findByName(taskName)) {
+                return
+            }
+
+            if (plugin.project.android.ndkVersion == null) {
+                plugin.project.android.ndkVersion = plugin.project.extensions.findByName("flutter").ndkVersion
+            }
+
             def task = project.tasks.create(taskName, ToolboxCargoBuildTask.class) {
                 buildMode = variant.name
                 buildDir = cargoBuildDir
@@ -131,7 +141,7 @@ class ToolboxPlugin implements Plugin<Project> {
                 pluginFile = ToolboxPlugin.file
             }
             project.tasks.whenTaskAdded { newTask ->
-                if (newTask.name == "javaPreCompile${variant.name.capitalize()}") {
+                if (newTask.name == "javaPreCompile${buildType.capitalize()}") {
                     newTask.dependsOn task
                 }
             }
