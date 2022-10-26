@@ -1,7 +1,8 @@
-use std::{fmt::Debug, fs, process::Command};
+use std::{fmt::Debug, fs, io::Write, path::Path, process::Command};
 
 use anyhow::Result;
 use log::{debug, info};
+use semver::Version;
 
 use super::utils::*;
 
@@ -77,8 +78,7 @@ fn get_targets() -> Vec<Target> {
     platforms
         .split(',')
         .into_iter()
-        .map(Target::from_flutter_target)
-        .flatten()
+        .filter_map(Target::from_flutter_target)
         .collect()
 }
 
@@ -101,6 +101,41 @@ const CLANG_TOOL_EXTENSION: &str = ".cmd";
 
 #[cfg(not(target_os = "windows"))]
 const CLANG_TOOL_EXTENSION: &str = "";
+
+// Workaround for libgcc missing in NDK23, inspired by cargo-ndk
+fn libgcc_workaround(build_dir: &Path, ndk_version: &Version) -> Result<String> {
+    let workaround_dir = build_dir
+        .join("toolbox")
+        .join("libgcc_workaround")
+        .join(ndk_version.major.to_string());
+    fs::create_dir_all(&workaround_dir)?;
+    if ndk_version.major >= 23 {
+        let mut file = std::fs::File::create(workaround_dir.join("libgcc.a"))?;
+        file.write_all(b"INPUT(-lunwind)")?;
+    } else {
+        // Other way around, untested, forward libgcc.a from libunwind once Rust
+        // gets updated for NDK23+.
+        let mut file = std::fs::File::create(workaround_dir.join("libunwind.a"))?;
+        file.write_all(b"INPUT(-lgcc)")?;
+    }
+
+    let mut rustflags = match std::env::var("CARGO_ENCODED_RUSTFLAGS") {
+        Ok(val) => val,
+        Err(std::env::VarError::NotPresent) => "".to_string(),
+        Err(std::env::VarError::NotUnicode(_)) => {
+            log::error!("RUSTFLAGS environment variable contains non-unicode characters");
+            std::process::exit(1);
+        }
+    };
+
+    if !rustflags.is_empty() {
+        rustflags.push('\x1f');
+    }
+    rustflags.push_str("-L\x1f");
+    rustflags.push_str(&workaround_dir.to_string_lossy());
+
+    Ok(rustflags)
+}
 
 fn build_for_target(target: &Target) -> Result<()> {
     let min_version = string_from_env("TOOLBOX_MIN_SDK_VERSION")?;
@@ -133,21 +168,28 @@ fn build_for_target(target: &Target) -> Result<()> {
         CLANG_TOOL_EXTENSION
     ));
 
+    let rustflags_key = "CARGO_ENCODED_RUSTFLAGS";
+
     let linker_key = format!(
         "cargo_target_{}_linker",
-        target.rust_target().replace("-", "_")
+        target.rust_target().replace('-', "_")
     )
     .to_ascii_uppercase();
     let linker_value = cc_value.clone();
+
+    let ndk_version = string_from_env("TOOLBOX_NDK_VERSION")?;
+    let build_dir = path_from_env("TOOLBOX_BUILD_DIR")?;
+    let output_dir = path_from_env("TOOLBOX_OUTPUT_DIR")?;
+    let lib_name = string_from_env("TOOLBOX_LIB_NAME")?;
+
+    let ndk_version = Version::parse(&ndk_version)?;
+    let rust_flags_value = libgcc_workaround(&build_dir, &ndk_version)?;
 
     debug!("ENV {}={}", ar_key, ar_value.display());
     debug!("ENV {}={}", cc_key, cc_value.display());
     debug!("ENV {}={}", cxx_key, cxx_value.display());
     debug!("ENV {}={}", linker_key, linker_value.display());
-
-    let build_dir = path_from_env("TOOLBOX_BUILD_DIR")?;
-    let output_dir = path_from_env("TOOLBOX_OUTPUT_DIR")?;
-    let lib_name = string_from_env("TOOLBOX_LIB_NAME")?;
+    debug!("ENV {}={}", rustflags_key, rust_flags_value);
 
     let mut cmd = Command::new("cargo");
     cmd.arg("build");
@@ -167,6 +209,7 @@ fn build_for_target(target: &Target) -> Result<()> {
     cmd.env(cc_key, cc_value);
     cmd.env(cxx_key, cxx_value);
     cmd.env(linker_key, linker_value);
+    cmd.env(rustflags_key, rust_flags_value);
 
     run_command(cmd)?;
 
