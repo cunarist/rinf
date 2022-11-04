@@ -120,13 +120,14 @@ class ToolboxPlugin implements Plugin<Project> {
                 platforms.add("android-x64")
             }
 
-            def taskName = "toolboxCargoBuild${buildType.capitalize()}";
+            def taskName = "toolboxCargoBuild${project.toolbox.libname.capitalize()}${buildType.capitalize()}";
+
             if (project.tasks.findByName(taskName)) {
                 return
             }
 
             if (plugin.project.android.ndkVersion == null) {
-                plugin.project.android.ndkVersion = plugin.project.extensions.findByName("flutter").ndkVersion
+                throw new GradleException("Please set 'android.ndkVersion' in 'app/build.gradle'.")
             }
 
             def task = project.tasks.create(taskName, ToolboxCargoBuildTask.class) {
@@ -140,11 +141,13 @@ class ToolboxPlugin implements Plugin<Project> {
                 targetPlatforms = platforms
                 pluginFile = ToolboxPlugin.file
             }
-            project.tasks.whenTaskAdded { newTask ->
+            def onTask = { newTask ->
                 if (newTask.name == "javaPreCompile${buildType.capitalize()}") {
                     newTask.dependsOn task
                 }
             }
+            project.tasks.each onTask
+            project.tasks.whenTaskAdded onTask
         }
     }
 }
