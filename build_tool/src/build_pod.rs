@@ -1,6 +1,10 @@
 use anyhow::Result;
 use log::info;
-use std::{env::Args, path::PathBuf, process::Command};
+use std::{
+    env::Args,
+    path::{Path, PathBuf},
+    process::Command,
+};
 
 use super::utils::*;
 
@@ -92,21 +96,49 @@ pub fn build_pod(mut args: Args) -> Result<()> {
         run_command(cmd)?;
     }
 
-    {
-        let lib_name = format!("lib{}.a", lib_name);
+    let perform_lipo = |target_file: &Path, lib_name: &str| -> Result<()> {
         let mut cmd = Command::new("lipo");
         cmd.arg("-create");
         for arch in &archs {
             let path = temp_target_dir()?
                 .join(target_for_arch(arch)?)
                 .join(if is_release() { "release" } else { "debug" })
-                .join(&lib_name);
+                .join(lib_name);
             cmd.arg(path);
         }
         cmd.arg("-output");
-        cmd.arg(final_target_dir()?.join(lib_name));
+        cmd.arg(target_file);
         run_command(cmd)?;
+        Ok(())
+    };
+
+    let bundle_paths = &[
+        format!("{}.framework/Versions/A/{}", lib_name, lib_name),
+        format!("{}.framework/{}", lib_name, lib_name), // iOS
+    ];
+
+    // Dynamic library in a bundle. Replace bundle dylib with lipoed rust dylib.
+    for bundle_path in bundle_paths {
+        let target_file = final_target_dir()?.join(bundle_path);
+        if target_file.exists() {
+            let lib_name = format!("lib{}.dylib", lib_name);
+            perform_lipo(&target_file, &lib_name)?;
+
+            // Replace absolute id with @rpath one so that it works properly
+            // when moved to Frameworks.
+            let mut cmd = Command::new("install_name_tool");
+            cmd.arg("-id");
+            cmd.arg(format!("@rpath/{}", bundle_path));
+            cmd.arg(&target_file);
+            run_command(cmd)?;
+            return Ok(());
+        }
     }
+
+    // Static library
+    let lib_name = format!("lib{}.a", lib_name);
+    let target_file = final_target_dir()?.join(&lib_name);
+    perform_lipo(&target_file, &lib_name)?;
 
     Ok(())
 }
