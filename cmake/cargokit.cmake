@@ -1,6 +1,12 @@
 SET(cargokit_cmake_root "${CMAKE_CURRENT_LIST_DIR}/..")
 
-function(apply_cargokit target manifest_dir lib_name)
+# Arguments
+# - target: CMAKE target to which rust library is linked
+# - manifest_dir: relative path from current folder to directory containing cargo manifest
+# - lib_name: cargo package name
+# - any_symbol_name: name of any exported symbol from the library.
+#                    used on windows to force linking with library.
+function(apply_cargokit target manifest_dir lib_name any_symbol_name)
 
     set(CARGOKIT_LIB_NAME "${lib_name}")
     set(CARGOKIT_LIB_FULL_NAME "${CMAKE_SHARED_MODULE_PREFIX}${CARGOKIT_LIB_NAME}${CMAKE_SHARED_MODULE_SUFFIX}")
@@ -68,6 +74,11 @@ function(apply_cargokit target manifest_dir lib_name)
     add_dependencies("${target}" "${target}_cargokit")
 
     target_link_libraries("${target}" PRIVATE "${OUTPUT_LIB}${IMPORT_LIB_EXTENSION}")
+
+
+    if(WIN32)
+        target_link_options(${target} PRIVATE "/INCLUDE:${any_symbol_name}")
+    endif()
 
     # Allow adding the output library to plugin bundled libraries
     set("${target}_cargokit_lib" ${OUTPUT_LIB} PARENT_SCOPE)
