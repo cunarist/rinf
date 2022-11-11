@@ -23,3 +23,4 @@ $BASEDIR/run_rust_tool.sh build_pod $@
 # build script. This should force rebuild (podspec currently doesn't support alwaysOutOfDate
 # attribute on custom build phase)
 ln -Fs "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}" "${TARGET_TEMP_DIR}/cargokit_phony"
+ln -Fs "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}" "${TARGET_TEMP_DIR}/cargokit_phony_out"
