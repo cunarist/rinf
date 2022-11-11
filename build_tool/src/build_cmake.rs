@@ -31,7 +31,7 @@ impl Target {
 }
 
 fn is_release() -> bool {
-    let configuration = std::env::var("TOOLBOX_CONFIGURATION")
+    let configuration = std::env::var("CARGOKIT_CONFIGURATION")
         .ok()
         .map(|s| s.to_ascii_lowercase())
         .unwrap_or_else(|| "release".into());
@@ -39,7 +39,7 @@ fn is_release() -> bool {
 }
 
 pub fn build_cmake() -> Result<()> {
-    let target = string_from_env("TOOLBOX_TARGET_PLATFORM")?;
+    let target = string_from_env("CARGOKIT_TARGET_PLATFORM")?;
     let target = Target::from_flutter_target(&target)
         .ok_or_else(|| anyhow::anyhow!("Invalid target {:?}", target))?;
     let installed_targets = installed_targets()?;
@@ -48,10 +48,10 @@ pub fn build_cmake() -> Result<()> {
         install_target(target.rust_target())?;
     }
 
-    let build_dir = path_from_env("TOOLBOX_BUILD_DIR")?;
-    let output_dir = path_from_env("TOOLBOX_TARGET_DIR")?;
-    let lib_name = string_from_env("TOOLBOX_LIB_NAME")?;
-    let manifest_path = path_from_env("TOOLBOX_MANIFEST_DIR")?
+    let build_dir = path_from_env("CARGOKIT_BUILD_DIR")?;
+    let output_dir = path_from_env("CARGOKIT_TARGET_DIR")?;
+    let lib_name = string_from_env("CARGOKIT_LIB_NAME")?;
+    let manifest_path = path_from_env("CARGOKIT_MANIFEST_DIR")?
         .join("Cargo.toml")
         .canonicalize()?;
 

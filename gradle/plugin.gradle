@@ -1,16 +1,16 @@
 import java.nio.file.Paths
 import org.apache.tools.ant.taskdefs.condition.Os
 
-ToolboxPlugin.file = buildscript.sourceFile
+CargoKitPlugin.file = buildscript.sourceFile
 
-apply plugin: ToolboxPlugin
+apply plugin: CargoKitPlugin
 
-class ToolboxExtension {
+class CargoKitExtension {
     String manifestDir; // Relative path to folder containing Cargo.toml
     String libname; // Library name within Cargo.toml. Must be a cdylib
 }
 
-abstract class ToolboxCargoBuildTask extends DefaultTask {
+abstract class CargoKitBuildTask extends DefaultTask {
 
     @Input
     String buildMode
@@ -41,37 +41,37 @@ abstract class ToolboxCargoBuildTask extends DefaultTask {
 
     @TaskAction
     def build() {
-        if (project.toolbox.manifestDir == null) {
-            throw new GradleException("Property 'manifestDir' must be set on toolbox extension");
+        if (project.cargokit.manifestDir == null) {
+            throw new GradleException("Property 'manifestDir' must be set on cargokit extension");
         }
-        if (project.toolbox.libname == null) {
-            throw new GradleException("Property 'libname' must be set on toolbox extension");
+        if (project.cargokit.libname == null) {
+            throw new GradleException("Property 'libname' must be set on cargokit extension");
         }
 
         def executableName = Os.isFamily(Os.FAMILY_WINDOWS) ? "run_rust_tool.cmd" : "run_rust_tool.sh"
         def path = Paths.get(new File(pluginFile).parent, "..", executableName);
 
-        def manifestDir = Paths.get(project.buildscript.sourceFile.parent, project.toolbox.manifestDir)
+        def manifestDir = Paths.get(project.buildscript.sourceFile.parent, project.cargokit.manifestDir)
 
         project.exec {
             executable path
             args "build_android"
-            environment "TOOLBOX_TOOL_TEMP_DIR", "${buildDir}/rust_tool"
-            environment "TOOLBOX_MANIFEST_DIR", manifestDir
-            environment "TOOLBOX_LIB_NAME", project.toolbox.libname
-            environment "TOOLBOX_BUILD_MODE", buildMode
-            environment "TOOLBOX_BUILD_DIR", buildDir
-            environment "TOOLBOX_OUTPUT_DIR", outputDir
-            environment "TOOLBOX_NDK_VERSION", ndkVersion
-            environment "TOOLBOX_NDK_DIR", ndkDirectory
-            environment "TOOLBOX_COMPILE_SDK_VERSION", compileSdkVersion
-            environment "TOOLBOX_MIN_SDK_VERSION", minSdkVersion
-            environment "TOOLBOX_TARGET_PLATFORMS", targetPlatforms.join(",")
+            environment "CARGOKIT_TOOL_TEMP_DIR", "${buildDir}/rust_tool"
+            environment "CARGOKIT_MANIFEST_DIR", manifestDir
+            environment "CARGOKIT_LIB_NAME", project.cargokit.libname
+            environment "CARGOKIT_BUILD_MODE", buildMode
+            environment "CARGOKIT_BUILD_DIR", buildDir
+            environment "CARGOKIT_OUTPUT_DIR", outputDir
+            environment "CARGOKIT_NDK_VERSION", ndkVersion
+            environment "CARGOKIT_NDK_DIR", ndkDirectory
+            environment "CARGOKIT_COMPILE_SDK_VERSION", compileSdkVersion
+            environment "CARGOKIT_MIN_SDK_VERSION", minSdkVersion
+            environment "CARGOKIT_TARGET_PLATFORMS", targetPlatforms.join(",")
         }
     }
 }
 
-class ToolboxPlugin implements Plugin<Project> {
+class CargoKitPlugin implements Plugin<Project> {
 
     static String file;
 
@@ -95,10 +95,10 @@ class ToolboxPlugin implements Plugin<Project> {
     void apply(Project project) {
         def plugin = findFlutterPlugin(project.rootProject);
 
-        project.extensions.create("toolbox", ToolboxExtension)
+        project.extensions.create("cargokit", CargoKitExtension)
 
         if (plugin == null) {
-            print("Flutter plugin not found, Toolbox plugin will not be applied.")
+            print("Flutter plugin not found, CargoKit plugin will not be applied.")
             return;
         }
 
@@ -120,7 +120,7 @@ class ToolboxPlugin implements Plugin<Project> {
                 platforms.add("android-x64")
             }
 
-            def taskName = "toolboxCargoBuild${project.toolbox.libname.capitalize()}${buildType.capitalize()}";
+            def taskName = "cargokitCargoBuild${project.cargokit.libname.capitalize()}${buildType.capitalize()}";
 
             if (project.tasks.findByName(taskName)) {
                 return
@@ -130,7 +130,7 @@ class ToolboxPlugin implements Plugin<Project> {
                 throw new GradleException("Please set 'android.ndkVersion' in 'app/build.gradle'.")
             }
 
-            def task = project.tasks.create(taskName, ToolboxCargoBuildTask.class) {
+            def task = project.tasks.create(taskName, CargoKitBuildTask.class) {
                 buildMode = variant.name
                 buildDir = cargoBuildDir
                 outputDir = cargoOutputDir
@@ -139,7 +139,7 @@ class ToolboxPlugin implements Plugin<Project> {
                 minSdkVersion = plugin.project.android.defaultConfig.minSdkVersion.apiLevel as int
                 compileSdkVersion = plugin.project.android.compileSdkVersion.substring(8) as int
                 targetPlatforms = platforms
-                pluginFile = ToolboxPlugin.file
+                pluginFile = CargoKitPlugin.file
             }
             def onTask = { newTask ->
                 if (newTask.name == "javaPreCompile${buildType.capitalize()}") {

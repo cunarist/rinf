@@ -1,4 +1,4 @@
-# Toolbox will get symlinked to project, but it's not part of workspace
+# CargoKit will get symlinked to project, but it's not part of workspace
 [workspace]
 
 [package]

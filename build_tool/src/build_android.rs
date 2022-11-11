@@ -72,7 +72,7 @@ impl Target {
 }
 
 fn get_targets() -> Vec<Target> {
-    let platforms = std::env::var("TOOLBOX_TARGET_PLATFORMS")
+    let platforms = std::env::var("CARGOKIT_TARGET_PLATFORMS")
         .ok()
         .unwrap_or_else(|| "".into());
     platforms
@@ -83,7 +83,7 @@ fn get_targets() -> Vec<Target> {
 }
 
 fn is_release() -> bool {
-    let configuration = std::env::var("TOOLBOX_BUILD_MODE")
+    let configuration = std::env::var("CARGOKIT_BUILD_MODE")
         .ok()
         .unwrap_or_else(|| "release".into());
     configuration != "debug"
@@ -105,7 +105,7 @@ const CLANG_TOOL_EXTENSION: &str = "";
 // Workaround for libgcc missing in NDK23, inspired by cargo-ndk
 fn libgcc_workaround(build_dir: &Path, ndk_version: &Version) -> Result<String> {
     let workaround_dir = build_dir
-        .join("toolbox")
+        .join("cargokit")
         .join("libgcc_workaround")
         .join(ndk_version.major.to_string());
     fs::create_dir_all(&workaround_dir)?;
@@ -138,11 +138,11 @@ fn libgcc_workaround(build_dir: &Path, ndk_version: &Version) -> Result<String> 
 }
 
 fn build_for_target(target: &Target) -> Result<()> {
-    let min_version = string_from_env("TOOLBOX_MIN_SDK_VERSION")?;
+    let min_version = string_from_env("CARGOKIT_MIN_SDK_VERSION")?;
     let min_version: i32 = min_version.parse()?;
     let min_version = min_version.max(target.min_sdk_version());
 
-    let toolchain_path = path_from_env("TOOLBOX_NDK_DIR")?
+    let toolchain_path = path_from_env("CARGOKIT_NDK_DIR")?
         .join("toolchains")
         .join("llvm")
         .join("prebuilt")
@@ -177,10 +177,10 @@ fn build_for_target(target: &Target) -> Result<()> {
     .to_ascii_uppercase();
     let linker_value = cc_value.clone();
 
-    let ndk_version = string_from_env("TOOLBOX_NDK_VERSION")?;
-    let build_dir = path_from_env("TOOLBOX_BUILD_DIR")?;
-    let output_dir = path_from_env("TOOLBOX_OUTPUT_DIR")?;
-    let lib_name = string_from_env("TOOLBOX_LIB_NAME")?;
+    let ndk_version = string_from_env("CARGOKIT_NDK_VERSION")?;
+    let build_dir = path_from_env("CARGOKIT_BUILD_DIR")?;
+    let output_dir = path_from_env("CARGOKIT_OUTPUT_DIR")?;
+    let lib_name = string_from_env("CARGOKIT_LIB_NAME")?;
 
     let ndk_version = Version::parse(&ndk_version)?;
     let rust_flags_value = libgcc_workaround(&build_dir, &ndk_version)?;
@@ -194,7 +194,7 @@ fn build_for_target(target: &Target) -> Result<()> {
     let mut cmd = Command::new("cargo");
     cmd.arg("build");
     cmd.arg("--manifest-path");
-    cmd.arg(path_from_env("TOOLBOX_MANIFEST_DIR")?.join("Cargo.toml"));
+    cmd.arg(path_from_env("CARGOKIT_MANIFEST_DIR")?.join("Cargo.toml"));
     cmd.arg("-p");
     cmd.arg(&lib_name);
     if is_release() {

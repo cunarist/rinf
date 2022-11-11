@@ -21,4 +21,4 @@ then
     exit 1
 fi
 
-cargo run --manifest-path=$BASEDIR/build_tool/Cargo.toml --bin build_tool --target-dir=$TOOLBOX_TOOL_TEMP_DIR -- $@
+cargo run --manifest-path=$BASEDIR/build_tool/Cargo.toml --bin build_tool --target-dir=$CARGOKIT_TOOL_TEMP_DIR -- $@

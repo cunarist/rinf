@@ -9,14 +9,14 @@ use std::{
 use super::utils::*;
 
 fn get_archs() -> Vec<String> {
-    let archs = std::env::var("TOOLBOX_ARCHS")
+    let archs = std::env::var("CARGOKIT_ARCHS")
         .ok()
         .unwrap_or_else(|| "x86_64".into());
     archs.split(' ').into_iter().map(String::from).collect()
 }
 
 fn target_for_arch(arch: &str) -> Result<String> {
-    let platform_name = string_from_env("TOOLBOX_PLATFORM_NAME")?;
+    let platform_name = string_from_env("CARGOKIT_PLATFORM_NAME")?;
     let suffix = match platform_name.as_str() {
         "macosx" => "apple-darwin",
         "iphonesimulator" => "apple-ios-sim",
@@ -41,27 +41,27 @@ fn target_for_arch(arch: &str) -> Result<String> {
 }
 
 fn is_release() -> bool {
-    let configuration = std::env::var("TOOLBOX_CONFIGURATION")
+    let configuration = std::env::var("CARGOKIT_CONFIGURATION")
         .ok()
         .unwrap_or_else(|| "Release".into());
     configuration != "Debug"
 }
 
 fn manifest_path(src_path: &str) -> Result<PathBuf> {
-    let src_root = path_from_env("TOOLBOX_SRCROOT")?;
+    let src_root = path_from_env("CARGOKIT_SRCROOT")?;
     // Resolve symlink so that crates with relative paths work properly
     // when using as flutter plugin (which itself is symlinked)
     Ok(src_root.join(src_path).join("Cargo.toml").canonicalize()?)
 }
 
 fn temp_target_dir() -> Result<PathBuf> {
-    let target_dir = string_from_env("TOOLBOX_TEMP_DIR")?;
+    let target_dir = string_from_env("CARGOKIT_TEMP_DIR")?;
     Ok(target_dir.into())
 }
 
 fn final_target_dir() -> Result<PathBuf> {
-    let product_name = string_from_env("TOOLBOX_PRODUCT_NAME")?;
-    let target_path = path_from_env("TOOLBOX_TARGET_DIR")?;
+    let product_name = string_from_env("CARGOKIT_PRODUCT_NAME")?;
+    let target_path = path_from_env("CARGOKIT_TARGET_DIR")?;
     Ok(target_path.join(product_name))
 }
 

@@ -10,7 +10,7 @@ mod logger;
 mod utils;
 
 fn init_logging() -> Result<()> {
-    let silent = std::env::var("TOOLBOX_SILENT")
+    let silent = std::env::var("CARGOKIT_SILENT")
         .ok()
         .unwrap_or_else(|| "".into());
     let level = if silent == "1" {
@@ -24,9 +24,9 @@ fn init_logging() -> Result<()> {
 }
 
 fn dump_environment() -> Result<()> {
-    debug!("Toolbox environment:");
+    debug!("CargoKit environment:");
     for var in std::env::vars() {
-        if var.0.to_ascii_lowercase().starts_with("toolbox_") {
+        if var.0.to_ascii_lowercase().starts_with("cargokit_") {
             debug!("{}={}", var.0, var.1);
         }
     }
