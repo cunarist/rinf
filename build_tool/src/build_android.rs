@@ -1,4 +1,10 @@
-use std::{fmt::Debug, fs, io::Write, path::Path, process::Command};
+use std::{
+    fmt::Debug,
+    fs,
+    io::Write,
+    path::{Path, PathBuf},
+    process::Command,
+};
 
 use anyhow::Result;
 use log::{debug, info};
@@ -137,6 +143,10 @@ fn libgcc_workaround(build_dir: &Path, ndk_version: &Version) -> Result<String> 
     Ok(rustflags)
 }
 
+fn pick_existing(paths: Vec<PathBuf>) -> Option<PathBuf> {
+    paths.into_iter().find(|p| p.exists())
+}
+
 fn build_for_target(target: &Target) -> Result<()> {
     let min_version = string_from_env("CARGOKIT_MIN_SDK_VERSION")?;
     let min_version: i32 = min_version.parse()?;
@@ -150,7 +160,11 @@ fn build_for_target(target: &Target) -> Result<()> {
         .join("bin");
 
     let ar_key = format!("AR_{}", target.rust_target());
-    let ar_value = toolchain_path.join(format!("{}-ar", target.ndk_prefix()));
+    let ar_value = pick_existing(vec![
+        toolchain_path.join(format!("{}-ar", target.ndk_prefix())),
+        toolchain_path.join("llvm-ar"),
+    ])
+    .expect("Did not find ar tool");
 
     let cc_key = format!("CC_{}", target.rust_target());
     let cc_value = toolchain_path.join(format!(
