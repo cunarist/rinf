@@ -6,7 +6,7 @@ use std::{
     process::Command,
 };
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use log::{debug, info};
 use semver::Version;
 
@@ -231,13 +231,14 @@ fn build_for_target(target: &Target) -> Result<()> {
     fs::create_dir_all(&output_dir)?;
 
     let lib_name_full = format!("lib{}.so", lib_name);
-    fs::copy(
-        build_dir
-            .join(target.rust_target())
-            .join(if is_release() { "release" } else { "debug" })
-            .join(&lib_name_full),
-        output_dir.join(&lib_name_full),
-    )?;
+    let src = build_dir
+        .join(target.rust_target())
+        .join(if is_release() { "release" } else { "debug" })
+        .join(&lib_name_full);
+    let dst = output_dir.join(&lib_name_full);
+    fs::copy(&src, &dst)
+        .with_context(|| format!("dst: {:?}", dst))
+        .with_context(|| format!("src: {:?}", src))?;
 
     Ok(())
 }

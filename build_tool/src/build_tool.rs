@@ -55,7 +55,7 @@ fn run() -> Result<()> {
 fn main() {
     let res = run();
     if let Err(error) = res {
-        eprintln!("Build tool failed:\n{}", error);
+        eprintln!("Build tool failed:\n{:?}", error);
         exit(1);
     }
 }
