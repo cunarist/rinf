@@ -44,6 +44,7 @@ abstract class CargoKitBuildTask extends DefaultTask {
         if (project.cargokit.manifestDir == null) {
             throw new GradleException("Property 'manifestDir' must be set on cargokit extension");
         }
+
         if (project.cargokit.libname == null) {
             throw new GradleException("Property 'libname' must be set on cargokit extension");
         }
@@ -120,34 +121,38 @@ class CargoKitPlugin implements Plugin<Project> {
                 platforms.add("android-x64")
             }
 
-            def taskName = "cargokitCargoBuild${project.cargokit.libname.capitalize()}${buildType.capitalize()}";
+            // The task name depends on plugin properties, which are not available
+            // at this point
+            project.getGradle().afterProject {
+                def taskName = "cargokitCargoBuild${project.cargokit.libname.capitalize()}${buildType.capitalize()}";
 
-            if (project.tasks.findByName(taskName)) {
-                return
-            }
-
-            if (plugin.project.android.ndkVersion == null) {
-                throw new GradleException("Please set 'android.ndkVersion' in 'app/build.gradle'.")
-            }
-
-            def task = project.tasks.create(taskName, CargoKitBuildTask.class) {
-                buildMode = variant.name
-                buildDir = cargoBuildDir
-                outputDir = cargoOutputDir
-                ndkVersion = plugin.project.android.ndkVersion
-                ndkDirectory = plugin.project.android.ndkDirectory
-                minSdkVersion = plugin.project.android.defaultConfig.minSdkVersion.apiLevel as int
-                compileSdkVersion = plugin.project.android.compileSdkVersion.substring(8) as int
-                targetPlatforms = platforms
-                pluginFile = CargoKitPlugin.file
-            }
-            def onTask = { newTask ->
-                if (newTask.name == "javaPreCompile${buildType.capitalize()}") {
-                    newTask.dependsOn task
+                if (project.tasks.findByName(taskName)) {
+                    return
                 }
+
+                if (plugin.project.android.ndkVersion == null) {
+                    throw new GradleException("Please set 'android.ndkVersion' in 'app/build.gradle'.")
+                }
+
+                def task = project.tasks.create(taskName, CargoKitBuildTask.class) {
+                    buildMode = variant.name
+                    buildDir = cargoBuildDir
+                    outputDir = cargoOutputDir
+                    ndkVersion = plugin.project.android.ndkVersion
+                    ndkDirectory = plugin.project.android.ndkDirectory
+                    minSdkVersion = plugin.project.android.defaultConfig.minSdkVersion.apiLevel as int
+                    compileSdkVersion = plugin.project.android.compileSdkVersion.substring(8) as int
+                    targetPlatforms = platforms
+                    pluginFile = CargoKitPlugin.file
+                }
+                def onTask = { newTask ->
+                    if (newTask.name == "javaPreCompile${buildType.capitalize()}") {
+                        newTask.dependsOn task
+                    }
+                }
+                project.tasks.each onTask
+                project.tasks.whenTaskAdded onTask
             }
-            project.tasks.each onTask
-            project.tasks.whenTaskAdded onTask
         }
     }
 }
