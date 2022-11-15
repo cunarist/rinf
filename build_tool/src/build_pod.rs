@@ -96,14 +96,19 @@ pub fn build_pod(mut args: Args) -> Result<()> {
         run_command(cmd)?;
     }
 
+    let lib_path = |lib_name: &str, arch: &str| -> Result<PathBuf> {
+        let path = temp_target_dir()?
+            .join(target_for_arch(arch)?)
+            .join(if is_release() { "release" } else { "debug" })
+            .join(lib_name);
+        Ok(path)
+    };
+
     let perform_lipo = |target_file: &Path, lib_name: &str| -> Result<()> {
         let mut cmd = Command::new("lipo");
         cmd.arg("-create");
         for arch in &archs {
-            let path = temp_target_dir()?
-                .join(target_for_arch(arch)?)
-                .join(if is_release() { "release" } else { "debug" })
-                .join(lib_name);
+            let path = lib_path(lib_name, arch)?;
             cmd.arg(path);
         }
         cmd.arg("-output");
@@ -112,33 +117,42 @@ pub fn build_pod(mut args: Args) -> Result<()> {
         Ok(())
     };
 
-    let bundle_paths = &[
-        format!("{}.framework/Versions/A/{}", lib_name, lib_name),
-        format!("{}.framework/{}", lib_name, lib_name), // iOS
-    ];
+    let static_lib_name = format!("lib{}.a", lib_name);
+    let is_static_lib = archs.iter().any(|a| {
+        lib_path(&static_lib_name, a)
+            .map(|a| a.exists())
+            .unwrap_or(false)
+    });
 
-    // Dynamic library in a bundle. Replace bundle dylib with lipoed rust dylib.
-    for bundle_path in bundle_paths {
-        let target_file = final_target_dir()?.join(bundle_path);
-        if target_file.exists() {
-            let lib_name = format!("lib{}.dylib", lib_name);
-            perform_lipo(&target_file, &lib_name)?;
+    // If the crate builds both staticlib and cdylib, we use static lib, assuming
+    // it will be linked with the rest of pod.
+    if is_static_lib {
+        let target_file = final_target_dir()?.join(&static_lib_name);
+        perform_lipo(&target_file, &static_lib_name)?;
+        Ok(())
+    } else {
+        let bundle_paths = &[
+            format!("{}.framework/Versions/A/{}", lib_name, lib_name),
+            format!("{}.framework/{}", lib_name, lib_name), // iOS
+        ];
 
-            // Replace absolute id with @rpath one so that it works properly
-            // when moved to Frameworks.
-            let mut cmd = Command::new("install_name_tool");
-            cmd.arg("-id");
-            cmd.arg(format!("@rpath/{}", bundle_path));
-            cmd.arg(&target_file);
-            run_command(cmd)?;
-            return Ok(());
+        // Dynamic library in a bundle. Replace bundle dylib with lipoed rust dylib.
+        for bundle_path in bundle_paths {
+            let target_file = final_target_dir()?.join(bundle_path);
+            if target_file.exists() {
+                let lib_name = format!("lib{}.dylib", lib_name);
+                perform_lipo(&target_file, &lib_name)?;
+
+                // Replace absolute id with @rpath one so that it works properly
+                // when moved to Frameworks.
+                let mut cmd = Command::new("install_name_tool");
+                cmd.arg("-id");
+                cmd.arg(format!("@rpath/{}", bundle_path));
+                cmd.arg(&target_file);
+                run_command(cmd)?;
+                return Ok(());
+            }
         }
+        Err(anyhow::anyhow!("Unable to find bundle for dynamic library"))
     }
-
-    // Static library
-    let lib_name = format!("lib{}.a", lib_name);
-    let target_file = final_target_dir()?.join(&lib_name);
-    perform_lipo(&target_file, &lib_name)?;
-
-    Ok(())
 }
