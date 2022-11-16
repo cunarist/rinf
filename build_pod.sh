@@ -22,5 +22,5 @@ $BASEDIR/run_rust_tool.sh build_pod $@
 # Make a symlink from built framework to phony file, which will be used as input to
 # build script. This should force rebuild (podspec currently doesn't support alwaysOutOfDate
 # attribute on custom build phase)
-ln -Fs "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}" "${TARGET_TEMP_DIR}/cargokit_phony"
-ln -Fs "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}" "${TARGET_TEMP_DIR}/cargokit_phony_out"
+ln -Fs "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}" "${BUILT_PRODUCTS_DIR}/cargokit_phony"
+ln -Fs "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}" "${BUILT_PRODUCTS_DIR}/cargokit_phony_out"
