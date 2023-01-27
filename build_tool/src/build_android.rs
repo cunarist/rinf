@@ -163,6 +163,7 @@ fn build_for_target(target: &Target) -> Result<()> {
     let ar_value = pick_existing(vec![
         toolchain_path.join(format!("{}-ar", target.ndk_prefix())),
         toolchain_path.join("llvm-ar"),
+        toolchain_path.join("llvm-ar.exe"),
     ])
     .expect("Did not find ar tool");
 
