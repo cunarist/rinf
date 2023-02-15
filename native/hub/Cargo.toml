@@ -1,0 +1,15 @@
+[package]
+name = "hub"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[dependencies]
+# Downloaded
+tokio = { workspace = true }
+lazy_static = { workspace = true }
+# Workspace
+sample_crate_first = { workspace = true }
+sample_crate_second = { workspace = true }

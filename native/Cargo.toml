@@ -1,0 +1,16 @@
+[workspace]
+members = ["bridge", "hub", "sample_crate_first", "sample_crate_second"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[workspace.dependencies]
+# Downloaded
+flutter_rust_bridge = { version = "1.63.1", features = ["worker-single"] }
+tokio = { version = "1.25.0", features = ["full"] }
+lazy_static = "1.4.0"
+serde_json = "1.0.93"
+# Workspace
+bridge = { path = "./bridge" }
+hub = { path = "./hub" }
+sample_crate_first = { path = "./sample_crate_first" }
+sample_crate_second = { path = "./sample_crate_second" }

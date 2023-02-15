@@ -1,0 +1,6 @@
+appTitle: "Some App Name"
+counter:
+  informationText: "Current value is {theValue}."
+status:
+  locale:
+    current: "You are using English"

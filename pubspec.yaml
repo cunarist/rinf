@@ -1,0 +1,61 @@
+name: someappname
+description: Biased app templated based on combination of Flutter and Rust
+
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.18.4 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  bitsdojo_window: ^0.1.5
+  flutter_rust_bridge: ^1.63.1
+  ffi: ^2.0.1
+  provider: ^6.0.0
+  meta: ^1.8.0
+  easy_localization: ^3.0.1
+  easy_localization_loader: ^1.0.1
+  flutter_dotenv: ^5.0.2
+  flutter_window_close: ^0.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.11.0
+  ffigen: ^7.2.0
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - assets/translations/
+
+flutter_icons:
+  image_path: "assets/app_icon.png"
+  web:
+    generate: true
+  android: "launcher_icon"
+  ios: true
+  remove_alpha_ios: true
+  windows:
+    generate: true
+  macos:
+    generate: true
