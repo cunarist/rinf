@@ -1,0 +1,13 @@
+[package]
+name = "sample_crate"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[dependencies]
+anyhow = "1.0.69"
+num = "0.4"
+image = "0.24.3"
+crossbeam = "0.8"

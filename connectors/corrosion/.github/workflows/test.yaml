@@ -1,0 +1,321 @@
+name: Tests
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - '**'
+jobs:
+  test:
+    name: Test Corrosion
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.rust == 'nightly' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-2019 # windows-latest is currently not having a supported MSVC compiler
+          - ubuntu-latest
+          - macos-12
+        arch:
+          - x86_64
+          - i686
+          - aarch64
+          - powerpc64le
+        abi:
+          - gnu
+          - darwin
+          - msvc
+        cmake:
+          - 3.15.7
+          - 3.19.0
+        rust:
+          - 1.46.0 # MSRV Minimum supported rust version
+          - 1.54.0 # MSRV macos-12
+          - stable
+        generator:
+          - default # This is just whatever the platform default is
+          - ninja
+
+        include:
+          - rust: nightly
+            cmake: 3.19.0
+            generator: ninja
+            arch: x86_64
+            abi: msvc
+            os: windows-2019
+          - rust: nightly
+            cmake: 3.19.0
+            generator: ninja
+            arch: x86_64
+            abi: gnu
+            os: ubuntu-latest
+          - rust: nightly
+            cmake: 3.19.0
+            generator: ninja
+            arch: x86_64
+            abi: darwin
+            os: macos-12
+          - os: ubuntu-latest
+            arch: x86_64
+            abi: gnu
+            cmake: 3.20.0
+            rust: stable
+            generator: ninja-multiconfig
+          - os: windows-2022
+            arch: aarch64
+            abi: msvc
+            cmake: 3.21.5 # Earliest supported version for VS 17 in windows-2022
+            rust: "1.54" # Minimum supported rust version for cross-compile with Windows MSVC
+            generator: default
+          - os: windows-2022
+            arch: i686
+            abi: msvc
+            cmake: 3.21.5 # Earliest supported version for VS 17 in windows-2022
+            rust: "1.54" # Minimum supported rust version for cross-compile with Windows MSVC
+            generator: default
+
+        exclude:
+
+          # You cannot build with GNU using Visual Studio on Windows
+          - os: windows-2019
+            abi: gnu
+            generator: default # Default generator is Visual Studio
+
+          # ARCH
+          - os: windows-2019
+            arch: i686
+            abi: gnu
+          - os: windows-2019
+            arch: aarch64
+            abi: gnu
+          - os: windows-2019
+            arch: i686
+            generator: ninja
+          - os: windows-2019
+            arch: aarch64
+            generator: ninja
+          - os: windows-2019
+            arch: powerpc64le
+          - os: macos-12
+            arch: i686
+          - os: macos-12
+            arch: aarch64
+          - os: macos-12
+            arch: powerpc64le
+
+          # Cross-compiling is broken on Windows with MSVC before 1.54, since build-scripts are cross-linked instead
+          # of being linked for the host platform.
+          - os: windows-2019
+            abi: msvc
+            rust: 1.46.0
+            arch: i686
+          - os: windows-2019
+            abi: msvc
+            rust: 1.46.0
+            arch: aarch64
+          - os: windows-2022
+            abi: msvc
+            rust: 1.46.0
+            arch: i686
+          - os: windows-2022
+            abi: msvc
+            rust: 1.46.0
+            arch: aarch64
+
+          # ABI
+          - os: ubuntu-latest
+            abi: msvc
+          - os: ubuntu-latest
+            abi: darwin
+          - os: windows-2019
+            abi: darwin
+          - os: macos-12
+            abi: msvc
+          - os: macos-12
+            abi: gnu
+
+          # Rust:
+          - rust: 1.46.0
+            os: macos-12
+          - rust: 1.54.0
+            os: windows-2019
+            abi: gnu
+          - rust: 1.54.0
+            os: windows-2019
+            abi: msvc
+            arch: x86_64
+          - rust: 1.54.0
+            os: ubuntu-latest
+
+    steps:
+      - name: Determine Rust OS
+        id: determine_rust_os
+        shell: bash
+        run: |
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            echo "os=pc-windows" >> $GITHUB_OUTPUT
+            echo "host_abi=msvc" >> $GITHUB_OUTPUT
+          elif [ "${{ runner.os }}" == "Linux" ]; then
+            echo "os=unknown-linux" >> $GITHUB_OUTPUT
+            echo "host_abi=gnu" >> $GITHUB_OUTPUT
+          elif [ "${{ runner.os }}" == "macOS" ]; then
+            echo "os=apple" >> $GITHUB_OUTPUT
+            echo "host_abi=darwin" >> $GITHUB_OUTPUT
+          fi
+      - name: Pick Compiler
+        id: pick_compiler
+        shell: bash
+        run: |
+          if [ "${{ matrix.abi }}" == "gnu" ]; then
+            if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+              echo "c_compiler=-DCMAKE_C_COMPILER=${{matrix.arch}}-linux-gnu-gcc" >> $GITHUB_OUTPUT
+              echo "cxx_compiler=-DCMAKE_CXX_COMPILER=${{matrix.arch}}-linux-gnu-g++" >> $GITHUB_OUTPUT
+              # todo: only set this when cross-compiling
+              echo "system_name=-DCMAKE_SYSTEM_NAME=Linux" >> $GITHUB_OUTPUT
+            else
+              echo "c_compiler=-DCMAKE_C_COMPILER=gcc" >> $GITHUB_OUTPUT
+              echo "cxx_compiler=-DCMAKE_CXX_COMPILER=g++" >> $GITHUB_OUTPUT
+            fi
+          elif [ "${{ matrix.abi }}" == "darwin" ]; then
+            echo "c_compiler=-DCMAKE_C_COMPILER=clang" >> $GITHUB_OUTPUT
+            echo "cxx_compiler=-DCMAKE_CXX_COMPILER=clang++" >> $GITHUB_OUTPUT
+          elif [ "${{ matrix.abi }}" == "msvc" ]; then
+            echo "c_compiler=-DCMAKE_C_COMPILER=cl" >> $GITHUB_OUTPUT
+            echo "cxx_compiler=-DCMAKE_CXX_COMPILER=cl" >> $GITHUB_OUTPUT
+          fi
+      - name: Pick Generator
+        id: pick_generator
+        shell: bash
+        run: |
+          if [ "${{ matrix.generator }}" == "ninja" ]; then
+            echo "generator=-GNinja" >> $GITHUB_OUTPUT
+          elif [ "${{ matrix.generator }}" == "ninja-multiconfig" ];then
+            echo "generator=-GNinja Multi-Config" >> $GITHUB_OUTPUT
+          fi
+      - name: Arch Flags
+        id: arch_flags
+        shell: bash
+        run: | # Cross-compiling is currently only supported on Windows+MSVC with the default generator
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            if [ "${{matrix.generator}}" == "default" ]; then
+              if [ "${{ matrix.arch }}" == "x86_64" ]; then
+                echo "msvc=amd64" >> $GITHUB_OUTPUT
+                echo "cmake=-Ax64" >> $GITHUB_OUTPUT
+              elif [ "${{ matrix.arch }}" == "i686" ]; then
+                echo "msvc=amd64_x86" >> $GITHUB_OUTPUT
+                echo "cmake=-AWin32" >> $GITHUB_OUTPUT
+              elif [ "${{ matrix.arch }}" == "aarch64" ]; then
+                echo "msvc=amd64_arm64" >> $GITHUB_OUTPUT
+                echo "cmake=-AARM64" >> $GITHUB_OUTPUT
+              fi
+            elif [ "${{matrix.generator}}" == "ninja" ]; then
+              # We don't do cross-compiling builds with Ninja
+              # Todo: Why not (cross-compile)?
+              echo "msvc=amd64" >> $GITHUB_OUTPUT
+            fi
+          elif [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+            echo "cmake=-DRust_CARGO_TARGET=${{matrix.arch}}-${{steps.determine_rust_os.outputs.os}}-${{matrix.abi}}" >> $GITHUB_OUTPUT
+          fi
+      - name: Setup MSVC Development Environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ steps.arch_flags.outputs.msvc }}
+        if: ${{ 'msvc' == matrix.abi }}
+      - uses: actions/checkout@v2
+      - name: Install CMake
+        uses: corrosion-rs/install-cmake@v1.1
+        with:
+          cmake: ${{matrix.cmake}}
+          ninja: 1.10.0
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{matrix.rust}}
+          target: ${{matrix.arch}}-${{steps.determine_rust_os.outputs.os}}-${{matrix.abi}}
+      - name: Install Cross Compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++-$(echo "${{matrix.arch}}" | tr _ -)-linux-gnu
+        if: ${{ 'ubuntu-latest' == matrix.os }}
+      - name: CMake Version
+        run: cmake --version
+      - name: Rust Version
+        run: rustc +${{matrix.rust}} --version
+      - name: Configure
+        run: >
+          cmake
+          "-S."
+          "-Bbuild"
+          "-DCORROSION_VERBOSE_OUTPUT=ON"
+          "${{steps.arch_flags.outputs.cmake}}"
+          "${{steps.pick_compiler.outputs.c_compiler}}"
+          "${{steps.pick_compiler.outputs.cxx_compiler}}"
+          "${{steps.pick_compiler.outputs.system_name}}"
+          "${{steps.pick_generator.outputs.generator}}"
+          "-DRust_TOOLCHAIN=${{matrix.rust}}"
+      - name: Run Tests
+        run: >
+          cd build
+          
+          ctest --verbose --build-config Debug
+
+  install:
+    name: Test Corrosion as a Library
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-2019
+          - ubuntu-latest
+          - macos-12
+        include:
+          - rust: 1.46.0
+          - os: macos-12
+            rust: 1.54.0  # On MacOS-12 linking fails before Rust 1.54
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup MSVC Development Environment
+        uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
+      - name: Install CMake
+        uses: corrosion-rs/install-cmake@v1.1
+        with:
+          cmake: 3.18.0
+          ninja: 1.10.0
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{matrix.rust}}
+          default: true
+      - name: CMake Version
+        run: cmake --version
+      - name: Rust Version
+        run: rustc --version
+      - name: Test Corrosion as subdirectory
+        run: >
+          cmake
+          -S.
+          -Bbuild
+          -DCORROSION_VERBOSE_OUTPUT=ON
+          -DCORROSION_TESTS_INSTALL_CORROSION=OFF
+
+          cd build
+
+          ctest --output-on-failure -C Debug
+      - name: Test Corrosion as installed module
+        run: >
+          cmake -E remove_directory build
+
+          cmake
+          -S.
+          -Bbuild
+          -DCORROSION_VERBOSE_OUTPUT=ON
+          -DCMAKE_BUILD_TYPE=Release
+          -DCORROSION_TESTS_INSTALL_CORROSION=ON
+
+          cd build
+
+          ctest --output-on-failure -C Release

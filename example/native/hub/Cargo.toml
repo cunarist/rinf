@@ -1,0 +1,19 @@
+
+[package]
+name = "hub"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[dependencies]
+flutter_rust_bridge = { version = "1.78.0", features = [
+    "worker-single",
+    "zero-copy",
+] }
+tokio = { version = "1.28.2", features = ["full"] }
+serde = { version = "1.0.164", features = ["derive"] }
+rmp-serde = "1.1.1"
+lazy_static = "1.4.0"
+sample_crate = { path = "../sample_crate" } # Sibling crate in `./native` folder
