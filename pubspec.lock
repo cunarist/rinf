@@ -253,10 +253,10 @@ packages:
     dependency: "direct dev"
     description:
       name: ffigen
-      sha256: ae0f7937cce0b818525ac9f395e18461ce3b4b3d9c6407e3cfbc3d91921f2ce8
+      sha256: "644232023241486ab39e257677f9a0045a5ae080a144cb5828fe9954565f9c22"
       url: "https://pub.dev"
     source: hosted
-    version: "7.2.5"
+    version: "7.2.6"
   file:
     dependency: transitive
     description:
@@ -270,14 +270,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_dotenv:
-    dependency: "direct main"
-    description:
-      name: flutter_dotenv
-      sha256: d9283d92059a22e9834bc0a31336658ffba77089fb6f3cc36751f1fc7c6661a3
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.2"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -303,10 +295,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_rust_bridge
-      sha256: f8f96059ffea18260c4009c3bc476f6300cf19fc180c89c7caf095bb8e30b4b7
+      sha256: bcd4ca6bd1a02430462cac2f6bd4e5b5b4665665a679e1cf817031d2e8cedd5c
       url: "https://pub.dev"
     source: hosted
-    version: "1.63.1"
+    version: "1.64.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -317,14 +309,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_window_close:
-    dependency: "direct main"
-    description:
-      name: flutter_window_close
-      sha256: "63f5846efbf0974ec233e6b5f468aa604a4857157f4c6c44fd482621804a0464"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.2"
   glob:
     dependency: transitive
     description:
@@ -429,14 +413,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
-  nested:
-    dependency: transitive
-    description:
-      name: nested
-      sha256: "03bac4c528c64c95c722ec99280375a6f2fc708eec17c7b3f07253b626cd2a20"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
   nm:
     dependency: transitive
     description:
@@ -557,14 +533,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.2.4"
-  provider:
-    dependency: "direct main"
-    description:
-      name: provider
-      sha256: cdbe7530b12ecd9eb455bdaa2fcb8d4dad22e80b8afb4798b41479d5ce26847f
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.0.5"
   puppeteer:
     dependency: transitive
     description:

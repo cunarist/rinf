@@ -1,5 +1,5 @@
 [package]
-name = "sample_crate_second"
+name = "sample_feature"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,4 +9,4 @@ crate-type = ["lib", "cdylib", "staticlib"]
 [dependencies]
 # Downloaded
 serde_json = { workspace = true }
-# Workspace
+# In workspace

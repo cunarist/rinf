@@ -1,56 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter_window_close/flutter_window_close.dart';
-import 'state.dart';
 import 'value.dart';
-import 'bridge/ffi.dart';
-import 'dart:convert';
+import 'bridge/wrapper.dart';
+import 'dart:io';
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
 
   @override
   Widget build(BuildContext context) {
-    ThemeMode themeMode = ThemeMode.system;
-
-    // Debug mode code
-    assert(() {
-      // assert statement gets removed in release mode
-      String debugLocale = dotenv.env['DEBUG_LOCALE'] ?? '';
-      switch (debugLocale) {
-        case '':
-          break;
-        default:
-          List splitted = debugLocale.split('-');
-          context.setLocale(Locale(splitted[0], splitted[1]));
-      }
-      String darkMode = dotenv.env['DARK_MODE'] ?? '';
-      switch (darkMode) {
-        case 'true':
-          themeMode = ThemeMode.dark;
-          break;
-        case 'false':
-          themeMode = ThemeMode.light;
-          break;
-      }
-      return true;
-    }());
-
-    // Code that will be run before closing the window on desktop
-    FlutterWindowClose.setWindowShouldCloseHandler(() async {
-      assert(() {
-        // assert statement gets removed in release mode
-        debugPrint('App closing');
-        return true;
-      }());
-      return true;
-    });
+    context.setLocale(const Locale('en', 'US'));
 
     // Return the actual app structure
     return MaterialApp(
-      title: 'appTitle'.tr(),
+      onGenerateTitle: (context) {
+        if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+          appWindow.title = 'appTitle'.tr(); // For desktop
+        }
+        return 'appTitle'.tr(); // For mobile and web
+      },
       theme: ThemeData(
         colorScheme: const ColorScheme.light(
           primary: primaryColor,
@@ -63,7 +32,7 @@ class App extends StatelessWidget {
           secondary: secondaryColor,
         ),
       ),
-      themeMode: themeMode,
+      themeMode: ThemeMode.system,
       home: const HomePage(),
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
@@ -82,32 +51,31 @@ class HomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Consumer<AppState>(
-              builder: (context, appState, child) => Text(
-                  'counter.informationText'.tr(namedArgs: {
-                'theValue': appState.tester.counterValue.toString()
-              })),
+            StreamBuilder<String>(
+              stream: viewmodelUpdateBroadcaster.stream.where((dataAddress) {
+                return dataAddress == 'someDataCategory.count';
+              }),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  Map? jsonValue = readViewmodelAsJson(
+                    'someDataCategory.count',
+                  );
+                  String numberText = jsonValue?['value'].toString() ?? '??';
+                  return Text('counter.informationText'.tr(namedArgs: {
+                    'theValue': numberText,
+                  }));
+                } else {
+                  return Text('counter.blankText'.tr());
+                }
+              },
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.read<AppState>().setState((AppState s) async {
-            int original = s.tester.counterValue;
-            int calculated = original;
-            Map jsonObject = {'theValue': 77};
-            String jsonString = json.encode(jsonObject);
-            api.requestTask(
-              order: 'someCategory.addOne',
-              json: jsonString,
-            );
-            api.requestTask(
-              order: 'someCategory.multiplyTwo',
-              json: jsonString,
-            );
-            s.tester.counterValue = calculated;
-          });
+          Map jsonValue = {'dummy': null};
+          sendUserAction('someTaskCategory.calculateSomething', jsonValue);
         },
         tooltip: 'Increment',
         child: const Icon(Icons.add),

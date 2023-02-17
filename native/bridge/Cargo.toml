@@ -9,5 +9,6 @@ crate-type = ["lib", "cdylib", "staticlib"]
 [dependencies]
 # Downloaded
 flutter_rust_bridge = { workspace = true }
-# Workspace
+once_cell = { workspace = true }
+# In workspace
 hub = { workspace = true }

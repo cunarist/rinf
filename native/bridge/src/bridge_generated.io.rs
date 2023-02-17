@@ -2,16 +2,24 @@ use super::*;
 // Section: wire functions
 
 #[no_mangle]
-pub extern "C" fn wire_start_main(port_: i64) {
-    wire_start_main_impl(port_)
+pub extern "C" fn wire_start_and_get_viewmodel_update_stream(port_: i64) {
+    wire_start_and_get_viewmodel_update_stream_impl(port_)
 }
 
 #[no_mangle]
-pub extern "C" fn wire_request_task(
-    order: *mut wire_uint_8_list,
-    json: *mut wire_uint_8_list,
+pub extern "C" fn wire_read_viewmodel(
+    data_address: *mut wire_uint_8_list,
+    take_ownership: bool,
 ) -> support::WireSyncReturn {
-    wire_request_task_impl(order, json)
+    wire_read_viewmodel_impl(data_address, take_ownership)
+}
+
+#[no_mangle]
+pub extern "C" fn wire_send_user_action(
+    task_address: *mut wire_uint_8_list,
+    json_string: *mut wire_uint_8_list,
+) -> support::WireSyncReturn {
+    wire_send_user_action_impl(task_address, json_string)
 }
 
 // Section: allocate functions

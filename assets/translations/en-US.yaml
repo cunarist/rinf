@@ -1,6 +1,7 @@
 appTitle: "Some App Name"
 counter:
   informationText: "Current value is {theValue}."
+  blankText: "Not calculated yet."
 status:
   locale:
     current: "You are using English"

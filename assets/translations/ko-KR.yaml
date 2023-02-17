@@ -1,6 +1,7 @@
-appTitle: 아무 앱 이름
+appTitle: "아무 앱 이름"
 counter:
   informationText: "현재 값은 {theValue}입니다."
+  blankText: "아직 계산되지 않았습니다."
 status:
   locale:
     current: "한국어로 사용하고 있습니다."

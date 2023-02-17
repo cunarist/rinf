@@ -8,8 +8,9 @@ crate-type = ["lib", "cdylib", "staticlib"]
 
 [dependencies]
 # Downloaded
+once_cell = { workspace = true }
+ctor = { workspace = true }
+serde_json = { workspace = true }
 tokio = { workspace = true }
-lazy_static = { workspace = true }
-# Workspace
-sample_crate_first = { workspace = true }
-sample_crate_second = { workspace = true }
+# In workspace
+sample_feature = { workspace = true }

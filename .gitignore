@@ -16,10 +16,8 @@ migrate_working_dir/
 *.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
+# VSCode launch configuration and tasks you configured
+.vscode/
 
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -44,7 +42,7 @@ app.*.map.json
 /android/app/release
 
 # Cunarist App Template
-.env
-.vscode/
 native/.cargo/config.toml
 native/target/
+android/app/src/*/jniLibs/
+xcuserdata

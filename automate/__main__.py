@@ -61,8 +61,8 @@ elif sys.argv[1] == "app-naming":
     print("Done! Don't forget to update description in pubspec.yaml file as well.")
 
 elif sys.argv[1] == "config-filling":
-    # Scan .env file
-    filepath = "./.env"
+    # Scan
+    filepath = "./android/local.properties"
     written_pairs = {}
     if os.path.isfile(filepath):
         with open(filepath, mode="r", encoding="utf8") as file:
@@ -70,31 +70,31 @@ elif sys.argv[1] == "config-filling":
         lines = [x.strip().split("=", 1) for x in lines if "=" in x]
         written_pairs = dict(lines)
 
-    # Update .env file
-    filepath = "./.env.template"
+    # Merge
+    filepath = "./android/local.properties.template"
     with open(filepath, mode="r", encoding="utf8") as file:
         lines = file.read().splitlines()
     for turn, line in enumerate(lines):
         if "=" not in line:
             continue
         item_key = line.strip().split("=", 1)[0]
-        if item_key in written_pairs.keys():
-            item_value = written_pairs[item_key]
-            lines[turn] = f"{item_key}={item_value}"
-    text = "".join(lines)
-    filepath = ".env"
+        item_value = line.strip().split("=", 1)[1]
+        if item_key not in written_pairs.keys():
+            written_pairs[item_key] = item_value
+    text = "\n".join([f"{k}={v}" for k, v in written_pairs.items()])
+    filepath = "./android/local.properties"
     with open(filepath, mode="w", encoding="utf8") as file:
         file.write(text)
-    print("Updated .env file from .env.template file in ./ folder.")
+    print("Updated local.properties file from the template file in ./android folder.")
 
-    # Scan config.toml file
+    # Scan
     filepath = "./native/.cargo/config.toml"
     original_tree = {}
     if os.path.isfile(filepath):
         with open(filepath, mode="r", encoding="utf8") as file:
             original_tree = toml.load(file)
 
-    # Update config.toml file
+    # Merge
     filepath = "./native/.cargo/config.toml.template"
     with open(filepath, mode="r", encoding="utf8") as file:
         template_tree = toml.load(file)
@@ -102,36 +102,18 @@ elif sys.argv[1] == "config-filling":
     filepath = "./native/.cargo/config.toml"
     with open(filepath, mode="w", encoding="utf8") as file:
         toml.dump(final_tree, file)
-    text = "Updated config.toml file from config.toml.template file"
+    text = "Updated config.toml file from the template file"
     text += " in ./native/.cargo folder."
     print(text)
 
+    print("Now go ahead and fill out the fields in those files!")
+
 elif sys.argv[1] == "bridge-gen":
-    # Clear bridge folder
-    folderpath = f"./lib/bridge"
-    if os.path.exists(folderpath) and os.path.isdir(folderpath):
-        shutil.rmtree(folderpath)
-
-    # Generate ffi.dart file
-    os.makedirs(f"./lib/bridge", exist_ok=True)
-
-    filepath = "./automate/template/ffi.dart.txt"
-    with open(filepath, mode="r", encoding="utf8") as file:
-        template_text = file.read()
-
-    crate_name = "bridge"
-    output_text = template_text
-    output_text = output_text.replace("[[CRATE]]", crate_name)
-    class_name = crate_name.replace("_", " ").title().replace(" ", "")
-    output_text = output_text.replace("[[CLASS]]", class_name)
-
-    filepath = f"./lib/bridge/ffi.dart"
-    with open(filepath, mode="w", encoding="utf8") as file:
-        file.write(output_text)
-
     command = "flutter_rust_bridge_codegen"
     command += f" -r ./native/bridge/src/api.rs"
     command += f" -d ./lib/bridge/bridge_generated.dart"
+    command += f" -c ios/Runner/bridge_generated.h"
+    command += f" -e macos/Runner/"
     os.system(command)
 
 elif sys.argv[1] == "template-update":
@@ -143,6 +125,27 @@ elif sys.argv[1] == "template-update":
     os.system(command)
     command = "git merge template/main --allow-unrelated-histories"
     os.system(command)
+
+elif sys.argv[1] == "code-quality":
+    command = "dart fix --apply"
+    os.system(command)
+    path = "./native"
+    os.chdir(path)
+    command = "cargo clippy --fix --allow-dirty"
+    os.system(command)
+
+elif sys.argv[1] == "size-check":
+    path = "./native"
+    os.chdir(path)
+    command = "cargo bloat --release"
+    os.system(command)
+    if len(sys.argv) == 2:
+        print("Platform option is not provided.")
+    else:
+        path = ".."
+        os.chdir(path)
+        command = f"flutter build {sys.argv[2]} --analyze-size"
+        os.system(command)
 
 else:
     print("No such option for automation is available.")
