@@ -1,8 +1,8 @@
 import os
 import sys
-import shutil
 from typing import Any
 import toml
+from PIL import Image, ImageDraw
 
 
 def exit():
@@ -21,6 +21,35 @@ def merge_dicts(d1: dict[Any, Any], d2: dict[Any, Any]) -> dict[Any, Any]:
         else:
             new[k] = d2[k]
     return new
+
+
+def process_icon(image: Image.Image, roundness: float, scale: float) -> Image.Image:
+    round_percent = roundness * 100
+    radius = int(round_percent / 100 * image.width)
+    width, height = image.size
+
+    mask_image = Image.new("L", (width, height), (0))
+    image_draw = ImageDraw.ImageDraw(mask_image)
+    image_draw.rounded_rectangle(
+        [(0, 0), (image.width, image.height)], radius, fill=(255)
+    )
+
+    rounded_image = image.convert("RGBA")
+    rounded_image.putalpha(mask_image)
+
+    new_width, new_height = int(width * scale), int(height * scale)
+    scaled_image = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    resized_image = rounded_image.resize(
+        (new_width, new_height), resample=Image.LANCZOS
+    )
+    scaled_image.paste(
+        resized_image,
+        (
+            int((width - new_width) / 2),
+            int((height - new_height) / 2),
+        ),
+    )
+    return scaled_image
 
 
 print("")
@@ -146,6 +175,27 @@ elif sys.argv[1] == "size-check":
         os.chdir(path)
         command = f"flutter build {sys.argv[2]} --analyze-size"
         os.system(command)
+
+elif sys.argv[1] == "icon-gen":
+    image = Image.open("./assets/app_icon_full.png")
+
+    new_image = process_icon(image, 0.232, 1)
+    new_image.save("./temp/app_icon_windows.png")
+
+    new_image = process_icon(image, 0.232, 1)
+    new_image.save("./temp/app_icon_linux.png")
+
+    new_image = process_icon(image, 0, 1)
+    new_image.save("./temp/app_icon_android.png")
+
+    new_image = process_icon(image, 0.232, 0.8)
+    new_image.save("./temp/app_icon_macos.png")
+
+    new_image = process_icon(image, 0, 1)
+    new_image.save("./temp/app_icon_ios.png")
+
+    command = "flutter pub run flutter_launcher_icons"
+    os.system(command)
 
 else:
     print("No such option for automation is available.")

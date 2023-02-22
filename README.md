@@ -17,7 +17,7 @@ Extra features added to the default Flutter template are:
 
 ## Platform Support
 
-Configuring the Flutter project targetting various platforms is not an easy task. It gets much harder when Rust is involved. With this template, you don't need to reinvent the wheel.
+Configuring the Flutter project targeting various platforms is not an easy task. It gets much harder when Rust is involved. With this template, you don't need to reinvent the wheel.
 
 - Windows
 - Linux
@@ -72,7 +72,7 @@ flutter doctor
 
 ## Extra Steps
 
-If you are targeting Android, iOS, or the web, there are extra steps involved. Refer to [flutter_rust_bridge docs](https://cjycode.com/flutter_rust_bridge/template/setup.html).
+If you are targeting Android, macOS, iOS, or the web, there are extra steps involved. Refer to [flutter_rust_bridge docs](https://cjycode.com/flutter_rust_bridge/template/setup.html).
 
 # 🗃️ Setting Up
 
@@ -94,25 +94,10 @@ Set the app name and domain. This only works once and you cannot revert this.
 python automate app-naming
 ```
 
-Convert icon files in `./assets` to apply the icon to multiple platforms with [Flutter Launcher Icons](https://pub.dev/packages/flutter_launcher_icons).
-
-File `app.icon.png` is applied to:
-
-- Windows
-- Linux
-- macOS
-- Android
-
-File `app_icon_full.png` is applied to:
-
-- iOS
-
-For platforms below, the icon file should be included at release.
-
-- Linux
+Apply `app_icon_full.png` file in `./assets` to multiple platforms with [Flutter Launcher Icons](https://pub.dev/packages/flutter_launcher_icons). Appropriate rounding and scaling are applied per platform with the power of Python. On Linux, you should include the icon manually in the distribution package.
 
 ```
-flutter pub run flutter_launcher_icons
+python automate icon-gen
 ```
 
 Receive the latest commits from [Cunarist App Template](https://github.com/cunarist/app-template).

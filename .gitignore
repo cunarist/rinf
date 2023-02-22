@@ -46,3 +46,4 @@ native/.cargo/config.toml
 native/target/
 android/app/src/*/jniLibs/
 xcuserdata
+temp/

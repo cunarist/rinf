@@ -46,15 +46,15 @@ flutter:
     - assets/translations/
 
 flutter_icons:
-  image_path: "assets/app_icon.png"
-  web:
-    generate: true
-  android: "launcher_icon"
-  ios: true
-  image_path_ios: "assets/app_icon_full.png"
-  remove_alpha_ios: true
   windows:
+    image_path: "temp/app_icon_windows.png"
     generate: true
     icon_size: 256
+  android: "launcher_icon"
+  image_path_android: "temp/app_icon_android.png"
   macos:
+    image_path: "temp/app_icon_macos.png"
     generate: true
+  ios: true
+  image_path_ios: "temp/app_icon_ios.png"
+  remove_alpha_ios: true
