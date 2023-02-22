@@ -92,29 +92,24 @@ elif sys.argv[1] == "app-naming":
 elif sys.argv[1] == "config-filling":
     # Scan
     filepath = "./android/local.properties"
-    written_pairs = {}
+    lines = []
     if os.path.isfile(filepath):
         with open(filepath, mode="r", encoding="utf8") as file:
             lines = file.read().splitlines()
-        lines = [x.strip().split("=", 1) for x in lines if "=" in x]
-        written_pairs = dict(lines)
 
-    # Merge
-    filepath = "./android/local.properties.template"
-    with open(filepath, mode="r", encoding="utf8") as file:
-        lines = file.read().splitlines()
-    for turn, line in enumerate(lines):
-        if "=" not in line:
-            continue
-        item_key = line.strip().split("=", 1)[0]
-        item_value = line.strip().split("=", 1)[1]
-        if item_key not in written_pairs.keys():
-            written_pairs[item_key] = item_value
-    text = "\n".join([f"{k}={v}" for k, v in written_pairs.items()])
+    does_exist = False
+    for line in lines:
+        if line.startswith("ndk.dir"):
+            does_exist = True
+            break
+
+    if not does_exist:
+        lines.append("ndk.dir= # Androkd NDK path on your system")
+
     filepath = "./android/local.properties"
     with open(filepath, mode="w", encoding="utf8") as file:
-        file.write(text)
-    print("Updated local.properties file from the template file in ./android folder.")
+        file.write("\n".join(lines))
+    print("Updated local.properties file with necessary fields.")
 
     # Scan
     filepath = "./native/.cargo/config.toml"
@@ -131,19 +126,32 @@ elif sys.argv[1] == "config-filling":
     filepath = "./native/.cargo/config.toml"
     with open(filepath, mode="w", encoding="utf8") as file:
         toml.dump(final_tree, file)
-    text = "Updated config.toml file from the template file"
-    text += " in ./native/.cargo folder."
+    text = "Updated config.toml file with the template file next to it."
     print(text)
 
     print("Now go ahead and fill out the fields in those files!")
 
 elif sys.argv[1] == "bridge-gen":
     command = "flutter_rust_bridge_codegen"
-    command += f" -r ./native/bridge/src/api.rs"
-    command += f" -d ./lib/bridge/bridge_generated.dart"
+    command += f" --rust-input ./native/hub/src/bridge/api.rs"
+    command += f" --dart-output ./lib/bridge/bridge_generated.dart"
+    command += f" --class-name Bridge"
+    command += f" --rust-output ./native/hub/src/bridge/bridge_generated.rs"
     command += f" -c ios/Runner/bridge_generated.h"
     command += f" -e macos/Runner/"
     os.system(command)
+
+    filepath = "./native/hub/src/lib.rs"
+    with open(filepath, mode="r", encoding="utf8") as file:
+        lines = file.readlines()
+
+    for turn, line in enumerate(lines):
+        if "AUTO INJECTED BY flutter_rust_bridge" in line:
+            lines[turn] = ""
+
+    filepath = "./native/hub/src/lib.rs"
+    with open(filepath, mode="w", encoding="utf8") as file:
+        file.write("".join(lines))
 
 elif sys.argv[1] == "template-update":
     command = "git remote rm template"
@@ -156,6 +164,8 @@ elif sys.argv[1] == "template-update":
     os.system(command)
 
 elif sys.argv[1] == "code-quality":
+    command = "black ."
+    os.system(command)
     command = "dart fix --apply"
     os.system(command)
     path = "./native"
@@ -196,6 +206,38 @@ elif sys.argv[1] == "icon-gen":
 
     command = "flutter pub run flutter_launcher_icons"
     os.system(command)
+
+elif sys.argv[1] == "translation":
+    filepath = "./assets/translations.csv"
+    with open(filepath, mode="r", encoding="utf8") as file:
+        first_line = file.readline()
+    languages = first_line.split(",")[1:]
+    languages = [t.strip() for t in languages]
+
+    filepath = "./ios/Runner/Info.plist"
+    with open(filepath, mode="r", encoding="utf8") as file:
+        lines = file.read().split("\n")
+    for turn, line in enumerate(lines):
+        if "<key>CFBundleLocalizations</key>" in line:
+            array_start_line = turn + 1
+            break
+
+    for line_number in range(array_start_line, len(lines)):
+        if "</array>" in lines[line_number]:
+            array_end_line = line_number
+
+    lines = lines[:array_start_line] + lines[array_end_line + 1 :]
+
+    language_strings = [" " * 8 + f"<string>{l}</string>" for l in languages]
+    language_strings.insert(0, " " * 4 + "<array>")
+    language_strings.append(" " * 4 + "</array>")
+    print(language_strings)
+    lines = lines[:array_start_line] + language_strings + lines[array_start_line:]
+    final_text = "\n".join(lines)
+
+    filepath = "./ios/Runner/Info.plist"
+    with open(filepath, mode="w", encoding="utf8") as file:
+        file.write(final_text)
 
 else:
     print("No such option for automation is available.")

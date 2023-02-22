@@ -4,7 +4,7 @@
 
 This template provides instant capabilities to developers who want to embrace the power of **Rust** and **Flutter** together. Simply duplicate this template and you're ready to go!
 
-Based on the default Flutter template, many additional packages and modifications are applied to make sure everything is super-ready.
+Based on the default Flutter template, many popular packages and modifications are applied to make sure everything is super-ready. Future scalability and performance are taken into account
 
 Extra features added to the default Flutter template are:
 
@@ -49,7 +49,7 @@ Go to the [official downloads page](https://git-scm.com/downloads)
 
 ## Preparing Python
 
-Download it from the app store if your system doesn't provide a pre-installed version. It's also available at [official downloads page](https://www.python.org/downloads/). Make sure Python is available in the path environment variable.
+Download it from the app store if your system doesn't provide a pre-installed version. It's also available at [official downloads page](https://www.python.org/downloads/). Make sure `python` is available in the path environment variable.
 
 ## Preparing Rust
 
@@ -98,6 +98,12 @@ Apply `app_icon_full.png` file in `./assets` to multiple platforms with [Flutter
 
 ```
 python automate icon-gen
+```
+
+Apply `translations.csv` file in `./assets` to multiple platforms. On some platforms, only modifying the CSV file is not enough.
+
+```
+python automate translation
 ```
 
 Receive the latest commits from [Cunarist App Template](https://github.com/cunarist/app-template).
@@ -247,9 +253,9 @@ Be careful all the time! You shouldn't be editing any file without enough knowle
 ### Rust Related
 
 - `native`: Rust crates. The name of the library crate folder should be the same as that of the library crate's name.
-  - Do not modify `bridge` crate inside.
+  - Think of `hub` crate as your Rust entry point. It is not a binary crate but it is similar.
+  - Do not modify `bridge` module inside `hub` crate.
   - `config.toml.template` file is okay to be modified if needed.
-  - Think of `hub` as your Rust entry point crate. It is not a binary crate but it is similar.
 
 ## Comments
 
@@ -272,8 +278,6 @@ If the characteristic of a specific Rust API is different from other Rust APIs, 
 ## Python Automation Scripts
 
 For faster and easier development, Cunarist App Template relies on Python scripts in `./automate` for automation.
-
-[Black](https://black.readthedocs.io/en/stable/) formatter is used for maintaining quality Python code.
 
 # 📁 Folder Structure
 

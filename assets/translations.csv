@@ -1,0 +1,5 @@
+key,en_US,ko_KR
+appTitle,Some App Name,아무 앱 이름
+counter.informationText,Current value is {theValue}.,현재 값은 {theValue}입니다.
+counter.blankText,Not calculated yet.,아직 계산되지 않았습니다.
+status.currentLocale,You are using English,한국어로 사용하고 있습니다.

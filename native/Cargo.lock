@@ -50,15 +50,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
-name = "bridge"
-version = "0.1.0"
-dependencies = [
- "flutter_rust_bridge",
- "hub",
- "once_cell",
-]
-
-[[package]]
 name = "build-target"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -243,8 +234,9 @@ name = "hub"
 version = "0.1.0"
 dependencies = [
  "ctor",
+ "flutter_rust_bridge",
  "once_cell",
- "sample_feature",
+ "sample_crate",
  "serde_json",
  "tokio",
 ]
@@ -444,7 +436,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7b4b9743ed687d4b4bcedf9ff5eaa7398495ae14e61cba0a295704edbc7decde"
 
 [[package]]
-name = "sample_feature"
+name = "sample_crate"
 version = "0.1.0"
 dependencies = [
  "serde_json",

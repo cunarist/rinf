@@ -16,6 +16,15 @@ typedef struct wire_uint_8_list {
   int32_t len;
 } wire_uint_8_list;
 
+typedef struct wire_StringList {
+  struct wire_uint_8_list **ptr;
+  int32_t len;
+} wire_StringList;
+
+typedef struct wire_DotAddress {
+  struct wire_StringList *layered;
+} wire_DotAddress;
+
 void store_dart_post_cobject(DartPostCObjectFnType ptr);
 
 Dart_Handle get_dart_object(uintptr_t ptr);
@@ -28,10 +37,14 @@ intptr_t init_frb_dart_api_dl(void *obj);
 
 void wire_start_and_get_viewmodel_update_stream(int64_t port_);
 
-WireSyncReturn wire_read_viewmodel(struct wire_uint_8_list *data_address, bool take_ownership);
+WireSyncReturn wire_read_viewmodel(struct wire_DotAddress *data_address, bool take_ownership);
 
-WireSyncReturn wire_send_user_action(struct wire_uint_8_list *task_address,
+WireSyncReturn wire_send_user_action(struct wire_DotAddress *task_address,
                                      struct wire_uint_8_list *json_string);
+
+struct wire_StringList *new_StringList_0(int32_t len);
+
+struct wire_DotAddress *new_box_autoadd_dot_address_0(void);
 
 struct wire_uint_8_list *new_uint_8_list_0(int32_t len);
 
@@ -42,6 +55,8 @@ static int64_t dummy_method_to_enforce_bundling(void) {
     dummy_var ^= ((int64_t) (void*) wire_start_and_get_viewmodel_update_stream);
     dummy_var ^= ((int64_t) (void*) wire_read_viewmodel);
     dummy_var ^= ((int64_t) (void*) wire_send_user_action);
+    dummy_var ^= ((int64_t) (void*) new_StringList_0);
+    dummy_var ^= ((int64_t) (void*) new_box_autoadd_dot_address_0);
     dummy_var ^= ((int64_t) (void*) new_uint_8_list_0);
     dummy_var ^= ((int64_t) (void*) free_WireSyncReturn);
     dummy_var ^= ((int64_t) (void*) store_dart_post_cobject);

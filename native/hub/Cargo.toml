@@ -8,9 +8,10 @@ crate-type = ["lib", "cdylib", "staticlib"]
 
 [dependencies]
 # Downloaded
+flutter_rust_bridge = { workspace = true }
 once_cell = { workspace = true }
 ctor = { workspace = true }
 serde_json = { workspace = true }
 tokio = { workspace = true }
 # In workspace
-sample_feature = { workspace = true }
+sample_crate = { path = "../sample_crate" }

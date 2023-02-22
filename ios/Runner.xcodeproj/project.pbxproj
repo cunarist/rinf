@@ -13,7 +13,7 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
-		A3671AD929957A9600604FF0 /* libbridge_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A3671AD529957A8000604FF0 /* libbridge_static.a */; };
+		A3671AD929957A9600604FF0 /* libhub_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A3671AD529957A8000604FF0 /* libhub_static.a */; };
 		F1D85560F01F0AE6EA88C9E9 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04BD42C313F1ED13D7E0D2DB /* Pods_Runner.framework */; };
 /* End PBXBuildFile section */
 
@@ -80,7 +80,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A3671AD929957A9600604FF0 /* libbridge_static.a in Frameworks */,
+				A3671AD929957A9600604FF0 /* libhub_static.a in Frameworks */,
 				F1D85560F01F0AE6EA88C9E9 /* Pods_Runner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -149,7 +149,7 @@
 			isa = PBXGroup;
 			children = (
 				A3671AD329957A8000604FF0 /* native.dylib */,
-				A3671AD529957A8000604FF0 /* libbridge_static.a */,
+				A3671AD529957A8000604FF0 /* libhub_static.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -235,10 +235,10 @@
 			remoteRef = A3671AD229957A8000604FF0 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		A3671AD529957A8000604FF0 /* libbridge_static.a */ = {
+		A3671AD529957A8000604FF0 /* libhub_static.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
-			path = libbridge_static.a;
+			path = libhub_static.a;
 			remoteRef = A3671AD429957A8000604FF0 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};

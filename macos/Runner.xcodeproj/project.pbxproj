@@ -26,7 +26,7 @@
 		33CC10F32044A3C60003C045 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 33CC10F22044A3C60003C045 /* Assets.xcassets */; };
 		33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 33CC10F42044A3C60003C045 /* MainMenu.xib */; };
 		33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC11122044BFA00003C045 /* MainFlutterWindow.swift */; };
-		A38F8BAA29957A110018A868 /* libbridge_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A38F8BA0299579880018A868 /* libbridge_static.a */; };
+		A38F8BAA29957A110018A868 /* libhub_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A38F8BA0299579880018A868 /* libhub_static.a */; };
 		D571CC3482D5F1EB0A8C8A73 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6BEDDB71D0DDA491B5917BAF /* Pods_Runner.framework */; };
 /* End PBXBuildFile section */
 
@@ -103,7 +103,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A38F8BAA29957A110018A868 /* libbridge_static.a in Frameworks */,
+				A38F8BAA29957A110018A868 /* libhub_static.a in Frameworks */,
 				D571CC3482D5F1EB0A8C8A73 /* Pods_Runner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -192,7 +192,7 @@
 			isa = PBXGroup;
 			children = (
 				A38F8B9E299579880018A868 /* native.dylib */,
-				A38F8BA0299579880018A868 /* libbridge_static.a */,
+				A38F8BA0299579880018A868 /* libhub_static.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -290,10 +290,10 @@
 			remoteRef = A38F8B9D299579880018A868 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		A38F8BA0299579880018A868 /* libbridge_static.a */ = {
+		A38F8BA0299579880018A868 /* libhub_static.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
-			path = libbridge_static.a;
+			path = libhub_static.a;
 			remoteRef = A38F8B9F299579880018A868 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};

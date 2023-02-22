@@ -33,7 +33,7 @@
 		ADDEDBA66A6E1 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
 		CA603EE7FF4DEAC3B2E0A336 /* native.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = native.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA608FDEAFC43EF4668187A5 /* Cargo.toml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cargo.toml; sourceTree = "<group>"; };
-		CA60F0FEBE702969E816930C /* libbridge_static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libbridge_static.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA60F0FEBE702969E816930C /* libhub_static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libhub_static.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -49,7 +49,7 @@
 			isa = PBXGroup;
 			children = (
 				CA603EE7FF4DEAC3B2E0A336 /* native.dylib */,
-				CA60F0FEBE702969E816930C /* libbridge_static.a */,
+				CA60F0FEBE702969E816930C /* libhub_static.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -104,8 +104,8 @@
 			dependencies = (
 			);
 			name = "native-staticlib";
-			productName = libbridge_static.a;
-			productReference = CA60F0FEBE702969E816930C /* libbridge_static.a */;
+			productName = libhub_static.a;
+			productReference = CA60F0FEBE702969E816930C /* libhub_static.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -191,8 +191,8 @@
 		CA6004C69C911C83950DBC35 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CARGO_XCODE_CARGO_DEP_FILE_NAME = libbridge.d;
-				CARGO_XCODE_CARGO_FILE_NAME = libbridge.a;
+				CARGO_XCODE_CARGO_DEP_FILE_NAME = libhub.d;
+				CARGO_XCODE_CARGO_FILE_NAME = libhub.a;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				DEAD_CODE_STRIPPING = YES;
 				INSTALL_GROUP = "";
@@ -207,8 +207,8 @@
 		CA6004C69C91CCA7472EC19F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CARGO_XCODE_CARGO_DEP_FILE_NAME = libbridge.d;
-				CARGO_XCODE_CARGO_FILE_NAME = libbridge.dylib;
+				CARGO_XCODE_CARGO_DEP_FILE_NAME = libhub.d;
+				CARGO_XCODE_CARGO_FILE_NAME = libhub.dylib;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DYLIB_COMPATIBILITY_VERSION = 0;
@@ -324,8 +324,8 @@
 		CA60A9B50E8D1C83950DBC35 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CARGO_XCODE_CARGO_DEP_FILE_NAME = libbridge.d;
-				CARGO_XCODE_CARGO_FILE_NAME = libbridge.a;
+				CARGO_XCODE_CARGO_DEP_FILE_NAME = libhub.d;
+				CARGO_XCODE_CARGO_FILE_NAME = libhub.a;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				DEAD_CODE_STRIPPING = YES;
 				INSTALL_GROUP = "";
@@ -340,8 +340,8 @@
 		CA60A9B50E8DCCA7472EC19F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CARGO_XCODE_CARGO_DEP_FILE_NAME = libbridge.d;
-				CARGO_XCODE_CARGO_FILE_NAME = libbridge.dylib;
+				CARGO_XCODE_CARGO_DEP_FILE_NAME = libhub.d;
+				CARGO_XCODE_CARGO_FILE_NAME = libhub.dylib;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DYLIB_COMPATIBILITY_VERSION = 0;

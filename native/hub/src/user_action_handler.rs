@@ -1,15 +1,15 @@
+use crate::api::DotAddress;
 use crate::sample_functions;
 
-pub async fn handle_user_action(user_action: (String, String)) {
-    let task_address = user_action.0; // "some.task.address"
-    let json_string = user_action.1; // "{'some':'json','string':true}"
+pub async fn handle_user_action(task_address: DotAddress, json_string: String) {
+    // `task_address` would be something like "some.task.address"
+    // `json_string` would be something like "{'some':'json','string':true}"
     let json_value = serde_json::from_str(&json_string).unwrap();
-    let task_layers = task_address.split('.').collect::<Vec<&str>>();
 
-    if task_layers.is_empty() {
-    } else if task_layers[0] == "someTaskCategory" {
-        if task_layers.len() == 1 {
-        } else if task_layers[1] == "calculateSomething" {
+    if task_address.len() == 0 {
+    } else if task_address[0] == "someTaskCategory" {
+        if task_address.len() == 1 {
+        } else if task_address[1] == "calculateSomething" {
             sample_functions::calculate_something(json_value);
         } else {
         }
