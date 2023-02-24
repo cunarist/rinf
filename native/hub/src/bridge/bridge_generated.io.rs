@@ -8,10 +8,10 @@ pub extern "C" fn wire_start_and_get_viewmodel_update_stream(port_: i64) {
 
 #[no_mangle]
 pub extern "C" fn wire_read_viewmodel(
-    data_address: *mut wire_DotAddress,
+    item_address: *mut wire_DotAddress,
     take_ownership: bool,
 ) -> support::WireSyncReturn {
-    wire_read_viewmodel_impl(data_address, take_ownership)
+    wire_read_viewmodel_impl(item_address, take_ownership)
 }
 
 #[no_mangle]

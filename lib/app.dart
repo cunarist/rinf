@@ -4,6 +4,7 @@ import 'value.dart';
 import 'bridge/wrapper.dart';
 import 'dart:io';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'dart:typed_data';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -52,13 +53,68 @@ class HomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             StreamBuilder<String>(
-              stream: viewmodelUpdateBroadcaster.stream.where((dataAddress) {
-                return dataAddress == 'someDataCategory.count';
+              stream: viewmodelUpdateBroadcaster.stream.where((itemAddress) {
+                return itemAddress == 'someItemCategory.mandelbrot';
+              }),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  Uint8List? imageData = readViewmodelAsBytes(
+                    'someItemCategory.mandelbrot',
+                    true,
+                  );
+                  if (imageData != null) {
+                    return Container(
+                      margin: const EdgeInsets.all(20),
+                      width: 256,
+                      height: 256,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: Image.memory(
+                            imageData,
+                            width: 64,
+                            height: 64,
+                            gaplessPlayback: true,
+                          ),
+                        ),
+                      ),
+                    );
+                  } else {
+                    return Container(
+                      margin: const EdgeInsets.all(20),
+                      width: 256,
+                      height: 256,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.0),
+                        color: Colors.black,
+                      ),
+                    );
+                  }
+                } else {
+                  return Container(
+                    margin: const EdgeInsets.all(20),
+                    width: 256,
+                    height: 256,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8.0),
+                      color: Colors.black,
+                    ),
+                  );
+                }
+              },
+            ),
+            StreamBuilder<String>(
+              stream: viewmodelUpdateBroadcaster.stream.where((itemAddress) {
+                return itemAddress == 'someItemCategory.count';
               }),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   Map? jsonValue = readViewmodelAsJson(
-                    'someDataCategory.count',
+                    'someItemCategory.count',
                   );
                   String numberText = jsonValue?['value'].toString() ?? '??';
                   return Text('counter.informationText'.tr(namedArgs: {

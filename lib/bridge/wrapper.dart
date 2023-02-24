@@ -10,9 +10,9 @@ DotAddress toDotAddress(String plain) {
   return DotAddress(layered: plain.split('.'));
 }
 
-dynamic readViewmodelAsJson(String dataAddress) {
+dynamic readViewmodelAsJson(String itemAddress) {
   Uint8List? bytes = api.readViewmodel(
-    dataAddress: toDotAddress(dataAddress),
+    itemAddress: toDotAddress(itemAddress),
     takeOwnership: false,
   );
   dynamic jsonValue;
@@ -25,10 +25,10 @@ dynamic readViewmodelAsJson(String dataAddress) {
   return jsonValue;
 }
 
-Uint8List? readViewmodelAsBytes(String dataAddress,
+Uint8List? readViewmodelAsBytes(String itemAddress,
     [bool takeOwnership = false]) {
   Uint8List? bytes = api.readViewmodel(
-    dataAddress: toDotAddress(dataAddress),
+    itemAddress: toDotAddress(itemAddress),
     takeOwnership: takeOwnership,
   );
   return bytes;

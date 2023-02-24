@@ -97,11 +97,11 @@ pub fn start_and_get_viewmodel_update_stream(viewmodel_update_stream: StreamSink
         let receiver = VIEWMODEL_UPDATE_RECEIVER.get().unwrap().lock().unwrap();
         loop {
             if let Ok(received) = receiver.recv() {
-                let data_address = received.0;
+                let item_address = received.0;
                 let bytes = received.1;
                 let mut viewmodel = VIEWMODEL.get().unwrap().lock().unwrap();
-                viewmodel.insert(data_address.clone(), bytes);
-                viewmodel_update_stream.add(data_address.to_string());
+                viewmodel.insert(item_address.clone(), bytes);
+                viewmodel_update_stream.add(item_address.to_string());
             }
             if hot_restart_number < DART_HOT_RESTART_COUNT.load(Ordering::SeqCst) {
                 // When another `StreamSink` is established by hot restart
@@ -112,14 +112,14 @@ pub fn start_and_get_viewmodel_update_stream(viewmodel_update_stream: StreamSink
 }
 
 pub fn read_viewmodel(
-    data_address: DotAddress,
+    item_address: DotAddress,
     take_ownership: bool,
 ) -> SyncReturn<Option<Vec<u8>>> {
     let mut viewmodel = VIEWMODEL.get().unwrap().lock().unwrap();
     let bytes = if take_ownership {
-        viewmodel.remove(&data_address)
+        viewmodel.remove(&item_address)
     } else {
-        viewmodel.get(&data_address).cloned()
+        viewmodel.get(&item_address).cloned()
     };
     SyncReturn(bytes)
 }

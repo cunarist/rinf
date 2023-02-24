@@ -15,7 +15,7 @@ abstract class Bridge {
   FlutterRustBridgeTaskConstMeta get kStartAndGetViewmodelUpdateStreamConstMeta;
 
   Uint8List? readViewmodel(
-      {required DotAddress dataAddress,
+      {required DotAddress itemAddress,
       required bool takeOwnership,
       dynamic hint});
 
@@ -65,16 +65,16 @@ class BridgeImpl implements Bridge {
           );
 
   Uint8List? readViewmodel(
-      {required DotAddress dataAddress,
+      {required DotAddress itemAddress,
       required bool takeOwnership,
       dynamic hint}) {
-    var arg0 = _platform.api2wire_box_autoadd_dot_address(dataAddress);
+    var arg0 = _platform.api2wire_box_autoadd_dot_address(itemAddress);
     var arg1 = takeOwnership;
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_read_viewmodel(arg0, arg1),
       parseSuccessData: _wire2api_opt_uint_8_list,
       constMeta: kReadViewmodelConstMeta,
-      argValues: [dataAddress, takeOwnership],
+      argValues: [itemAddress, takeOwnership],
       hint: hint,
     ));
   }
@@ -82,7 +82,7 @@ class BridgeImpl implements Bridge {
   FlutterRustBridgeTaskConstMeta get kReadViewmodelConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
         debugName: "read_viewmodel",
-        argNames: ["dataAddress", "takeOwnership"],
+        argNames: ["itemAddress", "takeOwnership"],
       );
 
   void sendUserAction(
@@ -305,11 +305,11 @@ class BridgeWire implements FlutterRustBridgeWireBase {
           .asFunction<void Function(int)>();
 
   WireSyncReturn wire_read_viewmodel(
-    ffi.Pointer<wire_DotAddress> data_address,
+    ffi.Pointer<wire_DotAddress> item_address,
     bool take_ownership,
   ) {
     return _wire_read_viewmodel(
-      data_address,
+      item_address,
       take_ownership,
     );
   }

@@ -4,20 +4,22 @@
 
 This template provides instant capabilities to developers who want to embrace the power of **Rust** and **Flutter** together. Simply duplicate this template and you're ready to go!
 
-Based on the default Flutter template, many popular packages and modifications are applied to make sure everything is super-ready. Future scalability and performance are taken into account
+![](readme/preview.gif)
+
+Based on the default Flutter template, many popular packages and modifications are applied to make sure everything is super-ready. Future scalability and performance are taken into account.
 
 Extra features added to the default Flutter template are:
 
 - Rust integration with the ability to use an arbitrary number of library crates
 - MVVM pattern with easy viewmodel binding from Dart and viewmodel update from Rust
 - Convenient configuration management
-- Preserving Rust logic on Dart hot reload
+- Preserving Rust logic on Dart's hot restart
 - Convenient app naming and icon generation
 - Setting desktop window properties
 
 ## Platform Support
 
-Configuring the Flutter project targeting various platforms is not an easy task. It gets much harder when Rust is involved. With this template, you don't need to reinvent the wheel.
+Preparing a Flutter project targeting various platforms is not an easy task. It gets much harder when Rust is involved. With this template, you don't need to reinvent the wheel.
 
 - Windows
 - Linux
@@ -33,9 +35,9 @@ The goal of this template is to enable the full power of Rust while using Flutte
 
 # 🧱 Project Structure
 
-**Flutter** deals with the cross-platform user interface while **Rust** handles the internal logic. The front-end and back-end are completely separated. These two worlds communicate through native steams.
+**Flutter** deals with the cross-platform user interface while **Rust** handles the internal logic. The front-end and back-end are completely separated. These two worlds communicate through the viewmodel and task calls.
 
-This repository is based on [Cunarist App Template](https://github.com/cunarist/app-template). It is possible to receive the latest commits from this template repository with the automated Python command stated below.
+This repository is based on [Cunarist App Template](https://github.com/cunarist/app-template). It is possible to receive the latest commits from this template repository with the automated Python script written below.
 
 # 👜 System Preparation
 
@@ -72,7 +74,7 @@ flutter doctor
 
 ## Extra Steps
 
-If you are targeting Android, macOS, iOS, or the web, there are extra steps involved. Refer to [flutter_rust_bridge docs](https://cjycode.com/flutter_rust_bridge/template/setup.html).
+If you are targeting Android, macOS, or iOS, there are extra steps involved. Refer to [flutter_rust_bridge docs](https://cjycode.com/flutter_rust_bridge/template/setup.html) to install necessary components on your system.
 
 # 🗃️ Setting Up
 
@@ -100,7 +102,7 @@ Apply `app_icon_full.png` file in `./assets` to multiple platforms with [Flutter
 python automate icon-gen
 ```
 
-Apply `translations.csv` file in `./assets` to multiple platforms. On some platforms, only modifying the CSV file is not enough.
+Apply `translations.csv` file in `./assets` to app profiles of multiple platforms. You need to run this extra command after changing the list of supported locales. Only modifying the CSV file is not enough on some platforms.
 
 ```
 python automate translation
@@ -123,7 +125,7 @@ python automate config-filling
 ```
 
 - File `./android/local.properties` contains information about the Android toolchain on the computer.
-- File `./native/.cargo/config.toml` includes environment variables loaded in Rust. You might need them to locate external C++ library paths through environment variables for compilation.
+- File `./native/.cargo/config.toml` includes environment variables loaded in Rust. You might need them to provide external C++ library paths through environment variables for compilation with some third-party crates.
 - There is no environment variable file for Dart. Use Dart's [hot reload](https://docs.flutter.dev/development/tools/hot-reload) feature instead. You might want to change variables directly in Dart to experiment with UI stuff such as dark mode.
 
 Configuration files are not version-controlled. You should change fields inside these files during development to make things work on your computer. That information is only used in production and not included in the final release.
@@ -177,13 +179,13 @@ import 'bridge/wrapper.dart';
 
 ...
 StreamBuilder<String>(
-  stream: viewmodelUpdateBroadcaster.stream.where((dataAddress) {
-    return dataAddress == 'someDataCategory.count';
+  stream: viewmodelUpdateBroadcaster.stream.where((itemAddress) {
+    return itemAddress == 'someItemCategory.count';
   }),
   builder: (context, snapshot) {
     if (snapshot.hasData) {
       Map? jsonValue = readViewmodelAsJson(
-        'someDataCategory.count',
+        'someItemCategory.count',
       );
       String numberText = jsonValue?['value'].toString() ?? '??';
       return Text('counter.informationText'.tr(namedArgs: {
@@ -197,34 +199,29 @@ StreamBuilder<String>(
 ...
 ```
 
-`StreamBuilder` listens to a stream from `viewmodelUpdateBroadcaster` from `bridge/wrapper.dart` module. For better performance, it only listens to events with `dataAddress` of a specific value. In other words, the builder gets notified only when the viewmodel item that they are interested in is changed.
+`StreamBuilder` listens to a stream from `viewmodelUpdateBroadcaster` from `bridge/wrapper.dart` module. For better performance, it only listens to events with `itemAddress` of a specific value. In other words, the builder gets notified only when the viewmodel item that it is interested in is changed.
 
 And then you have a Rust function.
 
 ```rust
 // ./native/hub/sample_functions.rs
 
+use crate::api::DotAddress;
+use crate::bridge::update_viewmodel_with_json;
 use crate::model;
-use crate::VIEWMODEL_UPDATE_SENDER;
 use serde_json::json;
 
 pub fn calculate_something(json_value: serde_json::Value) {
     let _ = json_value;
 
     let mut value = model::COUNT.write().unwrap();
-    *value = sample_feature::add_seven(*value);
+    *value = sample_crate::add_seven(*value);
     println!("{:}", *value);
     let json_value = json!({ "value": *value });
 
-    let viewmodel_update_sender = VIEWMODEL_UPDATE_SENDER
-        .get().unwrap().lock().unwrap();
-    viewmodel_update_sender
-        .send((
-            String::from("someDataCategory.count"),
-            json_value.to_string().as_bytes().to_vec(),
-        ))
-        .ok();
+    update_viewmodel_with_json(DotAddress::from("someItemCategory.count"), json_value)
 }
+...
 
 ```
 
@@ -236,6 +233,8 @@ In Dart, you can use `readViewmodelAsJson` function from `bridge/wrapper.dart` m
 
 You can also use `readViewmodelAsBytes` function which returns `Uint8List` representing raw bytes of a viewmodel item. If the size of a viewmodel item is large, perhaps because it's a large-resolution image, you can pass in a value of true with `takeOwnership` argument to the function to avoid copying. Be aware that this action removes the item from the viewmodel.
 
+Extra mechanisms such as calling a task from Dart can be found in the actual code. If there are things that are still unclear, feel free to leave a question or start a discussion.
+
 Keep in mind that `lib.rs` inside `./native/hub/src` is the entry point of your Rust logic.
 
 # 📜 Rules
@@ -244,30 +243,14 @@ Keep in mind that `lib.rs` inside `./native/hub/src` is the entry point of your 
 
 Be careful all the time! You shouldn't be editing any file without enough knowledge of how it works. Below are the top-level files and folders that are allowed to edit during app development:
 
-### Dart Related
-
 - `lib`: Dart modules.
   - Do not modify the `bridge` folder inside.
 - `pubspec.yaml`: Dart settings and dependencies.
-
-### Rust Related
-
+- `assets`: Asset files.
 - `native`: Rust crates. The name of the library crate folder should be the same as that of the library crate's name.
   - Think of `hub` crate as your Rust entry point. It is not a binary crate but it is similar.
   - Do not modify `bridge` module inside `hub` crate.
-  - `config.toml.template` file is okay to be modified if needed.
-
-## Comments
-
-Please write kind and readable comments next to your code. You are probably not going to be developing on your own. Other developers should be able to get a grasp of the complex code that you wrote. Long and detailed comments are also welcomed.
-
-## User Interface Texts
-
-Always write user interface texts in `./assets/translations`.
-
-When an app gains popularity, there comes a need to support multiple human languages. However, manually replacing thousands of text widgets in the user interface is not a trivial task. Therefore it is a must to write texts that will be presented to normal users in translation files.
-
-Refer to [Easy Localization](https://pub.dev/packages/easy_localization) docs for more details.
+  - `config.toml.template` file is okay to be modified.
 
 ## Division of Functions
 
@@ -275,9 +258,21 @@ Dart should only be used for the front-end user interface and Rust should handle
 
 If the characteristic of a specific Rust API is different from other Rust APIs, it should be detached into a separate Rust crate. All crates should provide a clean API with descriptive function names.
 
+## User Interface Texts
+
+Always write user interface texts in `./assets/translations.csv`.
+
+When an app gains popularity, there comes a need to support multiple human languages. However, manually replacing thousands of text widgets in the user interface is not a trivial task. Therefore it is a must to write texts that will be presented to normal users in translation files.
+
+Refer to [Easy Localization](https://pub.dev/packages/easy_localization) docs for more details.
+
+## Comments
+
+Please write kind and readable comments next to your code. You are probably not going to be developing on your own. Other developers should be able to get a grasp of the complex code that you wrote. Long and detailed comments are also welcomed.
+
 ## Python Automation Scripts
 
-For faster and easier development, Cunarist App Template relies on Python scripts in `./automate` for automation.
+It is okay to rely on Python scripts in `./automate` for automation for faster and easier development.
 
 # 📁 Folder Structure
 

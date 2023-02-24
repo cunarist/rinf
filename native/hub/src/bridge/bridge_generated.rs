@@ -38,7 +38,7 @@ fn wire_start_and_get_viewmodel_update_stream_impl(port_: MessagePort) {
     )
 }
 fn wire_read_viewmodel_impl(
-    data_address: impl Wire2Api<DotAddress> + UnwindSafe,
+    item_address: impl Wire2Api<DotAddress> + UnwindSafe,
     take_ownership: impl Wire2Api<bool> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
@@ -48,9 +48,9 @@ fn wire_read_viewmodel_impl(
             mode: FfiCallMode::Sync,
         },
         move || {
-            let api_data_address = data_address.wire2api();
+            let api_item_address = item_address.wire2api();
             let api_take_ownership = take_ownership.wire2api();
-            Ok(read_viewmodel(api_data_address, api_take_ownership))
+            Ok(read_viewmodel(api_item_address, api_take_ownership))
         },
     )
 }

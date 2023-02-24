@@ -37,7 +37,7 @@ intptr_t init_frb_dart_api_dl(void *obj);
 
 void wire_start_and_get_viewmodel_update_stream(int64_t port_);
 
-WireSyncReturn wire_read_viewmodel(struct wire_DotAddress *data_address, bool take_ownership);
+WireSyncReturn wire_read_viewmodel(struct wire_DotAddress *item_address, bool take_ownership);
 
 WireSyncReturn wire_send_user_action(struct wire_DotAddress *task_address,
                                      struct wire_uint_8_list *json_string);

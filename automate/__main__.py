@@ -195,7 +195,7 @@ elif sys.argv[1] == "icon-gen":
     new_image = process_icon(image, 0.232, 1)
     new_image.save("./temp/app_icon_linux.png")
 
-    new_image = process_icon(image, 0, 1)
+    new_image = process_icon(image, 0.232, 1)
     new_image.save("./temp/app_icon_android.png")
 
     new_image = process_icon(image, 0.232, 0.8)

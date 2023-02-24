@@ -20,21 +20,21 @@
 /* Begin PBXContainerItemProxy section */
 		A3671AD229957A8000604FF0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = A3671ACD29957A7F00604FF0 /* native.xcodeproj */;
+			containerPortal = A3671ACD29957A7F00604FF0 /* .native.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = CA603EE7FF4DEAC3B2E0A336;
 			remoteInfo = "native-cdylib";
 		};
 		A3671AD429957A8000604FF0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = A3671ACD29957A7F00604FF0 /* native.xcodeproj */;
+			containerPortal = A3671ACD29957A7F00604FF0 /* .native.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = CA60F0FEBE702969E816930C;
 			remoteInfo = "native-staticlib";
 		};
 		A3671AD629957A8A00604FF0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = A3671ACD29957A7F00604FF0 /* native.xcodeproj */;
+			containerPortal = A3671ACD29957A7F00604FF0 /* .native.xcodeproj */;
 			proxyType = 1;
 			remoteGlobalIDString = CA60F0FEBE701C83950DBC35;
 			remoteInfo = "native-staticlib";
@@ -72,7 +72,7 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A3671ACD29957A7F00604FF0 /* native.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = native.xcodeproj; path = ../native/native.xcodeproj; sourceTree = "<group>"; };
+		A3671ACD29957A7F00604FF0 /* .native.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = .native.xcodeproj; path = ../native/.native.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,7 +113,7 @@
 		97C146E51CF9000F007C117D = {
 			isa = PBXGroup;
 			children = (
-				A3671ACD29957A7F00604FF0 /* native.xcodeproj */,
+				A3671ACD29957A7F00604FF0 /* .native.xcodeproj */,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
 				97C146EF1CF9000F007C117D /* Products */,
@@ -217,7 +217,7 @@
 			projectReferences = (
 				{
 					ProductGroup = A3671ACE29957A7F00604FF0 /* Products */;
-					ProjectRef = A3671ACD29957A7F00604FF0 /* native.xcodeproj */;
+					ProjectRef = A3671ACD29957A7F00604FF0 /* .native.xcodeproj */;
 				},
 			);
 			projectRoot = "";
