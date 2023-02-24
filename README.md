@@ -206,7 +206,7 @@ And then you have a Rust function.
 ```rust
 // ./native/hub/sample_functions.rs
 
-use crate::api::DotAddress;
+use crate::api::String;
 use crate::bridge::update_viewmodel_with_json;
 use crate::model;
 use serde_json::json;
@@ -219,7 +219,7 @@ pub fn calculate_something(json_value: serde_json::Value) {
     println!("{:}", *value);
     let json_value = json!({ "value": *value });
 
-    update_viewmodel_with_json(DotAddress::from("someItemCategory.count"), json_value)
+    update_viewmodel_with_json(String::from("someItemCategory.count"), json_value)
 }
 ...
 

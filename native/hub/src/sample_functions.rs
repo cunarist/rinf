@@ -1,4 +1,3 @@
-use crate::api::DotAddress;
 use crate::bridge::update_viewmodel_with_bytes;
 use crate::bridge::update_viewmodel_with_json;
 use crate::model;
@@ -12,7 +11,7 @@ pub fn calculate_something(json_value: serde_json::Value) {
     println!("{:}", *value);
     let json_value = json!({ "value": *value });
 
-    update_viewmodel_with_json(DotAddress::from("someItemCategory.count"), json_value)
+    update_viewmodel_with_json("someItemCategory.count", json_value)
 }
 
 pub fn start_drawing_mandelbrot() {
@@ -32,10 +31,7 @@ pub fn start_drawing_mandelbrot() {
                 4,
             )
             .unwrap();
-            update_viewmodel_with_bytes(
-                DotAddress::from("someItemCategory.mandelbrot"),
-                mandelbrot,
-            );
+            update_viewmodel_with_bytes("someItemCategory.mandelbrot", mandelbrot);
             std::thread::sleep(std::time::Duration::from_millis(20));
             scale *= 0.95;
             if scale < 1e-9 {

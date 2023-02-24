@@ -6,13 +6,9 @@ import 'dart:async';
 var viewmodelUpdateStream = api.startAndGetViewmodelUpdateStream();
 var viewmodelUpdateBroadcaster = StreamController<String>.broadcast();
 
-DotAddress toDotAddress(String plain) {
-  return DotAddress(layered: plain.split('.'));
-}
-
 dynamic readViewmodelAsJson(String itemAddress) {
   Uint8List? bytes = api.readViewmodel(
-    itemAddress: toDotAddress(itemAddress),
+    itemAddress: itemAddress,
     takeOwnership: false,
   );
   dynamic jsonValue;
@@ -28,7 +24,7 @@ dynamic readViewmodelAsJson(String itemAddress) {
 Uint8List? readViewmodelAsBytes(String itemAddress,
     [bool takeOwnership = false]) {
   Uint8List? bytes = api.readViewmodel(
-    itemAddress: toDotAddress(itemAddress),
+    itemAddress: itemAddress,
     takeOwnership: takeOwnership,
   );
   return bytes;
@@ -37,7 +33,7 @@ Uint8List? readViewmodelAsBytes(String itemAddress,
 void sendUserAction(String taskAddress, dynamic jsonValue) {
   String jsonString = json.encode(jsonValue);
   api.sendUserAction(
-    taskAddress: toDotAddress(taskAddress),
+    taskAddress: taskAddress,
     jsonString: jsonString,
   );
 }

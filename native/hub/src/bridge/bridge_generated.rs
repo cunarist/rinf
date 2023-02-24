@@ -38,7 +38,7 @@ fn wire_start_and_get_viewmodel_update_stream_impl(port_: MessagePort) {
     )
 }
 fn wire_read_viewmodel_impl(
-    item_address: impl Wire2Api<DotAddress> + UnwindSafe,
+    item_address: impl Wire2Api<String> + UnwindSafe,
     take_ownership: impl Wire2Api<bool> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
@@ -55,7 +55,7 @@ fn wire_read_viewmodel_impl(
     )
 }
 fn wire_send_user_action_impl(
-    task_address: impl Wire2Api<DotAddress> + UnwindSafe,
+    task_address: impl Wire2Api<String> + UnwindSafe,
     json_string: impl Wire2Api<String> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
@@ -99,7 +99,6 @@ impl Wire2Api<bool> for bool {
         self
     }
 }
-
 impl Wire2Api<u8> for u8 {
     fn wire2api(self) -> u8 {
         self

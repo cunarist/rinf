@@ -15,26 +15,14 @@ abstract class Bridge {
   FlutterRustBridgeTaskConstMeta get kStartAndGetViewmodelUpdateStreamConstMeta;
 
   Uint8List? readViewmodel(
-      {required DotAddress itemAddress,
-      required bool takeOwnership,
-      dynamic hint});
+      {required String itemAddress, required bool takeOwnership, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kReadViewmodelConstMeta;
 
   void sendUserAction(
-      {required DotAddress taskAddress,
-      required String jsonString,
-      dynamic hint});
+      {required String taskAddress, required String jsonString, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kSendUserActionConstMeta;
-}
-
-class DotAddress {
-  final List<String> layered;
-
-  DotAddress({
-    required this.layered,
-  });
 }
 
 class BridgeImpl implements Bridge {
@@ -65,10 +53,10 @@ class BridgeImpl implements Bridge {
           );
 
   Uint8List? readViewmodel(
-      {required DotAddress itemAddress,
+      {required String itemAddress,
       required bool takeOwnership,
       dynamic hint}) {
-    var arg0 = _platform.api2wire_box_autoadd_dot_address(itemAddress);
+    var arg0 = _platform.api2wire_String(itemAddress);
     var arg1 = takeOwnership;
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_read_viewmodel(arg0, arg1),
@@ -86,10 +74,8 @@ class BridgeImpl implements Bridge {
       );
 
   void sendUserAction(
-      {required DotAddress taskAddress,
-      required String jsonString,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_box_autoadd_dot_address(taskAddress);
+      {required String taskAddress, required String jsonString, dynamic hint}) {
+    var arg0 = _platform.api2wire_String(taskAddress);
     var arg1 = _platform.api2wire_String(jsonString);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_send_user_action(arg0, arg1),
@@ -157,23 +143,6 @@ class BridgePlatform extends FlutterRustBridgeBase<BridgeWire> {
   }
 
   @protected
-  ffi.Pointer<wire_StringList> api2wire_StringList(List<String> raw) {
-    final ans = inner.new_StringList_0(raw.length);
-    for (var i = 0; i < raw.length; i++) {
-      ans.ref.ptr[i] = api2wire_String(raw[i]);
-    }
-    return ans;
-  }
-
-  @protected
-  ffi.Pointer<wire_DotAddress> api2wire_box_autoadd_dot_address(
-      DotAddress raw) {
-    final ptr = inner.new_box_autoadd_dot_address_0();
-    _api_fill_to_wire_dot_address(raw, ptr.ref);
-    return ptr;
-  }
-
-  @protected
   ffi.Pointer<wire_uint_8_list> api2wire_uint_8_list(Uint8List raw) {
     final ans = inner.new_uint_8_list_0(raw.length);
     ans.ref.ptr.asTypedList(raw.length).setAll(0, raw);
@@ -182,16 +151,6 @@ class BridgePlatform extends FlutterRustBridgeBase<BridgeWire> {
 // Section: finalizer
 
 // Section: api_fill_to_wire
-
-  void _api_fill_to_wire_box_autoadd_dot_address(
-      DotAddress apiObj, ffi.Pointer<wire_DotAddress> wireObj) {
-    _api_fill_to_wire_dot_address(apiObj, wireObj.ref);
-  }
-
-  void _api_fill_to_wire_dot_address(
-      DotAddress apiObj, wire_DotAddress wireObj) {
-    wireObj.layered = api2wire_StringList(apiObj.layered);
-  }
 }
 
 // ignore_for_file: camel_case_types, non_constant_identifier_names, avoid_positional_boolean_parameters, annotate_overrides, constant_identifier_names
@@ -305,7 +264,7 @@ class BridgeWire implements FlutterRustBridgeWireBase {
           .asFunction<void Function(int)>();
 
   WireSyncReturn wire_read_viewmodel(
-    ffi.Pointer<wire_DotAddress> item_address,
+    ffi.Pointer<wire_uint_8_list> item_address,
     bool take_ownership,
   ) {
     return _wire_read_viewmodel(
@@ -317,12 +276,12 @@ class BridgeWire implements FlutterRustBridgeWireBase {
   late final _wire_read_viewmodelPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(
-              ffi.Pointer<wire_DotAddress>, ffi.Bool)>>('wire_read_viewmodel');
+              ffi.Pointer<wire_uint_8_list>, ffi.Bool)>>('wire_read_viewmodel');
   late final _wire_read_viewmodel = _wire_read_viewmodelPtr.asFunction<
-      WireSyncReturn Function(ffi.Pointer<wire_DotAddress>, bool)>();
+      WireSyncReturn Function(ffi.Pointer<wire_uint_8_list>, bool)>();
 
   WireSyncReturn wire_send_user_action(
-    ffi.Pointer<wire_DotAddress> task_address,
+    ffi.Pointer<wire_uint_8_list> task_address,
     ffi.Pointer<wire_uint_8_list> json_string,
   ) {
     return _wire_send_user_action(
@@ -333,35 +292,11 @@ class BridgeWire implements FlutterRustBridgeWireBase {
 
   late final _wire_send_user_actionPtr = _lookup<
       ffi.NativeFunction<
-          WireSyncReturn Function(ffi.Pointer<wire_DotAddress>,
+          WireSyncReturn Function(ffi.Pointer<wire_uint_8_list>,
               ffi.Pointer<wire_uint_8_list>)>>('wire_send_user_action');
   late final _wire_send_user_action = _wire_send_user_actionPtr.asFunction<
       WireSyncReturn Function(
-          ffi.Pointer<wire_DotAddress>, ffi.Pointer<wire_uint_8_list>)>();
-
-  ffi.Pointer<wire_StringList> new_StringList_0(
-    int len,
-  ) {
-    return _new_StringList_0(
-      len,
-    );
-  }
-
-  late final _new_StringList_0Ptr = _lookup<
-          ffi.NativeFunction<ffi.Pointer<wire_StringList> Function(ffi.Int32)>>(
-      'new_StringList_0');
-  late final _new_StringList_0 = _new_StringList_0Ptr
-      .asFunction<ffi.Pointer<wire_StringList> Function(int)>();
-
-  ffi.Pointer<wire_DotAddress> new_box_autoadd_dot_address_0() {
-    return _new_box_autoadd_dot_address_0();
-  }
-
-  late final _new_box_autoadd_dot_address_0Ptr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<wire_DotAddress> Function()>>(
-          'new_box_autoadd_dot_address_0');
-  late final _new_box_autoadd_dot_address_0 = _new_box_autoadd_dot_address_0Ptr
-      .asFunction<ffi.Pointer<wire_DotAddress> Function()>();
+          ffi.Pointer<wire_uint_8_list>, ffi.Pointer<wire_uint_8_list>)>();
 
   ffi.Pointer<wire_uint_8_list> new_uint_8_list_0(
     int len,
@@ -400,17 +335,6 @@ class wire_uint_8_list extends ffi.Struct {
 
   @ffi.Int32()
   external int len;
-}
-
-class wire_StringList extends ffi.Struct {
-  external ffi.Pointer<ffi.Pointer<wire_uint_8_list>> ptr;
-
-  @ffi.Int32()
-  external int len;
-}
-
-class wire_DotAddress extends ffi.Struct {
-  external ffi.Pointer<wire_StringList> layered;
 }
 
 typedef DartPostCObjectFnType = ffi.Pointer<
