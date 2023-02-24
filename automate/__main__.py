@@ -87,6 +87,10 @@ elif sys.argv[1] == "app-naming":
             except UnicodeDecodeError:
                 pass
 
+    combined = f"{domain}.{lowercase_app_name}"
+    command = f"flutter pub run change_app_package_name:main {combined}"
+    os.system(command)
+
     print("Done! Don't forget to update description in pubspec.yaml file as well.")
 
 elif sys.argv[1] == "config-filling":

@@ -40,21 +40,21 @@
 		};
 		A38F8B9D299579880018A868 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = A38F8B98299579880018A868 /* .native.xcodeproj */;
+			containerPortal = A38F8B98299579880018A868 /* hub/hub.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = CA603EE7FF4DEAC3B2E0A336;
 			remoteInfo = "native-cdylib";
 		};
 		A38F8B9F299579880018A868 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = A38F8B98299579880018A868 /* .native.xcodeproj */;
+			containerPortal = A38F8B98299579880018A868 /* hub/hub.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = CA60F0FEBE702969E816930C;
 			remoteInfo = "native-staticlib";
 		};
 		A38F8BA829957A0D0018A868 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = A38F8B98299579880018A868 /* .native.xcodeproj */;
+			containerPortal = A38F8B98299579880018A868 /* hub/hub.xcodeproj */;
 			proxyType = 1;
 			remoteGlobalIDString = CA60F0FEBE701C83950DBC35;
 			remoteInfo = "native-staticlib";
@@ -95,7 +95,7 @@
 		6BEDDB71D0DDA491B5917BAF /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
-		A38F8B98299579880018A868 /* .native.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = .native.xcodeproj; path = ../native/.native.xcodeproj; sourceTree = "<group>"; };
+		A38F8B98299579880018A868 /* hub/hub.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = hub/hub.xcodeproj; path = ../native/hub/hub.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,7 +125,7 @@
 		33CC10E42044A3C60003C045 = {
 			isa = PBXGroup;
 			children = (
-				A38F8B98299579880018A868 /* .native.xcodeproj */,
+				A38F8B98299579880018A868 /* hub/hub.xcodeproj */,
 				33FAB671232836740065AC1E /* Runner */,
 				33CEB47122A05771004F2AC0 /* Flutter */,
 				33CC10EE2044A3C60003C045 /* Products */,
@@ -271,7 +271,7 @@
 			projectReferences = (
 				{
 					ProductGroup = A38F8B99299579880018A868 /* Products */;
-					ProjectRef = A38F8B98299579880018A868 /* .native.xcodeproj */;
+					ProjectRef = A38F8B98299579880018A868 /* hub/hub.xcodeproj */;
 				},
 			);
 			projectRoot = "";

@@ -46,7 +46,7 @@ android {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.example.someappname"
         // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
+        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
@@ -70,34 +70,34 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
-def ndkDir = localProperties.getProperty('ndk.dir')
+def ANDROID_NDK = localProperties.getProperty('ndk.dir')
 
 [
-    new Tuple2('Debug', ''),
-    new Tuple2('Profile', '--release'),
-    new Tuple2('Release', '--release')
+        Debug: null,
+        Profile: '--release',
+        Release: '--release'
 ].each {
-    def taskPostfix = it.first
-    def profileMode = it.second
+    def taskPostfix = it.key
+    def profileMode = it.value
     tasks.whenTaskAdded { task ->
         if (task.name == "javaPreCompile$taskPostfix") {
             task.dependsOn "cargoBuild$taskPostfix"
         }
     }
     tasks.register("cargoBuild$taskPostfix", Exec) {
-        // Until https://github.com/bbqsrc/cargo-ndk/pull/13 is merged,
-        // this workaround is necessary.
-
-        def ndk_command = """cargo ndk \
-            -t armeabi-v7a -t arm64-v8a -t x86_64 -t x86 \
-            -o ../android/app/src/main/jniLibs build $profileMode"""
-
-        workingDir "../../native"
-        environment "ANDROID_NDK_HOME", ndkDir
-        if (org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.currentOperatingSystem.isWindows()) {
-            commandLine 'cmd', '/C', ndk_command
-        } else {
-            commandLine 'sh', '-c', ndk_command
+        workingDir "../../native/hub"
+        environment ANDROID_NDK_HOME: "$ANDROID_NDK"
+        commandLine 'cargo', 'ndk',
+                // the 2 ABIs below are used by real Android devices
+                '-t', 'armeabi-v7a',
+                '-t', 'arm64-v8a',
+                // the below 2 ABIs are usually used for Android simulators,
+                // add or remove these ABIs as needed.
+                '-t', 'x86',
+                '-t', 'x86_64',
+                '-o', '../android/app/src/main/jniLibs', 'build'
+        if (profileMode != null) {
+            args profileMode
         }
     }
 }

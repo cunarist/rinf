@@ -1,5 +1,5 @@
 name: someappname
-description: Biased app templated based on combination of Flutter and Rust
+description: Production-ready app templated based on combination of Flutter and Rust
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -20,7 +20,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.18.4 <3.0.0"
+  sdk: ">=2.19.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -38,6 +38,7 @@ dev_dependencies:
   flutter_launcher_icons: ^0.11.0
   ffigen: ^7.2.6
   flutter_lints: ^2.0.0
+  change_app_package_name: ^1.1.0
 
 flutter:
   uses-material-design: true
@@ -49,7 +50,7 @@ flutter_icons:
     image_path: "temp/app_icon_windows.png"
     generate: true
     icon_size: 256
-  android: "launcher_icon"
+  android: "ic_launcher"
   image_path_android: "temp/app_icon_android.png"
   macos:
     image_path: "temp/app_icon_macos.png"

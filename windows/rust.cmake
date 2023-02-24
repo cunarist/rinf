@@ -5,17 +5,13 @@
 # find_package(Corrosion REQUIRED)
 
 include(FetchContent)
-
 FetchContent_Declare(
     Corrosion
     GIT_REPOSITORY https://github.com/AndrewGaspar/corrosion.git
     GIT_TAG origin/master # Optionally specify a version tag or branch here
 )
-
 FetchContent_MakeAvailable(Corrosion)
 
-corrosion_import_crate(MANIFEST_PATH ../native/Cargo.toml IMPORTED_CRATES imported_crates)
+corrosion_import_crate(MANIFEST_PATH ../native/hub/Cargo.toml)
 target_link_libraries(${BINARY_NAME} PRIVATE hub)
-foreach(imported_crate ${imported_crates})
-  list(APPEND PLUGIN_BUNDLED_LIBRARIES $<TARGET_FILE:${imported_crate}-shared>)
-endforeach()
+list(APPEND PLUGIN_BUNDLED_LIBRARIES $<TARGET_FILE:hub-shared>)
