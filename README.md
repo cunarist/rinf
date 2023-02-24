@@ -219,7 +219,7 @@ pub fn calculate_something(json_value: serde_json::Value) {
     println!("{:}", *value);
     let json_value = json!({ "value": *value });
 
-    update_viewmodel_with_json(String::from("someItemCategory.count"), json_value)
+    update_viewmodel_with_json("someItemCategory.count", json_value)
 }
 ...
 
