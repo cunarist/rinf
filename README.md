@@ -1,6 +1,6 @@
 # 🆎 About This Template
 
-> You can remove this section after you've created your repository.
+> You can remove this section and `./readme` folder after you've created your repository.
 
 This template provides instant capabilities to developers who want to embrace the power of **Rust** and **Flutter** together. Simply duplicate this template and you're ready to go!
 
