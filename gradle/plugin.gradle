@@ -87,7 +87,7 @@ class CargoKitPlugin implements Plugin<Project> {
                     return plugin;
                 }
             }
-            return _findFlutterPlugin(project.childProjects);
+            return _findFlutterPlugin(project.value.childProjects);
         }
         return null;
     }
