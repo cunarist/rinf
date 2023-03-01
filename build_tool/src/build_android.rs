@@ -192,6 +192,9 @@ fn build_for_target(target: &Target) -> Result<()> {
     .to_ascii_uppercase();
     let linker_value = cc_value.clone();
 
+    let ranlib_key = format!("RANLIB_{}", target.rust_target());
+    let ranlib_value = toolchain_path.join("llvm-ranlib");
+
     let ndk_version = string_from_env("CARGOKIT_NDK_VERSION")?;
     let build_dir = path_from_env("CARGOKIT_BUILD_DIR")?;
     let output_dir = path_from_env("CARGOKIT_OUTPUT_DIR")?;
@@ -205,6 +208,7 @@ fn build_for_target(target: &Target) -> Result<()> {
     debug!("ENV {}={}", cxx_key, cxx_value.display());
     debug!("ENV {}={}", linker_key, linker_value.display());
     debug!("ENV {}={}", rustflags_key, rust_flags_value);
+    debug!("ENV {}={}", ranlib_key, ranlib_value.display());
 
     let mut cmd = Command::new("cargo");
     cmd.arg("build");
