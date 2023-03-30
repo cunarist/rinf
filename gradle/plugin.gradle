@@ -80,14 +80,17 @@ class CargoKitPlugin implements Plugin<Project> {
         _findFlutterPlugin(rootProject.childProjects)
     }
 
-    private Plugin _findFlutterPlugin(Map projects) {
+   private Plugin _findFlutterPlugin(Map projects) {
         for (project in projects) {
             for (plugin in project.value.getPlugins()) {
                 if (plugin.class.name == "FlutterPlugin") {
                     return plugin;
                 }
             }
-            return _findFlutterPlugin(project.value.childProjects);
+            def plugin = _findFlutterPlugin(project.value.childProjects);
+            if (plugin != null) {
+                return plugin;
+            }
         }
         return null;
     }
