@@ -1,5 +1,5 @@
 name: someappname
-description: Production-ready app templated based on combination of Flutter and Rust
+description: Production-ready app templated based on the combination of Flutter and Rust
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -17,7 +17,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 0.1.0
 
 environment:
   sdk: ">=2.19.0 <3.0.0"
@@ -26,11 +26,13 @@ dependencies:
   flutter:
     sdk: flutter
   bitsdojo_window: ^0.1.5
-  flutter_rust_bridge: ^1.65.0
+  flutter_rust_bridge: ^1.75.3
   ffi: ^2.0.1
+  uuid: ^3.0.7
   meta: ^1.8.0
   easy_localization: ^3.0.1
   easy_localization_loader: ^1.0.1
+  messagepack: ^0.2.1
 
 dev_dependencies:
   flutter_test:

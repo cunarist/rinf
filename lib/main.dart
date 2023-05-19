@@ -14,10 +14,7 @@ void main() async {
     return true;
   }());
 
-  // Prepare view update broadcasting
-  viewmodelUpdateStream.listen((event) {
-    viewmodelUpdateBroadcaster.add(event);
-  });
+  await organizeRustRelatedThings();
 
   // Initialization of packages
   WidgetsFlutterBinding.ensureInitialized();

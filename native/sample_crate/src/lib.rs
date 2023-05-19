@@ -1,3 +1,6 @@
+///! Mandelbrot is copied and modified from
+///! https://github.com/ProgrammingRust/mandelbrot/blob/task-queue/src/main.rs and
+///! https://github.com/Ducolnd/rust-mandelbrot/blob/master/src/main.rs
 use anyhow::*;
 use image::codecs::png::PngEncoder;
 use image::*;
@@ -7,10 +10,6 @@ use std::sync::Mutex;
 pub fn add_seven(before: i32) -> i32 {
     before + 7
 }
-
-///! Mandelbrot is copied and modified from
-///! https://github.com/ProgrammingRust/mandelbrot/blob/task-queue/src/main.rs and
-///! https://github.com/Ducolnd/rust-mandelbrot/blob/master/src/main.rs
 
 #[derive(Debug, Clone)]
 pub struct Size {
@@ -203,16 +202,3 @@ pub fn mandelbrot(
 
     write_image(&colorize(&pixels), bounds)
 }
-
-// pub fn tree_preorder_traversal(root: TreeNode) -> Vec<String> {
-//     let mut ans = Vec::new();
-//     tree_preorder_traversal_core(root, &mut ans);
-//     ans
-// }
-//
-// fn tree_preorder_traversal_core(node: TreeNode, dst: &mut Vec<String>) {
-//     dst.push(node.name);
-//     for child in node.children {
-//         tree_preorder_traversal_core(child, dst);
-//     }
-// }

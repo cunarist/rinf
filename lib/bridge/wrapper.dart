@@ -1,39 +1,30 @@
-import 'dart:typed_data';
-import 'dart:convert';
-import 'ffi.dart';
+import 'ffi.dart' if (dart.library.html) 'ffi_web.dart';
 import 'dart:async';
 
-var viewmodelUpdateStream = api.startAndGetViewmodelUpdateStream();
 var viewmodelUpdateBroadcaster = StreamController<String>.broadcast();
 
-dynamic readViewmodelAsJson(String itemAddress) {
-  Uint8List? bytes = api.readViewmodel(
-    itemAddress: itemAddress,
-    takeOwnership: false,
-  );
-  dynamic jsonValue;
-  if (bytes != null) {
-    String jsonString = utf8.decode(bytes);
-    jsonValue = json.decode(jsonString);
-  } else {
-    jsonValue = null;
-  }
-  return jsonValue;
+Future organizeRustRelatedThings() async {
+  var endpointsOnRustThread = api.prepareChannels();
+  endpointsOnRustThread.move = true;
+  await api.layEndpointsOnRustThread(rustOpaque: endpointsOnRustThread);
+  var viewmodelUpdateStream = api.prepareViewmodelUpdateStream();
+  viewmodelUpdateStream.listen((event) {
+    viewmodelUpdateBroadcaster.add(event);
+  });
+  await Future.delayed(const Duration(milliseconds: 100));
+  api.startRustLogic();
 }
 
-Uint8List? readViewmodelAsBytes(String itemAddress,
-    [bool takeOwnership = false]) {
-  Uint8List? bytes = api.readViewmodel(
+Serialized? readViewmodel(String itemAddress) {
+  Serialized? serialized = api.readViewmodel(
     itemAddress: itemAddress,
-    takeOwnership: takeOwnership,
   );
-  return bytes;
+  return serialized;
 }
 
-void sendUserAction(String taskAddress, dynamic jsonValue) {
-  String jsonString = json.encode(jsonValue);
+void sendUserAction(String taskAddress, Serialized serialized) {
   api.sendUserAction(
     taskAddress: taskAddress,
-    jsonString: jsonString,
+    serialized: serialized,
   );
 }

@@ -1,87 +1,106 @@
+use flutter_rust_bridge::RustOpaque;
 use flutter_rust_bridge::StreamSink;
 use flutter_rust_bridge::SyncReturn;
-use once_cell::sync::OnceCell;
+use ref_thread_local::ref_thread_local;
+use ref_thread_local::RefThreadLocal;
+use std::cell::RefCell;
 use std::collections::HashMap;
-use std::sync::atomic::AtomicBool;
-use std::sync::atomic::AtomicI32;
-use std::sync::atomic::Ordering;
-use std::sync::mpsc::channel;
-use std::sync::mpsc::Receiver;
-use std::sync::mpsc::Sender;
-use std::sync::Mutex;
+pub use std::sync::Mutex;
+use tokio::sync::mpsc::channel;
+use tokio::sync::mpsc::Receiver;
+use tokio::sync::mpsc::Sender;
 
-type UserActionSender = OnceCell<Mutex<Sender<(String, String)>>>;
-pub static USER_ACTION_SENDER: UserActionSender = OnceCell::new();
-type UserActionReceiver = OnceCell<Mutex<Receiver<(String, String)>>>;
-pub static USER_ACTION_RECEIVER: UserActionReceiver = OnceCell::new();
-type ViewmodelUpdateSender = OnceCell<Mutex<Sender<(String, Vec<u8>)>>>;
-pub static VIEWMODEL_UPDATE_SENDER: ViewmodelUpdateSender = OnceCell::new();
-type ViewmodelUpdateReceiver = OnceCell<Mutex<Receiver<(String, Vec<u8>)>>>;
-pub static VIEWMODEL_UPDATE_RECEIVER: ViewmodelUpdateReceiver = OnceCell::new();
-
-type ViewModel = OnceCell<Mutex<HashMap<String, Vec<u8>>>>;
-static VIEWMODEL: ViewModel = OnceCell::new();
-
-static IS_RUST_LOGIC_STARTED: AtomicBool = AtomicBool::new(false);
-static DART_HOT_RESTART_COUNT: AtomicI32 = AtomicI32::new(0);
-
-pub fn start_and_get_viewmodel_update_stream(viewmodel_update_stream: StreamSink<String>) {
-    // Thread by flutter_rust_bridge
-
-    DART_HOT_RESTART_COUNT.fetch_add(1, Ordering::SeqCst);
-    let hot_restart_number = DART_HOT_RESTART_COUNT.load(Ordering::SeqCst);
-
-    if !IS_RUST_LOGIC_STARTED.load(Ordering::SeqCst) {
-        // Dart first run
-        IS_RUST_LOGIC_STARTED.store(true, Ordering::SeqCst);
-        let (sender, receiver) = channel();
-        USER_ACTION_SENDER.set(Mutex::new(sender)).ok();
-        USER_ACTION_RECEIVER.set(Mutex::new(receiver)).ok();
-        let (sender, receiver) = channel();
-        VIEWMODEL_UPDATE_SENDER.set(Mutex::new(sender)).ok();
-        VIEWMODEL_UPDATE_RECEIVER.set(Mutex::new(receiver)).ok();
-        let viewmodel = HashMap::<String, Vec<u8>>::new();
-        VIEWMODEL.set(Mutex::new(viewmodel)).ok();
-        std::thread::spawn(crate::main);
-    } else {
-        // Dart hot restart
-        let sender = VIEWMODEL_UPDATE_SENDER.get().unwrap().lock().unwrap();
-        sender.send((String::from("breakTheLoop"), vec![])).ok();
-    }
-
-    std::thread::spawn(move || {
-        let receiver = VIEWMODEL_UPDATE_RECEIVER.get().unwrap().lock().unwrap();
-        loop {
-            if let Ok(received) = receiver.recv() {
-                let item_address = received.0;
-                let bytes = received.1;
-                let mut viewmodel = VIEWMODEL.get().unwrap().lock().unwrap();
-                viewmodel.insert(item_address.clone(), bytes);
-                viewmodel_update_stream.add(item_address.to_string());
-            }
-            if hot_restart_number < DART_HOT_RESTART_COUNT.load(Ordering::SeqCst) {
-                // When another `StreamSink` is established by hot restart
-                break;
-            }
-        }
-    });
+#[derive(Debug, Clone)]
+pub struct Serialized {
+    pub data: Vec<u8>,
+    pub formula: String,
 }
 
-pub fn read_viewmodel(item_address: String, take_ownership: bool) -> SyncReturn<Option<Vec<u8>>> {
-    let mut viewmodel = VIEWMODEL.get().unwrap().lock().unwrap();
-    let bytes = if take_ownership {
-        viewmodel.remove(&item_address)
-    } else {
-        viewmodel.get(&item_address).cloned()
+#[derive(Debug)]
+pub struct EndpointsOnRustThread {
+    pub user_action_receiver: Receiver<(String, Serialized)>,
+    pub viewmodel_update_sender: Sender<(String, Serialized)>,
+}
+
+type ViewmodelUpdateStream = RefCell<Option<StreamSink<String>>>;
+type UserActionSender = RefCell<Option<Sender<(String, Serialized)>>>;
+type UserActionReceiver = RefCell<Option<Receiver<(String, Serialized)>>>;
+type ViewmodelUpdateSender = RefCell<Option<Sender<(String, Serialized)>>>;
+type ViewmodelUpdateReceiver = RefCell<Option<Receiver<(String, Serialized)>>>;
+
+ref_thread_local! {
+    // With this macro, each thread gets its own static variables instead of sharing them.
+    pub static managed STARTED_FLAG: bool = false; // For Dart thread
+    pub static managed VIEWMODEL: HashMap<String, Serialized> = HashMap::new(); // For Dart thread
+    pub static managed VIEWMODEL_UPDATE_STREAM: ViewmodelUpdateStream = RefCell::new(None); // For Rust thread
+    pub static managed USER_ACTION_SENDER: UserActionSender = RefCell::new(None); // For Dart thread
+    pub static managed USER_ACTION_RECEIVER: UserActionReceiver = RefCell::new(None); // For Rust thread
+    pub static managed VIEWMODEL_UPDATE_SENDER: ViewmodelUpdateSender= RefCell::new(None); // For Rust thread
+    pub static managed VIEWMODEL_UPDATE_RECEIVER: ViewmodelUpdateReceiver =RefCell::new( None); // For Dart thread
+}
+
+pub fn prepare_viewmodel_update_stream(viewmodel_update_stream: StreamSink<String>) {
+    // Thread 1 running Rust
+    let refcell = VIEWMODEL_UPDATE_STREAM.borrow_mut();
+    refcell.replace(Some(viewmodel_update_stream));
+}
+
+pub fn prepare_channels() -> SyncReturn<RustOpaque<Mutex<EndpointsOnRustThread>>> {
+    // Thread 0 running Dart
+    let (user_action_sender, user_action_receiver) = channel(1024);
+    let refcell = USER_ACTION_SENDER.borrow();
+    refcell.replace(Some(user_action_sender));
+    let (viewmodel_update_sender, viewmodel_update_receiver) = channel(1024);
+    let refcell = VIEWMODEL_UPDATE_RECEIVER.borrow();
+    refcell.replace(Some(viewmodel_update_receiver));
+    let endpoints_on_rust_thread = EndpointsOnRustThread {
+        user_action_receiver,
+        viewmodel_update_sender,
     };
-    SyncReturn(bytes)
+    SyncReturn(RustOpaque::new(Mutex::new(endpoints_on_rust_thread)))
 }
 
-pub fn send_user_action(task_address: String, json_string: String) -> SyncReturn<()> {
-    // Main thread by Flutter
+pub fn lay_endpoints_on_rust_thread(rust_opaque: RustOpaque<Mutex<EndpointsOnRustThread>>) {
+    // Thread 1 running Rust
+    let result = rust_opaque.try_unwrap();
+    let mutex = result.expect("Failed to unwrap received `RustOpaque` object!");
+    let result = mutex.into_inner();
+    let endpoints_at_dart_thread =
+        result.expect("Data inside received `RustOpaque` object is not valid!");
+    let inner = endpoints_at_dart_thread.user_action_receiver;
+    let refcell = USER_ACTION_RECEIVER.borrow();
+    refcell.replace(Some(inner));
+    let inner = endpoints_at_dart_thread.viewmodel_update_sender;
+    let refcell = VIEWMODEL_UPDATE_SENDER.borrow();
+    refcell.replace(Some(inner));
+}
 
-    let user_action = (task_address, json_string);
-    let sender = USER_ACTION_SENDER.get().unwrap().lock().unwrap();
-    sender.send(user_action).ok();
+pub fn start_rust_logic() {
+    // Thread 1 running Rust
+    crate::main();
+}
+
+pub fn send_user_action(task_address: String, serialized: Serialized) -> SyncReturn<()> {
+    // Thread 0 running Dart
+    let refcell = USER_ACTION_SENDER.borrow();
+    let borrowed = refcell.borrow();
+    let option = borrowed.as_ref();
+    let sender = option.expect("User action sender does not exist!");
+    let user_action = (task_address, serialized);
+    sender.try_send(user_action).ok();
     SyncReturn(())
+}
+
+pub fn read_viewmodel(item_address: String) -> SyncReturn<Option<Serialized>> {
+    // Thread 0 running Dart
+    let mut hashmap = VIEWMODEL.borrow_mut();
+    let receiver_refcell = VIEWMODEL_UPDATE_RECEIVER.borrow();
+    let receiver_option = receiver_refcell.replace(None);
+    let mut receiver = receiver_option.expect("Viewmodel update receiver does not exist!");
+    while let Ok(viewmodel_update) = receiver.try_recv() {
+        hashmap.insert(viewmodel_update.0, viewmodel_update.1);
+    }
+    receiver_refcell.replace(Some(receiver));
+    let item_option = hashmap.get(&item_address).cloned();
+    SyncReturn(item_option)
 }

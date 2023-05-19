@@ -1,2 +1,6 @@
+[build]
+# target = "wasm32-unknown-unknown"
+
 [env]
+RUSTFLAGS = "-C target-feature=+atomics,+bulk-memory,+mutable-globals"
 SOME_LIBRARY_DIR = "" # Folder path on system

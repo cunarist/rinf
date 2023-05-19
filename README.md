@@ -13,7 +13,7 @@ Extra features added to the default Flutter template are:
 - Rust integration with the ability to use an arbitrary number of library crates
 - MVVM pattern with easy viewmodel binding from Dart and viewmodel update from Rust
 - Convenient configuration management
-- Preserving Rust logic on Dart's hot restart
+- Restarting Rust logic on Dart's hot restart
 - Convenient app naming and icon generation
 - Setting desktop window properties
 
@@ -21,11 +21,12 @@ Extra features added to the default Flutter template are:
 
 Preparing a Flutter project targeting various platforms is not an easy task. It gets much harder when Rust is involved. With this template, you don't need to reinvent the wheel.
 
-- Windows
-- Linux
-- Android
-- macOS
-- iOS
+- ✅ Windows: Tested and supported
+- ✅ Linux: Tested and supported
+- ✅ Android: Tested and supported
+- ✅ macOS: Tested and supported
+- ✅ iOS: Tested and supported
+- ⏸️ Web: Not supported since threads and shared memory are not available in webassembly yet
 
 ## Contribution
 
@@ -219,19 +220,19 @@ pub fn calculate_something(json_value: serde_json::Value) {
     println!("{:}", *value);
     let json_value = json!({ "value": *value });
 
-    update_viewmodel_with_json("someItemCategory.count", json_value)
+    update_viewmodel_with_json("someItemCategory.count", json_value);
 }
 ...
 
 ```
 
-You perform some calculations and perhaps interact with your custom data model. Then you update the viewmodel through `VIEWMODEL_UPDATE_SENDER` channel sender with `Vec<u8>` bytes data. Because Dart widgets are bound to viewmodel items, updating them will automatically trigger related widgets to be rebuilt.
+In Rust, you perform some calculations and perhaps interact with your custom data model. Then you update the viewmodel with `update_viewmodel_with_json` function. Because Dart widgets are bound to viewmodel items, updating them from Rust will automatically trigger related widgets to be rebuilt. You can also use `update_viewmodel_with_bytes` function that accepts data of `Vec<u8>` type.
 
-By default, `json` is used to communicate between Dart and Rust. Although `json` has a bigger size compared to that of `protobuf` or `messagepack`, it has many advantages to be chosen. Thanks to extreme optimizations of `json` libraries of both Dart and Rust, its encoding and decoding performance is considerably faster than others. It also has highly readable syntax and its structure is very flexible. You can use it to pass basic texts or numbers as well as complex graph data, etc.
+Use `json` to communicate between Dart and Rust whenever possible. Although `json` has a bigger size compared to that of `protobuf` or `messagepack`, it has many advantages to be chosen. Thanks to extreme optimizations of `json` libraries of both Dart and Rust, its encoding and decoding performance is considerably faster than others. It also has highly readable syntax and its structure is very flexible. You can use it to pass basic texts or numbers as well as complex graph data, etc.
 
 In Dart, you can use `readViewmodelAsJson` function from `bridge/wrapper.dart` module to read a viewmodel item. Type of the result value will be one of `Map`, `List`, `int`, `double`, `bool`, `String` and `null` depending on the structure you defined.
 
-You can also use `readViewmodelAsBytes` function which returns `Uint8List` representing raw bytes of a viewmodel item. If the size of a viewmodel item is large, perhaps because it's a large-resolution image, you can pass in a value of true with `takeOwnership` argument to the function to avoid copying. Be aware that this action removes the item from the viewmodel.
+You can also use `readViewmodelAsBytes` function in Dart which returns `Uint8List` representing raw bytes of a viewmodel item. If the size of a viewmodel item is large, perhaps because it's a large-resolution image, you can pass in a value of true with `takeOwnership` argument to the function to avoid copying. Be aware that this option removes the item from the viewmodel.
 
 Extra mechanisms such as calling a task from Dart can be found in the actual code. If there are things that are still unclear, feel free to leave a question or start a discussion.
 

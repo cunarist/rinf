@@ -1,7 +1,6 @@
 import os
 import sys
 from typing import Any
-import toml
 from PIL import Image, ImageDraw
 
 
@@ -113,25 +112,20 @@ elif sys.argv[1] == "config-filling":
     filepath = "./android/local.properties"
     with open(filepath, mode="w", encoding="utf8") as file:
         file.write("\n".join(lines))
-    print("Updated local.properties file with necessary fields.")
+    print(f"Updated {filepath}")
 
     # Scan
-    filepath = "./native/.cargo/config.toml"
-    original_tree = {}
+    filepath = "./native/.cargo/config.toml.template"
+    lines = []
     if os.path.isfile(filepath):
         with open(filepath, mode="r", encoding="utf8") as file:
-            original_tree = toml.load(file)
+            lines = file.read().splitlines()
 
     # Merge
-    filepath = "./native/.cargo/config.toml.template"
-    with open(filepath, mode="r", encoding="utf8") as file:
-        template_tree = toml.load(file)
-    final_tree = merge_dicts(original_tree, template_tree)
     filepath = "./native/.cargo/config.toml"
     with open(filepath, mode="w", encoding="utf8") as file:
-        toml.dump(final_tree, file)
-    text = "Updated config.toml file with the template file next to it."
-    print(text)
+        file.write("\n".join(lines))
+    print(f"Updated {filepath}")
 
     print("Now go ahead and fill out the fields in those files!")
 
@@ -143,6 +137,7 @@ elif sys.argv[1] == "bridge-gen":
     command += f" --rust-output ./native/hub/src/bridge/bridge_generated.rs"
     command += f" -c ios/Runner/bridge_generated.h"
     command += f" -e macos/Runner/"
+    command += f" --wasm"
     os.system(command)
 
     filepath = "./native/hub/src/lib.rs"
@@ -168,7 +163,7 @@ elif sys.argv[1] == "template-update":
     os.system(command)
 
 elif sys.argv[1] == "code-quality":
-    command = "black ."
+    command = "python -m black ."
     os.system(command)
     command = "dart fix --apply"
     os.system(command)
@@ -242,6 +237,11 @@ elif sys.argv[1] == "translation":
     filepath = "./ios/Runner/Info.plist"
     with open(filepath, mode="w", encoding="utf8") as file:
         file.write(final_text)
+
+elif sys.argv[1] == "serve-web":
+    command = "dart run flutter_rust_bridge:serve"
+    command += f" --crate=./native/hub/"
+    os.system(command)
 
 else:
     print("No such option for automation is available.")

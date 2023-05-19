@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:someappname/bridge/bridge_generated.dart';
 import 'value.dart';
 import 'bridge/wrapper.dart';
 import 'dart:io';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'dart:typed_data';
+import 'package:messagepack/messagepack.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -58,11 +60,11 @@ class HomePage extends StatelessWidget {
               }),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  Uint8List? imageData = readViewmodelAsBytes(
+                  Serialized? serialized = readViewmodel(
                     'someItemCategory.mandelbrot',
-                    true,
                   );
-                  if (imageData != null) {
+                  if (serialized != null) {
+                    Uint8List imageData = serialized.data;
                     return Container(
                       margin: const EdgeInsets.all(20),
                       width: 256,
@@ -113,10 +115,14 @@ class HomePage extends StatelessWidget {
               }),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  Map? jsonValue = readViewmodelAsJson(
+                  Serialized? serialized = readViewmodel(
                     'someItemCategory.count',
                   );
-                  String numberText = jsonValue?['value'].toString() ?? '??';
+                  if (serialized == null) {
+                    return Text('counter.blankText'.tr());
+                  }
+                  var tree = Unpacker.fromList(serialized.data).unpackMap();
+                  String numberText = tree['value'].toString();
                   return Text('counter.informationText'.tr(namedArgs: {
                     'theValue': numberText,
                   }));
@@ -130,10 +136,10 @@ class HomePage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Map jsonValue = {'dummy': null};
+          Serialized payload = Serialized(data: Uint8List(0), formula: 'none');
           sendUserAction(
             'someTaskCategory.calculateSomething',
-            jsonValue,
+            payload,
           );
         },
         tooltip: 'Increment',
