@@ -1,2 +1,6 @@
+# This file is used for telling `rust-analyzer`
+# that `hub` crate is the starting point of the Rust logic.
+# DO NOT EDIT.
+
 [workspace]
-members = ["hub", "sample_crate"]
+members = ["hub"]

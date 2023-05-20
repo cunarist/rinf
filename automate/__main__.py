@@ -1,25 +1,13 @@
 import os
 import sys
-from typing import Any
+import json
 from PIL import Image, ImageDraw
+import tomlkit
 
 
 def exit():
     print("")
     sys.exit()
-
-
-def merge_dicts(d1: dict[Any, Any], d2: dict[Any, Any]) -> dict[Any, Any]:
-    new: dict[Any, Any] = dict()
-    for k in d2.keys():
-        if k in d1.keys():
-            if isinstance(d1[k], dict) and isinstance(d2[k], dict):
-                new[k] = merge_dicts(d1[k], d2[k])
-            else:
-                new[k] = d1[k]
-        else:
-            new[k] = d2[k]
-    return new
 
 
 def process_icon(image: Image.Image, roundness: float, scale: float) -> Image.Image:
@@ -30,7 +18,7 @@ def process_icon(image: Image.Image, roundness: float, scale: float) -> Image.Im
     mask_image = Image.new("L", (width, height), (0))
     image_draw = ImageDraw.ImageDraw(mask_image)
     image_draw.rounded_rectangle(
-        [(0, 0), (image.width, image.height)], radius, fill=(255)
+        ((0.0, 0.0), (float(image.width), float(image.height))), radius, fill=(255)
     )
 
     rounded_image = image.convert("RGBA")
@@ -49,6 +37,122 @@ def process_icon(image: Image.Image, roundness: float, scale: float) -> Image.Im
         ),
     )
     return scaled_image
+
+
+def merge_toml_files(filepath: str, template_filepath: str):
+    # Read the template file
+    with open(template_filepath) as template_file:
+        template_content = template_file.read()
+    # Parse the template content
+    template = tomlkit.parse(template_content)
+    # Check if the config file exists
+    if os.path.isfile(filepath):
+        # Read the existing TOML file
+        with open(filepath) as config_file:
+            config_content = config_file.read()
+        # Parse the existing TOML content
+        config = tomlkit.parse(config_content)
+    else:
+        # If the config file doesn't exist, use an empty TOML document
+        config = tomlkit.document()
+    Table = type(tomlkit.table())
+
+    # Helper function to recursively merge tables
+    def merge_docs(existing_doc, new_doc):
+        for key, value in new_doc.items():
+            if key in existing_doc:
+                # Check if the value is a table (nested structure)
+                if isinstance(value, Table) and isinstance(existing_doc[key], Table):
+                    # If both values are TOML document, recursively merge them
+                    merge_docs(existing_doc[key], value)
+            else:
+                # If the key doesn't exist, add a new key-value pair and preserve the comments
+                existing_doc[key] = value
+
+    # Merge the template into the config preserving comments
+    merge_docs(config, template)
+    # Serialize the merged TOML back to string
+    merged_content = tomlkit.dumps(config)
+    # Write the merged TOML to the config file
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    with open(filepath, "w") as output_file:
+        output_file.write(merged_content)
+
+
+def merge_properties_files(filepath: str, template_filepath: str):
+    # Read the template file
+    with open(template_filepath) as template_file:
+        template_content = template_file.read().split("\n")
+    # Check if the config file exists
+    if os.path.isfile(filepath):
+        # Read the existing properties file
+        with open(filepath) as config_file:
+            config_content = config_file.read().split("\n")
+    else:
+        # If the config file doesn't exist, use an empty content list
+        config_content = []
+
+    def merge_properties_content(existing_content: list, new_content: list):
+        merged_content = existing_content.copy()
+        existing_keys = {
+            line.split("=", 1)[0].strip()
+            for line in existing_content
+            if line and not line.startswith("#")
+        }
+        for line in new_content:
+            line = line.strip()
+            if line and not line.startswith("#"):
+                key, value = line.split("=", 1)
+                if key not in existing_keys:
+                    merged_content.append(f"{key}={value}")
+        return merged_content
+
+    merged_content = merge_properties_content(config_content, template_content)
+    # Write the merged properties to the config file
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    with open(filepath, "w") as output_file:
+        output_file.write("\n".join(merged_content))
+
+
+def merge_json_files(filepath: str, template_filepath: str):
+    # Read the template file
+    with open(template_filepath) as template_file:
+        template_content = template_file.read()
+    # Parse the template JSON
+    template = json.loads(template_content)
+    # Check if the config file exists
+    if os.path.isfile(filepath):
+        # Read the existing JSON file
+        with open(filepath) as config_file:
+            config_content = config_file.read()
+        # Parse the existing JSON
+        config = json.loads(config_content)
+    else:
+        # If the config file doesn't exist, use an empty dict
+        config = {}
+
+    # Helper function to recursively merge JSON objects
+    def merge_objects(existing_obj, new_obj):
+        for key, value in new_obj.items():
+            if (
+                key in existing_obj
+                and isinstance(value, dict)
+                and isinstance(existing_obj[key], dict)
+            ):
+                # If both values are dicts, recursively merge them
+                merge_objects(existing_obj[key], value)
+            else:
+                # Otherwise, update the value
+                existing_obj[key] = value
+
+    # Merge the template into the config
+    merge_objects(config, template)
+    # Serialize the merged JSON back to a string
+    merged_content = json.dumps(config, indent=4)
+    # Write the merged JSON to the config file
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    with open(filepath, "w") as output_file:
+        output_file.write(merged_content)
 
 
 print("")
@@ -87,47 +191,29 @@ elif sys.argv[1] == "app-naming":
                 pass
 
     combined = f"{domain}.{lowercase_app_name}"
-    command = f"flutter pub run change_app_package_name:main {combined}"
+    command = f"dart run change_app_package_name:main {combined}"
     os.system(command)
 
     print("Done! Don't forget to update description in pubspec.yaml file as well.")
 
 elif sys.argv[1] == "config-filling":
-    # Scan
+    # Android
     filepath = "./android/local.properties"
-    lines = []
-    if os.path.isfile(filepath):
-        with open(filepath, mode="r", encoding="utf8") as file:
-            lines = file.read().splitlines()
-
-    does_exist = False
-    for line in lines:
-        if line.startswith("ndk.dir"):
-            does_exist = True
-            break
-
-    if not does_exist:
-        lines.append("ndk.dir= # Androkd NDK path on your system")
-
-    filepath = "./android/local.properties"
-    with open(filepath, mode="w", encoding="utf8") as file:
-        file.write("\n".join(lines))
+    merge_properties_files(filepath, f"{filepath}.template")
     print(f"Updated {filepath}")
 
-    # Scan
-    filepath = "./native/.cargo/config.toml.template"
-    lines = []
-    if os.path.isfile(filepath):
-        with open(filepath, mode="r", encoding="utf8") as file:
-            lines = file.read().splitlines()
-
-    # Merge
+    # Rust
     filepath = "./native/.cargo/config.toml"
-    with open(filepath, mode="w", encoding="utf8") as file:
-        file.write("\n".join(lines))
+    merge_toml_files(filepath, f"{filepath}.template")
     print(f"Updated {filepath}")
 
-    print("Now go ahead and fill out the fields in those files!")
+    # Visual Studio Code
+    filepath = "./.vscode/settings.json"
+    merge_json_files(filepath, f"{filepath}.template")
+    print(f"Updated {filepath}")
+
+    print("")
+    print("Now go ahead and manually fill in those files!")
 
 elif sys.argv[1] == "bridge-gen":
     command = "flutter_rust_bridge_codegen"
@@ -186,24 +272,29 @@ elif sys.argv[1] == "size-check":
         os.system(command)
 
 elif sys.argv[1] == "icon-gen":
+    os.makedirs("./build/app_icons", exist_ok=True)
+
     image = Image.open("./assets/app_icon_full.png")
 
     new_image = process_icon(image, 0.232, 1)
-    new_image.save("./temp/app_icon_windows.png")
+    new_image.save("./build/app_icons/windows.png")
 
     new_image = process_icon(image, 0.232, 1)
-    new_image.save("./temp/app_icon_linux.png")
+    new_image.save("./build/app_icons/linux.png")
 
     new_image = process_icon(image, 0.232, 1)
-    new_image.save("./temp/app_icon_android.png")
+    new_image.save("./build/app_icons/android.png")
 
     new_image = process_icon(image, 0.232, 0.8)
-    new_image.save("./temp/app_icon_macos.png")
+    new_image.save("./build/app_icons/macos.png")
 
     new_image = process_icon(image, 0, 1)
-    new_image.save("./temp/app_icon_ios.png")
+    new_image.save("./build/app_icons/ios.png")
 
-    command = "flutter pub run flutter_launcher_icons"
+    new_image = process_icon(image, 0.232, 1)
+    new_image.save("./build/app_icons/web.png")
+
+    command = "dart run flutter_launcher_icons"
     os.system(command)
 
 elif sys.argv[1] == "translation":
@@ -216,11 +307,14 @@ elif sys.argv[1] == "translation":
     filepath = "./ios/Runner/Info.plist"
     with open(filepath, mode="r", encoding="utf8") as file:
         lines = file.read().split("\n")
+
+    array_start_line = 0
     for turn, line in enumerate(lines):
         if "<key>CFBundleLocalizations</key>" in line:
             array_start_line = turn + 1
             break
 
+    array_end_line = 0
     for line_number in range(array_start_line, len(lines)):
         if "</array>" in lines[line_number]:
             array_end_line = line_number

@@ -1,0 +1,11 @@
+{
+  "python.analysis.typeCheckingMode": "basic",
+  "python.formatting.provider": "black",
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "rust-analyzer.check.command": "clippy",
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  }
+}

@@ -59,7 +59,7 @@ pub async fn keep_drawing_mandelbrot() {
         // thread blocking tasks that take more than 10 milliseconds
         // are considered better to be sent to a separate thread.
         let join_handle = tokio::task::spawn_blocking(move || {
-            let mandelbrot = sample_crate::mandelbrot(
+            sample_crate::mandelbrot(
                 sample_crate::Size {
                     width: 64,
                     height: 64,
@@ -71,8 +71,7 @@ pub async fn keep_drawing_mandelbrot() {
                 scale,
                 4,
             )
-            .unwrap();
-            mandelbrot
+            .unwrap()
         });
         let calculated = join_handle.await;
         if let Ok(mandelbrot) = calculated {
