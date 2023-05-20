@@ -87,12 +87,6 @@ Install Python packages written in `./requirements.txt` from [PyPI](https://pypi
 pip install -r requirements.txt
 ```
 
-Set the app name and domain. This only works once and you cannot revert this.
-
-```
-python automate app-naming
-```
-
 Generate configuration files or update them from template files if they already exist. Make sure to check the terminal output and fill in those necessary files manually after the generation process is complete.
 
 ```
@@ -125,6 +119,12 @@ Check the actual sizes of compiled Rust libraries in release mode.
 
 ```
 python automate size-check (platform)
+```
+
+Set the app name and domain. This only works once and you cannot revert this.
+
+```
+python automate app-naming
 ```
 
 Apply `app_icon_full.png` file in `./assets` to multiple platforms with [Flutter Launcher Icons](https://pub.dev/packages/flutter_launcher_icons). Appropriate rounding and scaling are applied per platform with the power of Python. On Linux, you should include the icon manually in the distribution package.
