@@ -86,6 +86,16 @@ fn wire_send_user_action_impl(
         },
     )
 }
+fn wire_clean_viewmodel_impl() -> support::WireSyncReturn {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "clean_viewmodel",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || Ok(clean_viewmodel()),
+    )
+}
 fn wire_read_viewmodel_impl(
     item_address: impl Wire2Api<String> + UnwindSafe,
 ) -> support::WireSyncReturn {

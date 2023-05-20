@@ -41,6 +41,11 @@ abstract class Bridge {
 
   FlutterRustBridgeTaskConstMeta get kSendUserActionConstMeta;
 
+  /// This function is meant to be called when Dart's hot restart is triggered.
+  void cleanViewmodel({dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kCleanViewmodelConstMeta;
+
   Serialized? readViewmodel({required String itemAddress, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kReadViewmodelConstMeta;
@@ -172,6 +177,22 @@ class BridgeImpl implements Bridge {
       const FlutterRustBridgeTaskConstMeta(
         debugName: "send_user_action",
         argNames: ["taskAddress", "serialized"],
+      );
+
+  void cleanViewmodel({dynamic hint}) {
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner.wire_clean_viewmodel(),
+      parseSuccessData: _wire2api_unit,
+      constMeta: kCleanViewmodelConstMeta,
+      argValues: [],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kCleanViewmodelConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "clean_viewmodel",
+        argNames: [],
       );
 
   Serialized? readViewmodel({required String itemAddress, dynamic hint}) {

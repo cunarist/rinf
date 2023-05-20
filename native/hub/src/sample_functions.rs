@@ -20,19 +20,30 @@ pub async fn calculate_something(serialized: Serialized) {
     let mut value = rwlock.write().await;
     *value = sample_crate::add_seven(*value);
     println!("{:}", *value);
-    // Use JSON objects in Rust but use MessagePack to serialize them.
-    // They are cross-compatible.
+    // Use JSON objects for packing or unpacking whenever possible.
+    // Its highly readable macros and native data manipulation methods are
+    // considerably better than others.
+    // You can pack things like complex graph data, etc.
     let json_value = json!({
         "value": *value
     });
+    // Although we use JSON objects for packing,
+    // use MessagePack to serialize the packed data into bytes.
+    // They are cross-compatible.
+    // MessagePack provides 50~60% higher serialization performance
+    // and much smaller output size than those of JSON.
     let payload = Serialized {
         data: rmp_serde::encode::to_vec(&json_value).unwrap(),
         formula: String::from("messagePack"),
     };
+    // In Rust, you update the viewmodel with
+    // `update_viewmodel` function imported from module `bridge`.
+    // Because Dart widgets are bound to the viewmodel items,
+    // updating them from Rust will automatically trigger
+    // related Dart widgets to be rebuilt.
     update_viewmodel("someItemCategory.count", payload);
 }
 
-#[allow(dead_code)]
 pub async fn keep_drawing_mandelbrot() {
     let mut scale: f64 = 1.0;
     loop {
@@ -40,8 +51,14 @@ pub async fn keep_drawing_mandelbrot() {
         if scale < 1e-9 {
             scale = 1.0
         };
-        let (sender, receiver) = tokio::sync::oneshot::channel();
-        tokio::task::spawn_blocking(move || {
+        // Because drawing a mandelbrot image is
+        // a CPU-intensive blocking task,
+        // we use `spawn_blocking` instead of `spawn_local`
+        // to deligate this task to another thread.
+        // In real-world async scenarios,
+        // thread blocking tasks that take more than 10 milliseconds
+        // are considered better to be sent to a separate thread.
+        let join_handle = tokio::task::spawn_blocking(move || {
             let mandelbrot = sample_crate::mandelbrot(
                 sample_crate::Size {
                     width: 64,
@@ -55,18 +72,19 @@ pub async fn keep_drawing_mandelbrot() {
                 4,
             )
             .unwrap();
-            sender.send(mandelbrot).ok();
-        })
-        .await
-        .ok();
-        let received = receiver.await;
-        if let Ok(mandelbrot) = received {
+            mandelbrot
+        });
+        let calculated = join_handle.await;
+        if let Ok(mandelbrot) = calculated {
             let payload = Serialized {
                 data: mandelbrot,
                 formula: String::from("image"),
             };
             update_viewmodel("someItemCategory.mandelbrot", payload);
         }
+        // Never use `std::thread::sleep` in the main thread
+        // because it will block the whole async runtime
+        // managed by `tokio`.
         tokio::time::sleep(std::time::Duration::from_millis(20)).await;
     }
 }

@@ -27,6 +27,11 @@ pub fn wire_send_user_action(task_address: String, serialized: JsValue) -> suppo
 }
 
 #[wasm_bindgen]
+pub fn wire_clean_viewmodel() -> support::WireSyncReturn {
+    wire_clean_viewmodel_impl()
+}
+
+#[wasm_bindgen]
 pub fn wire_read_viewmodel(item_address: String) -> support::WireSyncReturn {
     wire_read_viewmodel_impl(item_address)
 }

@@ -7,10 +7,14 @@ mod with_user_action;
 /// This `main` function is the entry point for the Rust logic,
 /// which occupies one of those 2 threads.
 /// In this `main` function, `tokio` is used for single-threaded async concurrency.
-/// Use your separate threadpool or GPU when more computing power is needed.
+/// Use your separate threadpool or GPU only when more computing power is needed.
 /// Always use non-blocking async functions on the main thread, such as `tokio::time::sleep`.
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
+    // In debug mode, clean up the data upon Dart's hot restart
+    if cfg!(debug_assertions) {
+        data_model::clean_model();
+    }
     // This is `tokio::sync::mpsc::Reciver` that receives user actions in an async manner.
     let mut user_action_receiver = bridge::get_user_action_receiver();
     // This tells the tasks to stop running.

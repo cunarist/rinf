@@ -237,6 +237,16 @@ class BridgeWire implements FlutterRustBridgeWireBase {
       WireSyncReturn Function(
           ffi.Pointer<wire_uint_8_list>, ffi.Pointer<wire_Serialized>)>();
 
+  WireSyncReturn wire_clean_viewmodel() {
+    return _wire_clean_viewmodel();
+  }
+
+  late final _wire_clean_viewmodelPtr =
+      _lookup<ffi.NativeFunction<WireSyncReturn Function()>>(
+          'wire_clean_viewmodel');
+  late final _wire_clean_viewmodel =
+      _wire_clean_viewmodelPtr.asFunction<WireSyncReturn Function()>();
+
   WireSyncReturn wire_read_viewmodel(
     ffi.Pointer<wire_uint_8_list> item_address,
   ) {

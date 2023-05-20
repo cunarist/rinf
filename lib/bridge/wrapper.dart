@@ -3,7 +3,12 @@ import 'dart:async';
 
 var viewmodelUpdateBroadcaster = StreamController<String>.broadcast();
 
-Future organizeRustRelatedThings() async {
+Future<void> organizeRustRelatedThings() async {
+  assert(() {
+    // In debug mode, clean up the viewmodel upon Dart's hot restart
+    api.cleanViewmodel();
+    return true;
+  }());
   var endpointsOnRustThread = api.prepareChannels();
   endpointsOnRustThread.move = true;
   await api.layEndpointsOnRustThread(rustOpaque: endpointsOnRustThread);

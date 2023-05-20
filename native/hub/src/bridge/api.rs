@@ -91,6 +91,14 @@ pub fn send_user_action(task_address: String, serialized: Serialized) -> SyncRet
     SyncReturn(())
 }
 
+/// This function is meant to be called when Dart's hot restart is triggered in debug mode.
+pub fn clean_viewmodel() -> SyncReturn<()> {
+    // Thread 0 running Dart
+    let mut hashmap = VIEWMODEL.borrow_mut();
+    *hashmap = HashMap::new();
+    SyncReturn(())
+}
+
 pub fn read_viewmodel(item_address: String) -> SyncReturn<Option<Serialized>> {
     // Thread 0 running Dart
     let mut hashmap = VIEWMODEL.borrow_mut();

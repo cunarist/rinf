@@ -1,9 +1,15 @@
 //! This module is the model part of MVVM pattern.
 //! To be more clear, this module was named `data_model` instead of just `model`.
 
-use ref_thread_local::ref_thread_local;
+use ref_thread_local::{ref_thread_local, RefThreadLocal};
 use std::collections::HashMap;
 use tokio::sync::RwLock;
+
+/// This function is meant to be called when Dart's hot restart is triggered in debug mode.
+pub fn clean_model() {
+    let mut borrowed = SAMPLE_NUMBERS.borrow_mut();
+    *borrowed = HashMap::new();
+}
 
 ref_thread_local! {
     // With this macro, it is ensured

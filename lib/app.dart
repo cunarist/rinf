@@ -54,6 +54,12 @@ class HomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // `StreamBuilder` listens to a stream from `viewmodelUpdateBroadcaster`
+            // which is imported from `bridge/wrapper.dart` module.
+            //For better performance, it only listens to events with `itemAddress`
+            //of a specific value. In other words,
+            //the builder gets notified only when the viewmodel item
+            //that it is interested in is changed.
             StreamBuilder<String>(
               stream: viewmodelUpdateBroadcaster.stream.where((itemAddress) {
                 return itemAddress == 'someItemCategory.mandelbrot';

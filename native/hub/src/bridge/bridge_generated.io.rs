@@ -33,6 +33,11 @@ pub extern "C" fn wire_send_user_action(
 }
 
 #[no_mangle]
+pub extern "C" fn wire_clean_viewmodel() -> support::WireSyncReturn {
+    wire_clean_viewmodel_impl()
+}
+
+#[no_mangle]
 pub extern "C" fn wire_read_viewmodel(
     item_address: *mut wire_uint_8_list,
 ) -> support::WireSyncReturn {
