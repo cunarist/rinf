@@ -41,7 +41,7 @@ abstract class Bridge {
 
   FlutterRustBridgeTaskConstMeta get kSendUserActionConstMeta;
 
-  /// This function is meant to be called when Dart's hot restart is triggered.
+  /// This function is meant to be called when Dart's hot restart is triggered in debug mode.
   void cleanViewmodel({dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kCleanViewmodelConstMeta;
@@ -72,11 +72,11 @@ class MutexEndpointsOnRustThread extends FrbOpaque {
 }
 
 class Serialized {
-  final Uint8List data;
+  final Uint8List bytes;
   final String formula;
 
   const Serialized({
-    required this.data,
+    required this.bytes,
     required this.formula,
   });
 }
@@ -245,7 +245,7 @@ class BridgeImpl implements Bridge {
     if (arr.length != 2)
       throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
     return Serialized(
-      data: _wire2api_uint_8_list(arr[0]),
+      bytes: _wire2api_uint_8_list(arr[0]),
       formula: _wire2api_String(arr[1]),
     );
   }

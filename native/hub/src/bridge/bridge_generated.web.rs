@@ -73,7 +73,7 @@ impl Wire2Api<Serialized> for JsValue {
             self_.length()
         );
         Serialized {
-            data: self_.get(0).wire2api(),
+            bytes: self_.get(0).wire2api(),
             formula: self_.get(1).wire2api(),
         }
     }

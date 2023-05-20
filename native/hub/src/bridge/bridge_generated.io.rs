@@ -104,7 +104,7 @@ impl Wire2Api<Serialized> for *mut wire_Serialized {
 impl Wire2Api<Serialized> for wire_Serialized {
     fn wire2api(self) -> Serialized {
         Serialized {
-            data: self.data.wire2api(),
+            bytes: self.bytes.wire2api(),
             formula: self.formula.wire2api(),
         }
     }
@@ -129,7 +129,7 @@ pub struct wire_MutexEndpointsOnRustThread {
 #[repr(C)]
 #[derive(Clone)]
 pub struct wire_Serialized {
-    data: *mut wire_uint_8_list,
+    bytes: *mut wire_uint_8_list,
     formula: *mut wire_uint_8_list,
 }
 
@@ -163,7 +163,7 @@ impl NewWithNullPtr for wire_MutexEndpointsOnRustThread {
 impl NewWithNullPtr for wire_Serialized {
     fn new_with_null_ptr() -> Self {
         Self {
-            data: core::ptr::null_mut(),
+            bytes: core::ptr::null_mut(),
             formula: core::ptr::null_mut(),
         }
     }

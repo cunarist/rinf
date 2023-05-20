@@ -144,7 +144,7 @@ impl Wire2Api<u8> for u8 {
 
 impl support::IntoDart for Serialized {
     fn into_dart(self) -> support::DartAbi {
-        vec![self.data.into_dart(), self.formula.into_dart()].into_dart()
+        vec![self.bytes.into_dart(), self.formula.into_dart()].into_dart()
     }
 }
 impl support::IntoDartExceptPrimitive for Serialized {}

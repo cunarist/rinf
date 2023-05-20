@@ -12,7 +12,7 @@ use tokio::sync::mpsc::Sender;
 
 #[derive(Debug, Clone)]
 pub struct Serialized {
-    pub data: Vec<u8>,
+    pub bytes: Vec<u8>,
     pub formula: String,
 }
 

@@ -21,7 +21,7 @@ typedef struct wire_uint_8_list {
 } wire_uint_8_list;
 
 typedef struct wire_Serialized {
-  struct wire_uint_8_list *data;
+  struct wire_uint_8_list *bytes;
   struct wire_uint_8_list *formula;
 } wire_Serialized;
 

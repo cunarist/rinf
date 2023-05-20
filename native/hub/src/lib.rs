@@ -6,7 +6,7 @@ mod with_user_action;
 /// There are 2 threads behind this app, one for Dart and one for Rust.
 /// This `main` function is the entry point for the Rust logic,
 /// which occupies one of those 2 threads.
-/// In this `main` function, `tokio` is used for single-threaded async concurrency.
+/// `tokio`'s runtime is used for single-threaded async concurrency.
 /// Use your separate threadpool or GPU only when more computing power is needed.
 /// Always use non-blocking async functions on the main thread, such as `tokio::time::sleep`.
 #[tokio::main(flavor = "current_thread")]

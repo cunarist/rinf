@@ -63,7 +63,7 @@ class BridgePlatform extends FlutterRustBridgeBase<BridgeWire> {
 
   void _api_fill_to_wire_serialized(
       Serialized apiObj, wire_Serialized wireObj) {
-    wireObj.data = api2wire_uint_8_list(apiObj.data);
+    wireObj.bytes = api2wire_uint_8_list(apiObj.bytes);
     wireObj.formula = api2wire_String(apiObj.formula);
   }
 }
@@ -358,7 +358,7 @@ class wire_uint_8_list extends ffi.Struct {
 }
 
 class wire_Serialized extends ffi.Struct {
-  external ffi.Pointer<wire_uint_8_list> data;
+  external ffi.Pointer<wire_uint_8_list> bytes;
 
   external ffi.Pointer<wire_uint_8_list> formula;
 }

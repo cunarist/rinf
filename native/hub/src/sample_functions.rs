@@ -33,7 +33,7 @@ pub async fn calculate_something(serialized: Serialized) {
     // MessagePack provides 50~60% higher serialization performance
     // and much smaller output size than those of JSON.
     let payload = Serialized {
-        data: rmp_serde::encode::to_vec(&json_value).unwrap(),
+        bytes: rmp_serde::encode::to_vec(&json_value).unwrap(),
         formula: String::from("messagePack"),
     };
     // In Rust, you update the viewmodel with
@@ -54,7 +54,7 @@ pub async fn keep_drawing_mandelbrot() {
         // Because drawing a mandelbrot image is
         // a CPU-intensive blocking task,
         // we use `spawn_blocking` instead of `spawn_local`
-        // to deligate this task to another thread.
+        // to delegate this task to another thread.
         // In real-world async scenarios,
         // thread blocking tasks that take more than 10 milliseconds
         // are considered better to be sent to a separate thread.
@@ -77,12 +77,12 @@ pub async fn keep_drawing_mandelbrot() {
         let calculated = join_handle.await;
         if let Ok(mandelbrot) = calculated {
             let payload = Serialized {
-                data: mandelbrot,
+                bytes: mandelbrot,
                 formula: String::from("image"),
             };
             update_viewmodel("someItemCategory.mandelbrot", payload);
         }
-        // Never use `std::thread::sleep` in the main thread
+        // Never use `std::thread::sleep` on the main thread
         // because it will block the whole async runtime
         // managed by `tokio`.
         tokio::time::sleep(std::time::Duration::from_millis(20)).await;

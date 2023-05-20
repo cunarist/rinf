@@ -36,7 +36,7 @@ class BridgePlatform extends FlutterRustBridgeBase<BridgeWire>
 
   @protected
   List<dynamic> api2wire_serialized(Serialized raw) {
-    return [api2wire_uint_8_list(raw.data), api2wire_String(raw.formula)];
+    return [api2wire_uint_8_list(raw.bytes), api2wire_String(raw.formula)];
   }
 
   @protected

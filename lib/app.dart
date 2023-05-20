@@ -70,7 +70,7 @@ class HomePage extends StatelessWidget {
                     'someItemCategory.mandelbrot',
                   );
                   if (serialized != null) {
-                    Uint8List imageData = serialized.data;
+                    Uint8List imageData = serialized.bytes;
                     return Container(
                       margin: const EdgeInsets.all(20),
                       width: 256,
@@ -127,7 +127,7 @@ class HomePage extends StatelessWidget {
                   if (serialized == null) {
                     return Text('counter.blankText'.tr());
                   }
-                  var tree = Unpacker.fromList(serialized.data).unpackMap();
+                  var tree = Unpacker.fromList(serialized.bytes).unpackMap();
                   String numberText = tree['value'].toString();
                   return Text('counter.informationText'.tr(namedArgs: {
                     'theValue': numberText,
@@ -142,7 +142,7 @@ class HomePage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Serialized payload = Serialized(data: Uint8List(0), formula: 'none');
+          Serialized payload = Serialized(bytes: Uint8List(0), formula: 'none');
           sendUserAction(
             'someTaskCategory.calculateSomething',
             payload,
