@@ -52,7 +52,7 @@ Download it from the app store if your system doesn't provide a pre-installed ve
 
 ## Preparing Rust
 
-Refer to the [official docs](https://doc.rust-lang.org/book/ch01-01-installation.html). Version 1.68 or higher is recommended.
+Refer to the [official docs](https://doc.rust-lang.org/book/ch01-01-installation.html). Version 1.69 or higher is recommended.
 
 ## Preparing Flutter
 
@@ -71,7 +71,14 @@ flutter doctor
 
 ## Extra Steps
 
-If you are targeting Android, macOS, or iOS, there are extra steps involved. Refer to Flutter-Rust-Bridge [docs](https://cjycode.com/flutter_rust_bridge/template/setup.html) to install necessary components on your system.
+If you are planning to compile your code for Windows, Linux, or macOS, you can skip this section.
+
+If you intend to compile it for Android or iOS, there are additional steps involved. Please refer to the Flutter-Rust-Bridge docs for instructions on installing the necessary components on your system.
+
+- Android: [Link 1](https://cjycode.com/flutter_rust_bridge/tutorial/setup_android.html), [Link 2](https://cjycode.com/flutter_rust_bridge/template/setup_android.html)
+- iOS: [Link 1](https://cjycode.com/flutter_rust_bridge/tutorial_with_flutter.html#ios-app), [Link 2](https://cjycode.com/flutter_rust_bridge/template/setup_ios.html)
+
+Setting up your system with extra build targets can sometimes present various issues. If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/app-template/discussions) and open a Q&A thread for assistance.
 
 # 🗃️ Setting Up
 
@@ -214,6 +221,4 @@ Be careful all the time! You shouldn't be editing any file without enough knowle
 - `pubspec.yaml`: Dart settings and dependencies.
 - `assets`: Asset files.
 - `native`: Rust's workspace containing multiple library crates. The name of the library crate folder should be the same as that of the library crate's name.
-  - Think of `hub` crate as your Rust entry point. It is not a binary crate but it is similar.
   - Do not modify `bridge` module inside `hub` crate.
-  - `config.toml.template` file is okay to be modified.

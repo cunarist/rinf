@@ -28,7 +28,7 @@ async fn main() {
         while let Some(user_action) = user_action_receiver.recv().await {
             tokio::task::spawn_local(with_user_action::handle_user_action(user_action));
         }
-        shutdown_signal_sender.send(true).ok();
+        shutdown_signal_sender.send(()).ok();
     });
     // You can repeat `tokio::task::LocalSet::spawn_local`
     // if there should be more concurrent tasks.

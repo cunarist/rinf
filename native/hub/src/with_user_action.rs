@@ -5,7 +5,7 @@ use crate::bridge::api::Serialized;
 use crate::sample_functions;
 
 pub async fn handle_user_action(user_action: (String, Serialized)) {
-    // `task_address` would be something like "some.task.address"
+    // `task_address` would be something like "addressCategory.someTask"
     let task_address = user_action.0;
     let serialized = user_action.1;
     let layered: Vec<&str> = task_address.split('.').collect();

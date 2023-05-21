@@ -95,7 +95,7 @@ def ANDROID_NDK = localProperties.getProperty('ndk.dir')
                 // add or remove these ABIs as needed.
                 '-t', 'x86',
                 '-t', 'x86_64',
-                '-o', '../android/app/src/main/jniLibs', 'build'
+                '-o', '../../android/app/src/main/jniLibs', 'build'
         if (profileMode != null) {
             args profileMode
         }
