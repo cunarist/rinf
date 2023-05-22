@@ -19,7 +19,7 @@
 # Visual Studio Code related
 .classpath
 .project
-.settings/**
+.settings/
 .vscode/**
 
 # Flutter repo-specific
@@ -133,7 +133,6 @@ app.*.symbols
 
 # Cunarist App Template
 native/.cargo/**
-native/target/**
+native/target/
 android/app/src/*/jniLibs/
-native/android/
 !**.template

@@ -259,11 +259,14 @@ elif sys.argv[1] == "code-quality":
     os.system(command)
 
 elif sys.argv[1] == "size-check":
+    command = "cargo install cargo-bloat"
+    os.system(command)
     path = "./native"
     os.chdir(path)
-    command = "cargo bloat --release"
+    command = "cargo bloat --release -n 50"
     os.system(command)
     if len(sys.argv) == 2:
+        print("")
         print("Platform option is not provided.")
     else:
         path = ".."
