@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use tokio::sync::RwLock;
 
 /// This function is meant to be called when Dart's hot restart is triggered in debug mode.
+#[cfg(debug_assertions)]
 pub fn clean_model() {
     let mut borrowed = SAMPLE_NUMBERS.borrow_mut();
     *borrowed = HashMap::new();
