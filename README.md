@@ -34,7 +34,7 @@ We love contributions! If you have any suggestions or want to report a bug, plea
 
 **Flutter** deals with the cross-platform user interface while **Rust** handles the internal logic. The front-end and back-end are completely separated, which means that Dart code and Rust code should be detachable from each other. These two worlds communicate through signals.
 
-Moreover, you can conveniently receive the latest commits from the [Cunarist App Template](https://github.com/cunarist/app-template) into your repository using the provided Python script below.
+Moreover, you can conveniently receive the latest commits from the [Flutter-Rust-App-Template](https://github.com/cunarist/flutter-rust-app-template) into your repository using the provided Python script below.
 
 # 👜 System Preparation
 
@@ -78,7 +78,7 @@ If you intend to compile it for Android or iOS, there are additional steps invol
 - Android: [Link 1](https://cjycode.com/flutter_rust_bridge/tutorial/setup_android.html), [Link 2](https://cjycode.com/flutter_rust_bridge/template/setup_android.html)
 - iOS: [Link 1](https://cjycode.com/flutter_rust_bridge/tutorial_with_flutter.html#ios-app), [Link 2](https://cjycode.com/flutter_rust_bridge/template/setup_ios.html)
 
-Setting up your system with extra build targets can sometimes present various issues. If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/app-template/discussions) and open a Q&A thread for assistance.
+Setting up your system with extra build targets can sometimes present various issues. If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/flutter-rust-app-template/discussions) and open a Q&A thread for assistance.
 
 # 🗃️ Setting Up
 
