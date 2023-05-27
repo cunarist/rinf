@@ -241,7 +241,7 @@ elif sys.argv[1] == "bridge-gen":
 elif sys.argv[1] == "template-update":
     command = "git remote rm template"
     os.system(command)
-    command = "git remote add template https://github.com/cunarist/app-template.git"
+    command = "git remote add template https://github.com/cunarist/flutter-rust-app-template.git"
     os.system(command)
     command = "git fetch --all"
     os.system(command)
