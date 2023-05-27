@@ -1,6 +1,6 @@
 # 🆎 About This Template
 
-This template provides instant capabilities to developers who want to embrace the power of **Rust** and **Flutter** together. Simply duplicate this template and you're ready to go!
+This template provides instant capabilities to developers who want to embrace the power of **Flutter** and **Rust** together. Simply duplicate this template and you're ready to go!
 
 ![preview](https://github.com/cunarist/app-template/assets/66480156/be85cf04-2240-497f-8d0d-803c40536d8e)
 
