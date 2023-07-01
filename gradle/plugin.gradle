@@ -113,7 +113,7 @@ class CargoKitPlugin implements Plugin<Project> {
             final buildType = variant.buildType.name
 
             def cargoOutputDir = "${project.buildDir}/jniLibs/${buildType}";
-            def jniLibs = plugin.project.android.sourceSets.getByName(buildType).jniLibs;
+            def jniLibs = project.android.sourceSets.maybeCreate(buildType).jniLibs;
             jniLibs.srcDir(new File(cargoOutputDir))
 
             def platforms = plugin.getTargetPlatforms().collect()
@@ -149,8 +149,10 @@ class CargoKitPlugin implements Plugin<Project> {
                     pluginFile = CargoKitPlugin.file
                 }
                 def onTask = { newTask ->
-                    if (newTask.name == "javaPreCompile${buildType.capitalize()}") {
+                    if (newTask.name == "merge${buildType.capitalize()}NativeLibs") {
                         newTask.dependsOn task
+                        // Fix gradle 7.4.2 not picking up JNI library changes
+                        newTask.outputs.upToDateWhen { false }
                     }
                 }
                 project.tasks.each onTask
