@@ -92,6 +92,12 @@ Ideally, **Flutter** would deal with the cross-platform user interface while **R
 
 Use [MessagePack](https://msgpack.org/) for serializing messages sent between Dart and Rust as provided by the template, if you have other reasons not to do so. For those who aren't familiar, MessagePack is a nested binary structure similar to JSON, but much faster and more efficient.
 
+# ☕ Support Us
+
+😉 If you are benefiting from the features of Rust-In-Flutter and find it helpful, why not consider supporting this project? Your generous donations contribute to the maintenance and development of Rust-in-Flutter, ensuring its continuous improvement and growth.
+
+If you feel like so, please consider [buying us a coffee](https://www.buymeacoffee.com/cunarist).
+
 # 🌋 Pioneers
 
 This project was not done alone. There were various helpful projects that gave inspiration to the structure of this package. Credits to these wonderful efforts!
