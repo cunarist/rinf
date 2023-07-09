@@ -71,7 +71,7 @@ Once you've run this command, there will be some new folders and files that will
 
 Entry point of your Rust logic is the `hub` library crate. Do NOT modify the `bridge` module inside `hub/src`. You might want to remove `sample_crate` in production. 
 
-# 🧱 Recommended Structure
+# 🧱 Tips
 
 Ideally, **Flutter** would deal with the cross-platform user interface while **Rust** handles the business logic. The front-end and back-end can be completely separated, meaning that Dart and Rust codes are detachable from each other. These two worlds communicate through channels and streams.
 
