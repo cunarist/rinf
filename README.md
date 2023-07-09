@@ -29,7 +29,15 @@ With this package, you don't have to start from scratch or face the challenging 
 
 > If you have any suggestions or want to report a bug, please leave it as an [issue](https://github.com/cunarist/rust-in-flutter/issues) or a [pull request](https://github.com/cunarist/rust-in-flutter/pulls). We will try to respond as quickly as possible.
 
-# 👜 Installing Rust Toolchain
+# 👜 Installing
+
+First, add this package to your Flutter project.
+
+```bash
+flutter pub add rust_in_flutter
+```
+
+## Rust Toolchain
 
 Refer to the [Rust docs](https://doc.rust-lang.org/book/ch01-01-installation.html) to install Rust toolchain on your system. Because you're going to write Rust, only having the Flutter SDK on your system is not enough.
 
