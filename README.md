@@ -90,7 +90,7 @@ Now by heading over to `./native/hub/src/lib.rs`, you can start writing Rust!
 
 Ideally, **Flutter** would deal with the cross-platform user interface while **Rust** handles the business logic. The front-end and back-end can be completely separated, meaning that Dart and Rust codes are detachable from each other. These two worlds communicate through channels and streams.
 
-Use [MessagePack](https://msgpack.org/) for serializing messages sent between Dart and Rust as provided by the template, if you have other reasons not to do so. For those who aren't familiar, MessagePack is a nested binary structure similar to JSON, but much faster and more efficient.
+Use [MessagePack](https://msgpack.org/) for serializing messages sent between Dart and Rust as provided by the template, unless you have other reasons not to do so. For those who aren't familiar, MessagePack is a nested binary structure similar to JSON, but much faster and more efficient.
 
 # ☕ Support Us
 
