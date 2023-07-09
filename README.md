@@ -81,7 +81,7 @@ Once you've run the command, there will be some new folders and files that will 
 Entry point of your Rust logic is the `hub` library crate. You might want to remove `sample_crate` in production.
 
 Please keep in mind:
-- Do NOT change the name of the `hub` crate or the `native` folder. Compilation presets expect an entry library crate to be located at `./native/hub`.
+- Do NOT change the name of the `hub` crate or the `native` folder. Compilation presets expect the entry library crate to be located at `./native/hub`.
 - Do NOT modify the `bridge` module inside `./native/hub/src`.
 - You CAN name crates other than `hub` as you want.
 
