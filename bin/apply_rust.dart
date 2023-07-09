@@ -21,7 +21,7 @@ void main() async {
   // Copy the `native` folder
   final source = Directory('$packagePath/example/native');
   final destination = Directory('$projectPath/native');
-  copyDirectory(source, destination);
+  _copyDirectory(source, destination);
 
   // Copy `Cargo.toml`
   final sourceFile = File('$packagePath/example/Cargo.toml');
@@ -52,7 +52,7 @@ void main() async {
   } on FileSystemException {}
 }
 
-void copyDirectory(Directory source, Directory destination) {
+void _copyDirectory(Directory source, Directory destination) {
   var newDirectory = Directory(destination.path);
   newDirectory.createSync();
   source.listSync(recursive: false).forEach(
@@ -62,7 +62,7 @@ void copyDirectory(Directory source, Directory destination) {
           path.join(destination.absolute.path, path.basename(entity.path)),
         );
         newDirectory.createSync();
-        copyDirectory(entity.absolute, newDirectory);
+        _copyDirectory(entity.absolute, newDirectory);
       } else if (entity is File) {
         entity.copySync(
           path.join(destination.path, path.basename(entity.path)),

@@ -8,10 +8,10 @@
 import 'dart:math';
 import 'dart:async';
 import 'dart:typed_data';
-import 'bridge_definitions.dart';
-import 'ffi.dart' if (dart.library.html) 'ffi_web.dart';
+import 'src/bridge_definitions.dart';
+import 'src/ffi.dart' if (dart.library.html) 'ffi_web.dart';
 
-export 'bridge_definitions.dart';
+export 'src/bridge_definitions.dart';
 
 /// Listens to a stream from Rust and broadcasts the data in Dart.
 /// You can see the usage example at
