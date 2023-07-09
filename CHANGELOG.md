@@ -1,3 +1,8 @@
+## 1.0.2
+
+- Fixed typos.
+- Organized inner code.
+
 ## 1.0.1
 
 - Enforced bundling on macOS and iOS.
