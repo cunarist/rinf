@@ -10,6 +10,8 @@ use tokio::sync::mpsc::channel;
 use tokio::sync::mpsc::Receiver;
 use tokio::sync::mpsc::Sender;
 
+/// Available operations that a `RustRequest` object can hold.
+/// There are 4 options, `Create`,`Read`,`Update`, and `Delete`.
 pub enum Operation {
     Create,
     Read,
@@ -17,23 +19,27 @@ pub enum Operation {
     Delete,
 }
 
+/// Holds the data that Rust streams to Dart.
 #[derive(Clone)]
 pub struct RustSignal {
     pub address: String,
     pub bytes: Vec<u8>,
 }
 
+/// Request object that is sent from Dart to Rust.
 pub struct RustRequest {
     pub address: String,
     pub operation: Operation,
     pub bytes: Vec<u8>,
 }
 
+/// Wrapper for `RustRequest` with a unique ID.
 pub struct RustRequestUnique {
     pub id: i32,
     pub request: RustRequest,
 }
 
+/// Response object that is sent from Rust to Dart.
 #[derive(Clone)]
 pub struct RustResponse {
     pub successful: bool,
@@ -50,6 +56,7 @@ impl Default for RustResponse {
     }
 }
 
+/// Wrapper for `RustResponse` with a unique ID.
 #[derive(Clone)]
 pub struct RustResponseUnique {
     pub id: i32,
@@ -86,18 +93,21 @@ lazy_static! {
         Arc::new(Mutex::new(RefCell::new(None)));
 }
 
+/// Returns a stream object in Dart that listens to Rust.
 pub fn prepare_rust_signal_stream(signal_stream: StreamSink<RustSignal>) {
     // Thread 1 running Rust
     let cell = SIGNAL_STREAM_SHARED.lock().unwrap();
     cell.replace(Some(signal_stream));
 }
 
+/// Returns a stream object in Dart that returns responses from Rust.
 pub fn prepare_rust_response_stream(response_stream: StreamSink<RustResponseUnique>) {
     // Thread 1 running Rust
     let cell = RESPONSE_STREAM_SHARED.lock().unwrap();
     cell.replace(Some(response_stream));
 }
 
+/// Prepare channels that are used in the Rust world.
 pub fn prepare_channels() -> SyncReturn<()> {
     // Thread 0 running Dart
     let (request_sender, request_receiver) = channel(1024);
@@ -109,11 +119,13 @@ pub fn prepare_channels() -> SyncReturn<()> {
     SyncReturn(())
 }
 
+/// Start the main function of Rust.
 pub fn start_rust_logic() {
     // Thread 1 running Rust
     crate::main();
 }
 
+/// Send a request to Rust and receive a response in Dart.
 pub fn request_to_rust(request_unique: RustRequestUnique) -> SyncReturn<()> {
     // Thread 0 running Dart
     REQUEST_SENDER.with(move |inner| {

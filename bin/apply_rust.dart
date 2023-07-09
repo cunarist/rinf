@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:package_config/package_config.dart';
 
+/// Creates new folders and files to an existing Flutter project folder.
 void main() async {
   // Get the path of the current project directory
   final projectPath = Directory.current.path;

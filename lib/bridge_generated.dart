@@ -92,13 +92,13 @@ class BridgeImpl implements Bridge {
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_request_to_rust(arg0),
       parseSuccessData: _wire2api_unit,
-      constMeta: krequestToRustConstMeta,
+      constMeta: kRequestToRustConstMeta,
       argValues: [requestUnique],
       hint: hint,
     ));
   }
 
-  FlutterRustBridgeTaskConstMeta get krequestToRustConstMeta =>
+  FlutterRustBridgeTaskConstMeta get kRequestToRustConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
         debugName: "request_to_rust",
         argNames: ["requestUnique"],

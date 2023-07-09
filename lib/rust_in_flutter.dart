@@ -13,9 +13,12 @@ import 'ffi.dart' if (dart.library.html) 'ffi_web.dart';
 
 export 'bridge_definitions.dart';
 
+/// Listens to a stream from Rust and broadcasts the data in Dart.
+/// You can see the usage example at
+/// https://pub.dev/packages/rust_in_flutter/example.
 final rustBroadcaster = StreamController<RustSignal>.broadcast();
 final _responseBroadcaster = StreamController<RustResponseUnique>.broadcast();
-final _requestIdGenerator = IdGenerator();
+final _requestIdGenerator = _IdGenerator();
 
 class RustInFlutter {
   static Future<void> ensureInitialized() async {
@@ -33,6 +36,13 @@ class RustInFlutter {
   }
 }
 
+/// Sends bytes data to Rust wrapped in `RustRequest` object
+/// with operation and address fields.
+/// This concept is very similar to HTTP request.
+/// Returns `RustResponse` object that is somehow calculated
+/// from the Rust side.
+/// You can see the usage example at
+/// https://pub.dev/packages/rust_in_flutter/example.
 Future<RustResponse> requestToRust(RustRequest request) async {
   final id = _requestIdGenerator.generateId();
   final requestUnique = RustRequestUnique(id: id, request: request);
@@ -56,7 +66,7 @@ Future<RustResponse> requestToRust(RustRequest request) async {
   return response;
 }
 
-class IdGenerator {
+class _IdGenerator {
   int _counter = -pow(2, 31).toInt();
   final _maxLimit = pow(2, 31).toInt() - 1;
   int generateId() {

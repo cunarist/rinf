@@ -11,27 +11,34 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
 import 'package:uuid/uuid.dart';
 
 abstract class Bridge {
+  /// Returns a stream object in Dart that listens to Rust.
   Stream<RustSignal> prepareRustSignalStream({dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kPrepareRustSignalStreamConstMeta;
 
+  /// Returns a stream object in Dart that returns responses from Rust.
   Stream<RustResponseUnique> prepareRustResponseStream({dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kPrepareRustResponseStreamConstMeta;
 
+  /// Prepare channels that are used in the Rust world.
   void prepareChannels({dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kPrepareChannelsConstMeta;
 
+  /// Start the main function of Rust.
   Future<void> startRustLogic({dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kStartRustLogicConstMeta;
 
+  /// Send a request to Rust and receive a response in Dart.
   void requestToRust({required RustRequestUnique requestUnique, dynamic hint});
 
-  FlutterRustBridgeTaskConstMeta get krequestToRustConstMeta;
+  FlutterRustBridgeTaskConstMeta get kRequestToRustConstMeta;
 }
 
+/// Available operations that a `RustRequest` object can hold.
+/// There are 4 options, `Create`,`Read`,`Update`, and `Delete`.
 enum Operation {
   Create,
   Read,
@@ -39,6 +46,7 @@ enum Operation {
   Delete,
 }
 
+/// Request object that is sent from Dart to Rust.
 class RustRequest {
   final String address;
   final Operation operation;
@@ -51,6 +59,7 @@ class RustRequest {
   });
 }
 
+/// Wrapper for `RustRequest` with a unique ID.
 class RustRequestUnique {
   final int id;
   final RustRequest request;
@@ -61,6 +70,7 @@ class RustRequestUnique {
   });
 }
 
+/// Response object that is sent from Rust to Dart.
 class RustResponse {
   final bool successful;
   final Uint8List bytes;
@@ -71,6 +81,7 @@ class RustResponse {
   });
 }
 
+/// Wrapper for `RustResponse` with a unique ID.
 class RustResponseUnique {
   final int id;
   final RustResponse response;
@@ -81,6 +92,7 @@ class RustResponseUnique {
   });
 }
 
+/// Holds the data that Rust streams to Dart.
 class RustSignal {
   final String address;
   final Uint8List bytes;
