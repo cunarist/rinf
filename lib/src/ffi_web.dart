@@ -4,7 +4,7 @@
 import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
 import 'bridge_generated.web.dart';
 
-const root = 'pkg/hub';
+const _root = 'pkg/hub';
 final api = BridgeImpl.wasm(
-  WasmModule.initialize(kind: const Modules.noModules(root: root)),
+  WasmModule.initialize(kind: const Modules.noModules(root: _root)),
 );
