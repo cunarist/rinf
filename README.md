@@ -46,3 +46,13 @@ If you are planning to compile your code for Linux, Windows, macOS, or iOS, you 
 For Android, [install Android NDK](https://developer.android.com/studio/projects/install-ndk#specific-version). You must select the exact expected NDK version from your Flutter project, which can be seen in your `./android/app/build.gradle` file or [here](https://github.com/flutter/flutter/blob/stable/packages/flutter_tools/gradle/flutter.gradle). 
 
 > Using extra build targets with Rust can sometimes present various issues. If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/rust-in-flutter/discussions) and open a Q&A thread for assistance.
+
+# 🌋 Pioneers
+
+This project was not done alone. There were various helpful projects that gave inspiration to the structure of this package. Credits to these wonderful efforts!
+
+- https://github.com/fzyzcjy/flutter_rust_bridge
+- https://github.com/superlistapp/super_native_extensions
+- https://github.com/brickpop/flutter-rust-ffi
+- https://github.com/corrosion-rs/corrosion
+- https://github.com/irondash/cargokit
