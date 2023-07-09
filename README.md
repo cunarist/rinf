@@ -29,12 +29,6 @@ With this package, you don't have to start from scratch or face the challenging 
 
 > If you have any suggestions or want to report a bug, please leave it as an [issue](https://github.com/cunarist/rust-in-flutter/issues) or a [pull request](https://github.com/cunarist/rust-in-flutter/pulls). We will try to respond as quickly as possible.
 
-# 🧱 Recommended Structure
-
-Ideally, **Flutter** would deal with the cross-platform user interface while **Rust** handles the business logic. The front-end and back-end can be completely separated, meaning that Dart and Rust codes are detachable from each other. These two worlds communicate through channels and streams.
-
-Use [MessagePack](https://msgpack.org/) for serializing messages sent between Dart and Rust as provided by the template, if you have other reasons not to do so. For those who aren't familiar, MessagePack is a nested binary structure similar to JSON, but much faster and more efficient.
-
 # 👜 Installing Rust Toolchain
 
 Refer to the [Rust docs](https://doc.rust-lang.org/book/ch01-01-installation.html) to install Rust toolchain on your system. Because you're going to write Rust, only having the Flutter SDK on your system is not enough.
@@ -46,6 +40,12 @@ If you are planning to compile your code for Linux, Windows, macOS, or iOS, you 
 For Android, [install Android NDK](https://developer.android.com/studio/projects/install-ndk#specific-version). You must select the exact expected NDK version from your Flutter project, which can be seen in your `./android/app/build.gradle` file or [here](https://github.com/flutter/flutter/blob/stable/packages/flutter_tools/gradle/flutter.gradle). 
 
 > Using extra build targets with Rust can sometimes present various issues. If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/rust-in-flutter/discussions) and open a Q&A thread for assistance.
+
+# 🧱 Recommended Structure
+
+Ideally, **Flutter** would deal with the cross-platform user interface while **Rust** handles the business logic. The front-end and back-end can be completely separated, meaning that Dart and Rust codes are detachable from each other. These two worlds communicate through channels and streams.
+
+Use [MessagePack](https://msgpack.org/) for serializing messages sent between Dart and Rust as provided by the template, if you have other reasons not to do so. For those who aren't familiar, MessagePack is a nested binary structure similar to JSON, but much faster and more efficient.
 
 # 🌋 Pioneers
 
