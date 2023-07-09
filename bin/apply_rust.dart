@@ -18,13 +18,38 @@ void main() async {
   );
   final packagePath = package.root.toFilePath();
 
+  // Copy the `native` folder
   final source = Directory('$packagePath/example/native');
   final destination = Directory('$projectPath/native');
   copyDirectory(source, destination);
 
-  var sourceFile = File('$packagePath/example/Cargo.toml');
-  var destinationFile = File('$projectPath/Cargo.toml');
+  // Copy `Cargo.toml`
+  final sourceFile = File('$packagePath/example/Cargo.toml');
+  final destinationFile = File('$projectPath/Cargo.toml');
   sourceFile.copySync(destinationFile.path);
+
+  // Add some lines to `.gitignore`
+  final sectionTop = '# Rust related';
+  final gitignoreFile = File('$projectPath/.gitignore');
+  try {
+    final contents = gitignoreFile.readAsStringSync();
+    var doesRustSectionExist = false;
+    var splitted = contents.split("\n\n");
+    splitted = splitted.map((s) => s.trim()).toList();
+    for (final piece in splitted) {
+      if (piece.startsWith(sectionTop)) {
+        doesRustSectionExist = true;
+      }
+    }
+    if (!doesRustSectionExist) {
+      var text = sectionTop;
+      text += '\n' + '.cargo/';
+      text += '\n' + 'target/';
+      text += '\n' + '!Cargo.lock';
+      splitted.add(text);
+    }
+    gitignoreFile.writeAsStringSync(splitted.join('\n\n'));
+  } on FileSystemException {}
 }
 
 void copyDirectory(Directory source, Directory destination) {
