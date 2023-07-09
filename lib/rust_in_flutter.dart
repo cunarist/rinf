@@ -13,18 +13,18 @@ import 'ffi.dart' if (dart.library.html) 'ffi_web.dart';
 
 export 'bridge_definitions.dart';
 
-var rustBroadcaster = StreamController<RustSignal>.broadcast();
-var _responseBroadcaster = StreamController<RustResponseUnique>.broadcast();
-var _requestIdGenerator = IdGenerator();
+final rustBroadcaster = StreamController<RustSignal>.broadcast();
+final _responseBroadcaster = StreamController<RustResponseUnique>.broadcast();
+final _requestIdGenerator = IdGenerator();
 
 class RustInFlutter {
   static Future<void> ensureInitialized() async {
     api.prepareChannels();
-    var rustSignalStream = api.prepareRustSignalStream();
+    final rustSignalStream = api.prepareRustSignalStream();
     rustSignalStream.listen((rustSignal) {
       rustBroadcaster.add(rustSignal);
     });
-    var responseStream = api.prepareRustResponseStream();
+    final responseStream = api.prepareRustResponseStream();
     responseStream.listen((responseUnique) {
       _responseBroadcaster.add(responseUnique);
     });
@@ -37,10 +37,10 @@ Future<RustResponse> requestToRust(RustRequest request) async {
   final id = _requestIdGenerator.generateId();
   final requestUnique = RustRequestUnique(id: id, request: request);
   api.requestToRust(requestUnique: requestUnique);
-  var future = _responseBroadcaster.stream.firstWhere((responseUnique) {
+  final future = _responseBroadcaster.stream.firstWhere((responseUnique) {
     return responseUnique.id == id;
   });
-  var responseUnique = await future.timeout(
+  final responseUnique = await future.timeout(
     const Duration(seconds: 10),
     onTimeout: () {
       return RustResponseUnique(
@@ -52,7 +52,7 @@ Future<RustResponse> requestToRust(RustRequest request) async {
       );
     },
   );
-  var response = responseUnique.response;
+  final response = responseUnique.response;
   return response;
 }
 
@@ -60,8 +60,8 @@ class IdGenerator {
   int _counter = -pow(2, 31).toInt();
   final _maxLimit = pow(2, 31).toInt() - 1;
   int generateId() {
-    var id = _counter;
-    var increased = _counter + 1;
+    final id = _counter;
+    final increased = _counter + 1;
     _counter = increased <= _maxLimit ? increased : -pow(2, 31).toInt();
     return id;
   }

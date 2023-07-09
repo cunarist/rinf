@@ -41,6 +41,36 @@ For Android, [install Android NDK](https://developer.android.com/studio/projects
 
 > Using extra build targets with Rust can sometimes present various issues. If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/rust-in-flutter/discussions) and open a Q&A thread for assistance.
 
+# 👜 Applying Rust
+
+Simply run this in the command-line. Make sure that the current directory of the terminal is your Flutter project folder.
+
+```bash
+dart run rust_in_flutter:apply_rust
+```
+
+Once you've run this command, there will be some new folders and files that will be your Rust code's starting point.
+
+```diff
+    my_flutter_project/
+    ├── android/
+    ├── ios/
+    ├── lib/
+    ├── linux/
++   ├── native/
++   │   ├── hub/
++   │   ├── sample_crate/
++   │   └── README.md
+    ├── test/
+    ├── web/
+    ├── windows/
++   ├── Cargo.toml
+    ├── pubspec.yaml
+    └── ...
+```
+
+Entry point of your Rust logic is the `hub` library crate. Do NOT modify the `bridge` module inside `hub/src`. You might want to remove `sample_crate` in production. 
+
 # 🧱 Recommended Structure
 
 Ideally, **Flutter** would deal with the cross-platform user interface while **Rust** handles the business logic. The front-end and back-end can be completely separated, meaning that Dart and Rust codes are detachable from each other. These two worlds communicate through channels and streams.
