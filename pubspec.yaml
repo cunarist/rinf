@@ -17,6 +17,7 @@ dependencies:
   uuid: ^3.0.7
   meta: ^1.8.0
   package_config: ^2.1.0
+  path: ^1.8.3
 
 dev_dependencies:
   flutter_test:
