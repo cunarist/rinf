@@ -1,6 +1,6 @@
 # 🆎 About
 
-Easily use Rust to make your Flutter app blazingly fast!
+Easily integrate Rust to make your Flutter app blazingly fast!
 
 ![preview](https://github.com/cunarist/rust-in-flutter/assets/66480156/be85cf04-2240-497f-8d0d-803c40536d8e)
 
