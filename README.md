@@ -13,7 +13,7 @@ This high-level wrapper package simplifies Rust integration for your Flutter app
 - Async interaction with no blocking
 - Streaming from Rust to Dart
 - Restarting Rust logic on Dart's hot restart
-- No memory copy when sending data
+- No memory copy when sending native data
 - No complicated code generation during development
 - No messing with sensitive native files in your project
 
