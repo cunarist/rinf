@@ -21,10 +21,10 @@ dependencies:
   path: ^1.8.3
 
 dev_dependencies:
+  ffigen: ^6.1.2
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
-  ffigen: ^8.0.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -41,19 +41,20 @@ flutter:
   # This is required for using `dart:ffi`.
   # All these are used by the tooling to maintain consistency when
   # adding or updating assets for this project.
+  #
+  # Please refer to README.md for a detailed explanation.
   plugin:
     platforms:
       android:
-        package: com.cunarist.rust_in_flutter
-        pluginClass: RustInFlutterPlugin
+        ffiPlugin: true
       ios:
-        pluginClass: RustInFlutterPlugin
+        ffiPlugin: true
       linux:
-        pluginClass: RustInFlutterPlugin
+        ffiPlugin: true
       macos:
-        pluginClass: RustInFlutterPlugin
+        ffiPlugin: true
       windows:
-        pluginClass: RustInFlutterPluginCApi
+        ffiPlugin: true
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:

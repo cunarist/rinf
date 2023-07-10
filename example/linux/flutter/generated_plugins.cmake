@@ -3,10 +3,10 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  rust_in_flutter
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
+  rust_in_flutter
 )
 
 set(PLUGIN_BUNDLED_LIBRARIES)
