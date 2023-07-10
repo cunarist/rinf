@@ -30,7 +30,6 @@ build/
 # Rust related
 .cargo/
 target/
-Cargo.lock
 
 # Others
 **/*.lock
