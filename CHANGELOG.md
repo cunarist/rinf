@@ -1,3 +1,8 @@
+## 1.1.0
+
+- Now this package is a Flutter FFI plugin without dummy native code
+- Improved guides
+
 ## 1.0.4
 
 - Fixed a problem with library bundling on Linux
