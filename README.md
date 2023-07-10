@@ -31,7 +31,7 @@ With this package, you don't have to start from scratch or face the challenging 
 
 ## Why Use Rust?
 
-While Dart is an amazing object-oriented modern language, its performance sometimes does not meet the requirements because it's non-native garbage-collected language. That's where Rust comes into play. Rust's performance is known to be roughly about [5~40 times faster](https://programming-language-benchmarks.vercel.app/dart-vs-rust) than Dart, not to mention the ability to utilize multiple threads.
+While Dart is an amazing object-oriented modern language, its performance sometimes does not meet the requirements because it's non-native garbage-collected language. That's where Rust comes into play. Rust's performance is known to be roughly about [2~40 times faster](https://programming-language-benchmarks.vercel.app/dart-vs-rust) than Dart, not to mention the ability to utilize multiple threads.
 
 # 👜 Installing Components
 
