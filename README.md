@@ -30,7 +30,7 @@ With this package, you don't have to start from scratch or face the challenging 
 
 > If you have any suggestions or want to report a bug, please leave it as an [issue](https://github.com/cunarist/rust-in-flutter/issues) or a [pull request](https://github.com/cunarist/rust-in-flutter/pulls). We will try to respond as quickly as possible.
 
-# 👜 Installing
+# 👜 Installing Components
 
 ## Basic Steps
 
@@ -50,7 +50,7 @@ For Android, [install Android NDK](https://developer.android.com/studio/projects
 
 > Using extra build targets with Rust can sometimes present various issues. If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/rust-in-flutter/discussions) and open a Q&A thread for assistance.
 
-# 👜 Applying Rust
+# 👜 Applying Template
 
 Simply run this in the command-line. Make sure that the current directory of the terminal is your Flutter project folder.
 
