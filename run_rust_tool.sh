@@ -5,7 +5,8 @@ set -e
 BASEDIR=$(dirname "$0")
 
 # In case we're running in environment without PATH put the default location in there
-PATH="$PATH:~/.cargo/bin"
+# Put it at the front so that we don't accidentally pick up homebrew's cargo.
+PATH="~/.cargo/bin:$PATH"
 
 if ! command -v cargo --version >/dev/null 2>&1
 then
