@@ -144,7 +144,7 @@ pub async fn handle_request(request_unique: RustRequestUnique) {
 }
 ```
 
-Handling requests in Rust is as follows. Message schema is defined here because it will be different by address and operation type.
+Handling requests in Rust is as follows. Endpoint message schema is defined here because it will be different by address and operation type.
 
 ```rust
 pub async fn calculate_something(request: RustRequest) -> RustResponse {
