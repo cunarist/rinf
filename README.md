@@ -18,7 +18,7 @@ This high-level wrapper package simplifies Rust integration for your Flutter app
 
 ## Platform Support
 
-With this package, you don't have to start from scratch or face the challenging complexity of integrating Rust.
+All the challenging build settings are automatically handled by this package. Note that the files in your Flutter project are not affected.
 
 - ✅ Linux: Tested and supported
 - ✅ Android: Tested and supported
