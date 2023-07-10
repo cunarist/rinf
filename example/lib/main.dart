@@ -116,7 +116,7 @@ class HomeNotifier extends ChangeNotifier {
   int _count = 0;
   int get count => _count;
   void increment() async {
-    var request = RustRequest(
+    var rustRequest = RustRequest(
       address: 'basicCategory.counterNumber',
       operation: Operation.Read,
       // Use the `serialize` function
@@ -134,13 +134,13 @@ class HomeNotifier extends ChangeNotifier {
     );
     // Use `sendRustRequest` from `bridge/wrapper.dart`
     // to send the request to Rust and get the response.
-    var response = await requestToRust(request);
-    if (!response.successful) {
+    var rustResponse = await requestToRust(rustRequest);
+    if (!rustResponse.successful) {
       return;
     }
     // You have to explicitly tell the deserialized type
     // with `as` keyword for proper type checking.
-    var message = deserialize(response.bytes) as Map;
+    var message = deserialize(rustResponse.bytes) as Map;
     var innerValue = message['after_number'] as int;
     _count = innerValue;
     notifyListeners();

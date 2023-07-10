@@ -10,18 +10,18 @@ use crate::sample_functions;
 
 pub async fn handle_request(request_unique: RustRequestUnique) {
     // Get the request data.
-    let request = request_unique.request;
+    let rust_request = request_unique.request;
     let interaction_id = request_unique.id;
 
     // Run the function that corresponds to the address.
-    let layered: Vec<&str> = request.address.split('.').collect();
-    let response = if layered.is_empty() {
+    let layered: Vec<&str> = rust_request.address.split('.').collect();
+    let rust_response = if layered.is_empty() {
         RustResponse::default()
     } else if layered[0] == "basicCategory" {
         if layered.len() == 1 {
             RustResponse::default()
         } else if layered[1] == "counterNumber" {
-            sample_functions::calculate_something(request).await
+            sample_functions::calculate_something(rust_request).await
         } else {
             RustResponse::default()
         }
@@ -32,7 +32,7 @@ pub async fn handle_request(request_unique: RustRequestUnique) {
     // Return the response.
     let response_unique = RustResponseUnique {
         id: interaction_id,
-        response,
+        response: rust_response,
     };
     respond_to_dart(response_unique);
 }

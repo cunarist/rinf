@@ -43,9 +43,9 @@ class RustInFlutter {
 /// from the Rust side.
 /// You can see the usage example at
 /// https://pub.dev/packages/rust_in_flutter/example.
-Future<RustResponse> requestToRust(RustRequest request) async {
+Future<RustResponse> requestToRust(RustRequest rustRequest) async {
   final id = _requestIdGenerator.generateId();
-  final requestUnique = RustRequestUnique(id: id, request: request);
+  final requestUnique = RustRequestUnique(id: id, request: rustRequest);
   api.requestToRust(requestUnique: requestUnique);
   final future = _responseBroadcaster.stream.firstWhere((responseUnique) {
     return responseUnique.id == id;
@@ -62,8 +62,8 @@ Future<RustResponse> requestToRust(RustRequest request) async {
       );
     },
   );
-  final response = responseUnique.response;
-  return response;
+  final rustResponse = responseUnique.response;
+  return rustResponse;
 }
 
 class _IdGenerator {

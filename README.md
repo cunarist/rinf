@@ -94,7 +94,7 @@ When requesting from Dart, you should specify the operation and address. This wa
 
 ```dart
 void someFunction() async {
-    var request = RustRequest(
+    var rustRequest = RustRequest(
       address: 'basicCategory.counterNumber',
       operation: Operation.Read,
       bytes: serialize(
@@ -108,8 +108,8 @@ void someFunction() async {
       ),
     );
 
-    var response = await requestToRust(request);
-    var message = deserialize(response.bytes) as Map;
+    var rustResponse = await requestToRust(rustRequest);
+    var message = deserialize(rustResponse.bytes) as Map;
     var innerValue = message['after_number'] as int;
 }
 ```
@@ -118,17 +118,17 @@ Upon receiving requests from Rust, you should first classify them by address.
 
 ```rust
 pub async fn handle_request(request_unique: RustRequestUnique) {
-    let request = request_unique.request;
+    let rust_request = request_unique.request;
     let interaction_id = request_unique.id;
 
-    let layered: Vec<&str> = request.address.split('.').collect();
-    let response = if layered.is_empty() {
+    let layered: Vec<&str> = rust_request.address.split('.').collect();
+    let rust_response = if layered.is_empty() {
         RustResponse::default()
     } else if layered[0] == "basicCategory" {
         if layered.len() == 1 {
             RustResponse::default()
         } else if layered[1] == "counterNumber" {
-            sample_functions::calculate_something(request).await
+            sample_functions::calculate_something(rust_request).await
         } else {
             RustResponse::default()
         }
@@ -138,7 +138,7 @@ pub async fn handle_request(request_unique: RustRequestUnique) {
 
     let response_unique = RustResponseUnique {
         id: interaction_id,
-        response,
+        response: rust_response,
     };
     respond_to_dart(response_unique);
 }
@@ -147,8 +147,8 @@ pub async fn handle_request(request_unique: RustRequestUnique) {
 Handling requests in Rust is as follows. Endpoint message schema is defined here because it will be different by address and operation type.
 
 ```rust
-pub async fn calculate_something(request: RustRequest) -> RustResponse {
-    match request.operation {
+pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
+    match rust_request.operation {
         Operation::Create => RustResponse::default(),
         Operation::Read => {
             #[allow(dead_code)]
@@ -160,7 +160,7 @@ pub async fn calculate_something(request: RustRequest) -> RustResponse {
                 dummy_two: i32,
                 dummy_three: Vec<i32>,
             }
-            let slice = request.bytes.as_slice();
+            let slice = rust_request.bytes.as_slice();
             let received: RustRequestSchema = from_slice(slice).unwrap();
             println!("{:?}", received.letter);
 

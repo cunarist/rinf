@@ -12,8 +12,8 @@ use serde::Deserialize;
 use serde::Serialize;
 use tokio::task::spawn_blocking;
 
-pub async fn calculate_something(request: RustRequest) -> RustResponse {
-    match request.operation {
+pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
+    match rust_request.operation {
         Operation::Create => RustResponse::default(),
         Operation::Read => {
             // We declare MessagePack structs in this match condition
@@ -27,7 +27,7 @@ pub async fn calculate_something(request: RustRequest) -> RustResponse {
                 dummy_two: i32,
                 dummy_three: Vec<i32>,
             }
-            let slice = request.bytes.as_slice();
+            let slice = rust_request.bytes.as_slice();
             let received: RustRequestSchema = from_slice(slice).unwrap();
             println!("{:?}", received.letter);
 
