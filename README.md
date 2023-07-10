@@ -55,7 +55,7 @@ For Android, [install Android NDK](https://developer.android.com/studio/projects
 Simply run this in the command-line. Make sure that the current directory of the terminal is your Flutter project folder.
 
 ```bash
-dart run rust_in_flutter:apply_rust
+dart run rust_in_flutter:apply_template
 ```
 
 Once you've run the command, there will be some new folders and files that will be your starter Rust template.
