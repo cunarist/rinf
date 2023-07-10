@@ -5,7 +5,7 @@ corrosion_import_crate(
   MANIFEST_PATH
   ${runner_SOURCE_DIR}/../native/hub/Cargo.toml
 )
-target_link_libraries(${BINARY_NAME} PRIVATE hub)
+target_link_libraries(${BINARY_NAME} PUBLIC hub)
 
 set(
   PLUGIN_BUNDLED_LIBRARIES
