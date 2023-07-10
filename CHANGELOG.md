@@ -1,3 +1,10 @@
+## 1.0.4
+
+- Fixed a problem with library bundling on Linux
+- Added comments
+- Added guides
+- Improved template application
+
 ## 1.0.3
 
 - Included code snippets in guides
