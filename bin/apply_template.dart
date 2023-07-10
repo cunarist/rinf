@@ -49,7 +49,6 @@ void main() async {
     var text = sectionTop;
     text += '\n' + '.cargo/';
     text += '\n' + 'target/';
-    text += '\n' + '!Cargo.lock';
     splitted.add(text);
   }
   gitignoreFile.writeAsStringSync(splitted.join('\n\n'));
