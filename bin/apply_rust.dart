@@ -53,6 +53,9 @@ void main() async {
     splitted.add(text);
   }
   gitignoreFile.writeAsStringSync(splitted.join('\n\n'));
+
+  // Add `msgpack_dart` to Dart dependencies
+  await Process.run('dart', ['pub', 'add', 'msgpack_dart']);
 }
 
 void _copyDirectory(Directory source, Directory destination) {

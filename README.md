@@ -93,6 +93,9 @@ Now by heading over to `./native/hub/src/lib.rs`, you can start writing Rust!
 When requesting from Dart, you should specify the operation and address. This way of communication follows the definition of RESTful API.
 
 ```dart
+import 'package:rust_in_flutter/rust_in_flutter.dart';
+import 'package:msgpack_dart/msgpack_dart.dart';
+
 void someFunction() async {
     var rustRequest = RustRequest(
       address: 'basicCategory.counterNumber',
