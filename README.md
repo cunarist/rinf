@@ -29,7 +29,7 @@ With this package, you don't have to start from scratch or face the challenging 
 
 > If you have any suggestions or want to report a bug, please leave it as an [issue](https://github.com/cunarist/rust-in-flutter/issues) or a [pull request](https://github.com/cunarist/rust-in-flutter/pulls). We will try to respond as quickly as possible.
 
-## Why use Rust?
+## Why Use Rust?
 
 While Dart is an amazing object-oriented modern language, its performance sometimes does not meet the requirements because it's non-native garbage-collected language. That's where Rust comes into play. Rust's performance is known to be roughly about [5~40 times faster](https://programming-language-benchmarks.vercel.app/dart-vs-rust) than Dart, not to mention the ability to utilize multiple threads.
 
