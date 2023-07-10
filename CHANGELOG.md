@@ -1,3 +1,7 @@
+## 1.0.3
+
+- Included code snippets in guides
+
 ## 1.0.2
 
 - Fixed typos.
