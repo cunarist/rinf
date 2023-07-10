@@ -75,7 +75,7 @@ Once you've run the command, there will be some new folders and files that will 
     ├── windows/
 *   ├── .gitignore
 +   ├── Cargo.toml
-    ├── pubspec.yaml
+*   ├── pubspec.yaml
     └── ...
 ```
 
