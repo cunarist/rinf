@@ -54,7 +54,7 @@ flutter doctor
 
 ## Extra Steps
 
-If you are planning to compile your code for Linux, Windows, macOS, or iOS, you don't have to do anything more.
+If you intend to compile your code for Linux, Windows, macOS, or iOS, you won't need to take any additional steps.
 
 For Android, [install Android NDK](https://developer.android.com/studio/projects/install-ndk#specific-version) version `23.1.7779620`.
 
