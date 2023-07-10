@@ -90,7 +90,7 @@ Now by heading over to `./native/hub/src/lib.rs`, you can start writing Rust!
 
 # 🧱 Tips
 
-When requesting from Dart, you provide operation and address. This way of communication follows the definition of RESTful API.
+When requesting from Dart, you should specify the operation and address. This way of communication follows the definition of RESTful API.
 
 ```dart
 void someFunction() async {
@@ -114,7 +114,7 @@ void someFunction() async {
 }
 ```
 
-Upon receiving requests from Rust, you first classify them by address.
+Upon receiving requests from Rust, you should first classify them by address.
 
 ```rust
 pub async fn handle_request(request_unique: RustRequestUnique) {
