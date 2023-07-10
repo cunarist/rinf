@@ -58,7 +58,7 @@ Simply run this in the command-line. Make sure that the current directory of the
 dart run rust_in_flutter:apply_rust
 ```
 
-Once you've run the command, there will be some new folders and files that will be your Rust code's starting point.
+Once you've run the command, there will be some new folders and files that will be your starter Rust template.
 
 ```diff
     my_flutter_project/
