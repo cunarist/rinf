@@ -55,7 +55,7 @@ For Android, [install Android NDK](https://developer.android.com/studio/projects
 
 # 👜 Applying Template
 
-Simply run this in the command-line. Make sure that the current directory of the terminal is your Flutter project folder.
+Simply run this in the command-line from the Flutter project folder.
 
 ```bash
 dart run rust_in_flutter:apply_template
