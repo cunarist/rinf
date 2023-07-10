@@ -56,7 +56,7 @@ flutter doctor
 
 If you are planning to compile your code for Linux, Windows, macOS, or iOS, you don't have to do anything more.
 
-For Android, [install Android NDK](https://developer.android.com/studio/projects/install-ndk#specific-version). You must select the exact expected NDK version from your Flutter project, which can be seen in your `./android/app/build.gradle` file or [here](https://github.com/flutter/flutter/blob/stable/packages/flutter_tools/gradle/flutter.gradle).
+For Android, [install Android NDK](https://developer.android.com/studio/projects/install-ndk#specific-version) version `23.1.7779620`.
 
 > Using extra build targets with Rust can sometimes present various issues. If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/rust-in-flutter/discussions) and open a Q&A thread for assistance.
 
