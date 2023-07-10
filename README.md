@@ -32,15 +32,15 @@ With this package, you don't have to start from scratch or face the challenging 
 
 # 👜 Installing
 
+## Basic Steps
+
 First, add this package to your Flutter project.
 
 ```bash
 flutter pub add rust_in_flutter
 ```
 
-## Rust Toolchain
-
-Refer to the [Rust docs](https://doc.rust-lang.org/book/ch01-01-installation.html) to install Rust toolchain on your system. Because you're going to write Rust, only having the Flutter SDK on your system is not enough.
+Then install Rust toolchain. Refer to the [official Rust docs](https://doc.rust-lang.org/book/ch01-01-installation.html).
 
 ## Extra Steps
 
@@ -90,9 +90,112 @@ Now by heading over to `./native/hub/src/lib.rs`, you can start writing Rust!
 
 # 🧱 Tips
 
+When requesting from Dart, you provide operation and address. This way of communication follows the definition of RESTful API.
+
+```dart
+void someFunction() async {
+    var request = RustRequest(
+      address: 'basicCategory.counterNumber',
+      operation: Operation.Read,
+      bytes: serialize(
+        {
+          'letter': 'Hello from Dart!',
+          'before_number': 888,
+          'dummy_one': 1,
+          'dummy_two': 2,
+          'dummy_three': [3, 4, 5]
+        },
+      ),
+    );
+
+    var response = await requestToRust(request);
+    var message = deserialize(response.bytes) as Map;
+    var innerValue = message['after_number'] as int;
+}
+```
+
+Upon receiving requests from Rust, you first classify them by address.
+
+```rust
+pub async fn handle_request(request_unique: RustRequestUnique) {
+    let request = request_unique.request;
+    let interaction_id = request_unique.id;
+
+    let layered: Vec<&str> = request.address.split('.').collect();
+    let response = if layered.is_empty() {
+        RustResponse::default()
+    } else if layered[0] == "basicCategory" {
+        if layered.len() == 1 {
+            RustResponse::default()
+        } else if layered[1] == "counterNumber" {
+            sample_functions::calculate_something(request).await
+        } else {
+            RustResponse::default()
+        }
+    } else {
+        RustResponse::default()
+    };
+
+    let response_unique = RustResponseUnique {
+        id: interaction_id,
+        response,
+    };
+    respond_to_dart(response_unique);
+}
+```
+
+Handling requests in Rust is as follows. Message schema is defined here because it because it will be different by address and operation type.
+
+```rust
+pub async fn calculate_something(request: RustRequest) -> RustResponse {
+    match request.operation {
+        Operation::Create => RustResponse::default(),
+        Operation::Read => {
+            #[allow(dead_code)]
+            #[derive(Deserialize)]
+            struct RustRequestSchema {
+                letter: String,
+                before_number: i32,
+                dummy_one: i32,
+                dummy_two: i32,
+                dummy_three: Vec<i32>,
+            }
+            let slice = request.bytes.as_slice();
+            let received: RustRequestSchema = from_slice(slice).unwrap();
+            println!("{:?}", received.letter);
+
+            let before_value = received.before_number;
+            let after_value = sample_crate::add_seven(before_value);
+
+            #[derive(Serialize)]
+            struct RustResponseSchema {
+                after_number: i32,
+                dummy_one: i32,
+                dummy_two: i32,
+                dummy_three: Vec<i32>,
+            }
+            RustResponse {
+                successful: true,
+                bytes: to_vec_named(&RustResponseSchema {
+                    after_number: after_value,
+                    dummy_one: 1,
+                    dummy_two: 2,
+                    dummy_three: vec![3, 4, 5],
+                })
+                .unwrap(),
+            }
+        }
+        Operation::Update => RustResponse::default(),
+        Operation::Delete => RustResponse::default(),
+    }
+}
+```
+
+You can extend this RESTful API pattern and create hundreds and thousands of endpoints as you need. If you have a web background, this system might look familiar to you. More comments and details are included in the actual code inside the Rust template.
+
 Ideally, **Flutter** would deal with the cross-platform user interface while **Rust** handles the business logic. The front-end and back-end can be completely separated, meaning that Dart and Rust codes are detachable from each other. These two worlds communicate through channels and streams.
 
-Use [MessagePack](https://msgpack.org/) for serializing messages sent between Dart and Rust as provided by the template, unless you have other reasons not to do so. For those who aren't familiar, MessagePack is a nested binary structure similar to JSON, but much faster and more efficient.
+Use [MessagePack](https://msgpack.org/) for serializing messages sent between Dart and Rust as provided by the Rust template, unless you have other reasons not to do so. For those who aren't familiar, MessagePack is a nested binary structure similar to JSON, but much faster and more efficient.
 
 Data being sent between Dart and Rust are basically bytes arrays, represented as `Uint8List` in Dart and `Vec<u8>` in Rust. Though using MessagePack serialization is recommended, you can send any kind of bytes data as you wish, such as a high-resolution image or some kind of file data.
 
