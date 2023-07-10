@@ -9,13 +9,12 @@ This high-level wrapper package simplifies Rust integration for your Flutter app
 ## Benefits
 
 - Rust integration with the ability to use an arbitrary number of library crates
-- RESTful API with easy request from Dart and response from Rust
-- Async interaction with no blocking
+- Async RESTful API with easy request from Dart and response from Rust without blocking
 - Streaming from Rust to Dart
 - Restarting Rust logic on Dart's hot restart
 - No memory copy when sending native data
 - No complicated code generation during development
-- No messing with sensitive build files in your project
+- No messing with sensitive build files such as CMake, Gradle, Podfile, etc.
 
 ## Platform Support
 
