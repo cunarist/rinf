@@ -1,4 +1,4 @@
-# 🆎 About
+# 🆎 Rust-In-Flutter
 
 Easily integrate Rust to make your Flutter app blazingly fast!
 
