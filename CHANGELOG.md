@@ -1,22 +1,26 @@
+## 1.2.0
+
+- Made the Rust request handler more future-proof, taking potential web support into account.
+
 ## 1.1.1
 
-- Improved various guides to help understanding the features of this package
+- Improved various guides to help understanding the features of this package.
 
 ## 1.1.0
 
-- Now this package is a Flutter FFI plugin without dummy native code
+- Now this package is a Flutter FFI plugin without dummy native code.
 - Improved guides
 
 ## 1.0.4
 
-- Fixed a problem with library bundling on Linux
-- Added comments
-- Added guides
-- Improved template application
+- Fixed a problem with library bundling on Linux.
+- Added comments.
+- Added guides.
+- Improved template application.
 
 ## 1.0.3
 
-- Included code snippets in guides
+- Included code snippets in guides.
 
 ## 1.0.2
 
