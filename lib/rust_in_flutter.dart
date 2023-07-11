@@ -1,9 +1,6 @@
 /// This module supports communication with Rust.
-/// More specifically, sending requests and
-/// receiving responses updates are supported.
-/// This `wrapper.dart` includes everything you need,
-/// so do not import anything else inside the `bridge` folder.
-/// DO NOT EDIT.
+/// More specifically, sending requests to Rust and
+/// receiving stream signals from Rust are possible.
 
 import 'dart:math';
 import 'dart:async';
@@ -11,7 +8,7 @@ import 'dart:typed_data';
 import 'src/bridge_definitions.dart';
 import 'src/ffi.dart' if (dart.library.html) 'ffi_web.dart';
 
-export 'src/bridge_definitions.dart';
+export 'src/bridge_definitions.dart' hide Bridge;
 
 /// Listens to a stream from Rust and broadcasts the data in Dart.
 /// You can see the usage example at
@@ -20,7 +17,10 @@ final rustBroadcaster = StreamController<RustSignal>.broadcast();
 final _responseBroadcaster = StreamController<RustResponseUnique>.broadcast();
 final _requestIdGenerator = _IdGenerator();
 
+/// Contains basic functionalities of this package.
 class RustInFlutter {
+  /// Makes sure that the Rust side is ready.
+  /// Don't forget to call this function in the `main` function of Dart.
   static Future<void> ensureInitialized() async {
     api.prepareChannels();
     final rustSignalStream = api.prepareRustSignalStream();
@@ -38,9 +38,12 @@ class RustInFlutter {
 
 /// Sends bytes data to Rust wrapped in `RustRequest` object
 /// with operation and address fields.
-/// This concept is very similar to HTTP request.
+/// This system follows the definition of RESTful API
+/// and is very similar to HTTP request.
 /// Returns `RustResponse` object that is somehow calculated
 /// from the Rust side.
+/// If the Rust doesn't respond for 10 seconds,
+/// this function will return a failed `RustResponse` object.
 /// You can see the usage example at
 /// https://pub.dev/packages/rust_in_flutter/example.
 Future<RustResponse> requestToRust(RustRequest rustRequest) async {
