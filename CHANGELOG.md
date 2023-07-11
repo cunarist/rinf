@@ -1,3 +1,7 @@
+## 1.2.2
+
+- Hide more Dart APIs that are not meant to be used outside.
+
 ## 1.2.1
 
 - Updated many comments.
