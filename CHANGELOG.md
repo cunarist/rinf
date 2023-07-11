@@ -1,3 +1,9 @@
+## 1.2.1
+
+- Updated many comments.
+- Fine-tuned the visibility of Dart APIs.
+- Organized guides.
+
 ## 1.2.0
 
 - Made the Rust request handler more future-proof, taking potential web support into account.
