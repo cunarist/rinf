@@ -1,3 +1,7 @@
+## 1.1.1
+
+- Improved various guides to help understanding the features of this package
+
 ## 1.1.0
 
 - Now this package is a Flutter FFI plugin without dummy native code
