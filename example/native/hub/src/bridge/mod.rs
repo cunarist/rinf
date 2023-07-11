@@ -3,7 +3,7 @@
 //! stream signals to Dart are supported.
 #![allow(dead_code)]
 
-use self::api::RustResponseUnique;
+use api::RustResponseUnique;
 use api::RustSignal;
 use tokio::sync::mpsc::Receiver;
 
