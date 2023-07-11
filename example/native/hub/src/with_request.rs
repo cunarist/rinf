@@ -5,10 +5,9 @@
 use crate::bridge::api::RustRequestUnique;
 use crate::bridge::api::RustResponse;
 use crate::bridge::api::RustResponseUnique;
-use crate::bridge::respond_to_dart;
 use crate::sample_functions;
 
-pub async fn handle_request(request_unique: RustRequestUnique) {
+pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUnique {
     // Get the request data.
     let rust_request = request_unique.request;
     let interaction_id = request_unique.id;
@@ -30,9 +29,8 @@ pub async fn handle_request(request_unique: RustRequestUnique) {
     };
 
     // Return the response.
-    let response_unique = RustResponseUnique {
+    RustResponseUnique {
         id: interaction_id,
         response: rust_response,
-    };
-    respond_to_dart(response_unique);
+    }
 }

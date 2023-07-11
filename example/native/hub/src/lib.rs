@@ -3,6 +3,7 @@ use tokio::task::spawn;
 mod bridge;
 mod sample_functions;
 mod with_request;
+use crate::bridge::respond_to_dart;
 
 /// Dart operates within a single thread, while Rust has multiple threads.
 /// This `main` function is the entry point for the Rust logic.
@@ -20,7 +21,7 @@ async fn main() {
         // if more concurrent tasks are needed.
         spawn(sample_functions::keep_drawing_mandelbrot());
         while let Some(request_unique) = request_receiver.recv().await {
-            spawn(with_request::handle_request(request_unique));
+            spawn(async { respond_to_dart(with_request::handle_request(request_unique).await) });
         }
         // Send the shutdown signal after the request channel is closed,
         // which is typically triggered by Dart's hot restart.

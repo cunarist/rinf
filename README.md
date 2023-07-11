@@ -132,7 +132,7 @@ void someFunction() async {
 Upon receiving requests from Rust, you should first classify them by address.
 
 ```rust
-pub async fn handle_request(request_unique: RustRequestUnique) {
+pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUnique {
     let rust_request = request_unique.request;
     let interaction_id = request_unique.id;
 
@@ -151,11 +151,10 @@ pub async fn handle_request(request_unique: RustRequestUnique) {
         RustResponse::default()
     };
 
-    let response_unique = RustResponseUnique {
+    RustResponseUnique {
         id: interaction_id,
         response: rust_response,
-    };
-    respond_to_dart(response_unique);
+    }
 }
 ```
 
