@@ -2,7 +2,7 @@
 
 These are tools for connecting Flutter and native compilers.
 
-Rust-In-Flutter was not made alone. There were various helpful projects that gave inspiration to the structure of this package. Credits to these wonderful efforts!
+Rust-In-Flutter was not made alone. There were pioneers that gave inspiration to the structure of this package. Credits to these wonderful efforts!
 
 - https://github.com/fzyzcjy/flutter_rust_bridge
 - https://github.com/superlistapp/super_native_extensions
