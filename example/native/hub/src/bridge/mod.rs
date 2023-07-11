@@ -1,13 +1,11 @@
-//! This module communicates with Dart.
-//! More specifically, receiveing requests and
-//! sending responses updates are supported.
-//! DO NOT EDIT.
+//! This module supports communication with Dart.
+//! More specifically, sending responses and
+//! stream signals to Dart are supported.
 #![allow(dead_code)]
 
+use self::api::RustResponseUnique;
 use api::RustSignal;
 use tokio::sync::mpsc::Receiver;
-
-use self::api::RustResponseUnique;
 
 pub mod api;
 mod bridge_generated;
