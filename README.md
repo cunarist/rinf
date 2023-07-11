@@ -47,7 +47,7 @@ flutter pub add rust_in_flutter
 
 Then install Rust toolchain. Refer to the [official Rust docs](https://doc.rust-lang.org/book/ch01-01-installation.html).
 
-Finally, check that your system is ready for compiling. Flutter might want you to install additional components. You can repeat these commands to verify your system status after each installation step. If there are no issues in the output, you are good to go!
+Finally, check that your system is ready for compiling. You can repeat these commands to verify your system status after each installation step. If there are no issues in the output, you are good to go!
 
 ```bash
 rustc --version
