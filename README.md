@@ -80,7 +80,11 @@ Once you've run the command, there will be some new folders and files that will 
     ├── linux/
 +   ├── native/
 +   │   ├── hub/
++   │   │   ├── src/
++   │   │   └── Cargo.toml
 +   │   ├── sample_crate/
++   │   │   ├── src/
++   │   │   └── Cargo.toml
 +   │   └── README.md
     ├── web/
     ├── windows/
