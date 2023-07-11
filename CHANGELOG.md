@@ -1,3 +1,7 @@
+## 1.2.3
+
+- Clarified template structure in guides.
+
 ## 1.2.2
 
 - Hide more Dart APIs that are not meant to be used outside.
