@@ -4,7 +4,7 @@ Easily integrate Rust to make your Flutter app blazingly fast!
 
 ![preview](https://github.com/cunarist/rust-in-flutter/assets/66480156/be85cf04-2240-497f-8d0d-803c40536d8e)
 
-Designed with ease of use, future scalability, and exceptional performance in mind, this package handles all the complicated aspects behind the scenes. Simply add this package to your Flutter project and you're ready to write Rust!
+Designed with ease of use, future scalability, and exceptional performance in mind, this lightweight framework handles all the complicated aspects behind the scenes. Simply add this package to your Flutter project and you're ready to write Rust!
 
 ## Benefits
 
@@ -127,7 +127,7 @@ void someFunction() async {
 }
 ```
 
-Upon receiving requests from Rust, you should first classify them by address.
+Upon receiving the request in Rust, you should first classify them by address.
 
 ```rust
 pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUnique {
@@ -156,7 +156,7 @@ pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUn
 }
 ```
 
-Handling requests in Rust is as follows. Endpoint message schema is defined here because it will be different by address and operation type.
+Endpoint function in Rust would be like this. Message schema is defined in the match statement because it will be different by the operation type.
 
 ```rust
 pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
