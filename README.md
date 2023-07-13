@@ -209,7 +209,7 @@ Ideally, **Flutter** would deal with the cross-platform user interface while **R
 
 Use [MessagePack](https://msgpack.org/) for serializing messages sent between Dart and Rust as provided by the Rust template unless you have other reasons not to do so. For those who aren't familiar, MessagePack is a nested binary structure similar to JSON, but much faster and more efficient.
 
-Data being sent between Dart and Rust are basically bytes arrays, represented as `Uint8List` in Dart and `Vec<u8>` in Rust. Though using MessagePack serialization is recommended, you can send any kind of bytes data as you wish, such as a high-resolution image or some kind of file data, or just pass in a blank bytes array.
+Data being sent between Dart and Rust are basically bytes arrays, represented as `Uint8List` in Dart and `Vec<u8>` in Rust. Though using MessagePack serialization is recommended, you can send any kind of bytes data as you wish such as a high-resolution image or some kind of file data, or just toss in a blank bytes array if you don't need additional details.
 
 # ☕ Support Us
 
