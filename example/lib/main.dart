@@ -41,7 +41,7 @@ class Home extends StatelessWidget {
             // and rebuilds the widget accordingly.
             StreamBuilder<RustSignal>(
               // Receive signals from Rust
-              // with `rustBroadcaster` from `bridge/wrapper.dart`,
+              // with `rustBroadcaster` from `rust_in_flutter.dart`,
               // For better performance, filter signals
               // by checking the `address` field with the `where` method.
               // This approach allows the builder to rebuild its widget
@@ -51,8 +51,8 @@ class Home extends StatelessWidget {
                 return rustSignal.address == 'sampleCategory.mandelbrot';
               }),
               builder: (context, snapshot) {
-                // If the app has just started and widget was built
-                // not owing to the native signal,
+                // If the app has just started and widget is built
+                // without receiving a Rust signal,
                 // the snapshot's data will be null.
                 var received = snapshot.data;
                 if (received == null) {
@@ -120,8 +120,8 @@ class HomeNotifier extends ChangeNotifier {
       address: 'basicCategory.counterNumber',
       operation: Operation.Read,
       // Use the `serialize` function
-      // provided by `msgpack_dart` package
-      // to convert the message into bytes.
+      // provided by `msgpack_dart.dart`
+      // to convert the message into raw bytes.
       bytes: serialize(
         {
           'letter': 'Hello from Dart!',
@@ -132,14 +132,17 @@ class HomeNotifier extends ChangeNotifier {
         },
       ),
     );
-    // Use `sendRustRequest` from `bridge/wrapper.dart`
+    // Use `requestToRust` from `rust_in_flutter.dart`
     // to send the request to Rust and get the response.
     var rustResponse = await requestToRust(rustRequest);
     if (!rustResponse.successful) {
       return;
     }
+    // Use the `deserialize` function
+    // provided by `msgpack_dart.dart`
+    // to convert raw bytes into Dart object.
     // You have to explicitly tell the deserialized type
-    // with `as` keyword for proper type checking.
+    // with `as` keyword for proper type checking in Dart.
     var message = deserialize(rustResponse.bytes) as Map;
     var innerValue = message['after_number'] as int;
     _count = innerValue;
