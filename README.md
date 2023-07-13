@@ -94,7 +94,7 @@ Once you've run the command, there will be some new folders and files that will 
     └── ...
 ```
 
-Don't forget to read the `./native/README.md` file first. Also, you might want to remove `sample_crate` in production.
+Don't forget to read the `./native/README.md` file first. Also, you might want to remove `sample_crate` in production. If you already have a Rust crate that you want to use here, just put it inside `./native` and set it as a dependency of the `hub` crate.
 
 Now by heading over to `./native/hub/src/lib.rs`, you can start writing Rust!
 
