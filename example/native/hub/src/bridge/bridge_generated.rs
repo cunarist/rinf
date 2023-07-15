@@ -51,6 +51,16 @@ fn wire_prepare_channels_impl() -> support::WireSyncReturn {
         move || Ok(prepare_channels()),
     )
 }
+fn wire_check_rust_streams_impl(port_: MessagePort) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "check_rust_streams",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || move |task_callback| Ok(check_rust_streams()),
+    )
+}
 fn wire_start_rust_logic_impl(port_: MessagePort) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap(
         WrapInfo {

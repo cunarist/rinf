@@ -193,6 +193,20 @@ class BridgeWire implements FlutterRustBridgeWireBase {
   late final _wire_prepare_channels =
       _wire_prepare_channelsPtr.asFunction<WireSyncReturn Function()>();
 
+  void wire_check_rust_streams(
+    int port_,
+  ) {
+    return _wire_check_rust_streams(
+      port_,
+    );
+  }
+
+  late final _wire_check_rust_streamsPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
+          'wire_check_rust_streams');
+  late final _wire_check_rust_streams =
+      _wire_check_rust_streamsPtr.asFunction<void Function(int)>();
+
   void wire_start_rust_logic(
     int port_,
   ) {

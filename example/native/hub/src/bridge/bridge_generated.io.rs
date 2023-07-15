@@ -17,6 +17,11 @@ pub extern "C" fn wire_prepare_channels() -> support::WireSyncReturn {
 }
 
 #[no_mangle]
+pub extern "C" fn wire_check_rust_streams(port_: i64) {
+    wire_check_rust_streams_impl(port_)
+}
+
+#[no_mangle]
 pub extern "C" fn wire_start_rust_logic(port_: i64) {
     wire_start_rust_logic_impl(port_)
 }

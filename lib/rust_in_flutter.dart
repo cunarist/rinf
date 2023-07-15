@@ -34,7 +34,7 @@ class RustInFlutter {
     rustResponseStream.listen((responseUnique) {
       _responseBroadcaster.add(responseUnique);
     });
-    await Future.delayed(const Duration(milliseconds: 100));
+    while (!(await api.checkRustStreams())) {}
     api.startRustLogic();
   }
 }

@@ -119,6 +119,22 @@ pub fn prepare_channels() -> SyncReturn<()> {
     SyncReturn(())
 }
 
+/// Check if the streams are ready in Rust.
+/// This should be done before starting the Rust logic.
+pub fn check_rust_streams() -> bool {
+    // Thread 1 running Rust
+    let mut are_all_ready = true;
+    let cell = SIGNAL_STREAM_SHARED.lock().unwrap();
+    if cell.borrow().is_none() {
+        are_all_ready = false;
+    };
+    let cell = RESPONSE_STREAM_SHARED.lock().unwrap();
+    if cell.borrow().is_none() {
+        are_all_ready = false;
+    };
+    are_all_ready
+}
+
 /// Start the main function of Rust.
 pub fn start_rust_logic() {
     // Thread 1 running Rust

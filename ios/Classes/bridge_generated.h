@@ -43,6 +43,8 @@ void wire_prepare_rust_response_stream(int64_t port_);
 
 WireSyncReturn wire_prepare_channels(void);
 
+void wire_check_rust_streams(int64_t port_);
+
 void wire_start_rust_logic(int64_t port_);
 
 WireSyncReturn wire_request_to_rust(struct wire_RustRequestUnique *request_unique);
@@ -58,6 +60,7 @@ static int64_t dummy_method_to_enforce_bundling(void) {
     dummy_var ^= ((int64_t) (void*) wire_prepare_rust_signal_stream);
     dummy_var ^= ((int64_t) (void*) wire_prepare_rust_response_stream);
     dummy_var ^= ((int64_t) (void*) wire_prepare_channels);
+    dummy_var ^= ((int64_t) (void*) wire_check_rust_streams);
     dummy_var ^= ((int64_t) (void*) wire_start_rust_logic);
     dummy_var ^= ((int64_t) (void*) wire_request_to_rust);
     dummy_var ^= ((int64_t) (void*) new_box_autoadd_rust_request_unique_0);

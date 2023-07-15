@@ -70,6 +70,22 @@ class BridgeImpl implements Bridge {
         argNames: [],
       );
 
+  Future<bool> checkRustStreams({dynamic hint}) {
+    return _platform.executeNormal(FlutterRustBridgeTask(
+      callFfi: (port_) => _platform.inner.wire_check_rust_streams(port_),
+      parseSuccessData: _wire2api_bool,
+      constMeta: kCheckRustStreamsConstMeta,
+      argValues: [],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kCheckRustStreamsConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "check_rust_streams",
+        argNames: [],
+      );
+
   Future<void> startRustLogic({dynamic hint}) {
     return _platform.executeNormal(FlutterRustBridgeTask(
       callFfi: (port_) => _platform.inner.wire_start_rust_logic(port_),

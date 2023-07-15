@@ -26,6 +26,12 @@ abstract class Bridge {
 
   FlutterRustBridgeTaskConstMeta get kPrepareChannelsConstMeta;
 
+  /// Check if the streams are ready in Rust.
+  /// This should be done before starting the Rust logic.
+  Future<bool> checkRustStreams({dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kCheckRustStreamsConstMeta;
+
   /// Start the main function of Rust.
   Future<void> startRustLogic({dynamic hint});
 

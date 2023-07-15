@@ -70,6 +70,8 @@ class BridgeWasmModule implements WasmModule {
 
   external dynamic /* void */ wire_prepare_channels();
 
+  external dynamic /* void */ wire_check_rust_streams(NativePortType port_);
+
   external dynamic /* void */ wire_start_rust_logic(NativePortType port_);
 
   external dynamic /* void */ wire_request_to_rust(
@@ -90,6 +92,9 @@ class BridgeWire extends FlutterRustBridgeWasmWireBase<BridgeWasmModule> {
 
   dynamic /* void */ wire_prepare_channels() =>
       wasmModule.wire_prepare_channels();
+
+  void wire_check_rust_streams(NativePortType port_) =>
+      wasmModule.wire_check_rust_streams(port_);
 
   void wire_start_rust_logic(NativePortType port_) =>
       wasmModule.wire_start_rust_logic(port_);

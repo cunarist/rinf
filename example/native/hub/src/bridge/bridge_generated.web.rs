@@ -17,6 +17,11 @@ pub fn wire_prepare_channels() -> support::WireSyncReturn {
 }
 
 #[wasm_bindgen]
+pub fn wire_check_rust_streams(port_: MessagePort) {
+    wire_check_rust_streams_impl(port_)
+}
+
+#[wasm_bindgen]
 pub fn wire_start_rust_logic(port_: MessagePort) {
     wire_start_rust_logic_impl(port_)
 }
