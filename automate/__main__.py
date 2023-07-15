@@ -19,8 +19,6 @@ elif sys.argv[1] == "bridge-gen":
     command += f" --dart-output ./lib/src/bridge_generated.dart"
     command += f" --dart-decl-output ./lib/src/bridge_definitions.dart"
     command += f" --class-name Bridge"
-    command += f" -c ./ios/Classes/bridge_generated.h"
-    command += f" -e ./macos/Classes/"
     command += f" --wasm"
     os.system(command)
 
