@@ -55,6 +55,30 @@ void main() async {
 
   // Add `msgpack_dart` to Dart dependencies
   await Process.run('dart', ['pub', 'add', 'msgpack_dart']);
+
+  // Modify `./lib/main.dart`
+  final mainFile = File('$projectPath/lib/main.dart');
+  final lines = mainFile.readAsLinesSync();
+  final allLines = lines.join('\n');
+  final modifiedLines = <String>[];
+  for (final line in lines) {
+    if (line.contains('main()')) {
+      modifiedLines.add('void main() async {');
+      if (!allLines.contains('RustInFlutter.ensureInitialized()')) {
+        modifiedLines.add('  await RustInFlutter.ensureInitialized();');
+      }
+    } else {
+      modifiedLines.add(line);
+    }
+  }
+  if (!allLines.contains('package:rust_in_flutter/rust_in_flutter.dart')) {
+    modifiedLines.insert(
+      0,
+      "import 'package:rust_in_flutter/rust_in_flutter.dart';",
+    );
+  }
+  final modifiedContent = modifiedLines.join('\n');
+  mainFile.writeAsStringSync(modifiedContent);
 }
 
 void _copyDirectory(Directory source, Directory destination) {
