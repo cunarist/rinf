@@ -9,6 +9,7 @@ Designed with ease of use, future scalability, and exceptional performance in mi
 ## Benefits
 
 - Rust integration with the ability to use an arbitrary number of library crates
+- Being able to use an existing Rust crate as it is
 - No messing with sensitive build files such as CMake, Gradle, Podfile, etc
 - No complicated code generation during development
 - Defining unlimited RESTful API endpoints without much effort
