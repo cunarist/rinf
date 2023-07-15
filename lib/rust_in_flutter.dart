@@ -30,8 +30,8 @@ class RustInFlutter {
     rustSignalStream.listen((rustSignal) {
       rustBroadcaster.add(rustSignal);
     });
-    final responseStream = api.prepareRustResponseStream();
-    responseStream.listen((responseUnique) {
+    final rustResponseStream = api.prepareRustResponseStream();
+    rustResponseStream.listen((responseUnique) {
       _responseBroadcaster.add(responseUnique);
     });
     await Future.delayed(const Duration(milliseconds: 100));
