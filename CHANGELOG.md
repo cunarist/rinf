@@ -1,3 +1,9 @@
+## 1.2.4
+
+- Updated many outdated comments and guides.
+- Decreased the time spent on `ensureInitialized`. Also, `ensureInitialized()` is automatically inserted in `main.dart` when doing `dart run rust_in_flutter:apply_template` from now on.
+- Various code improvements were applied.
+
 ## 1.2.3
 
 - Clarified template structure in guides.
