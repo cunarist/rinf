@@ -1,3 +1,7 @@
+## 1.2.5
+
+- Updated the guide about Android NDK version.
+
 ## 1.2.4
 
 - Updated many outdated comments and guides.
