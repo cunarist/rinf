@@ -70,13 +70,15 @@ Simply run this in the command-line from the Flutter project folder.
 dart run rust_in_flutter:apply_template
 ```
 
-Once you've run the command, there will be some new folders and files that will be your starter Rust template.
+Once you've run the command, there will be some new files and folders that will be your starter Rust template.
 
 ```diff
     my_flutter_project/
     ├── android/
     ├── ios/
     ├── lib/
+*   │   ├── main.dart
+    │   └── ...
     ├── linux/
 +   ├── native/
 +   │   ├── hub/
@@ -207,7 +209,7 @@ You can extend this RESTful API pattern and create hundreds and thousands of end
 
 Ideally, **Flutter** would deal with the cross-platform user interface while **Rust** handles the business logic. The front-end and back-end can be completely separated, meaning that Dart and Rust codes are detachable from each other. These two worlds communicate through channels and streams.
 
-Use [MessagePack](https://msgpack.org/) for serializing messages sent between Dart and Rust as provided by the Rust template unless you have other reasons not to do so. For those who aren't familiar, MessagePack is a nested binary structure similar to JSON, but much faster and more efficient.
+Use [MessagePack](https://msgpack.org/) for serializing messages sent between Dart and Rust as provided by the Rust template unless you have other reasons not to do so. For those who aren't familiar, MessagePack is a nested binary structure similar to JSON, but faster and smaller.
 
 Data being sent between Dart and Rust are basically bytes arrays, represented as `Uint8List` in Dart and `Vec<u8>` in Rust. Though using MessagePack serialization is recommended, you can send any kind of bytes data as you wish such as a high-resolution image or some kind of file data, or just toss in a blank bytes array if you don't need additional details.
 
