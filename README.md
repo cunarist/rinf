@@ -38,8 +38,6 @@ While Dart is an amazing object-oriented modern language, its performance someti
 
 # 👜 Installing Components
 
-## Basic Steps
-
 First, add this package to your Flutter project.
 
 ```bash
@@ -55,11 +53,9 @@ rustc --version
 flutter doctor
 ```
 
-## Extra Steps
+## Caveats
 
-If you intend to compile your code for Linux, Windows, macOS, or iOS, you don't need to take any additional steps.
-
-For Android, [install Android NDK](https://developer.android.com/studio/projects/install-ndk#specific-version). The NDK version that your project expects is specified in `android/app/build.gradle` file. You can find the current value of `flutter.ndkVersion` in the Flutter [source code](https://github.com/flutter/flutter/blob/stable/packages/flutter_tools/gradle/flutter.gradle)
+- For Android, The NDK version that your project expects is specified in `android/app/build.gradle` file as `ndkVersion`. This version number must be `23.1.7779620` or higher for this package to work. If the value of `ndkVersion` is `flutter.ndkVersion`, you should be using Flutter SDK [3.10 or higher](https://docs.flutter.dev/release/release-notes/release-notes-3.10.0).
 
 > Using extra build targets with Rust can sometimes present various issues. If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/rust-in-flutter/discussions) and open a Q&A thread for assistance.
 
