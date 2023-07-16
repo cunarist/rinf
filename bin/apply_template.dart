@@ -57,28 +57,29 @@ void main() async {
   await Process.run('dart', ['pub', 'add', 'msgpack_dart']);
 
   // Modify `./lib/main.dart`
+  await Process.run('dart', ['format', './lib/main.dart']);
   final mainFile = File('$projectPath/lib/main.dart');
-  final lines = mainFile.readAsLinesSync();
-  final allLines = lines.join('\n');
-  final modifiedLines = <String>[];
-  for (final line in lines) {
-    if (line.contains('main()')) {
-      modifiedLines.add('void main() async {');
-      if (!allLines.contains('RustInFlutter.ensureInitialized()')) {
-        modifiedLines.add('  await RustInFlutter.ensureInitialized();');
-      }
-    } else {
-      modifiedLines.add(line);
-    }
-  }
-  if (!allLines.contains('package:rust_in_flutter/rust_in_flutter.dart')) {
-    modifiedLines.insert(
-      0,
+  var mainText = mainFile.readAsStringSync();
+  if (!mainText.contains('package:rust_in_flutter/rust_in_flutter.dart')) {
+    mainText = mainText.replaceFirst(
+      '\n\n',
       "import 'package:rust_in_flutter/rust_in_flutter.dart';",
     );
   }
-  final modifiedContent = modifiedLines.join('\n');
-  mainFile.writeAsStringSync(modifiedContent);
+  if (!mainText.contains('main () {')) {
+    mainText = mainText.replaceFirst(
+      'main() {',
+      'main() async {',
+    );
+  }
+  if (!mainText.contains('RustInFlutter.ensureInitialized()')) {
+    mainText = mainText.replaceFirst(
+      'main() async {',
+      'main() async { await RustInFlutter.ensureInitialized();',
+    );
+  }
+  mainFile.writeAsStringSync(mainText);
+  await Process.run('dart', ['format', './lib/main.dart']);
 }
 
 void _copyDirectory(Directory source, Directory destination) {

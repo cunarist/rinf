@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rust_in_flutter/rust_in_flutter.dart';
 import 'package:msgpack_dart/msgpack_dart.dart';
+import 'package:rust_in_flutter/rust_in_flutter.dart';
 
 void main() async {
   await RustInFlutter.ensureInitialized();
