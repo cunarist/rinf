@@ -53,11 +53,9 @@ rustc --version
 flutter doctor
 ```
 
-## Caveats
+Quite simple, isn't it?
 
-- For Android, The NDK version that your project expects is specified in `./android/app/build.gradle` file as `ndkVersion` variable. This version number must be `23.1.7779620` or higher for this package to work. If the value of `ndkVersion` is `flutter.ndkVersion`, you should be using Flutter SDK [3.10 or higher](https://docs.flutter.dev/release/release-notes/release-notes-3.10.0).
-
-> Using extra build targets with Rust can sometimes present various issues. If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/rust-in-flutter/discussions) and open a Q&A thread for assistance.
+> Using various build targets with Rust can sometimes present various issues. If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/rust-in-flutter/discussions) and open a Q&A thread for assistance.
 
 # 👜 Applying Template
 
