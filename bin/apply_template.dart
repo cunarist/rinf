@@ -66,7 +66,7 @@ void main() async {
       "import 'package:rust_in_flutter/rust_in_flutter.dart';",
     );
   }
-  if (!mainText.contains('main () {')) {
+  if (mainText.contains('main() {')) {
     mainText = mainText.replaceFirst(
       'main() {',
       'main() async {',
