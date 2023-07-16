@@ -1,3 +1,7 @@
+## 1.2.8
+
+- Fixed small things.
+
 ## 1.2.7
 
 - Stabilized `main.dart` modifcation upon `dart run rust_in_flutter:apply_template`.
