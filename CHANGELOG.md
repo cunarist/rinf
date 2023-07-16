@@ -1,3 +1,7 @@
+## 1.2.6
+
+- Hid the information regarding the compilation of connector crates to avoid confusion with actual crates.
+
 ## 1.2.5
 
 - Updated the guide about Android NDK version.
