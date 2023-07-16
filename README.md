@@ -53,8 +53,6 @@ rustc --version
 flutter doctor
 ```
 
-Quite simple, isn't it?
-
 > Using various build targets with Rust can sometimes present various issues. If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/rust-in-flutter/discussions) and open a Q&A thread for assistance.
 
 # 👜 Applying Template
