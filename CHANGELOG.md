@@ -1,3 +1,7 @@
+## 1.2.7
+
+- Stabilized `main.dart` modifcation upon `dart run rust_in_flutter:apply_template`.
+
 ## 1.2.6
 
 - Hid the information regarding the compilation of connector crates to avoid confusion with actual crates.
