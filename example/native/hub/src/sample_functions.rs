@@ -1,7 +1,7 @@
 //! This module is only for demonstration purposes.
 //! You might want to remove this module in production.
 
-use crate::bridge::api::Operation;
+use crate::bridge::api::RustOperation;
 use crate::bridge::api::RustRequest;
 use crate::bridge::api::RustResponse;
 use crate::bridge::api::RustSignal;
@@ -14,8 +14,8 @@ use tokio::task::spawn_blocking;
 
 pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
-        Operation::Create => RustResponse::default(),
-        Operation::Read => {
+        RustOperation::Create => RustResponse::default(),
+        RustOperation::Read => {
             // We declare MessagePack structs in this match condition
             // because schema will differ by the operation type.
             #[allow(dead_code)]
@@ -54,8 +54,8 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
                 .unwrap(),
             }
         }
-        Operation::Update => RustResponse::default(),
-        Operation::Delete => RustResponse::default(),
+        RustOperation::Update => RustResponse::default(),
+        RustOperation::Delete => RustResponse::default(),
     }
 }
 

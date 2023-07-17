@@ -8,7 +8,7 @@ import 'dart:typed_data';
 import 'src/bridge_definitions.dart';
 import 'src/ffi.dart' if (dart.library.html) 'ffi_web.dart';
 
-export 'src/bridge_definitions.dart' show Operation;
+export 'src/bridge_definitions.dart' show RustOperation;
 export 'src/bridge_definitions.dart' show RustRequest;
 export 'src/bridge_definitions.dart' show RustResponse;
 export 'src/bridge_definitions.dart' show RustSignal;

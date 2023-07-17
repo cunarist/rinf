@@ -35,7 +35,7 @@ class BridgePlatform extends FlutterRustBridgeBase<BridgeWire>
   List<dynamic> api2wire_rust_request(RustRequest raw) {
     return [
       api2wire_String(raw.address),
-      api2wire_operation(raw.operation),
+      api2wire_rust_operation(raw.operation),
       api2wire_uint_8_list(raw.bytes)
     ];
   }

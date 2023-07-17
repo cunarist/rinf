@@ -104,7 +104,7 @@ import 'package:msgpack_dart/msgpack_dart.dart';
 void someFunction() async {
     var rustRequest = RustRequest(
       address: 'basicCategory.counterNumber',
-      operation: Operation.Read,
+      operation: RustOperation.Read,
       bytes: serialize(
         {
           'letter': 'Hello from Dart!',
@@ -156,8 +156,8 @@ Endpoint function in Rust would be like this. Message schema is defined in the m
 ```rust
 pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
-        Operation::Create => RustResponse::default(),
-        Operation::Read => {
+        RustOperation::Create => RustResponse::default(),
+        RustOperation::Read => {
             #[allow(dead_code)]
             #[derive(Deserialize)]
             struct RustRequestSchema {
@@ -192,8 +192,8 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
                 .unwrap(),
             }
         }
-        Operation::Update => RustResponse::default(),
-        Operation::Delete => RustResponse::default(),
+        RustOperation::Update => RustResponse::default(),
+        RustOperation::Delete => RustResponse::default(),
     }
 }
 ```

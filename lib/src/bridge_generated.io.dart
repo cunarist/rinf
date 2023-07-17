@@ -48,7 +48,7 @@ class BridgePlatform extends FlutterRustBridgeBase<BridgeWire> {
   void _api_fill_to_wire_rust_request(
       RustRequest apiObj, wire_RustRequest wireObj) {
     wireObj.address = api2wire_String(apiObj.address);
-    wireObj.operation = api2wire_operation(apiObj.operation);
+    wireObj.operation = api2wire_rust_operation(apiObj.operation);
     wireObj.bytes = api2wire_uint_8_list(apiObj.bytes);
   }
 

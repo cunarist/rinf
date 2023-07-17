@@ -114,14 +114,14 @@ impl Wire2Api<i32> for i32 {
         self
     }
 }
-impl Wire2Api<Operation> for i32 {
-    fn wire2api(self) -> Operation {
+impl Wire2Api<RustOperation> for i32 {
+    fn wire2api(self) -> RustOperation {
         match self {
-            0 => Operation::Create,
-            1 => Operation::Read,
-            2 => Operation::Update,
-            3 => Operation::Delete,
-            _ => unreachable!("Invalid variant for Operation: {}", self),
+            0 => RustOperation::Create,
+            1 => RustOperation::Read,
+            2 => RustOperation::Update,
+            3 => RustOperation::Delete,
+            _ => unreachable!("Invalid variant for RustOperation: {}", self),
         }
     }
 }

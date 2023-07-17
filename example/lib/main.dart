@@ -118,7 +118,7 @@ class HomeNotifier extends ChangeNotifier {
   void increment() async {
     var rustRequest = RustRequest(
       address: 'basicCategory.counterNumber',
-      operation: Operation.Read,
+      operation: RustOperation.Read,
       // Use the `serialize` function
       // provided by `msgpack_dart.dart`
       // to convert the message into raw bytes.

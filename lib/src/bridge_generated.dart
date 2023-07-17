@@ -188,7 +188,7 @@ int api2wire_i32(int raw) {
 }
 
 @protected
-int api2wire_operation(Operation raw) {
+int api2wire_rust_operation(RustOperation raw) {
   return api2wire_i32(raw.index);
 }
 

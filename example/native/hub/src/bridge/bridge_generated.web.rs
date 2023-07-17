@@ -92,8 +92,8 @@ impl Wire2Api<i32> for JsValue {
         self.unchecked_into_f64() as _
     }
 }
-impl Wire2Api<Operation> for JsValue {
-    fn wire2api(self) -> Operation {
+impl Wire2Api<RustOperation> for JsValue {
+    fn wire2api(self) -> RustOperation {
         (self.unchecked_into_f64() as i32).wire2api()
     }
 }

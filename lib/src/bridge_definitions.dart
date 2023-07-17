@@ -45,7 +45,7 @@ abstract class Bridge {
 
 /// Available operations that a `RustRequest` object can hold.
 /// There are 4 options, `Create`,`Read`,`Update`, and `Delete`.
-enum Operation {
+enum RustOperation {
   Create,
   Read,
   Update,
@@ -55,7 +55,7 @@ enum Operation {
 /// Request object that is sent from Dart to Rust.
 class RustRequest {
   final String address;
-  final Operation operation;
+  final RustOperation operation;
   final Uint8List bytes;
 
   const RustRequest({

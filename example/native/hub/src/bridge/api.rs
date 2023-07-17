@@ -12,7 +12,7 @@ use tokio::sync::mpsc::Sender;
 
 /// Available operations that a `RustRequest` object can hold.
 /// There are 4 options, `Create`,`Read`,`Update`, and `Delete`.
-pub enum Operation {
+pub enum RustOperation {
     Create,
     Read,
     Update,
@@ -29,7 +29,7 @@ pub struct RustSignal {
 /// Request object that is sent from Dart to Rust.
 pub struct RustRequest {
     pub address: String,
-    pub operation: Operation,
+    pub operation: RustOperation,
     pub bytes: Vec<u8>,
 }
 
