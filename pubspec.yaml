@@ -6,8 +6,8 @@ funding:
   - https://www.buymeacoffee.com/cunarist
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=3.10.0"
+  sdk: ">=3.0.5 <4.0.0"
+  flutter: ">=3.3.0"
 
 dependencies:
   flutter:
