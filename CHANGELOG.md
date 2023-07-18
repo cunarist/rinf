@@ -1,3 +1,7 @@
+## 1.3.1
+
+- Fixed a problem with Rust crate path detection on Android.
+
 ## 1.3.0
 
 - Changed the name of an exposed enum. Now `Operation` has changed to `RustOperation` so that it won't make confusions with other operations. All developers should update their code to match this new name, probably using the batch replace function in various IDEs.
