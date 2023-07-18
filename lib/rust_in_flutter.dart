@@ -6,7 +6,7 @@ import 'dart:math';
 import 'dart:async';
 import 'dart:typed_data';
 import 'src/bridge_definitions.dart';
-import 'src/ffi.dart' if (dart.library.html) 'src/ffi_web.dart';
+import 'src/ffi.dart' if (dart.library.html) 'ffi_web.dart';
 
 export 'src/bridge_definitions.dart' show RustOperation;
 export 'src/bridge_definitions.dart' show RustRequest;
