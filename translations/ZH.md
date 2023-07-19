@@ -2,71 +2,76 @@
 
 # 🆎 Rust-In-Flutter
 
-快速集成Rust代码到您的Flutter项目当中！  
+快速集成 Rust 代码到您的 Flutter 项目当中！
 
-![preview](https://github.com/cunarist/rust-in-flutter/assets/66480156/be85cf04-2240-497f-8d0d-803c40536d8e)  
+![preview](https://github.com/cunarist/rust-in-flutter/assets/66480156/be85cf04-2240-497f-8d0d-803c40536d8e)
 
-兼具易用性、可拓展性和强悍性能的轻量级框架，在幕后为您默默处理所有问题！只需要在项目依赖中加入这个库，就可以开始编写您的Rust代码！  
-
+兼具易用性、可拓展性和强悍性能的轻量级框架，在幕后为您默默处理所有问题！只需要在项目依赖中加入这个库，就可以开始编写您的 Rust 代码！
 
 ## 优势
 
-- 可集成任意数量的crates  
-- 可以原样使用现有的crate包  
-- 无需烦心于CMake、Gradle、Podfile等繁琐的构建文件  
-- 开发过程中没有复杂的代码生成  
-- 定义数量无限制的RESTful API  
-- 通过简单的Dart请求和Rust响应实现异步交互  
-- 从Rust到Dart的Stream  
-- 在Dart项目热重载时重启Rust逻辑  
-- 极小的性能开销  
-- 发送native数据时没有memory copy  
+- 可集成任意数量的 crates
+- 可以原样使用现有的 crate 包
+- 无需烦心于 CMake、Gradle、Podfile 等繁琐的构建文件
+- 开发过程中没有复杂的代码生成
+- 定义数量无限制的 RESTful API
+- 通过简单的 Dart 请求和 Rust 响应实现异步交互
+- 从 Rust 到 Dart 的 Stream
+- 在 Dart 项目热重载时重启 Rust 逻辑
+- 极小的性能开销
+- 发送 native 数据时没有 memory copy
 
 ## 平台支持
 
-所有构建工作会被自动化完成。注意，Flutter项目中的文件不会受到影响。  
+所有构建工作会被自动化完成。注意，Flutter 项目中的文件不会受到影响。
 
-- ✅ Linux: 支持，已完成测试  
-- ✅ Android: 支持，已完成测试  
-- ✅ Windows: 支持，已完成测试  
-- ✅ macOS: 支持，已完成测试  
-- ✅ iOS: 支持，已完成测试  
-- ⏸️ Web: 暂不支持，但正在[积极筹划](https://github.com/cunarist/rust-in-flutter/issues/34)  
+- ✅ Linux: 支持，已完成测试
+- ✅ Android: 支持，已完成测试
+- ✅ Windows: 支持，已完成测试
+- ✅ macOS: 支持，已完成测试
+- ✅ iOS: 支持，已完成测试
+- ⏸️ Web: 暂不支持，但正在[积极筹划](https://github.com/cunarist/rust-in-flutter/issues/34)
 
-> 若您有任何建议或者发现了bug，可以提交一份[issue](https://github.com/cunarist/rust-in-flutter/issues)或[pull](https://github.com/cunarist/rust-in-flutter/pulls)请求，我们会尽快回应您！
+> 若您有任何建议或者发现了 bug，可以提交一份[issue](https://github.com/cunarist/rust-in-flutter/issues)或[pull](https://github.com/cunarist/rust-in-flutter/pulls)请求，我们会尽快回应您！
 
-## 为什么使用Rust？
+## 为什么使用 Rust？
 
-Dart确实是一个超棒的、现代化的、面向对象的编程语言。但由于需要垃圾回收等机制，它在性能上并不拔尖。在部分较为苛刻的场景下，我们可以考虑使用Rust，获得[2~40倍](https://programming-language-benchmarks.vercel.app/dart-vs-rust)的性能提升(甚至无需使用多线程)。  
+Dart 确实是一个超棒的、现代化的、面向对象的编程语言。但由于需要垃圾回收等机制，它在性能上并不拔尖。在部分较为苛刻的场景下，我们可以考虑使用 Rust，获得[2~40 倍](https://programming-language-benchmarks.vercel.app/dart-vs-rust)的性能提升(甚至无需使用多线程)。
 
 # 👜 安装组件
 
-首先，将rust_in_flutter添加到项目依赖：  
+首先，将 rust_in_flutter 添加到项目依赖：
 
 ```bash
 flutter pub add rust_in_flutter
 ```
 
-然后安装Rust工具链。请参阅[Rust官方文档](https://doc.rust-lang.org/book/ch01-01-installation.html)。  
+然后安装 Rust 工具链。请参阅[Rust 官方文档](https://doc.rust-lang.org/book/ch01-01-installation.html)。
 
-最后，检查系统环境是否已准备好进行编译。您可以在每个安装步骤后重复这些命令来验证系统状态。如果输出结果中没有问题，就可以开始了！  
+最后，检查系统环境是否已准备好进行编译。您可以在每个安装步骤后重复这些命令来验证系统状态。如果输出结果中没有问题，就可以开始了！
 
 ```bash
 rustc --version
 flutter doctor
 ```
 
-> 在Rust中使用各种不同的构建目标时，也许会遇到问题。不管遇到任何情况，您可以随时到[讨论页](https://github.com/cunarist/rust-in-flutter/discussions)发起一个Q&A来寻求帮助！  
+## 构建工具版本问题
 
-# 👜 应用模板  
+- 要编译适用于 Android 的应用程序，您应该使用 Rust 1.68 或更高版本。由于一个[问题](https://github.com/rust-lang/rust/pull/85806)，Rust 版本 1.67 及更早版本仅与 Android NDK 版本 22 及更早版本兼容。
 
-只需在 Flutter 项目文件夹下的命令行中运行以下命令即可：  
+- 对于 Android，`./android/app/build.gradle` 文件中的 `ndkVersion` 变量的值必须是 `flutter.ndkVersion`，并且您应该使用 Flutter SDK 3.10 或更高版本。如果您是使用 Flutter SDK 3.7 或更早版本创建的 Flutter 项目，则可能缺少此变量。请参考[此讨论](https://github.com/cunarist/rust-in-flutter/discussions/60)了解如何将此变量添加到您的文件中。
+
+> 在 Rust 中使用各种不同的构建目标时，也许会遇到问题。不管遇到任何情况，您可以随时到[讨论页](https://github.com/cunarist/rust-in-flutter/discussions)发起一个 Q&A 来寻求帮助！
+
+# 👜 应用模板
+
+只需在 Flutter 项目文件夹下的命令行中运行以下命令即可：
 
 ```bash
 dart run rust_in_flutter:apply_template
 ```
 
-运行命令后，会出现一些新的文件和文件夹，它们将成为Rust项目的初始模板。  
+运行命令后，会出现一些新的文件和文件夹，它们将成为 Rust 项目的初始模板。
 
 ```diff
     my_flutter_project/
@@ -92,13 +97,13 @@ dart run rust_in_flutter:apply_template
     └── ...
 ```
 
-别忘了先阅读`./native/README.md`文件。此外，您可能需要在生产环境中移除`sample_crate`。如果您已经有了要在这里使用的Rust crate，只需把它放在`./native`目录中，并将其设置为 `hub` crate 的一个依赖。  
+别忘了先阅读`./native/README.md`文件。此外，您可能需要在生产环境中移除`sample_crate`。如果您已经有了要在这里使用的 Rust crate，只需把它放在`./native`目录中，并将其设置为 `hub` crate 的一个依赖。
 
-现在请前往 `./native/hub/src/lib.rs`，您可以开始编写Rust代码了！  
+现在请前往 `./native/hub/src/lib.rs`，您可以开始编写 Rust 代码了！
 
 # 🧱 注意事项
 
-向Dart发起请求时，您应当指定operation和address。这种通信方式遵循RESTful API的标准。  
+向 Dart 发起请求时，您应当指定 operation 和 address。这种通信方式遵循 RESTful API 的标准。
 
 ```dart
 import 'package:msgpack_dart/msgpack_dart.dart';
@@ -125,7 +130,7 @@ void someFunction() async {
 }
 ```
 
-在 Rust 中接收到请求后，应当先按address对其进行分类：  
+在 Rust 中接收到请求后，应当先按 address 对其进行分类：
 
 ```rust
 pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUnique {
@@ -154,8 +159,9 @@ pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUn
 }
 ```
 
-Rust代码中的Endpoint函数应该如下图所示：    
-> 请在match中定义消息模式(Message Schema)，因为不同类型会有不同的消息模式。  
+Rust 代码中的 Endpoint 函数应该如下图所示：
+
+> 请在 match 中定义消息模式(Message Schema)，因为不同类型会有不同的消息模式。
 
 ```rust
 pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
@@ -202,16 +208,16 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
 }
 ```
 
-您可以扩展这种RESTful API模式，并根据需要创建成百上千个endpoint。如果您有web开发背景，这可能会让您觉得很熟悉。更多注释和细节包含在Rust模板的代码中，供您参阅。  
+您可以扩展这种 RESTful API 模式，并根据需要创建成百上千个 endpoint。如果您有 web 开发背景，这可能会让您觉得很熟悉。更多注释和细节包含在 Rust 模板的代码中，供您参阅。
 
-理想情况下，**Flutter**处理跨平台用户界面，而**Rust**负责业务逻辑。前端和后端可以完全分离，这意味着Dart和Rust代码各司其职。这两个世界通过channel和stream进行通信。  
+理想情况下，**Flutter**处理跨平台用户界面，而**Rust**负责业务逻辑。前端和后端可以完全分离，这意味着 Dart 和 Rust 代码各司其职。这两个世界通过 channel 和 stream 进行通信。
 
-我们使用[MessagePack](https://msgpack.org/)来序列化Dart和Rust之间发送的消息(正如Rust模板所提供的那样)，除非您有其他理由不这么做。MessagePack是一种嵌套的二进制结构，类似于JSON，但速度更快、体积更小。  
+我们使用[MessagePack](https://msgpack.org/)来序列化 Dart 和 Rust 之间发送的消息(正如 Rust 模板所提供的那样)，除非您有其他理由不这么做。MessagePack 是一种嵌套的二进制结构，类似于 JSON，但速度更快、体积更小。
 
-在Dart和Rust之间传递数据基本上都是字节数组(bytes array)，Dart中称之为 `Uint8List`，而Rust中称之为`Vec<u8>`。虽然我们推荐使用MessagePack进行序列化，但您也可以发送任何类型的字节数据，例如高分辨率图像或某种文件数据。若您不需要发送额外的数据信息，可以直接发送一个空的字节数组。  
+在 Dart 和 Rust 之间传递数据基本上都是字节数组(bytes array)，Dart 中称之为 `Uint8List`，而 Rust 中称之为`Vec<u8>`。虽然我们推荐使用 MessagePack 进行序列化，但您也可以发送任何类型的字节数据，例如高分辨率图像或某种文件数据。若您不需要发送额外的数据信息，可以直接发送一个空的字节数组。
 
-# ☕ 支持我们  
+# ☕ 支持我们
 
-😉 如果您从Rust-In-Flutter的功能中受益，并认为它对您非常有帮助，为什么不考虑下支持这个项目呢？您的慷慨捐助将有助于Rust-In-Flutter项目的维护和开发，确保其不断改进、发展！  
+😉 如果您从 Rust-In-Flutter 的功能中受益，并认为它对您非常有帮助，为什么不考虑下支持这个项目呢？您的慷慨捐助将有助于 Rust-In-Flutter 项目的维护和开发，确保其不断改进、发展！
 
-若有此想法，您可以[打赏一下](https://www.buymeacoffee.com/cunarist)我们。  
+若有此想法，您可以[打赏一下](https://www.buymeacoffee.com/cunarist)我们。

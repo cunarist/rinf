@@ -55,6 +55,12 @@ rustc --version
 flutter doctor
 ```
 
+## 빌드 도구 버전 문제
+
+- 안드로이드 앱을 컴파일하려면 Rust 1.68 이상을 사용해야 합니다. 이 [이슈](https://github.com/rust-lang/rust/pull/85806)에 따르면, Rust 1.67 이하는 안드로이드 NDK 버전 22 이하와만 호환됩니다.
+
+- 안드로이드 앱 컴파일을 위해선, `./android/app/build.gradle` 파일에서 `ndkVersion` 변수의 값은 `flutter.ndkVersion`이어야 하고 Flutter SDK 3.10 이상을 사용해야 합니다. 만약 Flutter SDK 3.7 이하로 프로젝트를 생성한 경우, 이 변수가 누락되어 있을 수 있습니다. [이 토론](https://github.com/cunarist/rust-in-flutter/discussions/60)에서 파일에 `ndkVersion` 변수를 추가하는 방법을 확인하세요.
+
 > Rust로 다양한 빌드 타겟을 사용하면 때로 예상치 못한 문제가 나타날 수 있습니다. 문제가 발생하면 [토론 페이지](https://github.com/cunarist/rust-in-flutter/discussions)에서 Q&A 스레드를 열어주시기 바랍니다.
 
 # 👜 템플릿 적용
@@ -200,16 +206,16 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
 }
 ```
 
-이 RESTful API 패턴을 확장하여 필요에 따라 수백, 수천 개의 엔드포인트를 생성할 수 있습니다. 웹 개발을 한 경험이 있다면 익숙한 방식일 것입니다. Rust 템플릿 내부의 실제 코드에 더 많은 주석과 정보가 포함되어 있습니다.
+이 RESTful API 패턴을 확장하여 필요에 따라 수백, 수천 개의 엔드포인트를 생성할 수 있습니다. 웹 개발을 한 경험이 있다면 이 방식은 이미 익숙할 것입니다. Rust 템플릿 내부의 실제 코드에 더 많은 주석과 정보가 포함되어 있습니다.
 
-이상적으로는 Flutter가 크로스 플랫폼 사용자 인터페이스를 처리하고 Rust가 비즈니스 로직을 담당할 것입니다. 프론트엔드와 백엔드는 완전히 구분되어 있으어 있으며 Dart와 Rust 코드는 분리되는 것이 가능합니다. 통신은 채널과 스트림을 통해 이루어집니다.
+이상적으로 Flutter는 크로스 플랫폼 사용자 인터페이스를 처리하고 Rust가 비즈니스 로직을 담당할 것입니다. 프론트엔드와 백엔드는 완전히 구분되어 있으어 있으며 Dart와 Rust 코드는 서로 분리되는 것이 가능합니다. 통신은 채널과 스트림을 통해 이루어집니다.
 
 Dart와 Rust 간에 전송되는 메시지의 직렬화에는 [MessagePack](https://msgpack.org/)을 사용하세요. 이는 Rust 템플릿에서 기본적으로 제공되며, 다른 이유가 없다면 MessagePack을 사용하는 것이 좋습니다. MessagePack은 JSON과 유사한 구조지만, Binary이며 JSON보다 더 빠르고 더 작은 크기를 가집니다.
 
-Dart와 Rust 사이에서 전송되는 데이터는 기본적으로 바이트 배열입니다. Dart에서는 `Uint8List`로, Rust에서는 `Vec<u8>`로 표현됩니다. 추천되는 메시지 직렬화 방식은 MessagePack이지만, 다른 종류의 바이트 데이터(고해상도 이미지 또는 파일 데이터 등)도 전송할 수 있습니다. 아무 정보도 포함시킬 필요가 없으면 빈 바이트 배열을 담으면 됩니다.
+Dart와 Rust 사이에서 전송되는 데이터는 기본적으로 바이트 배열로 나타냅니다. Dart에서는 `Uint8List`로, Rust에서는 `Vec<u8>`로 표현됩니다. 추천되는 메시지 직렬화 방식은 MessagePack이지만, 다른 종류의 바이트 데이터(고해상도 이미지 또는 파일 데이터 등)도 전송할 수 있습니다. 아무 정보도 포함시킬 필요가 없으면 빈 바이트 배열을 담으면 됩니다.
 
 # ☕ 개발 지원하기
 
-😉 Rust-In-Flutter의 기능이 도움이 되었다면, 이 프로젝트를 지원해주세요. 여러분의 너그러운 후원은 Rust-In-Flutter의 유지보수에 큰 도움이 됩니다.
+😉 Rust-In=Flutter의 기능이 도움이 되었다면, 이 프로젝트를 지원해주세요. 여러분의 너그러운 후원은 Rust-In-Flutter의 유지보수에 큰 도움이 됩니다.
 
 만약 지원해 주시기로 결정했다면, [Buy me a coffee](https://www.buymeacoffee.com/cunarist)로 찾아와 주세요.
