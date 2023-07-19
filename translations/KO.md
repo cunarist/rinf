@@ -57,9 +57,8 @@ flutter doctor
 
 ## 빌드 도구 버전 문제
 
-- 안드로이드 앱을 컴파일하려면 Rust 1.68 이상을 사용해야 합니다. [이 이슈](https://github.com/rust-lang/rust/pull/85806)에 따르면, Rust 1.67 이하는 안드로이드 NDK 버전 22 이하와만 호환됩니다.
-
-- 안드로이드 앱 컴파일을 위해선, `./android/app/build.gradle` 파일에서 `ndkVersion` 변수의 값은 `flutter.ndkVersion`이어야 하고 Flutter SDK 3.10 이상을 사용해야 합니다. 만약 Flutter SDK 3.7 이하로 프로젝트를 생성한 경우, 이 변수가 누락되어 있을 수 있습니다. [이 토론](https://github.com/cunarist/rust-in-flutter/discussions/60)에서 파일에 `ndkVersion` 변수를 추가하는 방법을 확인하세요.
+- Android 앱을 빌드하기 위해선 [이 이슈](https://github.com/rust-lang/rust/pull/85806)로 인해 Rust 1.68 이상을 사용해야 합니다.
+- Android 앱을 빌드하기 위해선 `./android/app/build.gradle` 파일에 `ndkVersion` 변수가 있어야 하지만, Flutter SDK 3.7 이전 버전으로 Flutter 프로젝트를 생성한 경우 이 변수가 존재하지 않을 수 있습니다. 이 문제를 해결하려면 [이 토론](https://github.com/cunarist/rust-in-flutter/discussions/60)을 참고하세요.
 
 > Rust로 다양한 빌드 타겟을 사용하면 때로 예상치 못한 문제가 나타날 수 있습니다. 문제가 발생하면 [토론 페이지](https://github.com/cunarist/rust-in-flutter/discussions)에서 Q&A 스레드를 열어주시기 바랍니다.
 

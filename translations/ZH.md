@@ -57,9 +57,8 @@ flutter doctor
 
 ## 构建工具版本问题
 
-- 要编译适用于 Android 的应用程序，您应该使用 Rust 1.68 或更高版本。由于一个[问题](https://github.com/rust-lang/rust/pull/85806)，Rust 版本 1.67 及更早版本仅与 Android NDK 版本 22 及更早版本兼容。
-
-- 对于 Android，`./android/app/build.gradle` 文件中的 `ndkVersion` 变量的值必须是 `flutter.ndkVersion`，并且您应该使用 Flutter SDK 3.10 或更高版本。如果您是使用 Flutter SDK 3.7 或更早版本创建的 Flutter 项目，则可能缺少此变量。请参考[此讨论](https://github.com/cunarist/rust-in-flutter/discussions/60)了解如何将此变量添加到您的文件中。
+- 对于 Android 应用，您应该使用 Rust 1.68 或更高版本，因为[这个问题](https://github.com/rust-lang/rust/pull/85806)。
+- 对于 Android 应用，`./android/app/build.gradle` 中的 `ndkVersion` 变量是必需的，但如果您是使用 Flutter SDK 3.7 或更早版本创建的 Flutter 项目，则可能会缺少该变量。请访问[这个讨论](https://github.com/cunarist/rust-in-flutter/discussions/60)来解决这个问题。
 
 > 在 Rust 中使用各种不同的构建目标时，也许会遇到问题。不管遇到任何情况，您可以随时到[讨论页](https://github.com/cunarist/rust-in-flutter/discussions)发起一个 Q&A 来寻求帮助！
 

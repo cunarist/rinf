@@ -57,8 +57,8 @@ flutter doctor
 
 ## Build Tool Version Issues
 
-- To compile the app for Android, you should be using Rust 1.68 or higher. Due to an [issue](https://github.com/rust-lang/rust/pull/85806), Rust versions 1.67 and earlier are only compatible with Android NDK versions 22 and earlier.
-- For Android, The value of `ndkVersion` variable in `./android/app/build.gradle` must be `flutter.ndkVersion` and you should be using Flutter SDK 3.10 or higher. If you've created your Flutter project with Flutter SDK 3.7 and earlier, this variable might be missing. Visit [this discussion](https://github.com/cunarist/rust-in-flutter/discussions/60) to understand how to add this variable to your file.
+- For Android apps, you should be using Rust 1.68 or higher due to [this issue](https://github.com/rust-lang/rust/pull/85806).
+- For Android apps, variable `ndkVersion` in `./android/app/build.gradle` is necessary, but this might be missing if you've created your Flutter project with Flutter SDK 3.7 and earlier. Visit [this discussion](https://github.com/cunarist/rust-in-flutter/discussions/60) to solve this problem.
 
 > Using various build targets with Rust can sometimes present various issues. If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/rust-in-flutter/discussions) and open a Q&A thread for assistance.
 
