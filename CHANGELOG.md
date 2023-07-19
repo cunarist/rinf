@@ -1,3 +1,10 @@
+## 1.3.2
+
+- Added Chinese guides. (Thanks @moluopro)
+- Added Korean guides.
+- Added guides about build tool version issues.
+- Added guides about library bundling.
+
 ## 1.3.1
 
 - Fixed a problem with Rust crate path detection on Android.
