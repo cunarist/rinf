@@ -1,5 +1,6 @@
+[English Guide](https://github.com/cunarist/rust-in-flutter/blob/main/README.md) · [中文文档](https://github.com/cunarist/rust-in-flutter/blob/main/translations/ZH.md) · [한국어 설명서](https://github.com/cunarist/rust-in-flutter/blob/main/translations/KO.md) 
+
 # 🆎 Rust-In-Flutter
-> [English](https://github.com/cunarist/rust-in-flutter)  &nbsp;&nbsp;&nbsp;[中文文档](https://github.com/cunarist/rust-in-flutter/blob/main/README.ZH.md)  
 
 Easily integrate Rust to make your Flutter app blazingly fast!  
 

@@ -1,5 +1,6 @@
+> 感谢您的帮助！非英语语言的文档可能会有语法不太通顺的问题。如果您想要为文档的改进做出贡献，请在 [Pull request](https://github.com/cunarist/rust-in-flutter/pulls) 留下您的意见。我们随时欢迎您的帮助，再次感谢！
+
 # 🆎 Rust-In-Flutter
-> [English](https://github.com/cunarist/rust-in-flutter)  &nbsp;&nbsp;&nbsp;[中文文档](https://github.com/cunarist/rust-in-flutter/blob/main/README.ZH.md)  
 
 快速集成Rust代码到您的Flutter项目当中！  
 
