@@ -1,10 +1,11 @@
 # 🆎 Rust-In-Flutter
+> [English](https://github.com/cunarist/rust-in-flutter)  &nbsp;&nbsp;&nbsp;[中文文档](https://github.com/cunarist/rust-in-flutter/blob/main/README.ZH.md)  
 
-Easily integrate Rust to make your Flutter app blazingly fast!
+Easily integrate Rust to make your Flutter app blazingly fast!  
 
 ![preview](https://github.com/cunarist/rust-in-flutter/assets/66480156/be85cf04-2240-497f-8d0d-803c40536d8e)
 
-Designed with ease of use, future scalability, and exceptional performance in mind, this lightweight framework handles all the complicated aspects behind the scenes. Simply add this package to your Flutter project and you're ready to write Rust!
+Designed with ease of use, future scalability, and exceptional performance in mind, this lightweight framework handles all the complicated aspects behind the scenes. Simply add this package to your Flutter project and you're ready to write Rust!  
 
 ## Benefits
 
