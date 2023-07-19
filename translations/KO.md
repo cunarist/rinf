@@ -207,7 +207,7 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
 
 이 RESTful API 패턴을 확장하여 필요에 따라 수백, 수천 개의 엔드포인트를 생성할 수 있습니다. 웹 개발을 한 경험이 있다면 익숙한 방식일 것입니다. Rust 템플릿 내부의 실제 코드에 더 많은 주석과 정보가 포함되어 있습니다.
 
-이상적으로는 Flutter가 크로스 플랫폼 사용자 인터페이스를 처리하고 Rust가 비즈니스 로직을 담당할 것입니다. 프론트엔드와 백엔드는 완전히 구분되어 있으어 있으며 Dart와 Rust 코드는 서로 분리되는 것이 가능합니다. 통신은 채널과 스트림을 통해 이루어집니다.
+이상적으로는 Flutter가 크로스 플랫폼 사용자 인터페이스를 처리하고 Rust가 비즈니스 로직을 담당할 것입니다. 프론트엔드와 백엔드는 완전히 구분되어 있으며 Dart와 Rust 코드는 서로 분리되는 것이 가능합니다. 통신은 채널과 스트림을 통해 이루어집니다.
 
 Dart와 Rust 간에 전송되는 메시지의 직렬화에는 [MessagePack](https://msgpack.org/)을 사용하세요. 이는 Rust 템플릿에서 기본적으로 제공되며, 다른 이유가 없다면 MessagePack을 사용하는 것이 좋습니다. MessagePack은 JSON과 유사한 구조지만, Binary이며 JSON보다 더 빠르고 더 작은 크기를 가집니다.
 
