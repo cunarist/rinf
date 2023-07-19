@@ -216,6 +216,8 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
 
 在 Dart 和 Rust 之间传递数据基本上都是字节数组(bytes array)，Dart 中称之为 `Uint8List`，而 Rust 中称之为`Vec<u8>`。虽然我们推荐使用 MessagePack 进行序列化，但您也可以发送任何类型的字节数据，例如高分辨率图像或某种文件数据。若您不需要发送额外的数据信息，可以直接发送一个空的字节数组。
 
+Rust crates 编译生成的库文件会自动包含在构建文件夹或可执行二进制文件中，无需手动捆绑。
+
 # ☕ 支持我们
 
 😉 如果您从 Rust-In-Flutter 的功能中受益，并认为它对您非常有帮助，为什么不考虑下支持这个项目呢？您的慷慨捐助将有助于 Rust-In-Flutter 项目的维护和开发，确保其不断改进、发展！

@@ -213,6 +213,8 @@ Use [MessagePack](https://msgpack.org/) for serializing messages sent between Da
 
 Data being sent between Dart and Rust are basically bytes arrays, represented as `Uint8List` in Dart and `Vec<u8>` in Rust. Though using MessagePack serialization is recommended, you can send any kind of bytes data as you wish such as a high-resolution image or some kind of file data, or just toss in a blank bytes array if you don't need additional details.
 
+The library files compiled from Rust crates are automatically included in the build folder or the executable binary. No manual bundling is needed.
+
 # ☕ Support Us
 
 😉 If you are benefiting from the features of Rust-In-Flutter and find it helpful, why not consider supporting this project? Your generous donations contribute to the maintenance and development of Rust-In-Flutter, ensuring its continuous improvement and growth.
