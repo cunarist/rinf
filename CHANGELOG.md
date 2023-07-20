@@ -1,3 +1,7 @@
+## 1.4.0
+
+- Filled in various guides to help developers understand the structure more easily.
+
 ## 1.3.2
 
 - Added Chinese guides. (Thanks @moluopro)
