@@ -64,7 +64,9 @@ flutter doctor
 
 # 👜 Applying Template
 
-Simply run this in the command-line from the Flutter project folder.
+This section assumes that you already have a Flutter project made with `flutter create` command. Use this Flutter project's folder as your terminal's working directory.
+
+Simply run this in the command-line.
 
 ```bash
 dart run rust_in_flutter:apply_template

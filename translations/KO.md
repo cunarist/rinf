@@ -64,7 +64,9 @@ flutter doctor
 
 # 👜 템플릿 적용
 
-Flutter 프로젝트 폴더에서 이 명령을 실행하기만 하면 됩니다.
+이 섹션은 `flutter create` 명령으로 생성된 Flutter 프로젝트가 준비되어 있다고 가정합니다. 터미널의 현재 경로가 이 Flutter 프로젝트의 폴더가 되도록 지정하세요.
+
+다음 명령을 터미널에서 실행하세요.
 
 ```bash
 dart run rust_in_flutter:apply_template
