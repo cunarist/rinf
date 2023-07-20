@@ -98,7 +98,7 @@ dart run rust_in_flutter:apply_template
     └── ...
 ```
 
-别忘了先阅读`./native/README.md`文件。此外，您可能需要在生产环境中移除`sample_crate`。如果您已经有了要在这里使用的 Rust crate，只需把它放在`./native`目录中，并将其设置为 `hub` crate 的一个依赖。
+别忘了先阅读`./native/README.md`文件。各种注释都写在代码中，以帮助您理解代码的结构。此外，您可能需要在生产环境中移除`sample_crate`。如果您已经有了要在这里使用的 Rust crate，只需把它放在`./native`目录中，并将其设置为 `hub` crate 的一个依赖。
 
 现在请前往 `./native/hub/src/lib.rs`，您可以开始编写 Rust 代码了！
 

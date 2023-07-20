@@ -98,7 +98,7 @@ dart run rust_in_flutter:apply_template
     └── ...
 ```
 
-`./native/README.md` 파일을 반드시 먼저 읽어 보세요. 또한 실제 개발 시에 `sample_crate`는 필요없으니 제거하세요. 이미 만들어 놓았던 Rust crate가 있다면 `./native` 폴더에 넣고 `hub` Crate의 Dependency로 설정하세요.
+`./native/README.md` 파일을 반드시 먼저 읽어 보세요. 작동 구조를 이해하는 데에 필요한 주석들은 코드 안에 포함되어 있습니다. 또한, 실제 개발 시에 `sample_crate`는 필요없으니 제거하세요. 사용하고 싶은 기존의 Rust crate가 있다면 `./native` 폴더에 넣고 `hub` Crate의 Dependency로 설정하세요.
 
 이제 `./native/hub/src/lib.rs`에서부터 Rust 코드를 작성하시면 됩니다!
 
