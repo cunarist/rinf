@@ -1,3 +1,5 @@
+//! This `hub` crate is the entry point for the Rust logic.
+
 use bridge::respond_to_dart;
 use tokio::task::spawn;
 
@@ -5,7 +7,6 @@ mod bridge;
 mod sample_functions;
 mod with_request;
 
-/// This `main` function is the entry point for the Rust logic.
 /// `tokio`'s async runtime allows millions of concurrent tasks to be
 /// executed at the same time utilizing only the number of threads
 /// equivalent to the number of cores on the computer.
