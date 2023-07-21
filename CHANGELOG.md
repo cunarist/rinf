@@ -1,3 +1,7 @@
+## 1.4.1
+
+- Improved various guides.
+
 ## 1.4.0
 
 - Filled in various guides to help developers understand the structure more easily.
