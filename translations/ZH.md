@@ -40,6 +40,8 @@ Dart 确实是一个超棒的、现代化的、面向对象的编程语言。但
 
 # 👜 安装组件
 
+这部分假设您已经在系统上安装了[Flutter SDK](https://docs.flutter.dev/get-started/install)，并使用`flutter create`命令创建了一个 Flutter 项目。请将此 Flutter 项目的文件夹作为您的终端工作目录。
+
 首先，将 rust_in_flutter 添加到项目依赖：
 
 ```bash
@@ -63,8 +65,6 @@ flutter doctor
 > 在 Rust 中使用各种不同的构建目标时，也许会遇到问题。不管遇到任何情况，您可以随时到[讨论页](https://github.com/cunarist/rust-in-flutter/discussions)发起一个 Q&A 来寻求帮助！
 
 # 👜 应用模板
-
-这部分假设您已经用 `flutter create` 命令创建了一个 Flutter 项目。请将该 Flutter 项目的文件夹作为您终端的工作目录。
 
 只需在命令行中运行以下命令。
 

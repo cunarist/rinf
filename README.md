@@ -40,6 +40,8 @@ While Dart is an amazing object-oriented modern language, its performance someti
 
 # 👜 Installing Components
 
+This section assumes that you've already installed [Flutter SDK](https://docs.flutter.dev/get-started/install) on your system and made a Flutter project with `flutter create` command. Use this Flutter project's folder as your terminal's working directory.
+
 First, add this package to your Flutter project.
 
 ```bash
@@ -64,9 +66,7 @@ flutter doctor
 
 # 👜 Applying Template
 
-This section assumes that you already have a Flutter project made with `flutter create` command. Use this Flutter project's folder as your terminal's working directory.
-
-Simply run this in the command-line.
+Simply run this in the command-line from your Flutter project's directory.
 
 ```bash
 dart run rust_in_flutter:apply_template

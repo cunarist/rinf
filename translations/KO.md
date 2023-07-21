@@ -40,6 +40,8 @@ Dart는 훌륭한 객체지향형 모던 언어이지만 Garbage collection을 �
 
 # 👜 컴포넌트 설치
 
+이 섹션은 [Flutter SDK](https://docs.flutter.dev/get-started/install)가 시스템에 설치되어 있고 `flutter create` 명령으로 생성된 Flutter 프로젝트가 이미 준비되어 있다고 간주합니다. 터미널의 작업 디렉토리로 이 Flutter 프로젝트 폴더를 사용하세요.
+
 우선, 이 패키지를 Flutter 프로젝트에 추가하세요.
 
 ```bash
@@ -63,8 +65,6 @@ flutter doctor
 > Rust로 다양한 빌드 타겟을 사용하면 때로 예상치 못한 문제가 나타날 수 있습니다. 문제가 발생하면 [토론 페이지](https://github.com/cunarist/rust-in-flutter/discussions)에서 Q&A 스레드를 열어주시기 바랍니다.
 
 # 👜 템플릿 적용
-
-이 섹션은 `flutter create` 명령으로 생성된 Flutter 프로젝트가 준비되어 있다고 가정합니다. 터미널의 현재 경로가 이 Flutter 프로젝트의 폴더가 되도록 지정하세요.
 
 다음 명령을 터미널에서 실행하세요.
 
