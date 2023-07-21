@@ -36,7 +36,7 @@ Rust를 활용해서 Flutter 앱의 속도를 극적으로 향상시켜 보세�
 
 ## 왜 Rust를 사용해야 할까요?
 
-Dart는 훌륭한 객체지향형 모던 언어이지만 Garbage collection을 동원하며 네이티브가 아닌 언어이기 때문에 성능이 불충분할 때가 있습니다. 이럴 경우 Rust를 사용해야 합니다. Rust의 성능은 Dart보다 [대략 2~40배 빠르다](https://programming-language-benchmarks.vercel.app/dart-vs-rust)고 알려져 있습니다. Rust에서는 멀티스레딩을 활용할 수도 있습니다.
+Dart는 훌륭한 객체지향형 모던 언어이지만 Garbage collection을 동원하며 네이티브가 아닌 언어이기 때문에 성능이 불충분할 때가 있습니다. 이럴 경우 Rust를 사용해야 합니다. Rust의 성능은 Dart보다 [대략 2~40배 빠르다](https://programming-language-benchmarks.vercel.app/dart-vs-rust)고 알려져 있으며, Rust에서는 멀티스레딩을 활용할 수도 있습니다.
 
 # 👜 컴포넌트 설치
 
