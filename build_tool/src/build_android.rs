@@ -83,7 +83,6 @@ fn get_targets() -> Vec<Target> {
         .unwrap_or_else(|| "".into());
     platforms
         .split(',')
-        .into_iter()
         .filter_map(Target::from_flutter_target)
         .collect()
 }
