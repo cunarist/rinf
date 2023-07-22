@@ -178,13 +178,15 @@ fn build_for_target(target: &Target) -> Result<()> {
     let sdk_path = path_from_env("CARGOKIT_SDK_DIR")?;
     let ndk_path = sdk_path.join("ndk").join(&ndk_version);
 
-    if !ndk_path.is_dir() {
+    let ndk_package_xml = ndk_path.join("package.xml");
+
+    if !ndk_package_xml.is_file() {
         info!("Installing NDK {}...", ndk_version);
         let java_home = string_from_env("CARGOKIT_JAVA_HOME")?;
         install_ndk(&sdk_path, &ndk_version, &java_home)?;
     }
 
-    if !ndk_path.is_dir() {
+    if !ndk_package_xml.is_file() {
         return Err(anyhow::format_err!(
             "NDK version {} failed to install into {}",
             ndk_version,
