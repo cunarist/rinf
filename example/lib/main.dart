@@ -4,23 +4,20 @@ import 'package:msgpack_dart/msgpack_dart.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 
 void main() async {
+  // Wait for initialization to be completed first.
   await RustInFlutter.ensureInitialized();
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      // This example uses providers for very simple state management.
       home: ChangeNotifierProvider(
-        create: (_) => HomeNotifier(),
+        create: (context) => HomeNotifier(),
         child: const Home(),
       ),
     );
@@ -56,6 +53,7 @@ class Home extends StatelessWidget {
                 // the snapshot's data will be null.
                 var received = snapshot.data;
                 if (received == null) {
+                  // Return a black container if the received data is null.
                   return Container(
                     margin: const EdgeInsets.all(20),
                     width: 256,
@@ -66,6 +64,7 @@ class Home extends StatelessWidget {
                     ),
                   );
                 } else {
+                  // Return an image container if some data is received.
                   var imageData = received.bytes;
                   return Container(
                     margin: const EdgeInsets.all(20),
@@ -87,6 +86,7 @@ class Home extends StatelessWidget {
                 }
               },
             ),
+            // Update the text according to the state.
             Consumer<HomeNotifier>(
               builder: (context, notifier, child) {
                 var currentCount = notifier.count;
@@ -102,9 +102,11 @@ class Home extends StatelessWidget {
           ],
         ),
       ),
+      // This is a button that calls the state update method.
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.read<HomeNotifier>().increment();
+          final provider = Provider.of<HomeNotifier>(context, listen: false);
+          provider.increment();
         },
         child: const Icon(Icons.add),
       ),
@@ -115,14 +117,18 @@ class Home extends StatelessWidget {
 class HomeNotifier extends ChangeNotifier {
   int _count = 0;
   int get count => _count;
+
+  // This state update method interacts with Rust.
   void increment() async {
     var rustRequest = RustRequest(
       address: 'basicCategory.counterNumber',
       operation: RustOperation.Read,
       // Use the `serialize` function
       // provided by `msgpack_dart.dart`
-      // to convert the message into raw bytes.
+      // to convert Dart objects into raw bytes.
       bytes: serialize(
+        // The message schema is declared at the Rust side.
+        // You can customize the schemas as you want.
         {
           'letter': 'Hello from Dart!',
           'before_number': _count,
@@ -140,7 +146,7 @@ class HomeNotifier extends ChangeNotifier {
     }
     // Use the `deserialize` function
     // provided by `msgpack_dart.dart`
-    // to convert raw bytes into Dart object.
+    // to convert raw bytes into Dart objects.
     // You have to explicitly tell the deserialized type
     // with `as` keyword for proper type checking in Dart.
     var message = deserialize(rustResponse.bytes) as Map;
