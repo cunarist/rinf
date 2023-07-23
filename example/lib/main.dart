@@ -51,7 +51,7 @@ class Home extends StatelessWidget {
                 // If the app has just started and widget is built
                 // without receiving a Rust signal,
                 // the snapshot's data will be null.
-                var received = snapshot.data;
+                final received = snapshot.data;
                 if (received == null) {
                   // Return a black container if the received data is null.
                   return Container(
@@ -65,7 +65,7 @@ class Home extends StatelessWidget {
                   );
                 } else {
                   // Return an image container if some data is received.
-                  var imageData = received.bytes;
+                  final imageData = received.bytes;
                   return Container(
                     margin: const EdgeInsets.all(20),
                     width: 256,
@@ -89,7 +89,7 @@ class Home extends StatelessWidget {
             // Update the text according to the state.
             Consumer<HomeNotifier>(
               builder: (context, notifier, child) {
-                var currentCount = notifier.count;
+                final currentCount = notifier.count;
                 if (currentCount == 0) {
                   return const Text("Not calculated yet");
                 } else {
@@ -120,7 +120,7 @@ class HomeNotifier extends ChangeNotifier {
 
   // This state update method interacts with Rust.
   void increment() async {
-    var rustRequest = RustRequest(
+    final rustRequest = RustRequest(
       address: 'basicCategory.counterNumber',
       operation: RustOperation.Read,
       // Use the `serialize` function
@@ -140,7 +140,7 @@ class HomeNotifier extends ChangeNotifier {
     );
     // Use `requestToRust` from `rust_in_flutter.dart`
     // to send the request to Rust and get the response.
-    var rustResponse = await requestToRust(rustRequest);
+    final rustResponse = await requestToRust(rustRequest);
     if (!rustResponse.successful) {
       return;
     }
@@ -149,8 +149,8 @@ class HomeNotifier extends ChangeNotifier {
     // to convert raw bytes into Dart objects.
     // You have to explicitly tell the deserialized type
     // with `as` keyword for proper type checking in Dart.
-    var message = deserialize(rustResponse.bytes) as Map;
-    var innerValue = message['after_number'] as int;
+    final message = deserialize(rustResponse.bytes) as Map;
+    final innerValue = message['after_number'] as int;
     _count = innerValue;
     notifyListeners();
   }
