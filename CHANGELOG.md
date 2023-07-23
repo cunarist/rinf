@@ -1,3 +1,8 @@
+## 1.5.0
+
+- Now the Android NDK version that the Flutter SDK expects will be used, not the version specified by this package.
+- Fixed a bug saying `IntoDart` trait is not implemented.
+
 ## 1.4.1
 
 - Improved various guides.
