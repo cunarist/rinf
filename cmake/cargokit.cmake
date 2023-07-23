@@ -69,15 +69,18 @@ function(apply_cargokit target manifest_dir lib_name any_symbol_name)
 
     set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/_phony_" PROPERTIES SYMBOLIC TRUE)
 
-    add_custom_target("${target}_cargokit" DEPENDS ${OUTPUT_LIB})
-
-    add_dependencies("${target}" "${target}_cargokit")
-
-    target_link_libraries("${target}" PRIVATE "${OUTPUT_LIB}${IMPORT_LIB_EXTENSION}")
-
-
-    if(WIN32)
-        target_link_options(${target} PRIVATE "/INCLUDE:${any_symbol_name}")
+    if (TARGET ${target})
+        # If we have actual cmake target provided create target and make existing
+        # target depend on it
+        add_custom_target("${target}_cargokit" DEPENDS ${OUTPUT_LIB})
+        add_dependencies("${target}" "${target}_cargokit")
+        target_link_libraries("${target}" PRIVATE "${OUTPUT_LIB}${IMPORT_LIB_EXTENSION}")
+        if(WIN32)
+            target_link_options(${target} PRIVATE "/INCLUDE:${any_symbol_name}")
+        endif()
+    else()
+        # Otherwise (FFI) just use ALL to force building always
+        add_custom_target("${target}_cargokit" ALL DEPENDS ${OUTPUT_LIB})
     endif()
 
     # Allow adding the output library to plugin bundled libraries
