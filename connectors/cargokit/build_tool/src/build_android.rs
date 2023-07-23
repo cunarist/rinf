@@ -83,7 +83,6 @@ fn get_targets() -> Vec<Target> {
         .unwrap_or_else(|| "".into());
     platforms
         .split(',')
-        .into_iter()
         .filter_map(Target::from_flutter_target)
         .collect()
 }
@@ -147,12 +146,55 @@ fn pick_existing(paths: Vec<PathBuf>) -> Option<PathBuf> {
     paths.into_iter().find(|p| p.exists())
 }
 
+fn install_ndk(sdk_path: &Path, ndk_version: &str, java_home: &str) -> Result<()> {
+    #[cfg(target_os = "windows")]
+    const SDK_MANAGER_EXTENSION: &str = ".bat";
+    #[cfg(not(target_os = "windows"))]
+    const SDK_MANAGER_EXTENSION: &str = "";
+
+    let sdk_manager = sdk_path
+        .join("cmdline-tools")
+        .join("latest")
+        .join("bin")
+        .join(format!("sdkmanager{}", SDK_MANAGER_EXTENSION));
+
+    let mut cmd = Command::new(sdk_manager);
+    cmd.arg("--install")
+        .arg(format!("ndk;{}", ndk_version))
+        .env("JAVA_HOME", java_home);
+
+    run_command(cmd)?;
+
+    Ok(())
+}
+
 fn build_for_target(target: &Target) -> Result<()> {
     let min_version = string_from_env("CARGOKIT_MIN_SDK_VERSION")?;
     let min_version: i32 = min_version.parse()?;
     let min_version = min_version.max(target.min_sdk_version());
 
-    let toolchain_path = path_from_env("CARGOKIT_NDK_DIR")?
+    let ndk_version = string_from_env("CARGOKIT_NDK_VERSION")?;
+
+    let sdk_path = path_from_env("CARGOKIT_SDK_DIR")?;
+    let ndk_path = sdk_path.join("ndk").join(&ndk_version);
+
+    let ndk_package_xml = ndk_path.join("package.xml");
+
+    if !ndk_package_xml.is_file() {
+        info!("Installing NDK {}...", ndk_version);
+        let java_home = string_from_env("CARGOKIT_JAVA_HOME")?;
+        install_ndk(&sdk_path, &ndk_version, &java_home)?;
+    }
+
+    if !ndk_package_xml.is_file() {
+        return Err(anyhow::format_err!(
+            "NDK version {} failed to install into {}",
+            ndk_version,
+            ndk_path.display()
+        ));
+    }
+
+    let toolchain_path = ndk_path
         .join("toolchains")
         .join("llvm")
         .join("prebuilt")
@@ -195,7 +237,6 @@ fn build_for_target(target: &Target) -> Result<()> {
     let ranlib_key = format!("RANLIB_{}", target.rust_target());
     let ranlib_value = toolchain_path.join("llvm-ranlib");
 
-    let ndk_version = string_from_env("CARGOKIT_NDK_VERSION")?;
     let build_dir = path_from_env("CARGOKIT_BUILD_DIR")?;
     let output_dir = path_from_env("CARGOKIT_OUTPUT_DIR")?;
     let lib_name = string_from_env("CARGOKIT_LIB_NAME")?;

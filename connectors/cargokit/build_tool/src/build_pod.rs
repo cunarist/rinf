@@ -12,7 +12,7 @@ fn get_archs() -> Vec<String> {
     let archs = std::env::var("CARGOKIT_ARCHS")
         .ok()
         .unwrap_or_else(|| "x86_64".into());
-    archs.split(' ').into_iter().map(String::from).collect()
+    archs.split(' ').map(String::from).collect()
 }
 
 fn target_for_arch(arch: &str) -> Result<String> {
