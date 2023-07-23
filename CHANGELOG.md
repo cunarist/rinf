@@ -1,3 +1,8 @@
+## 1.5.1
+
+- Added Japanese translation.
+- Fixed some sentences in Korean guides.
+
 ## 1.5.0
 
 - Now the Android NDK version that the Flutter SDK expects will be used, not the version specified by this package.
