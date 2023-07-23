@@ -1,3 +1,7 @@
+## 1.5.3
+
+- Fixed some example app code.
+
 ## 1.5.2
 
 - Improved the readability of example app code.
