@@ -40,7 +40,7 @@ Dart는 훌륭한 객체지향형 모던 언어이지만 Garbage collection을 �
 
 # 👜 컴포넌트 설치
 
-이 섹션은 [Flutter SDK](https://docs.flutter.dev/get-started/install)가 시스템에 설치되어 있고 `flutter create` 명령으로 생성된 Flutter 프로젝트가 이미 준비되어 있다고 간주합니다. 터미널의 작업 디렉토리로 이 Flutter 프로젝트 폴더를 사용하세요.
+이 섹션은 [Flutter SDK](https://docs.flutter.dev/get-started/install)가 시스템에 설치되어 있고 `flutter create` 명령으로 생성된 Flutter 프로젝트가 이미 준비되어 있다고 간주합니다. 터미널의 작업 디렉토리로 준비된 Flutter 프로젝트의 폴더를 사용하세요.
 
 우선, 이 패키지를 Flutter 프로젝트에 추가하세요.
 
@@ -60,7 +60,7 @@ flutter doctor
 ## 빌드 도구 버전 문제
 
 - Android 앱을 빌드하기 위해선 [이 이슈](https://github.com/rust-lang/rust/pull/85806)로 인해 Rust 1.68 이상을 사용해야 합니다.
-- Android 앱을 빌드하기 위해선 `./android/app/build.gradle` 파일에 `ndkVersion` 변수가 있어야 하지만, Flutter SDK 3.7 이전 버전으로 Flutter 프로젝트를 생성한 경우 이 변수가 존재하지 않을 수 있습니다. 이 문제를 해결하려면 [이 토론](https://github.com/cunarist/rust-in-flutter/discussions/60)을 참고하세요.
+- Android 앱을 빌드하기 위해선 `./android/app/build.gradle` 파일에 `ndkVersion` 변수가 있어야 하지만, Flutter SDK 3.7 이하 버전으로 Flutter 프로젝트를 생성한 경우 이 변수가 존재하지 않을 수 있습니다. 이 문제를 해결하려면 [이 토론](https://github.com/cunarist/rust-in-flutter/discussions/60)을 참고하세요.
 
 > Rust로 다양한 빌드 타겟을 사용하면 때로 예상치 못한 문제가 나타날 수 있습니다. 문제가 발생하면 [토론 페이지](https://github.com/cunarist/rust-in-flutter/discussions)에서 Q&A 스레드를 열어주시기 바랍니다.
 
