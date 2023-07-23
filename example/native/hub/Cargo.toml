@@ -8,7 +8,7 @@ crate-type = ["lib", "cdylib", "staticlib"]
 
 [dependencies]
 # Published
-flutter_rust_bridge = { version = "1.78.0", features = [
+flutter_rust_bridge = { version = "1.79.0", features = [
     "worker-single",
     "zero-copy",
 ] }
