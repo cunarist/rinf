@@ -1,3 +1,7 @@
+## 1.6.0
+
+- Added step-by-step guides.
+
 ## 1.5.3
 
 - Fixed some example app code.
