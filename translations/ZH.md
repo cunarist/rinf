@@ -107,6 +107,8 @@ dart run rust_in_flutter:apply_template
 向 Dart 发起请求时，您应当指定 operation 和 address。这种通信方式遵循 RESTful API 的标准。
 
 ```dart
+// ./lib/main.dart
+
 import 'package:msgpack_dart/msgpack_dart.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 
@@ -134,6 +136,8 @@ void someFunction() async {
 在 Rust 中接收到请求后，应当先按 address 对其进行分类：
 
 ```rust
+// ./native/hub/src/with_request.rs
+
 pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUnique {
     let rust_request = request_unique.request;
     let interaction_id = request_unique.id;
@@ -165,6 +169,8 @@ Rust 代码中的 Endpoint 函数应该如下图所示：
 > 请在 match 中定义消息模式(Message Schema)，因为不同类型会有不同的消息模式。
 
 ```rust
+// ./native/hub/src/sample_functions.rs
+
 pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
@@ -218,6 +224,8 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
 在 Dart 和 Rust 之间传递数据基本上都是字节数组(bytes array)，Dart 中称之为 `Uint8List`，而 Rust 中称之为`Vec<u8>`。虽然我们推荐使用 MessagePack 进行序列化，但您也可以发送任何类型的字节数据，例如高分辨率图像或某种文件数据。若您不需要发送额外的数据信息，可以直接发送一个空的字节数组。
 
 Rust-In-Flutter 的所有构建设置都确保从 Rust crates 编译的所有库文件都被正确地包含在最终构建中，已准备好进行分发。因此，您无需担心打包库文件的问题。
+
+其他详细的公告或信息将在[讨论页面](https://github.com/cunarist/rust-in-flutter/discussions)上分享。请访问该页面以阅读额外的指南并提问。
 
 # ☕ 支持我们
 

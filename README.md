@@ -107,6 +107,8 @@ Now by heading over to `./native/hub/src/lib.rs`, you can start writing Rust!
 When requesting from Dart, you should specify the operation and address. This way of communication follows the definition of RESTful API.
 
 ```dart
+// ./lib/main.dart
+
 import 'package:msgpack_dart/msgpack_dart.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 
@@ -134,6 +136,8 @@ void someFunction() async {
 Upon receiving the request in Rust, you should first classify them by address.
 
 ```rust
+// ./native/hub/src/with_request.rs
+
 pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUnique {
     let rust_request = request_unique.request;
     let interaction_id = request_unique.id;
@@ -163,6 +167,8 @@ pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUn
 Endpoint function in Rust would be like this. Message schema is defined in the match statement because it will be different by the operation type.
 
 ```rust
+// ./native/hub/src/sample_functions.rs
+
 pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
@@ -216,6 +222,8 @@ Use [MessagePack](https://msgpack.org/) for serializing messages sent between Da
 Data being sent between Dart and Rust are basically bytes arrays, represented as `Uint8List` in Dart and `Vec<u8>` in Rust. Though using MessagePack serialization is recommended, you can send any kind of bytes data as you wish such as a high-resolution image or some kind of file data, or just toss in a blank bytes array if you don't need additional details.
 
 All build settings of Rust-In-Flutter ensures that all library files compiled from Rust crates are properly included in the final build, ready to be distributed. Therefore you do not need to worry about bundling library files.
+
+Any other detailed announcements or informations are shared at [the discussions page](https://github.com/cunarist/rust-in-flutter/discussions). Please visit this page to read additional guides and ask questions.
 
 # ☕ Support Us
 

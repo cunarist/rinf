@@ -107,6 +107,8 @@ dart run rust_in_flutter:apply_template
 Dart에서 요청을 보낼 때에는 작업 및 주소를 함께 지정해야 합니다. 상호작용 방식은 RESTful API의 정의에 부합하도록 설계되었습니다.
 
 ```dart
+// ./lib/main.dart
+
 import 'package:msgpack_dart/msgpack_dart.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 
@@ -134,6 +136,8 @@ void someFunction() async {
 Rust에서 요청을 수신하면 먼저 주소별로 분류하세요.
 
 ```rust
+// ./native/hub/src/with_request.rs
+
 pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUnique {
     let rust_request = request_unique.request;
     let interaction_id = request_unique.id;
@@ -163,6 +167,8 @@ pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUn
 Rust에서의 엔드포인트 함수는 다음과 같습니다. 메시지 Schema는 작업 유형에 따라 다르기 때문에 Match 구문 내에서 정의되도록 쓰여 있습니다.
 
 ```rust
+// ./native/hub/src/sample_functions.rs
+
 pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
@@ -216,6 +222,8 @@ Dart와 Rust 간에 전송되는 메시지의 직렬화에는 [MessagePack](http
 Dart와 Rust 사이에서 전송되는 데이터는 기본적으로 바이트 배열입니다. 이는 Dart에서는 `Uint8List`로, Rust에서는 `Vec<u8>`로 표현됩니다. 추천되는 메시지 직렬화 방식은 MessagePack이지만, 고해상도 이미지 또는 파일 데이터 등 다른 종류의 바이트 데이터도 전송할 수 있습니다. 아무 정보도 포함시킬 필요가 없다면 빈 바이트 배열을 담으면 됩니다.
 
 Rust-In-Flutter의 빌드 설정은 Rust crate들에서 컴파일된 모든 라이브러리 파일들이 최종 빌드에 올바르게 포함되어 배포 준비가 되었음을 보장합니다. 따라서 라이브러리 파일을 번들링하는 것에 대해 걱정할 필요는 없습니다.
+
+공지사항과 자세한 정보들은 [토론 페이지](https://github.com/cunarist/rust-in-flutter/discussions)에 올라옵니다. 추가적인 설명을 읽거나 질문을 하시려면 이곳을 방문해주세요.
 
 # ☕ 개발 지원하기
 

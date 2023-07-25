@@ -107,6 +107,8 @@ dart run rust_in_flutter:apply_template
 Dart からリクエストする際には、操作とアドレスを指定する必要があります。この通信方法は RESTful API の定義に従っています。
 
 ```dart
+// ./lib/main.dart
+
 import 'package:msgpack_dart/msgpack_dart.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 
@@ -134,6 +136,8 @@ void someFunction() async {
 Rust でリクエストを受け取った場合、まずアドレスによって分類する必要があります。
 
 ```rust
+// ./native/hub/src/with_request.rs
+
 pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUnique {
     let rust_request = request_unique.request;
     let interaction_id = request_unique.id;
@@ -163,6 +167,8 @@ pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUn
 Rust におけるエンドポイント関数は以下のようになります。メッセージスキーマは、操作の種類によって異なるため、match 文で定義されています。
 
 ```rust
+// ./native/hub/src/sample_functions.rs
+
 pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
@@ -216,6 +222,8 @@ RESTful API パターンを拡張して、必要に応じて数百から数千�
 Dart と Rust の間で送信されるデータは基本的にバイト配列であり、Dart では`Uint8List`、Rust では`Vec<u8>`として表現されます。MessagePack のシリアライズを使用することをお勧めしますが、高解像度の画像やファイルデータなど、任意のバイトデータを送信することができます。また、必要な場合は空のバイト配列を送信することもできます。
 
 Rust-In-Flutter のすべてのビルド設定により、Rust クレートからコンパイルされたすべてのライブラリファイルが適切に最終ビルドに含まれ、配布の準備が整います。したがって、ライブラリファイルのバンドルについて心配する必要はありません。
+
+その他の詳細なお知らせや情報は、[ディスカッションページ](https://github.com/cunarist/rust-in-flutter/discussions)で共有されています。追加のガイドを読むや質問をするには、このページを訪れてください。
 
 # ☕ サポートをお願いします
 
