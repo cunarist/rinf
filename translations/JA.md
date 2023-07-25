@@ -36,7 +36,13 @@ Flutter アプリを驚くほど高速化するために、簡単に Rust を統
 
 ## Rust の利用理由
 
-Dart は素晴らしいオブジェクト指向の現代的な言語ですが、ネイティブでガベージコレクションされないため、パフォーマンスが要件を満たさない場合があります。そこで Rust が登場します。Rust のパフォーマンスは、Dart の約[2〜40 倍高速](https://programming-language-benchmarks.vercel.app/dart-vs-rust)であり、さらに複数のスレッドを利用できる能力もあります。
+Dart は GUI アプリ向けの素晴らしいオブジェクト指向のモダンな言語ですが、ネイティブではないガベージコレクションの言語であるため、そのパフォーマンスが要件を満たさない場合があります。そこで Rust が登場します。Rust のパフォーマンスは、Dart よりもおよそ[2~40 倍高速](https://programming-language-benchmarks.vercel.app/dart-vs-rust)であるとされています。さらに、複数のスレッドを利用する能力も備えています。
+
+Rust は、Stack Overflow 上で[最も愛されているプログラミング言語](https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages)と報告されており、そのゼロキャスト抽象哲学による高い生産性とネイティブパフォーマンスが提供されています。
+
+もちろん、C や C++もありますが、多くの開発者が[Rust が将来的に C++を置き換える](https://dev.to/roy8/why-rust-will-replace-c-in-the-future-49op)と信じています。Rust が C++よりも人気がある理由はいくつかあります。まず第一に、Rust ははるかにシンプルで学びやすいです。これは、シンプルさと安全性に焦点を当てた設計によるものです。さらに、Rust は多くの場面で C++よりも優れたパフォーマンスを提供します。また、より活発なコミュニティと優れたツールサポートを持っています。
+
+Rust の詳細は[公式の書籍](https://doc.rust-lang.org/book/foreword.html)で学び、理解することができます。
 
 # 👜 コンポーネントのインストール
 

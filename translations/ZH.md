@@ -36,7 +36,13 @@
 
 ## 为什么使用 Rust？
 
-Dart 确实是一个超棒的、现代化的、面向对象的编程语言。但由于需要垃圾回收等机制，它在性能上并不拔尖。在部分较为苛刻的场景下，我们可以考虑使用 Rust，获得[2~40 倍](https://programming-language-benchmarks.vercel.app/dart-vs-rust)的性能提升(甚至无需使用多线程)。
+虽然 Dart 是一种出色的面向对象的现代 GUI 应用语言，但由于它是一种非本地垃圾回收语言，其性能有时无法满足要求。这就是 Rust 的用武之地。Rust 的性能据说比 Dart 快大约[2~40 倍](https://programming-language-benchmarks.vercel.app/dart-vs-rust)，更不用说它还可以利用多个线程。
+
+Rust 据称是 Stack Overflow 上[最受喜爱的编程语言](https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages)，得益于其零开销抽象哲学，它提供高生产力和本地性能。
+
+当然，还有 C 和 C++，但许多开发人员相信[Rust 最终将取代 C++](https://dev.to/roy8/why-rust-will-replace-c-in-the-future-49op)成为首选编程语言。Rust 变得比 C++更受欢迎有许多原因。首先，它更简单、更易学。这归功于 Rust 的设计，其专注于简洁和安全。此外，Rust 在许多情况下比 C++表现更好。它还拥有更活跃的社区和更好的工具支持。
+
+您可以通过[官方书籍](https://doc.rust-lang.org/book/foreword.html)更深入地了解和学习 Rust。
 
 # 👜 安装组件
 
