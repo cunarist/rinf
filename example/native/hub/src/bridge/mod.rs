@@ -1,6 +1,7 @@
 //! This module supports communication with Dart.
 //! More specifically, sending responses and
 //! stream signals to Dart are supported.
+//! DO NOT EDIT.
 #![allow(dead_code)]
 
 use api::RustResponseUnique;
