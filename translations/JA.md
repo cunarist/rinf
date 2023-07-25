@@ -136,6 +136,7 @@ Dart から Rust に配列と文字列を送信し、それに対していくつ
 ```diff
   // lib/main.dart
   ...
+  import 'package:msgpack_dart/msgpack_dart.dart';
   import 'package:rust_in_flutter/rust_in_flutter.dart';
   ...
   ElevatedButton(
@@ -163,6 +164,7 @@ Dart から Rust に配列と文字列を送信し、それに対していくつ
 ```diff
   // lib/main.dart
   ...
+  import 'package:msgpack_dart/msgpack_dart.dart';
   import 'package:rust_in_flutter/rust_in_flutter.dart';
   ...
   ElevatedButton(
@@ -170,8 +172,6 @@ Dart から Rust に配列と文字列を送信し、それに対していくつ
       final rustRequest = RustRequest(
         address: 'myCategory.someData',
         operation: RustOperation.Read,
-        // Dartのオブジェクトを生のバイト配列に変換するために、
-        // `msgpack_dart.dart`が提供する`serialize`関数を使います。
         bytes: serialize(
           {
             'input_numbers': [3, 4, 5],
@@ -267,6 +267,47 @@ Dart から Rust に配列と文字列を送信し、それに対していくつ
 +   }
     ...
 ```
+
+わかりました！Dart から Rust からのレスポンスを受け取ったら、その中のバイトデータを自由に処理できます。
+
+```diff
+  // lib/main.dart
+  ...
+  import 'package:msgpack_dart/msgpack_dart.dart';
+  import 'package:rust_in_flutter/rust_in_flutter.dart';
+  ...
+  ElevatedButton(
+    onPressed: () async {
+      final rustRequest = RustRequest(
+        address: 'myCategory.someData',
+        operation: RustOperation.Read,
+        bytes: serialize(
+          {
+            'input_numbers': [3, 4, 5],
+            'input_string': 'Zero-cost abstraction',
+          },
+        ),
+      );
+      final rustResponse = await requestToRust(rustRequest);
++     final message = deserialize(rustResponse.bytes) as Map;
++     print(message["output_numbers"]);
++     print(message["output_string"]);
+    },
+    child: Text("Rustにリクエスト"),
+  ),
+    ...
+```
+
+そして、コマンドラインに出力された結果が見られます！
+
+```
+flutter: [4, 5, 6]
+flutter: ZERO-COST ABSTRACTION
+```
+
+ここでは単にメッセージを出力しているだけですが、実際のアプリではこのレスポンスデータを使用して Flutter のウィジェットをリビルドすることができます。
+
+このような RESTful API のパターンを拡張し、必要に応じて数百、数千のエンドポイントを作成することができます。Web のバックグラウンドがある場合、このシステムは馴染みのあるものに見えるかもしれません。
 
 ## Rust から Dart へのストリーミング
 

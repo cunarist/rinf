@@ -136,6 +136,7 @@ dart run rust_in_flutter:apply_template
 ```diff
   // lib/main.dart
   ...
+  import 'package:msgpack_dart/msgpack_dart.dart';
   import 'package:rust_in_flutter/rust_in_flutter.dart';
   ...
   ElevatedButton(
@@ -163,6 +164,7 @@ dart run rust_in_flutter:apply_template
 ```diff
   // lib/main.dart
   ...
+  import 'package:msgpack_dart/msgpack_dart.dart';
   import 'package:rust_in_flutter/rust_in_flutter.dart';
   ...
   ElevatedButton(
@@ -170,8 +172,6 @@ dart run rust_in_flutter:apply_template
       final rustRequest = RustRequest(
         address: 'myCategory.someData',
         operation: RustOperation.Read,
-        // 使用`msgpack_dart.dart`提供的`serialize`函数
-        // 将Dart对象转换为原始字节。
         bytes: serialize(
           {
             'input_numbers': [3, 4, 5],
@@ -267,6 +267,47 @@ dart run rust_in_flutter:apply_template
 +   }
     ...
 ```
+
+好的！当您从 Dart 收到 Rust 的响应后，您可以对其中的字节数据进行任意处理。
+
+```diff
+  // lib/main.dart
+  ...
+  import 'package:msgpack_dart/msgpack_dart.dart';
+  import 'package:rust_in_flutter/rust_in_flutter.dart';
+  ...
+  ElevatedButton(
+    onPressed: () async {
+      final rustRequest = RustRequest(
+        address: 'myCategory.someData',
+        operation: RustOperation.Read,
+        bytes: serialize(
+          {
+            'input_numbers': [3, 4, 5],
+            'input_string': 'Zero-cost abstraction',
+          },
+        ),
+      );
+      final rustResponse = await requestToRust(rustRequest);
++     final message = deserialize(rustResponse.bytes) as Map;
++     print(message["output_numbers"]);
++     print(message["output_string"]);
+    },
+    child: Text("向Rust发送请求"),
+  ),
+    ...
+```
+
+然后我们可以在命令行中看到打印输出！
+
+```
+flutter: [4, 5, 6]
+flutter: ZERO-COST ABSTRACTION
+```
+
+我们在这里仅仅简单地打印了消息，但实际应用中，响应数据将用于重建 Flutter 的 widget。
+
+您可以扩展这种 RESTful API 模式，并根据需要创建成百上千个端点。如果您有 Web 开发背景，这种系统可能会很熟悉。
 
 ## 从 Rust 到 Dart 的数据流
 

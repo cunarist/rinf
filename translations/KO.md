@@ -136,6 +136,7 @@ Dart에서 Rust로 숫자 배열과 문자열을 보내어 계산을 수행하�
 ```diff
   // lib/main.dart
   ...
+  import 'package:msgpack_dart/msgpack_dart.dart';
   import 'package:rust_in_flutter/rust_in_flutter.dart';
   ...
   ElevatedButton(
@@ -163,6 +164,7 @@ Dart에서 Rust로 숫자 배열과 문자열을 보내어 계산을 수행하�
 ```diff
   // lib/main.dart
   ...
+  import 'package:msgpack_dart/msgpack_dart.dart';
   import 'package:rust_in_flutter/rust_in_flutter.dart';
   ...
   ElevatedButton(
@@ -170,9 +172,6 @@ Dart에서 Rust로 숫자 배열과 문자열을 보내어 계산을 수행하�
       final rustRequest = RustRequest(
         address: 'myCategory.someData',
         operation: RustOperation.Read,
-        // Use the `serialize` function
-        // provided by `msgpack_dart.dart`
-        // to convert Dart objects into raw bytes.
         bytes: serialize(
           {
             'input_numbers': [3, 4, 5],
@@ -268,6 +267,47 @@ Dart에서 Rust로 숫자 배열과 문자열을 보내어 계산을 수행하�
 +   }
     ...
 ```
+
+좋습니다! 이제 Dart에서 Rust로부터의 응답을 받았을 때, 그 안에 있는 바이트 데이터를 원하는 대로 처리할 수 있습니다.
+
+```diff
+  // lib/main.dart
+  ...
+  import 'package:msgpack_dart/msgpack_dart.dart';
+  import 'package:rust_in_flutter/rust_in_flutter.dart';
+  ...
+  ElevatedButton(
+    onPressed: () async {
+      final rustRequest = RustRequest(
+        address: 'myCategory.someData',
+        operation: RustOperation.Read,
+        bytes: serialize(
+          {
+            'input_numbers': [3, 4, 5],
+            'input_string': 'Zero-cost abstraction',
+          },
+        ),
+      );
+      final rustResponse = await requestToRust(rustRequest);
++     final message = deserialize(rustResponse.bytes) as Map;
++     print(message["output_numbers"]);
++     print(message["output_string"]);
+    },
+    child: Text("Rust로 요청"),
+  ),
+    ...
+```
+
+이제 콘솔에 결과가 출력될 것입니다!
+
+```
+flutter: [4, 5, 6]
+flutter: ZERO-COST ABSTRACTION
+```
+
+우리는 여기서 단순히 메시지를 출력하는 것으로 끝냈지만, 실제 앱에서는 이 응답 데이터가 Flutter 위젯을 다시 빌드하는 데에 활용될 것입니다.
+
+이러한 RESTful API 패턴을 확장하여 필요에 따라 수백 개 또는 수천 개의 엔드포인트를 만들 수 있습니다. 웹 개발 경험이 있다면 이 방식이 익숙할 것입니다.
 
 ## Rust에서 Dart로의 스트리밍
 

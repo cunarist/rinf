@@ -136,6 +136,7 @@ Let's start from our [default example](https://github.com/cunarist/rust-in-flutt
 ```diff
   // lib/main.dart
   ...
+  import 'package:msgpack_dart/msgpack_dart.dart';
   import 'package:rust_in_flutter/rust_in_flutter.dart';
   ...
   ElevatedButton(
@@ -163,6 +164,7 @@ Now we should send this request to Rust. `requestToRust` function does this job,
 ```diff
   // lib/main.dart
   ...
+  import 'package:msgpack_dart/msgpack_dart.dart';
   import 'package:rust_in_flutter/rust_in_flutter.dart';
   ...
   ElevatedButton(
@@ -170,9 +172,6 @@ Now we should send this request to Rust. `requestToRust` function does this job,
       final rustRequest = RustRequest(
         address: 'myCategory.someData',
         operation: RustOperation.Read,
-        // Use the `serialize` function
-        // provided by `msgpack_dart.dart`
-        // to convert Dart objects into raw bytes.
         bytes: serialize(
           {
             'input_numbers': [3, 4, 5],
@@ -274,6 +273,7 @@ Finally, when you receive a response from Rust in Dart, you can do anything with
 ```diff
   // lib/main.dart
   ...
+  import 'package:msgpack_dart/msgpack_dart.dart';
   import 'package:rust_in_flutter/rust_in_flutter.dart';
   ...
   ElevatedButton(
@@ -281,9 +281,6 @@ Finally, when you receive a response from Rust in Dart, you can do anything with
       final rustRequest = RustRequest(
         address: 'myCategory.someData',
         operation: RustOperation.Read,
-        // Use the `serialize` function
-        // provided by `msgpack_dart.dart`
-        // to convert Dart objects into raw bytes.
         bytes: serialize(
           {
             'input_numbers': [3, 4, 5],
