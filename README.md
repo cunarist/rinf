@@ -40,7 +40,7 @@ While Dart is an amazing object-oriented modern language for GUI apps, its perfo
 
 Rust is reported to be [the most loved programming language](https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages) on Stack Overflow, providing high productivity along with its native performance thanks to its zero-cast abstraction philosophy.
 
-Of course, there are C and C++, but many developers believe that [Rust will eventually replace C++](https://dev.to/roy8/why-rust-will-replace-c-in-the-future-49op) as the go to programming language. There are many reasons why Rust is becoming more popular than C++. First of all, it’s much simpler and easier to learn. This is due to its design, which is focused on simplicity and safety. Additionally, Rust offers better performance than C++ in many cases. It also has a more active community and better tooling support.
+Of course, there are C and C++, but many developers believe that [Rust will eventually replace C++](https://dev.to/roy8/why-rust-will-replace-c-in-the-future-49op) as the go to programming language. There are many reasons why Rust is becoming more popular than C++. First of all, it’s much simpler and easier to learn. This is due to its design, which is focused on simplicity and memory safety. Additionally, Rust offers better performance than C++ in many cases. It also has a more active community and better tooling support.
 
 You can read and learn Rust more [at the official book](https://doc.rust-lang.org/book/foreword.html).
 
