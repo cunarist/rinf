@@ -102,7 +102,7 @@ Don't forget to read the `./native/README.md` file first. Various comments are w
 
 Now by heading over to `./native/hub/src/lib.rs`, you can start writing Rust!
 
-# 🧱 Tips
+# 🧱 How to Write Code
 
 When requesting from Dart, you should specify the operation and address. This way of communication follows the definition of RESTful API.
 

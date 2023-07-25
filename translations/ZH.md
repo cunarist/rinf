@@ -102,7 +102,7 @@ dart run rust_in_flutter:apply_template
 
 现在请前往 `./native/hub/src/lib.rs`，您可以开始编写 Rust 代码了！
 
-# 🧱 注意事项
+# 🧱 如何编写代码
 
 向 Dart 发起请求时，您应当指定 operation 和 address。这种通信方式遵循 RESTful API 的标准。
 

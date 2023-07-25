@@ -102,7 +102,7 @@ dart run rust_in_flutter:apply_template
 
 これで、`./native/hub/src/lib.rs`に移動して、Rust のコードを書き始めることができます！
 
-# 🧱 ヒント
+# 🧱 コードの書き方
 
 Dart からリクエストする際には、操作とアドレスを指定する必要があります。この通信方法は RESTful API の定義に従っています。
 
