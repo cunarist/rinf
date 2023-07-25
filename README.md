@@ -46,7 +46,7 @@ You can read and learn Rust more [at the official book](https://doc.rust-lang.or
 
 # 👜 Installing Components
 
-This section assumes that you've already installed [Flutter SDK](https://docs.flutter.dev/get-started/install) on your system and made a Flutter project with `flutter create` command. Use this Flutter project's folder as your terminal's working directory. If you don't have a Flutter project yet, go ahead and make one following [this awesome tutorial](https://docs.flutter.dev/get-started/codelab).
+This section assumes that you've already installed [Flutter SDK](https://docs.flutter.dev/get-started/install) on your system and made a Flutter project with `flutter create` command. If you don't have a Flutter project yet, go ahead and make one following [this awesome tutorial](https://docs.flutter.dev/get-started/codelab).
 
 First, add this package to your Flutter project.
 
@@ -110,45 +110,91 @@ Now by heading over to `./native/hub/src/lib.rs`, you can start writing Rust!
 
 # 🧱 How to Write Code
 
-When requesting from Dart, you should specify the operation and address. This way of communication follows the definition of RESTful API.
+## Request from Dart, Response from Rust
 
-```dart
-// ./lib/main.dart
+As your app grows bigger, you will need to define new Rust API endpoints.
 
-import 'package:msgpack_dart/msgpack_dart.dart';
-import 'package:rust_in_flutter/rust_in_flutter.dart';
+Let's say that you want to make a new button that sends an array of numbers and a string from Dart to Rust to perform some calculation on it. You can follow these steps to understand how to send a request and wait for the response.
 
-void someFunction() async {
-    var rustRequest = RustRequest(
-      address: 'basicCategory.counterNumber',
-      operation: RustOperation.Read,
-      bytes: serialize(
-        {
-          'letter': 'Hello from Dart!',
-          'before_number': 888,
-          'dummy_one': 1,
-          'dummy_two': 2,
-          'dummy_three': [3, 4, 5]
-        },
-      ),
-    );
+Let's start from our [default example](https://github.com/cunarist/rust-in-flutter/tree/main/example). Create a button widget in Dart that will accept the user input.
 
-    var rustResponse = await requestToRust(rustRequest);
-    var message = deserialize(rustResponse.bytes) as Map;
-    var innerValue = message['after_number'] as int;
-}
+```diff
+  // lib/main.dart
+  ...
+  child: Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
++     ElevatedButton(
++       onPressed: () async {},
++       child: Text("Request to Rust"),
++     ),
+  ...
 ```
 
-Upon receiving the request in Rust, you should first classify them by address.
+`onPressed` function should send a request to Rust. Let's create a `RustRequest` object first.
 
-```rust
-// ./native/hub/src/with_request.rs
+```diff
+  // lib/main.dart
+  ...
+  import 'package:rust_in_flutter/rust_in_flutter.dart';
+  ...
+  ElevatedButton(
++   onPressed: () async {
++     final rustRequest = RustRequest(
++       address: 'myCategory.someData',
++       operation: RustOperation.Read,
++       bytes: serialize(
++         {
++           'input_numbers': [3, 4, 5],
++           'input_string': 'Zero-cost abstraction',
++         },
++       ),
++     );
++   },
+    child: Text("Request to Rust"),
+  ),
+  ...
+```
 
-pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUnique {
-    let rust_request = request_unique.request;
-    let interaction_id = request_unique.id;
+`address` can be any string that suits your app's design, represented as camelcase strings layered by dots. `operation` can be one of create, read, update, and delete, since this system follows the definition of RESTful API. As the name suggests, `bytes` is just a simple bytes array, usually created by [MessagePack](https://msgpack.org/) serialization.
 
-    let layered: Vec<&str> = rust_request.address.split('.').collect();
+Now we should send this request to Rust. `requestToRust` function does this job, which returns a `RustResponse` object.
+
+```diff
+  // lib/main.dart
+  ...
+  import 'package:rust_in_flutter/rust_in_flutter.dart';
+  ...
+  ElevatedButton(
+    onPressed: () async {
+      final rustRequest = RustRequest(
+        address: 'myCategory.someData',
+        operation: RustOperation.Read,
+        // Use the `serialize` function
+        // provided by `msgpack_dart.dart`
+        // to convert Dart objects into raw bytes.
+        bytes: serialize(
+          {
+            'input_numbers': [3, 4, 5],
+            'input_string': 'Zero-cost abstraction',
+          },
+        ),
+      );
++     final rustResponse = await requestToRust(rustRequest);
+    },
+    child: Text("Request to Rust"),
+  ),
+    ...
+```
+
+So, our new API address is `myCategory.someData`. Make sure that the request handler function in Rust accepts this.
+
+```diff
+    // native/hub/src/with_request.rs
+    ...
+    use crate::bridge::api::RustResponse;
+    use crate::sample_functions;
+    ...
     let rust_response = if layered.is_empty() {
         RustResponse::default()
     } else if layered[0] == "basicCategory" {
@@ -159,71 +205,198 @@ pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUn
         } else {
             RustResponse::default()
         }
++   } else if layered[0] == "myCategory" {
++       if layered.len() == 1 {
++           RustResponse::default()
++       } else if layered[1] == "someData" {
++           sample_functions::some_data(rust_request).await
++       } else {
++           RustResponse::default()
++       }
     } else {
         RustResponse::default()
     };
-
-    RustResponseUnique {
-        id: interaction_id,
-        response: rust_response,
-    }
-}
+    ...
 ```
 
-Endpoint function in Rust would be like this. Message schema is defined in the match statement because it will be different by the operation type.
+This `sample_functions::some_data` is our new endpoint Rust function. This simple API endpoint will add one to each element in the array, capitalize all letters in the string, and return them. Message schema is defined in the match statement because it will be different by the operation type.
 
-```rust
-// ./native/hub/src/sample_functions.rs
-
-pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
-    match rust_request.operation {
-        RustOperation::Create => RustResponse::default(),
-        RustOperation::Read => {
-            #[allow(dead_code)]
-            #[derive(Deserialize)]
-            struct RustRequestSchema {
-                letter: String,
-                before_number: i32,
-                dummy_one: i32,
-                dummy_two: i32,
-                dummy_three: Vec<i32>,
-            }
-            let slice = rust_request.bytes.as_slice();
-            let received: RustRequestSchema = from_slice(slice).unwrap();
-            println!("{:?}", received.letter);
-
-            let before_value = received.before_number;
-            let after_value = sample_crate::add_seven(before_value);
-
-            #[derive(Serialize)]
-            struct RustResponseSchema {
-                after_number: i32,
-                dummy_one: i32,
-                dummy_two: i32,
-                dummy_three: Vec<i32>,
-            }
-            RustResponse {
-                successful: true,
-                bytes: to_vec_named(&RustResponseSchema {
-                    after_number: after_value,
-                    dummy_one: 1,
-                    dummy_two: 2,
-                    dummy_three: vec![3, 4, 5],
-                })
-                .unwrap(),
-            }
-        }
-        RustOperation::Update => RustResponse::default(),
-        RustOperation::Delete => RustResponse::default(),
-    }
-}
+```diff
+    // native/hub/src/sample_functions.rs
+    ...
+    use crate::bridge::api::RustOperation;
+    use crate::bridge::api::RustRequest;
+    use crate::bridge::api::RustResponse;
+    use rmp_serde::from_slice;
+    use rmp_serde::to_vec_named;
+    use serde::Deserialize;
+    use serde::Serialize;
+    ...
++   pub async fn some_data(rust_request: RustRequest) -> RustResponse {
++       match rust_request.operation {
++           RustOperation::Create => RustResponse::default(),
++           RustOperation::Read => {
++               #[allow(dead_code)]
++               #[derive(Deserialize)]
++               struct RustRequestSchema {
++                   input_numbers: Vec<i8>,
++                   input_string: String,
++               }
++               let slice = rust_request.bytes.as_slice();
++               let received: RustRequestSchema = from_slice(slice).unwrap();
++
++               let new_numbers = received.input_numbers.into_iter().map(|x| x + 1).collect();
++               let new_string = received.input_string.to_uppercase();
++
++               #[derive(Serialize)]
++               struct RustResponseSchema {
++                   output_numbers: Vec<i8>,
++                   output_string: String,
++               }
++               RustResponse {
++                   successful: true,
++                   bytes: to_vec_named(&RustResponseSchema {
++                       output_numbers: new_numbers,
++                       output_string: new_string,
++                   })
++                   .unwrap(),
++               }
++           }
++           RustOperation::Update => RustResponse::default(),
++           RustOperation::Delete => RustResponse::default(),
++       }
++   }
+    ...
 ```
 
-You can extend this RESTful API pattern and create hundreds and thousands of endpoints as you need. If you have a web background, this system might look familiar. More comments and details are included in the actual code inside the Rust template.
+Finally, when you receive a response from Rust in Dart, you can do anything with the bytes data in it.
 
-Ideally, **Flutter** would deal with the cross-platform user interface while **Rust** handles the business logic. The front-end and back-end can be completely separated, meaning that Dart and Rust codes are detachable from each other. These two worlds communicate through channels and streams.
+```diff
+  // lib/main.dart
+  ...
+  import 'package:rust_in_flutter/rust_in_flutter.dart';
+  ...
+  ElevatedButton(
+    onPressed: () async {
+      final rustRequest = RustRequest(
+        address: 'myCategory.someData',
+        operation: RustOperation.Read,
+        // Use the `serialize` function
+        // provided by `msgpack_dart.dart`
+        // to convert Dart objects into raw bytes.
+        bytes: serialize(
+          {
+            'input_numbers': [3, 4, 5],
+            'input_string': 'Zero-cost abstraction',
+          },
+        ),
+      );
+      final rustResponse = await requestToRust(rustRequest);
++     final message = deserialize(rustResponse.bytes) as Map;
++     print(message["output_numbers"]);
++     print(message["output_string"]);
+    },
+    child: Text("Request to Rust"),
+  ),
+    ...
+```
 
-Use [MessagePack](https://msgpack.org/) for serializing messages sent between Dart and Rust as provided by the Rust template unless you have other reasons not to do so. For those who aren't familiar, MessagePack is a nested binary structure similar to JSON, but faster and smaller.
+And we can see the printed output in the command-line!
+
+```
+flutter: [4, 5, 6]
+flutter: ZERO-COST ABSTRACTION
+```
+
+We just simply print the message here, but the response data will be used for rebuilding Flutter widgets in real apps.
+
+You can extend this RESTful API pattern and create hundreds and thousands of endpoints as you need. If you have a web background, this system might look familiar.
+
+## Streaming from Rust to Dart
+
+Let's say that you want to send increasing numbers every second from Rust to Dart. In this case, it would be inefficient for Dart to send requests repeatedly. This is where streaming is needed.
+
+Let's start from our [default example](https://github.com/cunarist/rust-in-flutter/tree/main/example). Spawn an async function in Rust.
+
+```diff
+    // native/hub/src/lib.rs
+    ...
+    use tokio::task::spawn;
+    ...
+    mod sample_functions;
+    ...
+    spawn(sample_functions::keep_drawing_mandelbrot());
++   spawn(sample_functions::keep_sending_numbers());
+    while let Some(request_unique) = request_receiver.recv().await {
+    ...
+```
+
+Define the async Rust function that runs forever, sending numbers to Dart every second.
+
+```diff
+    // native/hub/src/sample_functions.rs
+    ...
+    use crate::bridge::api::RustSignal;
+    use crate::bridge::send_rust_signal;
+    ...
+    use rmp_serde::to_vec_named;
+    ...
+    use serde::Serialize;
+    ...
++   pub async fn keep_sending_numbers() {
++       let mut current_number: i32 = 1;
++       loop {
++           tokio::time::sleep(std::time::Duration::from_secs(1)).await;
++
++           #[derive(Serialize)]
++           struct RustSignalSchema {
++               current_number: i32,
++           }
++           let rust_signal = RustSignal {
++               address: String::from("sampleCategory.mandelbrot"),
++               bytes: to_vec_named(&RustSignalSchema {
++                   current_number: current_number,
++               })
++               .unwrap(),
++           };
++           send_rust_signal(rust_signal);
++           current_number += 1;
++       }
++   }
+    ...
+```
+
+Finally, receive the signals in Dart with `StreamBuilder`, filter them by address with the `where` method, and rebuild the widget.
+
+```diff
+  // lib/main.dart
+  ...
+  import 'package:msgpack_dart/msgpack_dart.dart';
+  import 'package:rust_in_flutter/rust_in_flutter.dart';
+  ...
+  children: [
++   StreamBuilder<RustSignal>(
++     stream: rustBroadcaster.stream.where((rustSignal) {
++       return rustSignal.address == "myCategory.increasingNumbers";
++     }),
++     builder: (context, snapshot) {
++       final received = snapshot.data;
++       if (received == null) {
++         return Text("Nothing received yet");
++       } else {
++         final singal = deserialize(received.bytes) as Map;
++         final currentNumber = singal["current_number"] as int;
++         return Text(currentNumber.toString());
++       }
++     },
++   ),
+```
+
+## Tips
+
+Ideally, **Flutter** would deal with the cross-platform user interface while **Rust** handles the business logic. The front-end and back-end can be completely separated, meaning that Dart and Rust codes are detachable from each other. These two worlds communicate through streams.
+
+Use MessagePack for serializing messages sent between Dart and Rust as provided by the Rust template unless you have other reasons not to do so. For those who aren't familiar, MessagePack is a nested binary structure similar to JSON, but faster and smaller. MessagePack also supports [more types](https://github.com/msgpack/msgpack/blob/master/spec.md#type-system) of inner data compared to JSON, including binaries.
 
 Data being sent between Dart and Rust are basically bytes arrays, represented as `Uint8List` in Dart and `Vec<u8>` in Rust. Though using MessagePack serialization is recommended, you can send any kind of bytes data as you wish such as a high-resolution image or some kind of file data, or just toss in a blank bytes array if you don't need additional details.
 
