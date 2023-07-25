@@ -40,7 +40,7 @@ Dart は素晴らしいオブジェクト指向の現代的な言語ですが、
 
 # 👜 コンポーネントのインストール
 
-このセクションでは、すでに[Flutter SDK](https://docs.flutter.dev/get-started/install)をシステムにインストールし、`flutter create`コマンドで Flutter プロジェクトを作成しているものとします。この Flutter プロジェクトのフォルダをターミナルの作業ディレクトリとして使用してください。もしまだ Flutter プロジェクトを持っていない場合は、この素晴らしいチュートリアルに従って作成してください。
+このセクションでは、すでに[Flutter SDK](https://docs.flutter.dev/get-started/install)をシステムにインストールし、`flutter create`コマンドで Flutter プロジェクトを作成しているものとします。この Flutter プロジェクトのフォルダをターミナルの作業ディレクトリとして使用してください。もしまだ Flutter プロジェクトを持っていない場合は、[この素晴らしいチュートリアル](https://docs.flutter.dev/get-started/codelab)に従って作成してください。
 
 まず、このパッケージを Flutter プロジェクトに追加します。
 
