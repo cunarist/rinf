@@ -40,7 +40,7 @@ While Dart is an amazing object-oriented modern language, its performance someti
 
 # 👜 Installing Components
 
-This section assumes that you've already installed [Flutter SDK](https://docs.flutter.dev/get-started/install) on your system and made a Flutter project with `flutter create` command. Use this Flutter project's folder as your terminal's working directory.
+This section assumes that you've already installed [Flutter SDK](https://docs.flutter.dev/get-started/install) on your system and made a Flutter project with `flutter create` command. Use this Flutter project's folder as your terminal's working directory. If you don't have a Flutter project yet, go ahead and make one following [this awesome tutorial](https://docs.flutter.dev/get-started/codelab).
 
 First, add this package to your Flutter project.
 

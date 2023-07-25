@@ -40,7 +40,7 @@ Dart는 훌륭한 객체지향형 모던 언어이지만 Garbage collection을 �
 
 # 👜 컴포넌트 설치
 
-이 섹션은 [Flutter SDK](https://docs.flutter.dev/get-started/install)가 시스템에 설치되어 있고 `flutter create` 명령으로 생성된 Flutter 프로젝트가 이미 준비되어 있다고 간주합니다. 터미널의 작업 디렉토리로 준비된 Flutter 프로젝트의 폴더를 사용하세요.
+이 섹션은 [Flutter SDK](https://docs.flutter.dev/get-started/install)가 시스템에 설치되어 있고 `flutter create` 명령으로 생성된 Flutter 프로젝트가 이미 준비되어 있다고 간주합니다. 터미널의 작업 디렉토리로 준비된 Flutter 프로젝트의 폴더를 사용하세요. 아직 Flutter 프로젝트를 생성하지 않았다면, [이 안내](https://docs.flutter.dev/get-started/codelab)를 따라 만드세요.
 
 우선, 이 패키지를 Flutter 프로젝트에 추가하세요.
 
