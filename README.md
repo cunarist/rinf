@@ -392,7 +392,7 @@ Finally, receive the signals in Dart with `StreamBuilder`, filter them by addres
 +   ),
 ```
 
-## Tips
+# ✋ Tips
 
 Ideally, **Flutter** would deal with the cross-platform user interface while **Rust** handles the business logic. The front-end and back-end can be completely separated, meaning that Dart and Rust codes are detachable from each other. These two worlds communicate through streams.
 

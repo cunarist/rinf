@@ -348,7 +348,7 @@ dart run rust_in_flutter:apply_template
 +   ),
 ```
 
-## 小贴士
+# ✋ 小贴士
 
 在理想情况下，**Flutter** 将处理跨平台用户界面，而 **Rust** 负责业务逻辑。前端和后端可以完全分离，这意味着 Dart 和 Rust 代码可以相互独立。这两个世界通过流进行通信。
 
