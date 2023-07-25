@@ -1,3 +1,7 @@
+## 1.6.1
+
+- Slightly improved guide sections.
+
 ## 1.6.0
 
 - Added step-by-step guides.
