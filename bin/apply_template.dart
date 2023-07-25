@@ -41,7 +41,7 @@ void main() async {
   var splitted = contents.split("\n\n");
   splitted = splitted.map((s) => s.trim()).toList();
   for (final piece in splitted) {
-    if (piece.startsWith(sectionTop)) {
+    if (piece.contains(sectionTop)) {
       doesRustSectionExist = true;
     }
   }
