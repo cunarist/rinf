@@ -31,6 +31,8 @@ Rust에 대해 더 자세히 알기 위해선 [공식 서적](https://doc.rust-l
 
 # 🛠️ Rust 툴체인 설치하기
 
+이 섹션은 [Flutter SDK](https://docs.flutter.dev/get-started/install)가 시스템에 설치되어 있다고 간주합니다.
+
 Rust 툴체인 설치는 매우 간단합니다. [공식 설치 페이지](https://www.rust-lang.org/tools/install)의 안내를 참고하세요.
 
 Rust 툴체인 설치가 완료되었다면, 시스템이 준비되었는지 확인하세요. 다양한 플랫폼을 대상으로 빌드하기 위해 Flutter SDK가 추가적인 설치를 요구할 수 있습니다. 터미널 출력에 아무런 문제가 포함되어 있지 않다면 다음 단계로 넘어가셔도 좋습니다.
@@ -42,7 +44,7 @@ flutter doctor
 
 # 👜 Rust 템플릿 적용하기
 
-이 섹션은 이미 Flutter 프로젝트가 이미 준비되어 있다고 간주합니다. 아직 Flutter 프로젝트를 생성하지 않았다면, [공식 안내](https://docs.flutter.dev/get-started/codelab)를 따라 만들어 주세요.
+이 섹션은 Flutter 프로젝트가 준비되어 있다고 간주합니다. 아직 Flutter 프로젝트를 생성하지 않았다면, [공식 안내](https://docs.flutter.dev/get-started/codelab)를 따라 만들어 주세요.
 
 먼저, 이 패키지를 Flutter 프로젝트에 추가하세요.
 

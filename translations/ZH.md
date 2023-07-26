@@ -31,6 +31,8 @@ Rust 在 Stack Overflow 上被评为[最受喜爱的编程语言](https://survey
 
 # 🛠️ 安装 Rust 工具链
 
+这部分假设您的系统已安装[Flutter SDK](https://docs.flutter.dev/get-started/install)。
+
 安装 Rust 工具链非常简单。只需前往[官方安装页面](https://www.rust-lang.org/tools/install)并按照说明进行操作即可。
 
 Rust 工具链安装完成后，请检查系统是否准备就绪。Flutter SDK 可能需要一些额外的组件来定位各种平台。如果输出没有问题，你就可以开始使用了！

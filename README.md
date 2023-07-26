@@ -31,6 +31,8 @@ To delve deeper into the world of Rust, check out the official book: [https://do
 
 # 🛠️ Installing Rust Toolchain
 
+This section assumes that [Flutter SDK](https://docs.flutter.dev/get-started/install) is installed on your system.
+
 Installing Rust toolchain is very easy. Just head over to the [official installation page](https://www.rust-lang.org/tools/install) and follow the instructions.
 
 Once Rust toolchain installation is completed, check that your system is ready. Flutter SDK might require some additional components to target various platforms. If there are no issues in the output, you are good to go!
