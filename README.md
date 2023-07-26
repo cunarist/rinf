@@ -385,9 +385,9 @@ Finally, receive the signals in Dart with `StreamBuilder`, filter them by addres
 
 # ✋ FAQ
 
-1. Where should I use Rust?
+1. When should I use Rust?
 
-   Ideally, **Flutter** would deal with the cross-platform user interface while **Rust** handles the business logic. The front-end and back-end can be completely separated, meaning that Dart and Rust codes are detachable from each other. These two worlds communicate through streams.
+   Ideally, **Flutter** would deal with the cross-platform user interface while **Rust** handles the business logic. The front-end and back-end can be completely separated, meaning that Dart and Rust codes are detachable from each other.
 
 2. How are data passed between Dart and Rust?
 
@@ -403,7 +403,7 @@ Finally, receive the signals in Dart with `StreamBuilder`, filter them by addres
 
 5. Android app build has failed. What should I do?
 
-   For Android apps, you should be using Rust 1.68 or higher due to [this issue](https://github.com/rust-lang/rust/pull/85806). Also, variable `ndkVersion` in `./android/app/build.gradle` is necessary and it may need to be modified. Visit [this discussion](https://github.com/cunarist/rust-in-flutter/discussions/60) to solve this problem.
+   For Android apps, you should be using Rust 1.68 or higher due to [this issue](https://github.com/rust-lang/rust/pull/85806). Also, variable `ndkVersion` should be present in `./android/app/build.gradle` file, but it may be missing if you've created your Flutter project with Flutter SDK 3.7 and earlier. Visit [this discussion](https://github.com/cunarist/rust-in-flutter/discussions/60) to solve this problem.
 
 6. Where should I ask for help?
 

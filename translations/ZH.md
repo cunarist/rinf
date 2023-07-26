@@ -381,7 +381,7 @@ flutter: ZERO-COST ABSTRACTION
 
 1. 我应该在何时使用 Rust?
 
-   在理想情况下，**Flutter** 将处理 GUI 界面，而 **Rust** 负责底层业务逻辑。前端和后端可以完全分离，这意味着 Dart 和 Rust 代码可以相互独立，而这两个世界之间通过`Stream`进行通信。
+   在理想情况下，**Flutter** 将处理 GUI 界面，而 **Rust** 负责底层业务逻辑。前端和后端可以完全分离，这意味着 Dart 和 Rust 代码可以相互独立。
 
 2. Dart 和 Rust 代码之间通过什么数据类型传递数据?
 
