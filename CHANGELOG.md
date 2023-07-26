@@ -1,3 +1,7 @@
+## 1.6.4
+
+- Organized guide sections.
+
 ## 1.6.3
 
 - Organized guide sections.
