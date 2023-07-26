@@ -36,43 +36,32 @@
 
 ## 为什么使用 Rust？
 
-虽然 Dart 是一种出色的面向对象的现代 GUI 应用语言，但由于它是一种非本地垃圾回收语言，其性能有时无法满足要求。这就是 Rust 的用武之地。Rust 的性能据说比 Dart 快大约[2~40 倍](https://programming-language-benchmarks.vercel.app/dart-vs-rust)，更不用说它还可以利用多个线程。
+虽然 Dart 是一种出色的、面向对象的、现代化的语言，但由于它具有垃圾回收等特性，性能并不是极致的。这就是 Rust 的用武之地。Rust 的性能被认为比 Dart 快大约[2~40倍](https://programming-language-benchmarks.vercel.app/dart-vs-rust)(甚至无需使用多线程)。
 
-Rust 据称是 Stack Overflow 上[最受喜爱的编程语言](https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages)，得益于其零开销抽象哲学，它提供高生产力和本地性能。
-
-当然，还有 C 和 C++，但许多开发人员相信[Rust 最终将取代 C++](https://dev.to/roy8/why-rust-will-replace-c-in-the-future-49op)成为首选编程语言。Rust 变得比 C++更受欢迎有许多原因。首先，它更简单、更易学。这归功于 Rust 的设计，其专注于简洁和安全。此外，Rust 在许多情况下比 C++表现更好。它还拥有更活跃的社区和更好的工具支持。
-
-您可以通过[官方书籍](https://doc.rust-lang.org/book/foreword.html)更深入地了解和学习 Rust。
+Rust是 Stack Overflow 上[最受喜爱的编程语言](https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages)，得益于其零开销抽象哲学和丰富的语法特性，Rust提供了较高的生产力和性能。您可以通过[相关书籍](https://www.rustwiki.org.cn/)更深入地了解和学习Rust。  
 
 # 👜 安装组件
 
-这部分假设您已经在您的系统上安装了[Flutter SDK](https://docs.flutter.dev/get-started/install)，并使用 `flutter create` 命令创建了一个 Flutter 项目。如果您还没有一个 Flutter 项目，请按照[这个绝妙的教程](https://docs.flutter.dev/get-started/codelab)创建一个。
+我们假设您已经在您的系统上安装了[Flutter SDK](https://docs.flutter.dev/get-started/install)，并使用 `flutter create` 命令创建了一个 Flutter 项目。  
 
-首先，将 rust_in_flutter 添加到项目依赖：
+首先，将 rust_in_flutter 添加到项目依赖：  
 
 ```bash
 flutter pub add rust_in_flutter
 ```
 
-然后安装 Rust 工具链。请参阅[Rust 官方文档](https://doc.rust-lang.org/book/ch01-01-installation.html)。
+然后安装 Rust 工具链。请参阅[Rust官方文档](https://doc.rust-lang.org/book/ch01-01-installation.html)。  
 
-最后，检查系统环境是否已准备好进行编译。您可以在每个安装步骤后重复这些命令来验证系统状态。如果输出结果中没有问题，就可以开始了！
+最后，检查系统环境是否已准备好进行编译。您可以在每个安装步骤后重复这些命令，来验证环境配置是否达标。如果输出结果中没有问题，就可以开始啦！  
 
 ```bash
 rustc --version
 flutter doctor
 ```
 
-## 构建工具版本问题
-
-- 对于 Android 应用，您应该使用 Rust 1.68 或更高版本，因为[这个问题](https://github.com/rust-lang/rust/pull/85806)。
-- 对于 Android 应用，`./android/app/build.gradle` 中的 `ndkVersion` 变量是必需的，但如果您是使用 Flutter SDK 3.7 或更早版本创建的 Flutter 项目，则可能会缺少该变量。请访问[这个讨论](https://github.com/cunarist/rust-in-flutter/discussions/60)来解决这个问题。
-
-> 在 Rust 中使用各种不同的构建目标时，也许会遇到问题。不管遇到任何情况，您可以随时到[讨论页](https://github.com/cunarist/rust-in-flutter/discussions)发起一个 Q&A 来寻求帮助！
-
 # 👜 应用模板
 
-只需在命令行中运行以下命令。
+只需在命令行中运行以下命令：  
 
 ```bash
 dart run rust_in_flutter:apply_template
@@ -104,19 +93,17 @@ dart run rust_in_flutter:apply_template
     └── ...
 ```
 
-别忘了先阅读`./native/README.md`文件。各种注释都写在代码中，以帮助您理解代码的结构。此外，您可能需要在生产环境中移除`sample_crate`。如果您已经有了要在这里使用的 Rust crate，只需把它放在`./native`目录中，并将其设置为 `hub` crate 的一个依赖。
+别忘了先阅读`./native/README.md`文件。代码里提供了大量的注释说明，以帮助您理解代码的结构。此外，您可能需要在生产环境中移除`sample_crate`。如果您已经有了要在这里使用的 Rust crate，只需把它放在`./native`目录中，并将其设置为 `hub` crate 的一个依赖。  
 
 现在请前往 `./native/hub/src/lib.rs`，您可以开始编写 Rust 代码了！
 
 # 🧱 如何编写代码
 
-## 从 Dart 发送请求，从 Rust 接收响应
+## 从Dart发送请求，从Rust接收响应
 
-随着您的应用程序变得越来越大，您将需要定义新的 Rust API 端点。
+随着您的应用程序变得越来越大，您将需要定义新的 Rust API 端点(函数)。假设您想在Flutter页面中创建一个新的按钮，点击按钮后在Dart中将一个int类型的数组和一个字符串发送到Rust，以便在Rust中执行一些计算。您可以按照以下步骤来了解如何发送请求并等待响应。  
 
-假设您想创建一个新的按钮，在 Dart 中将一个数字数组和一个字符串发送到 Rust，以便在其上执行一些计算。您可以按照以下步骤来了解如何发送请求并等待响应。
-
-让我们从我们的[默认示例](https://github.com/cunarist/rust-in-flutter/tree/main/example)开始。在 Dart 中创建一个接受用户输入的按钮小部件。
+让我们从[官方案例](https://github.com/cunarist/rust-in-flutter/tree/main/example)开始。在 Dart 中创建一个接受用户输入的按钮小部件：  
 
 ```diff
   // lib/main.dart
@@ -131,7 +118,7 @@ dart run rust_in_flutter:apply_template
   ...
 ```
 
-`onPressed`函数应该向 Rust 发送请求。让我们首先创建一个`RustRequest`对象。
+`onPressed`函数应该向 Rust 发送请求。让我们首先创建一个`RustRequest`对象：  
 
 ```diff
   // lib/main.dart
@@ -157,9 +144,9 @@ dart run rust_in_flutter:apply_template
   ...
 ```
 
-`address`可以是任何字符串，适合您的应用程序设计，表示为由点分隔的驼峰字符串层级。`operation`可以是 create、read、update 和 delete 中的一个，因为此系统遵循 RESTful API 的定义。正如其名称所示，`bytes`只是一个简单的字节数组，通常由[MessagePack](https://msgpack.org/)序列化创建。
+`address`的值可以是任何适合您的应用程序API的字符串，表示为由点分隔的驼峰命名的字符串组合。`operation`可以是 create、read、update 和 delete 中的一个，因为`rust_in_flutter`遵循`RESTful API`的定义。正如其名称所示，`bytes`只是一个简单的字节数组，通常由[MessagePack](https://msgpack.org/)序列化创建。  
 
-现在我们应该将此请求发送到 Rust。`requestToRust`函数完成了这个工作，它返回一个`RustResponse`对象。
+现在我们应该将此请求发送到Rust。`requestToRust`函数完成了这个工作，它返回一个`RustResponse`对象。
 
 ```diff
   // lib/main.dart
@@ -186,7 +173,7 @@ dart run rust_in_flutter:apply_template
     ...
 ```
 
-因此，我们的新 API 地址是`myCategory.someData`。确保 Rust 中的请求处理程序函数接受此地址。
+根据之前的命名，我们的新 API 地址是`myCategory.someData`。确保 Rust 中的请求处理程序函数接受此`address`：  
 
 ```diff
     // native/hub/src/with_request.rs
@@ -219,7 +206,7 @@ dart run rust_in_flutter:apply_template
     ...
 ```
 
-这个`sample_functions::some_data`是我们的新端点 Rust 函数。这个简单的 API 端点会将数组中的每个元素加一，将字符串中的所有字母转换为大写，并将它们返回。消息模式在匹配语句中定义，因为它会根据操作类型而有所不同。
+被调用的`sample_functions::some_data`就是我们新的端点 Rust 函数。这个简单的 API 端点会将数组中的每个元素加一，将字符串中的所有字母转换为大写，然后将它们返回。消息模式在匹配语句中定义，因为它会根据操作类型而有所不同：  
 
 ```diff
     // native/hub/src/sample_functions.rs
@@ -269,7 +256,7 @@ dart run rust_in_flutter:apply_template
     ...
 ```
 
-好的！当您从 Dart 收到 Rust 的响应后，您可以对其中的字节数据进行任意处理。
+当您在Dart中收到Rust的响应后，您可以对其中的字节数据进行任意处理：  
 
 ```diff
   // lib/main.dart
@@ -299,22 +286,22 @@ dart run rust_in_flutter:apply_template
     ...
 ```
 
-然后我们可以在命令行中看到打印输出！
+然后可以在命令行中看到打印输出：  
 
 ```
 flutter: [4, 5, 6]
 flutter: ZERO-COST ABSTRACTION
 ```
 
-我们在这里仅仅简单地打印了消息，但实际应用中，响应数据将用于重建 Flutter 的 widget。
+我们在这里仅仅简单地打印了消息，但实际应用中，响应数据将用于重建Flutter的Widget。  
 
-您可以扩展这种 RESTful API 模式，并根据需要创建成百上千个端点。如果您有 Web 开发背景，这种系统可能会很熟悉。
+您可以扩展这种 RESTful API 模式，并根据需要创建成百上千个端点函数。如果您具有Web开发背景，这种编写代码的方式可能会让您觉得很熟悉。  
 
-## 从 Rust 到 Dart 的数据流
+## 从Rust到Dart的数据流
 
-假设您希望每秒从 Rust 发送递增的数字到 Dart。在这种情况下，Dart 重复发送请求是低效的，这时就需要使用数据流（streaming）。
+假设您希望每秒从Rust发送递增的数字到Dart。在这种情况下，Dart重复发送请求是低效的，这时就需要使用数据流(streaming)。  
 
-让我们从[默认示例](https://github.com/cunarist/rust-in-flutter/tree/main/example)开始。在 Rust 中创建一个异步函数。
+还是让我们从[官方案例](https://github.com/cunarist/rust-in-flutter/tree/main/example)开始，在 Rust 中创建一个异步函数：  
 
 ```diff
     // native/hub/src/lib.rs
@@ -329,7 +316,7 @@ flutter: ZERO-COST ABSTRACTION
     ...
 ```
 
-定义一个异步的 Rust 函数，它会无限运行，每秒向 Dart 发送数字。
+定义一个异步的 Rust 函数，它会无限运行，每秒向 Dart 发送数字：  
 
 ```diff
     // native/hub/src/sample_functions.rs
@@ -364,7 +351,7 @@ flutter: ZERO-COST ABSTRACTION
     ...
 ```
 
-最后，在 Dart 中使用`StreamBuilder`接收信号，使用`where`方法按地址进行过滤，并重新构建小部件。
+最后，在Dart中使用`StreamBuilder`接收信号，使用`where`方法按地址进行过滤，并重新构建小部件：  
 
 ```diff
   // lib/main.dart
@@ -390,17 +377,25 @@ flutter: ZERO-COST ABSTRACTION
 +   ),
 ```
 
-# ✋ 小贴士
+## ✋ 常见问题
 
-在理想情况下，**Flutter** 将处理跨平台用户界面，而 **Rust** 负责业务逻辑。前端和后端可以完全分离，这意味着 Dart 和 Rust 代码可以相互独立。这两个世界通过流进行通信。
+1. 我应该在何时使用Rust ？  
+> 在理想情况下，**Flutter** 将处理GUI界面，而 **Rust** 负责底层业务逻辑。前端和后端可以完全分离，这意味着Dart和Rust代码可以相互独立，而这两个世界之间通过`Stream`进行通信。  
 
-我们使用[MessagePack](https://msgpack.org/)来序列化 Dart 和 Rust 之间发送的消息(正如 Rust 模板所提供的那样)，除非您有其他理由不这么做。MessagePack 是一种嵌套的二进制结构，类似于 JSON，但速度更快、体积更小。MessagePack 也支持比 JSON 更多类型的内部数据，包括二进制数据。你可以在 [这个链接](https://github.com/msgpack/msgpack/blob/master/spec.md#type-system) 中查看详细的类型系统规范。
+2. Dart和Rust代码之间通过什么数据类型传递数据 ？  
+> 在Dart和Rust之间传递的数据一般是字节数组(bytes array)，Dart中称之为 `Uint8List`，而Rust中称之为`Vec<u8>`。虽然我们推荐使用`MessagePack`进行序列化，但您也可以发送任何类型的字节数据，例如高分辨率图像或某种文件。若您不需要发送额外的数据信息，可以直接发送一个空的字节数组。  
 
-在 Dart 和 Rust 之间传递数据基本上都是字节数组(bytes array)，Dart 中称之为 `Uint8List`，而 Rust 中称之为`Vec<u8>`。虽然我们推荐使用 MessagePack 进行序列化，但您也可以发送任何类型的字节数据，例如高分辨率图像或某种文件数据。若您不需要发送额外的数据信息，可以直接发送一个空的字节数组。
+3. 什么是MessagePack ？我们的项目为何使用它 ？  
+> 我们使用[MessagePack](https://msgpack.org/)来序列化Dart和Rust之间发送的消息(正如Rust模板代码中所呈现的那样)，除非您有其他理由不这么做。MessagePack 是一种嵌套的二进制结构，类似于JSON，但速度更快、体积更小。MessagePack 也支持比 JSON 更多类型的内部数据，包括二进制数据。您可以在 [这个链接](https://github.com/msgpack/msgpack/blob/master/spec.md#type-system) 里查看详细的类型系统规范。  
 
-Rust-In-Flutter 的所有构建设置都确保从 Rust crates 编译的所有库文件都被正确地包含在最终构建中，已准备好进行分发。因此，您无需担心打包库文件的问题。
+4. Rust项目生成的动态链接库在哪儿 ？  
+> Rust-In-Flutter确保了从 Rust crates 编译的所有库文件能被正确地包含在最终构建的产物中，并已准备好通过Flutter应用进行分发。因此，您无需考虑如何打包出动态库以及应该把它放到哪儿的问题。  
 
-其他详细的公告或信息将在[讨论页面](https://github.com/cunarist/rust-in-flutter/discussions)上分享。请访问该页面以阅读额外的指南并提问。
+5. 打包Android应用时出现了问题 ？  
+> 对于 Android 应用，您应该使用 Rust 1.68 或更高版本，具体原因可以查看[这里](https://github.com/rust-lang/rust/pull/85806)。另外，`./android/app/build.gradle`中的`ndkVersion`变量可能需要修改。如果您使用 Flutter SDK 3.7 或更早的版本创建了Flutter项目，也可能会缺少该变量。请访问[这里](https://github.com/cunarist/rust-in-flutter/discussions/60)来解决这个问题。  
+
+6. 您遇到了其他的问题 ？  
+> 在Rust中使用各种不同的构建目标时，也许会遇到问题。不管遇到任何情况，您可以随时到[讨论页](https://github.com/cunarist/rust-in-flutter/discussions)发起一个 Q&A 来寻求帮助！请访问该页面以阅读额外的指南并提问。    
 
 # ☕ 支持我们
 
