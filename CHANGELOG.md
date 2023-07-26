@@ -1,3 +1,7 @@
+## 1.6.5
+
+- Improved guides.
+
 ## 1.6.4
 
 - Organized guide sections.
