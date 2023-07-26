@@ -152,7 +152,7 @@ Dart에서 Rust로 숫자 배열과 문자열을 보내어 계산을 수행하�
 +       ),
 +     );
 +   },
-    child: Text("Rust로 요청하기"),
+    child: Text("Request to Rust"),
   ),
   ...
 ```
@@ -181,7 +181,7 @@ Dart에서 Rust로 숫자 배열과 문자열을 보내어 계산을 수행하�
       );
 +     final rustResponse = await requestToRust(rustRequest);
     },
-    child: Text("Rust로 요청하기"),
+    child: Text("Request to Rust"),
   ),
     ...
 ```
@@ -194,6 +194,7 @@ Dart에서 Rust로 숫자 배열과 문자열을 보내어 계산을 수행하�
     use crate::bridge::api::RustResponse;
     use crate::sample_functions;
     ...
+    let layered: Vec<&str> = rust_request.address.split('.').collect();
     let rust_response = if layered.is_empty() {
         RustResponse::default()
     } else if layered[0] == "basicCategory" {
@@ -293,7 +294,7 @@ Dart에서 Rust로 숫자 배열과 문자열을 보내어 계산을 수행하�
 +     print(message["output_numbers"]);
 +     print(message["output_string"]);
     },
-    child: Text("Rust로 요청"),
+    child: Text("Request to Rust"),
   ),
     ...
 ```
@@ -350,7 +351,7 @@ Rust에서 Dart로 매 초마다 증가하는 숫자를 보내고 싶다고 가�
 +               current_number: i32,
 +           }
 +           let rust_signal = RustSignal {
-+               address: String::from("sampleCategory.mandelbrot"),
++               address: String::from("myCategory.increasingNumbers"),
 +               bytes: to_vec_named(&RustSignalSchema {
 +                   current_number: current_number,
 +               })

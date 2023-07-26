@@ -194,6 +194,7 @@ Dart から Rust に配列と文字列を送信し、それに対していくつ
     use crate::bridge::api::RustResponse;
     use crate::sample_functions;
     ...
+    let layered: Vec<&str> = rust_request.address.split('.').collect();
     let rust_response = if layered.is_empty() {
         RustResponse::default()
     } else if layered[0] == "basicCategory" {
@@ -293,7 +294,7 @@ Dart から Rust に配列と文字列を送信し、それに対していくつ
 +     print(message["output_numbers"]);
 +     print(message["output_string"]);
     },
-    child: Text("Rustにリクエスト"),
+    child: Text("Request to Rust"),
   ),
     ...
 ```
@@ -350,7 +351,7 @@ Rust から Dart に毎秒増加する数値を送信したいとします。こ
 +               current_number: i32,
 +           }
 +           let rust_signal = RustSignal {
-+               address: String::from("sampleCategory.mandelbrot"),
++               address: String::from("myCategory.increasingNumbers"),
 +               bytes: to_vec_named(&RustSignalSchema {
 +                   current_number: current_number,
 +               })

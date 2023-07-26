@@ -194,6 +194,7 @@ dart run rust_in_flutter:apply_template
     use crate::bridge::api::RustResponse;
     use crate::sample_functions;
     ...
+    let layered: Vec<&str> = rust_request.address.split('.').collect();
     let rust_response = if layered.is_empty() {
         RustResponse::default()
     } else if layered[0] == "basicCategory" {
@@ -293,7 +294,7 @@ dart run rust_in_flutter:apply_template
 +     print(message["output_numbers"]);
 +     print(message["output_string"]);
     },
-    child: Text("向Rust发送请求"),
+    child: Text("Request to Rust"),
   ),
     ...
 ```
@@ -350,7 +351,7 @@ flutter: ZERO-COST ABSTRACTION
 +               current_number: i32,
 +           }
 +           let rust_signal = RustSignal {
-+               address: String::from("sampleCategory.mandelbrot"),
++               address: String::from("myCategory.increasingNumbers"),
 +               bytes: to_vec_named(&RustSignalSchema {
 +                   current_number: current_number,
 +               })

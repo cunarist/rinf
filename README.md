@@ -194,6 +194,7 @@ So, our new API address is `myCategory.someData`. Make sure that the request han
     use crate::bridge::api::RustResponse;
     use crate::sample_functions;
     ...
+    let layered: Vec<&str> = rust_request.address.split('.').collect();
     let rust_response = if layered.is_empty() {
         RustResponse::default()
     } else if layered[0] == "basicCategory" {
@@ -350,7 +351,7 @@ Define the async Rust function that runs forever, sending numbers to Dart every 
 +               current_number: i32,
 +           }
 +           let rust_signal = RustSignal {
-+               address: String::from("sampleCategory.mandelbrot"),
++               address: String::from("myCategory.increasingNumbers"),
 +               bytes: to_vec_named(&RustSignalSchema {
 +                   current_number: current_number,
 +               })
