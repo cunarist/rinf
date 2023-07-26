@@ -21,8 +21,6 @@ Rust를 활용해서 Flutter 앱의 속도를 극적으로 향상시켜 보세�
 - ✅ iOS: 지원 및 작동 확인됨
 - ⏸️ Web: 현재는 미지원이나 [고려 중](https://github.com/cunarist/rust-in-flutter/issues/34)
 
-> 제안 사항이나 버그를 신고할 때에는 [이슈](https://github.com/cunarist/rust-in-flutter/issues) 또는 [Pull request](https://github.com/cunarist/rust-in-flutter/pulls)를 작성해주세요. 가능한 한 빠르게 답변해 드리겠습니다.
-
 ## 왜 Rust를 사용해야 할까요?
 
 Dart는 GUI 앱 개발에 최적화된 훌륭한 객체지향형 언어이지만, Garbage collection을 동원하며 네이티브가 아닌 언어이기 때문에 성능이 불충분할 때가 있습니다. 이럴 경우 Rust를 사용해야 합니다. Rust의 성능은 Dart보다 [대략 2~40배 빠르다](https://programming-language-benchmarks.vercel.app/dart-vs-rust)고 알려져 있으며, Rust에서는 멀티스레딩을 활용할 수도 있습니다.
@@ -31,19 +29,11 @@ Rust는 Stack Overflow에서 [가장 사랑받는 프로그래밍 언어](https:
 
 Rust에 대해 더 자세히 알기 위해선 [공식 서적](https://doc.rust-lang.org/book/foreword.html)을 참고하시기 바랍니다.
 
-# 🛠️ 구성 요소 설치하기
+# 🛠️ Rust 툴체인 설치하기
 
-이 섹션은 [Flutter SDK](https://docs.flutter.dev/get-started/install)가 시스템에 설치되어 있고 `flutter create` 명령으로 생성된 Flutter 프로젝트가 이미 준비되어 있다고 간주합니다. 아직 Flutter 프로젝트를 생성하지 않았다면, [이 안내](https://docs.flutter.dev/get-started/codelab)를 따라 준비해 주세요.
+Rust 툴체인 설치는 매우 간단합니다. [공식 설치 페이지](https://www.rust-lang.org/tools/install)의 안내를 참고하세요.
 
-우선, 이 패키지를 Flutter 프로젝트에 추가하세요.
-
-```bash
-flutter pub add rust_in_flutter
-```
-
-그리고 Rust toolchain을 설치하세요. [공식 Rust 문서](https://doc.rust-lang.org/book/ch01-01-installation.html)에 설치 방법이 나와 있습니다.
-
-마지막으로 시스템이 준비되었는지 확인하세요. 구성 요소를 설치하면서 시스템 상태를 확인하려면 이 명령들을 실행하면 됩니다. 터미널 출력에 아무런 문제가 포함되어 있지 않다면 다음 단계로 넘어가셔도 좋습니다.
+Rust 툴체인 설치가 완료되었다면, 시스템이 준비되었는지 확인하세요. 다양한 플랫폼을 대상으로 빌드하기 위해 Flutter SDK가 추가적인 설치를 요구할 수 있습니다. 터미널 출력에 아무런 문제가 포함되어 있지 않다면 다음 단계로 넘어가셔도 좋습니다.
 
 ```bash
 rustc --version
@@ -52,7 +42,15 @@ flutter doctor
 
 # 👜 Rust 템플릿 적용하기
 
-다음 명령을 터미널에서 실행하세요.
+이 섹션은 이미 Flutter 프로젝트가 이미 준비되어 있다고 간주합니다. 아직 Flutter 프로젝트를 생성하지 않았다면, [공식 안내](https://docs.flutter.dev/get-started/codelab)를 따라 만들어 주세요.
+
+먼저, 이 패키지를 Flutter 프로젝트에 추가하세요.
+
+```bash
+flutter pub add rust_in_flutter
+```
+
+그리고 다음 명령을 터미널에서 실행하세요.
 
 ```bash
 dart run rust_in_flutter:apply_template

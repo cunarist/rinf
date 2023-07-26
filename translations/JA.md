@@ -21,8 +21,6 @@ Flutter アプリを驚くほど高速化するために、簡単に Rust を統
 - ✅ iOS：テスト済みサポート
 - ⏸️ Web：現時点ではサポートされていません [検討中](https://github.com/cunarist/rust-in-flutter/issues/34)
 
-> 提案がある場合やバグを報告したい場合は、[issue](https://github.com/cunarist/rust-in-flutter/issues)または[pull request](https://github.com/cunarist/rust-in-flutter/pulls)として残してください。できる限り迅速に対応いたします。
-
 ## Rust の利用理由
 
 Dart は GUI アプリケーション向けの素晴らしいオブジェクト指向のモダンな言語ですが、ネイティブのガベージコレクションにより、要件を満たすことができない場合があります。そこで、Rust が登場し、Dart よりも約[2~40 倍高速](https://programming-language-benchmarks.vercel.app/dart-vs-rust)であり、さらに複数スレッドを活用することができます。
@@ -31,19 +29,11 @@ Rust は Stack Overflow で[最も愛されているプログラミング言語]
 
 Rust の世界をさらに探求するには、公式の書籍をご覧ください：[https://doc.rust-lang.org/book/foreword.html](https://doc.rust-lang.org/book/foreword.html)。
 
-# 🛠️ コンポーネントのインストール
+# 🛠️ Rust ツールチェーンのインストール
 
-このセクションでは、すでに[Flutter SDK](https://docs.flutter.dev/get-started/install)をシステムにインストールし、`flutter create`コマンドで Flutter プロジェクトを作成したと仮定しています。まだ Flutter プロジェクトを作成していない場合は、[この素晴らしいチュートリアル](https://docs.flutter.dev/get-started/codelab)に従って作成してください。
+Rust ツールチェーンのインストールは非常に簡単です。[公式のインストールページ](https://www.rust-lang.org/tools/install)にアクセスして、指示に従うだけです。
 
-まず、このパッケージを Flutter プロジェクトに追加します。
-
-```bash
-flutter pub add rust_in_flutter
-```
-
-そして、Rust ツールチェーンをインストールしてください。公式 Rust ドキュメントを参照してください：[公式 Rust ドキュメント](https://doc.rust-lang.org/book/ch01-01-installation.html)。
-
-最後に、システムがコンパイルに対して準備ができていることを確認してください。各インストールステップの後でシステムの状態を確認するために以下のコマンドを繰り返すことができます。出力に問題がない場合は、準備が整っています！
+Rust ツールチェーンのインストールが完了したら、システムが正常に準備されているか確認してください。Flutter SDK は、さまざまなプラットフォームを対象とするためにいくつかの追加コンポーネントが必要になる場合があります。出力に問題がなければ、準備完了です！
 
 ```bash
 rustc --version
@@ -52,7 +42,13 @@ flutter doctor
 
 # 👜 Rust のテンプレートを適用する
 
-Rust のテンプレートを適用する
+このセクションでは、既に Flutter プロジェクトを作成したことを前提としています。まだ作成していない場合は、[この素晴らしい公式チュートリアル](https://docs.flutter.dev/get-started/codelab)に従ってプロジェクトを作成してください。
+
+まず、このパッケージを Flutter プロジェクトに追加します。
+
+```bash
+flutter pub add rust_in_flutter
+```
 
 単純に、Flutter プロジェクトのディレクトリで以下のコマンドをコマンドラインで実行してください。
 

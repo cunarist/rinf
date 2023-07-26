@@ -29,19 +29,11 @@ Rust has garnered a devoted following, being [the most loved programming languag
 
 To delve deeper into the world of Rust, check out the official book: [https://doc.rust-lang.org/book/foreword.html](https://doc.rust-lang.org/book/foreword.html).
 
-# 🛠️ Installing Components
+# 🛠️ Installing Rust Toolchain
 
-This section assumes that you've already installed [Flutter SDK](https://docs.flutter.dev/get-started/install) on your system and made a Flutter project with `flutter create` command. If you don't have a Flutter project yet, go ahead and make one following [this awesome tutorial](https://docs.flutter.dev/get-started/codelab).
+Installing Rust toolchain is very easy. Just head over to the [official installation page](https://www.rust-lang.org/tools/install) and follow the instructions.
 
-First, add this package to your Flutter project.
-
-```bash
-flutter pub add rust_in_flutter
-```
-
-Then install Rust toolchain. Refer to the [official Rust docs](https://doc.rust-lang.org/book/ch01-01-installation.html).
-
-Finally, check that your system is ready for compiling. You can repeat these commands to verify your system status after each installation step. If there are no issues in the output, you are good to go!
+Once Rust toolchain installation is completed, check that your system is ready. Flutter SDK might require some additional components to target various platforms. If there are no issues in the output, you are good to go!
 
 ```bash
 rustc --version
@@ -50,7 +42,15 @@ flutter doctor
 
 # 👜 Applying Rust Template
 
-Simply run this in the command-line from your Flutter project's directory.
+This section assumes that you've already created a Flutter project. If you haven't, go ahead and make one following [this awesome official tutorial](https://docs.flutter.dev/get-started/codelab).
+
+First of all, add this package to your Flutter project.
+
+```bash
+flutter pub add rust_in_flutter
+```
+
+Then, simply run this in the command-line from your Flutter project's directory.
 
 ```bash
 dart run rust_in_flutter:apply_template
