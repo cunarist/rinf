@@ -44,7 +44,7 @@ Rust は、Stack Overflow 上で[最も愛されているプログラミング�
 
 Rust の詳細は[公式の書籍](https://doc.rust-lang.org/book/foreword.html)で学び、理解することができます。
 
-# 👜 コンポーネントのインストール
+# 🛠️ コンポーネントのインストール
 
 このセクションでは、すでに[Flutter SDK](https://docs.flutter.dev/get-started/install)をシステムにインストールし、`flutter create`コマンドで Flutter プロジェクトを作成したと仮定しています。まだ Flutter プロジェクトを作成していない場合は、[この素晴らしいチュートリアル](https://docs.flutter.dev/get-started/codelab)に従って作成してください。
 
@@ -63,7 +63,9 @@ rustc --version
 flutter doctor
 ```
 
-# 👜 テンプレートの適用
+# 👜 Rust のテンプレートを適用する
+
+Rust のテンプレートを適用する
 
 単純に、Flutter プロジェクトのディレクトリで以下のコマンドをコマンドラインで実行してください。
 

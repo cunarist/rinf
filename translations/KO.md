@@ -44,7 +44,7 @@ Rust는 Stack Overflow에서 [가장 사랑받는 프로그래밍 언어](https:
 
 Rust에 대해 더 자세히 알고 학습하기 위해선 [공식 서적](https://doc.rust-lang.org/book/foreword.html)을 참고하시기 바랍니다.
 
-# 👜 구성 요소 설치
+# 🛠️ 구성 요소 설치하기
 
 이 섹션은 [Flutter SDK](https://docs.flutter.dev/get-started/install)가 시스템에 설치되어 있고 `flutter create` 명령으로 생성된 Flutter 프로젝트가 이미 준비되어 있다고 간주합니다. 아직 Flutter 프로젝트를 생성하지 않았다면, [이 안내](https://docs.flutter.dev/get-started/codelab)를 따라 준비해 주세요.
 
@@ -63,7 +63,7 @@ rustc --version
 flutter doctor
 ```
 
-# 👜 템플릿 적용
+# 👜 Rust 템플릿 적용하기
 
 다음 명령을 터미널에서 실행하세요.
 

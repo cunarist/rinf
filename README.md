@@ -44,7 +44,7 @@ Of course, there are C and C++, but many developers believe that [Rust will even
 
 You can read and learn Rust more [at the official book](https://doc.rust-lang.org/book/foreword.html).
 
-# 👜 Installing Components
+# 🛠️ Installing Components
 
 This section assumes that you've already installed [Flutter SDK](https://docs.flutter.dev/get-started/install) on your system and made a Flutter project with `flutter create` command. If you don't have a Flutter project yet, go ahead and make one following [this awesome tutorial](https://docs.flutter.dev/get-started/codelab).
 
@@ -63,7 +63,7 @@ rustc --version
 flutter doctor
 ```
 
-# 👜 Applying Template
+# 👜 Applying Rust Template
 
 Simply run this in the command-line from your Flutter project's directory.
 

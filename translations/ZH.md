@@ -40,7 +40,7 @@
 
 Rust 是 Stack Overflow 上[最受喜爱的编程语言](https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages)，得益于其零开销抽象哲学和丰富的语法特性，Rust 提供了较高的生产力和性能。您可以通过[相关书籍](https://www.rustwiki.org.cn/)更深入地了解和学习 Rust。
 
-# 👜 安装组件
+# 🛠️ 安装组件应用 Rust 模板
 
 我们假设您已经在您的系统上安装了[Flutter SDK](https://docs.flutter.dev/get-started/install)，并使用 `flutter create` 命令创建了一个 Flutter 项目。
 
@@ -59,7 +59,7 @@ rustc --version
 flutter doctor
 ```
 
-# 👜 应用模板
+# 👜 应用 Rust 模板
 
 只需在命令行中运行以下命令：
 
