@@ -6,20 +6,9 @@ Flutter アプリを驚くほど高速化するために、簡単に Rust を統
 
 ![プレビュー](https://github.com/cunarist/rust-in-flutter/assets/66480156/be85cf04-2240-497f-8d0d-803c40536d8e)
 
+敏感なビルドファイルの心配なし、開発中の複雑なコード生成も不要です。すべてがスムーズに動作します。
+
 この軽量なフレームワークは、使いやすさ、将来の拡張性、優れたパフォーマンスを考慮して設計されており、裏側の複雑な部分をすべて処理します。このパッケージを Flutter プロジェクトに追加するだけで、Rust のコードを簡単に書くことができます！
-
-## 利点
-
-- Rust の統合：任意のライブラリクレートの使用が可能
-- 既存の Rust クレートをそのまま使用可能
-- CMake、Gradle、Podfile などの機密ビルドファイルを扱う必要なし
-- 開発中の複雑なコード生成なし
-- 多くの労力をかけずに無制限の RESTful API エンドポイントの定義
-- Dart からの簡単なリクエストと Rust からの非同期相互作用
-- Rust から Dart へのストリーミング
-- Dart のホットリスタート時に Rust ロジックを再起動
-- 最小限のオーバーヘッド
-- ネイティブデータ送信時のメモリコピーなし
 
 ## プラットフォームサポート
 
@@ -36,13 +25,11 @@ Flutter アプリを驚くほど高速化するために、簡単に Rust を統
 
 ## Rust の利用理由
 
-Dart は GUI アプリ向けの素晴らしいオブジェクト指向のモダンな言語ですが、ネイティブではないガベージコレクションの言語であるため、そのパフォーマンスが要件を満たさない場合があります。そこで Rust が登場します。Rust のパフォーマンスは、Dart よりもおよそ[2~40 倍高速](https://programming-language-benchmarks.vercel.app/dart-vs-rust)であるとされています。さらに、複数のスレッドを利用する能力も備えています。
+Dart は GUI アプリケーション向けの素晴らしいオブジェクト指向のモダンな言語ですが、ネイティブのガベージコレクションにより、要件を満たすことができない場合があります。そこで、Rust が登場し、Dart よりも約[2~40 倍高速](https://programming-language-benchmarks.vercel.app/dart-vs-rust)であり、さらに複数スレッドを活用することができます。
 
-Rust は、Stack Overflow 上で[最も愛されているプログラミング言語](https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages)と報告されており、そのゼロキャスト抽象哲学による高い生産性とネイティブパフォーマンスが提供されています。
+Rust は Stack Overflow で[最も愛されているプログラミング言語](https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages)として支持されています。そのネイティブなパフォーマンスは、ゼロキャストの抽象化哲学により高い生産性を実現します。多くの開発者は、将来的に Rust が C++の代替となる可能性を予測しています。Rust のシンプルさ、メモリの安全性、さまざまなシナリオでの優れたパフォーマンス、活気あるコミュニティ、堅牢なツールサポートが人気の向上に寄与しています。
 
-もちろん、C や C++もありますが、多くの開発者が[Rust が将来的に C++を置き換える](https://dev.to/roy8/why-rust-will-replace-c-in-the-future-49op)と信じています。Rust が C++よりも人気がある理由はいくつかあります。まず第一に、Rust ははるかにシンプルで学びやすいです。これは、シンプルさと安全性に焦点を当てた設計によるものです。さらに、Rust は多くの場面で C++よりも優れたパフォーマンスを提供します。また、より活発なコミュニティと優れたツールサポートを持っています。
-
-Rust の詳細は[公式の書籍](https://doc.rust-lang.org/book/foreword.html)で学び、理解することができます。
+Rust の世界をさらに探求するには、公式の書籍をご覧ください：[https://doc.rust-lang.org/book/foreword.html](https://doc.rust-lang.org/book/foreword.html)。
 
 # 🛠️ コンポーネントのインストール
 

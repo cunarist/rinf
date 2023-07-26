@@ -6,20 +6,9 @@
 
 ![preview](https://github.com/cunarist/rust-in-flutter/assets/66480156/be85cf04-2240-497f-8d0d-803c40536d8e)
 
+无需烦恼于敏感的构建文件，无需在开发过程中进行复杂的代码生成。一切都已事先准备好，即插即用。
+
 兼具易用性、可拓展性和强悍性能的轻量级框架，在幕后为您默默处理所有问题！只需要在项目依赖中加入这个库，就可以开始编写您的 Rust 代码！
-
-## 优势
-
-- 可集成任意数量的 crates
-- 可以原样使用现有的 crate 包
-- 无需烦心于 CMake、Gradle、Podfile 等繁琐的构建文件
-- 开发过程中没有复杂的代码生成
-- 定义数量无限制的 RESTful API
-- 通过简单的 Dart 请求和 Rust 响应实现异步交互
-- 从 Rust 到 Dart 的 Stream
-- 在 Dart 项目热重载时重启 Rust 逻辑
-- 极小的性能开销
-- 发送 native 数据时没有 memory copy
 
 ## 平台支持
 
@@ -38,7 +27,9 @@
 
 虽然 Dart 是一种出色的、面向对象的、现代化的语言，但由于它具有垃圾回收等特性，性能并不是极致的。这就是 Rust 的用武之地。Rust 的性能被认为比 Dart 快大约[2~40 倍](https://programming-language-benchmarks.vercel.app/dart-vs-rust)(甚至无需使用多线程)。
 
-Rust 是 Stack Overflow 上[最受喜爱的编程语言](https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages)，得益于其零开销抽象哲学和丰富的语法特性，Rust 提供了较高的生产力和性能。您可以通过[相关书籍](https://www.rustwiki.org.cn/)更深入地了解和学习 Rust。
+Rust 在 Stack Overflow 上被评为[最受喜爱的编程语言](https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages)，其原生性能得益于零转换抽象哲学，确保高生产力。许多开发者认为 Rust 有望在未来取代 C++。Rust 的简单性、内存安全性、在各种场景下的优异性能、充满活力的社区以及强大的工具支持共同促使其日益受欢迎。
+
+要深入了解 Rust 的世界，请查阅官方书籍：[https://doc.rust-lang.org/book/foreword.html](https://doc.rust-lang.org/book/foreword.html)。
 
 # 🛠️ 安装组件应用 Rust 模板
 

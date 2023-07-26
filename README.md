@@ -6,24 +6,13 @@ Easily integrate Rust to make your Flutter app blazingly fast!
 
 ![preview](https://github.com/cunarist/rust-in-flutter/assets/66480156/be85cf04-2240-497f-8d0d-803c40536d8e)
 
-Designed with ease of use, future scalability, and exceptional performance in mind, this lightweight framework handles all the complicated aspects behind the scenes. Simply add this package to your Flutter project and you're ready to write Rust!
+No messing with sensitive build files, no complicated code generation during development. It just works out-of-the-box.
 
-## Benefits
-
-- Rust integration with the ability to use an arbitrary number of library crates
-- Being able to use an existing Rust crate as it is
-- No messing with sensitive build files such as CMake, Gradle, Podfile, etc
-- No complicated code generation during development
-- Defining unlimited RESTful API endpoints without much effort
-- Async interaction with easy request from Dart and response from Rust
-- Streaming from Rust to Dart
-- Restarting Rust logic on Dart's hot restart
-- Minimal overhead
-- No memory copy when sending native data
+Designed for ease of use, future scalability, and unparalleled performance, this lightweight framework takes care of all the complexity behind the scenes. Simply add this package to your Flutter project, and you're all set to write Rust!
 
 ## Platform Support
 
-All the challenging build settings are automatically handled by this package. Note that the files in your Flutter project are not affected.
+All the challenging build settings are automatically handled by this package.
 
 - ✅ Linux: Tested and supported
 - ✅ Android: Tested and supported
@@ -32,17 +21,13 @@ All the challenging build settings are automatically handled by this package. No
 - ✅ iOS: Tested and supported
 - ⏸️ Web: Not now [but considered](https://github.com/cunarist/rust-in-flutter/issues/34)
 
-> If you have any suggestions or want to report a bug, please leave it as an [issue](https://github.com/cunarist/rust-in-flutter/issues) or a [pull request](https://github.com/cunarist/rust-in-flutter/pulls). We will try to respond as quickly as possible.
-
 ## Why Use Rust?
 
-While Dart is an amazing object-oriented modern language for GUI apps, its performance sometimes does not meet the requirements because it's non-native garbage-collected language. That's where Rust comes into play. Rust's performance is known to be roughly about [2~40 times faster](https://programming-language-benchmarks.vercel.app/dart-vs-rust) than Dart, not to mention the ability to utilize multiple threads.
+While Dart excels as an amazing object-oriented language for GUI apps, its non-native garbage collection may not always meet demanding performance requirements. This is where Rust steps in, offering an incredible speed advantage of roughly [2~40 times faster](https://programming-language-benchmarks.vercel.app/dart-vs-rust) than Dart, alongside the ability to leverage multiple threads.
 
-Rust is reported to be [the most loved programming language](https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages) on Stack Overflow, providing high productivity along with its native performance thanks to its zero-cast abstraction philosophy.
+Rust has garnered a devoted following, being [the most loved programming language](https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages) on Stack Overflow. Its native performance, thanks to the zero-cast abstraction philosophy, ensures high productivity. Many developers foresee Rust potentially replacing C++ in the future. Rust's simplicity, memory safety, superior performance in various scenarios, vibrant community, and robust tooling support contribute to its growing popularity.
 
-Of course, there are C and C++, but many developers believe that [Rust will eventually replace C++](https://dev.to/roy8/why-rust-will-replace-c-in-the-future-49op) as the go to programming language. There are many reasons why Rust is becoming more popular than C++. First of all, it’s much simpler and easier to learn. This is due to its design, which is focused on simplicity and memory safety. Additionally, Rust offers better performance than C++ in many cases. It also has a more active community and better tooling support.
-
-You can read and learn Rust more [at the official book](https://doc.rust-lang.org/book/foreword.html).
+To delve deeper into the world of Rust, check out the official book: [https://doc.rust-lang.org/book/foreword.html](https://doc.rust-lang.org/book/foreword.html).
 
 # 🛠️ Installing Components
 
