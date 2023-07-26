@@ -1,3 +1,7 @@
+## 1.6.2
+
+- Filled in missing translations.
+
 ## 1.6.1
 
 - Slightly improved guide sections.
