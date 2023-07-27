@@ -1,3 +1,8 @@
+## 1.6.6
+
+- Improved guides.
+- Now, the template application command will check if the current directory is a Flutter project first.
+
 ## 1.6.5
 
 - Improved guides.
