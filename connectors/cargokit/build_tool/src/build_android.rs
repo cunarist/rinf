@@ -100,6 +100,8 @@ const ARCH: &str = "darwin-x86_64";
 const ARCH: &str = "linux-x86_64";
 #[cfg(target_os = "windows")]
 const ARCH: &str = "windows-x86_64";
+#[cfg(target_os = "unknown")]
+const ARCH: &str = "";
 
 #[cfg(target_os = "windows")]
 const CLANG_TOOL_EXTENSION: &str = ".cmd";
