@@ -19,7 +19,7 @@ Rust를 활용해서 Flutter 앱의 속도를 극적으로 향상시켜 보세�
 - ✅ Windows: 지원 및 작동 확인됨
 - ✅ macOS: 지원 및 작동 확인됨
 - ✅ iOS: 지원 및 작동 확인됨
-- ⏸️ Web: 현재는 미지원이나 [고려 중](https://github.com/cunarist/rust-in-flutter/issues/34)
+- ✅ Web: 지원 및 작동 확인됨
 
 ## 왜 Rust를 사용해야 할까요?
 

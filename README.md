@@ -19,7 +19,7 @@ All the challenging build settings are automatically handled by this package.
 - ✅ Windows: Tested and supported
 - ✅ macOS: Tested and supported
 - ✅ iOS: Tested and supported
-- ⏸️ Web: Not now [but considered](https://github.com/cunarist/rust-in-flutter/issues/34)
+- ✅ Web: Tested and supported
 
 ## Why Use Rust?
 

@@ -19,7 +19,7 @@ Flutter アプリを驚くほど高速化するために、簡単に Rust を統
 - ✅ Windows：テスト済みサポート
 - ✅ macOS：テスト済みサポート
 - ✅ iOS：テスト済みサポート
-- ⏸️ Web：現時点ではサポートされていません [検討中](https://github.com/cunarist/rust-in-flutter/issues/34)
+- ✅ Web：テスト済みサポート
 
 ## Rust の利用理由
 

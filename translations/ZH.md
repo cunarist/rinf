@@ -19,7 +19,7 @@
 - ✅ Windows: 支持，已完成测试
 - ✅ macOS: 支持，已完成测试
 - ✅ iOS: 支持，已完成测试
-- ⏸️ Web: 暂不支持，但正在[积极筹划](https://github.com/cunarist/rust-in-flutter/issues/34)
+- ✅ Web: 支持，已完成测试
 
 ## 为什么使用 Rust？
 
