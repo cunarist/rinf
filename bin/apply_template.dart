@@ -12,21 +12,29 @@ void main() async {
   if (packageConfig == null) {
     return;
   }
-  final packageName = "rust_in_flutter";
+  final packageName = 'rust_in_flutter';
   final package = packageConfig.packages.firstWhere(
     (p) => p.name == packageName,
   );
   final packagePath = package.root.toFilePath();
 
+  // Check if current folder is a Flutter project.
+  final mainFile = File('$projectPath/lib/main.dart');
+  final isFlutterProject = await mainFile.exists();
+  if (!isFlutterProject) {
+    print("\nThis folder doesn't look like a Flutter project. Aborting...\n");
+    return;
+  }
+
   // Copy the `native` folder
-  final source = Directory('$packagePath/example/native');
-  final destination = Directory('$projectPath/native');
-  _copyDirectory(source, destination);
+  final templateSource = Directory('$packagePath/example/native');
+  final templateDestination = Directory('$projectPath/native');
+  _copyDirectory(templateSource, templateDestination);
 
   // Copy `Cargo.toml`
-  final sourceFile = File('$packagePath/example/Cargo.toml');
-  final destinationFile = File('$projectPath/Cargo.toml');
-  sourceFile.copySync(destinationFile.path);
+  final cargoSource = File('$packagePath/example/Cargo.toml');
+  final cargoDestination = File('$projectPath/Cargo.toml');
+  cargoSource.copySync(cargoDestination.path);
 
   // Add some lines to `.gitignore`
   final sectionTop = '# Rust related';
@@ -35,10 +43,10 @@ void main() async {
   try {
     contents = gitignoreFile.readAsStringSync();
   } on FileSystemException {
-    contents = "";
+    contents = '';
   }
   var doesRustSectionExist = false;
-  var splitted = contents.split("\n\n");
+  var splitted = contents.split('\n\n');
   splitted = splitted.map((s) => s.trim()).toList();
   for (final piece in splitted) {
     if (piece.contains(sectionTop)) {
@@ -58,7 +66,6 @@ void main() async {
 
   // Modify `./lib/main.dart`
   await Process.run('dart', ['format', './lib/main.dart']);
-  final mainFile = File('$projectPath/lib/main.dart');
   var mainText = mainFile.readAsStringSync();
   if (!mainText.contains('package:rust_in_flutter/rust_in_flutter.dart')) {
     mainText = mainText.replaceFirst(
@@ -80,6 +87,8 @@ void main() async {
   }
   mainFile.writeAsStringSync(mainText);
   await Process.run('dart', ['format', './lib/main.dart']);
+
+  print("\n🎉 Rust template is now ready! 🎉 \n");
 }
 
 void _copyDirectory(Directory source, Directory destination) {
