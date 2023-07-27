@@ -31,7 +31,7 @@ Rust の世界をさらに探求するには、公式の書籍をご覧くださ
 
 # 🛠️ Rust ツールチェーンのインストール
 
-このセクションでは、システムに[Flutter SDK](https://docs.flutter.dev/get-started/install)がインストールされていることを前提としています。
+> このセクションでは、システムに[Flutter SDK](https://docs.flutter.dev/get-started/install)がインストールされていることを前提としています。
 
 Rust ツールチェーンのインストールは非常に簡単です。[公式のインストールページ](https://www.rust-lang.org/tools/install)にアクセスして、指示に従うだけです。
 
@@ -44,7 +44,7 @@ flutter doctor
 
 # 👜 Rust のテンプレートを適用する
 
-このセクションでは、既に Flutter プロジェクトを作成したことを前提としています。まだ作成していない場合は、[この素晴らしい公式チュートリアル](https://docs.flutter.dev/get-started/codelab)に従ってプロジェクトを作成してください。
+> このセクションでは、既に Flutter プロジェクトを作成したことを前提としています。まだ作成していない場合は、[この素晴らしい公式チュートリアル](https://docs.flutter.dev/get-started/codelab)に従ってプロジェクトを作成してください。
 
 まず、このパッケージを Flutter プロジェクトに追加します。
 
@@ -379,23 +379,23 @@ Rust から Dart に毎秒増加する数値を送信したいとします。こ
 
    理想的には、**Flutter**がクロスプラットフォームのユーザーインターフェースを担当し、**Rust**がビジネスロジックを扱うようにします。フロントエンドとバックエンドを完全に分離することができ、Dart と Rust のコードが互いに切り離すことができます。これらの 2 つの世界はストリームを介して通信します。
 
-2. Dart と Rust の間でデータはどのように渡されますか？
+1. Dart と Rust の間でデータはどのように渡されますか？
 
    Dart と Rust の間で送信されるデータは基本的にバイト配列です。Dart では`Uint8List`として、Rust では`Vec<u8>`として表現されます。MessagePack シリアル化の使用をお勧めしますが、高解像度の画像やファイルデータなど、任意の種類のバイトデータを送信することができます。必要な詳細がない場合は、空のバイト配列を送信することもできます。
 
-3. "MessagePack"とは何で、なぜ推奨されていますか？
+1. "MessagePack"とは何で、なぜ推奨されていますか？
 
    MessagePack は JSON に似たネストされたバイナリ構造であり、より高速でより小さいです。MessagePack は JSON よりも[より多くの種類](https://github.com/msgpack/msgpack/blob/master/spec.md#type-system)の内部データをサポートしており、バイナリも含まれます。他に理由がない限り、Dart と Rust の間で送信されるメッセージをシリアル化するために、Rust のテンプレートで提供される MessagePack を使用してください。
 
-4. Rust クレートから生成されたライブラリファイルはどこにありますか？
+1. Rust クレートから生成されたライブラリファイルはどこにありますか？
 
    Rust-In-Flutter のすべてのビルド設定により、Rust クレートからコンパイルされたすべてのライブラリファイルが最終ビルドに適切に含まれ、配布の準備が整います。そのため、ライブラリファイルをバンドルする必要はありません。
 
-5. Android アプリのビルドに失敗しました。どうすればよいですか？
+1. Android アプリのビルドに失敗しました。どうすればよいですか？
 
    Android アプリでは、[この問題](https://github.com/rust-lang/rust/pull/85806)のために Rust 1.68 以上を使用する必要があります。また、`./android/app/build.gradle`ファイルに`ndkVersion`変数が存在している必要がありますが、Flutter SDK 3.7 以前で Flutter プロジェクトを作成した場合には欠落している可能性があります。この問題を解決するには、[このディスカッション](https://github.com/cunarist/rust-in-flutter/discussions/60)を参照してください。
 
-6. 助けを求める場所はどこですか？
+1. 助けを求める場所はどこですか？
 
    問題に遭遇した場合は、[ディスカッションページ](https://github.com/cunarist/rust-in-flutter/discussions)を訪れ、アシスタンスを求めるための Q&A スレッドを開いて自由に質問してください。追加のガイドを読み、質問をするためにこのページを訪れてください。
 

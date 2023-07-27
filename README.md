@@ -31,7 +31,7 @@ To delve deeper into the world of Rust, check out the official book: [https://do
 
 # 🛠️ Installing Rust Toolchain
 
-This section assumes that [Flutter SDK](https://docs.flutter.dev/get-started/install) is installed on your system.
+> This section assumes that [Flutter SDK](https://docs.flutter.dev/get-started/install) is installed on your system.
 
 Installing Rust toolchain is very easy. Just head over to the [official installation page](https://www.rust-lang.org/tools/install) and follow the instructions.
 
@@ -44,7 +44,7 @@ flutter doctor
 
 # 👜 Applying Rust Template
 
-This section assumes that you've already created a Flutter project. If you haven't, go ahead and make one following [this awesome official tutorial](https://docs.flutter.dev/get-started/codelab).
+> This section assumes that you've already created a Flutter project. If you haven't, go ahead and make one following [this awesome official tutorial](https://docs.flutter.dev/get-started/codelab).
 
 First of all, add this package to your Flutter project.
 
@@ -377,23 +377,23 @@ Finally, receive the signals in Dart with `StreamBuilder`, filter them by addres
 
    Ideally, **Flutter** would deal with the cross-platform user interface while **Rust** handles the business logic. The front-end and back-end can be completely separated, meaning that Dart and Rust codes are detachable from each other.
 
-2. How are data passed between Dart and Rust?
+1. How are data passed between Dart and Rust?
 
    Data being sent between Dart and Rust are basically bytes arrays, represented as `Uint8List` in Dart and `Vec<u8>` in Rust. Though using MessagePack serialization is recommended, you can send any kind of bytes data as you wish such as a high-resolution image or some kind of file data, or just toss in a blank bytes array if you don't need additional details.
 
-3. What is "MessagePack" and why is it recommended?
+1. What is "MessagePack" and why is it recommended?
 
    MessagePack is a nested binary structure similar to JSON, but faster and smaller. MessagePack also supports [more types](https://github.com/msgpack/msgpack/blob/master/spec.md#type-system) of inner data compared to JSON, including binaries. Use MessagePack for serializing messages sent between Dart and Rust as provided by the Rust template unless you have other reasons not to do so.
 
-4. Where are the library files generated from Rust crates?
+1. Where are the library files generated from Rust crates?
 
    All build settings of Rust-In-Flutter ensures that all library files compiled from Rust crates are properly included in the final build, ready to be distributed. Therefore you do not need to worry about bundling library files.
 
-5. Android app build has failed. What should I do?
+1. Android app build has failed. What should I do?
 
    For Android apps, you should be using Rust 1.68 or higher due to [this issue](https://github.com/rust-lang/rust/pull/85806). Also, variable `ndkVersion` should be present in `./android/app/build.gradle` file, but it may be missing if you've created your Flutter project with Flutter SDK 3.7 and earlier. Visit [this discussion](https://github.com/cunarist/rust-in-flutter/discussions/60) to solve this problem.
 
-6. Where should I ask for help?
+1. Where should I ask for help?
 
    If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/rust-in-flutter/discussions) and open a Q&A thread for assistance. Please visit this page to read additional guides and ask questions.
 
