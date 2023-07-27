@@ -373,29 +373,29 @@ Finally, receive the signals in Dart with `StreamBuilder`, filter them by addres
 
 # ✋ FAQ
 
-1. When should I use Rust?
+**Q** . When should I use Rust?
 
-   Ideally, **Flutter** would deal with the cross-platform user interface while **Rust** handles the business logic. The front-end and back-end can be completely separated, meaning that Dart and Rust codes are detachable from each other.
+**A** . Ideally, **Flutter** would deal with the cross-platform user interface while **Rust** handles the business logic. The front-end and back-end can be completely separated, meaning that Dart and Rust codes are detachable from each other.
 
-1. How are data passed between Dart and Rust?
+**Q** .How are data passed between Dart and Rust?
 
-   Data being sent between Dart and Rust are basically bytes arrays, represented as `Uint8List` in Dart and `Vec<u8>` in Rust. Though using MessagePack serialization is recommended, you can send any kind of bytes data as you wish such as a high-resolution image or some kind of file data, or just toss in a blank bytes array if you don't need additional details.
+**A** . Data being sent between Dart and Rust are basically bytes arrays, represented as `Uint8List` in Dart and `Vec<u8>` in Rust. Though using MessagePack serialization is recommended, you can send any kind of bytes data as you wish such as a high-resolution image or some kind of file data, or just toss in a blank bytes array if you don't need additional details.
 
-1. What is "MessagePack" and why is it recommended?
+**Q** .What is "MessagePack" and why is it recommended?
 
-   MessagePack is a nested binary structure similar to JSON, but faster and smaller. MessagePack also supports [more types](https://github.com/msgpack/msgpack/blob/master/spec.md#type-system) of inner data compared to JSON, including binaries. Use MessagePack for serializing messages sent between Dart and Rust as provided by the Rust template unless you have other reasons not to do so.
+**A** . MessagePack is a nested binary structure similar to JSON, but faster and smaller. MessagePack also supports [more types](https://github.com/msgpack/msgpack/blob/master/spec.md#type-system) of inner data compared to JSON, including binaries. Use MessagePack for serializing messages sent between Dart and Rust as provided by the Rust template unless you have other reasons not to do so.
 
-1. Where are the library files generated from Rust crates?
+**Q** .Where are the library files generated from Rust crates?
 
-   All build settings of Rust-In-Flutter ensures that all library files compiled from Rust crates are properly included in the final build, ready to be distributed. Therefore you do not need to worry about bundling library files.
+**A** . All build settings of Rust-In-Flutter ensures that all library files compiled from Rust crates are properly included in the final build, ready to be distributed. Therefore you do not need to worry about bundling library files.
 
-1. Android app build has failed. What should I do?
+**Q** .Android app build has failed. What should I do?
 
-   For Android apps, you should be using Rust 1.68 or higher due to [this issue](https://github.com/rust-lang/rust/pull/85806). Also, variable `ndkVersion` should be present in `./android/app/build.gradle` file, but it may be missing if you've created your Flutter project with Flutter SDK 3.7 and earlier. Visit [this discussion](https://github.com/cunarist/rust-in-flutter/discussions/60) to solve this problem.
+**A** . For Android apps, you should be using Rust 1.68 or higher due to [this issue](https://github.com/rust-lang/rust/pull/85806). Also, variable `ndkVersion` should be present in `./android/app/build.gradle` file, but it may be missing if you've created your Flutter project with Flutter SDK 3.7 and earlier. Visit [this discussion](https://github.com/cunarist/rust-in-flutter/discussions/60) to solve this problem.
 
-1. Where should I ask for help?
+**Q** .Where should I ask for help?
 
-   If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/rust-in-flutter/discussions) and open a Q&A thread for assistance. Please visit this page to read additional guides and ask questions.
+**A** . If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/rust-in-flutter/discussions) and open a Q&A thread for assistance. Please visit this page to read additional guides and ask questions.
 
 # ☕ Support Us
 

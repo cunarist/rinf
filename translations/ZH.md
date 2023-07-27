@@ -371,29 +371,29 @@ flutter: ZERO-COST ABSTRACTION
 
 ## ✋ 常见问题
 
-1. 我应该在何时使用 Rust?
+**Q** .我应该在何时使用 Rust?
 
-   在理想情况下，**Flutter** 将处理 GUI 界面，而 **Rust** 负责底层业务逻辑。前端和后端可以完全分离，这意味着 Dart 和 Rust 代码可以相互独立。
+**A** . 在理想情况下，**Flutter** 将处理 GUI 界面，而 **Rust** 负责底层业务逻辑。前端和后端可以完全分离，这意味着 Dart 和 Rust 代码可以相互独立。
 
-1. Dart 和 Rust 代码之间通过什么数据类型传递数据?
+**Q** .Dart 和 Rust 代码之间通过什么数据类型传递数据?
 
-   在 Dart 和 Rust 之间传递的数据一般是字节数组(bytes array)，Dart 中称之为 `Uint8List`，而 Rust 中称之为`Vec<u8>`。虽然我们推荐使用`MessagePack`进行序列化，但您也可以发送任何类型的字节数据，例如高分辨率图像或某种文件。若您不需要发送额外的数据信息，可以直接发送一个空的字节数组。
+**A** . 在 Dart 和 Rust 之间传递的数据一般是字节数组(bytes array)，Dart 中称之为 `Uint8List`，而 Rust 中称之为`Vec<u8>`。虽然我们推荐使用`MessagePack`进行序列化，但您也可以发送任何类型的字节数据，例如高分辨率图像或某种文件。若您不需要发送额外的数据信息，可以直接发送一个空的字节数组。
 
-1. 什么是 MessagePack?我们的项目为何使用它?
+**Q** .什么是 MessagePack?我们的项目为何使用它?
 
-   我们使用[MessagePack](https://msgpack.org/)来序列化 Dart 和 Rust 之间发送的消息(正如 Rust 模板代码中所呈现的那样)，除非您有其他理由不这么做。MessagePack 是一种嵌套的二进制结构，类似于 JSON，但速度更快、体积更小。MessagePack 也支持比 JSON 更多类型的内部数据，包括二进制数据。您可以在 [这个链接](https://github.com/msgpack/msgpack/blob/master/spec.md#type-system) 里查看详细的类型系统规范。
+**A** . 我们使用[MessagePack](https://msgpack.org/)来序列化 Dart 和 Rust 之间发送的消息(正如 Rust 模板代码中所呈现的那样)，除非您有其他理由不这么做。MessagePack 是一种嵌套的二进制结构，类似于 JSON，但速度更快、体积更小。MessagePack 也支持比 JSON 更多类型的内部数据，包括二进制数据。您可以在 [这个链接](https://github.com/msgpack/msgpack/blob/master/spec.md#type-system) 里查看详细的类型系统规范。
 
-1. Rust 项目生成的动态链接库在哪儿?
+**Q** .Rust 项目生成的动态链接库在哪儿?
 
-   Rust-In-Flutter 确保了从 Rust crates 编译的所有库文件能被正确地包含在最终构建的产物中，并已准备好通过 Flutter 应用进行分发。因此，您无需考虑如何打包出动态库以及应该把它放到哪儿的问题。
+**A** . Rust-In-Flutter 确保了从 Rust crates 编译的所有库文件能被正确地包含在最终构建的产物中，并已准备好通过 Flutter 应用进行分发。因此，您无需考虑如何打包出动态库以及应该把它放到哪儿的问题。
 
-1. 打包 Android 应用时出现了问题?
+**Q** .打包 Android 应用时出现了问题?
 
-   对于 Android 应用，您应该使用 Rust 1.68 或更高版本，具体原因可以查看[这里](https://github.com/rust-lang/rust/pull/85806)。另外，`./android/app/build.gradle`中的`ndkVersion`变量可能需要修改。如果您使用 Flutter SDK 3.7 或更早的版本创建了 Flutter 项目，也可能会缺少该变量。请访问[这里](https://github.com/cunarist/rust-in-flutter/discussions/60)来解决这个问题。
+**A** . 对于 Android 应用，您应该使用 Rust 1.68 或更高版本，具体原因可以查看[这里](https://github.com/rust-lang/rust/pull/85806)。另外，`./android/app/build.gradle`中的`ndkVersion`变量可能需要修改。如果您使用 Flutter SDK 3.7 或更早的版本创建了 Flutter 项目，也可能会缺少该变量。请访问[这里](https://github.com/cunarist/rust-in-flutter/discussions/60)来解决这个问题。
 
-1. 您遇到了其他的问题?
+**Q** .您遇到了其他的问题?
 
-   在 Rust 中使用各种不同的构建目标时，也许会遇到问题。不管遇到任何情况，您可以随时到[讨论页](https://github.com/cunarist/rust-in-flutter/discussions)发起一个 Q&A 来寻求帮助！请访问该页面以阅读额外的指南并提问。
+**A** . 在 Rust 中使用各种不同的构建目标时，也许会遇到问题。不管遇到任何情况，您可以随时到[讨论页](https://github.com/cunarist/rust-in-flutter/discussions)发起一个 Q&A 来寻求帮助！请访问该页面以阅读额外的指南并提问。
 
 # ☕ 支持我们
 

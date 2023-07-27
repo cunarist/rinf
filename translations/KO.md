@@ -373,29 +373,29 @@ Rust에서 Dart로 매 초마다 증가하는 숫자를 보내고 싶다고 가�
 
 # ✋ 자주 묻는 질문 (FAQ)
 
-1. Rust를 언제 사용해야 하나요?
+**Q** .Rust를 언제 사용해야 하나요?
 
-   이상적으로는 Flutter가 크로스 플랫폼 사용자 인터페이스를 처리하고 Rust가 비즈니스 로직을 담당할 것입니다. 프론트엔드와 백엔드는 완전히 구분되어 있으며 Dart와 Rust 코드는 서로 분리되는 것이 가능합니다.
+**A** . 이상적으로는 Flutter가 크로스 플랫폼 사용자 인터페이스를 처리하고 Rust가 비즈니스 로직을 담당할 것입니다. 프론트엔드와 백엔드는 완전히 구분되어 있으며 Dart와 Rust 코드는 서로 분리되는 것이 가능합니다.
 
-1. Dart와 Rust 사이에서 데이터는 어떻게 전달되나요?
+**Q** .Dart와 Rust 사이에서 데이터는 어떻게 전달되나요?
 
-   Dart와 Rust 사이에서 전송되는 데이터는 기본적으로 바이트 배열입니다. 이는 Dart에서는 `Uint8List`로, Rust에서는 `Vec<u8>`로 표현됩니다. 추천되는 메시지 직렬화 방식은 MessagePack이지만, 고해상도 이미지 또는 파일 데이터 등 다른 종류의 바이트 데이터도 전송할 수 있습니다. 아무 정보도 포함시킬 필요가 없다면 빈 바이트 배열을 담으면 됩니다.
+**A** . Dart와 Rust 사이에서 전송되는 데이터는 기본적으로 바이트 배열입니다. 이는 Dart에서는 `Uint8List`로, Rust에서는 `Vec<u8>`로 표현됩니다. 추천되는 메시지 직렬화 방식은 MessagePack이지만, 고해상도 이미지 또는 파일 데이터 등 다른 종류의 바이트 데이터도 전송할 수 있습니다. 아무 정보도 포함시킬 필요가 없다면 빈 바이트 배열을 담으면 됩니다.
 
-1. "MessagePack"은 무엇이며, 왜 권장되나요?
+**Q** ."MessagePack"은 무엇이며, 왜 권장되나요?
 
-   MessagePack은 JSON과 유사한 구조지만, Binary이며 JSON보다 더 빠르고 더 작은 크기를 가집니다. 또한, MessagePack는 JSON에 비해 [더 많은 타입](https://github.com/msgpack/msgpack/blob/master/spec.md#type-system)을 지원합니다. Dart와 Rust 간에 전송되는 메시지의 직렬화에는 [MessagePack](https://msgpack.org/)을 사용하세요. 이는 Rust 템플릿에서 기본적으로 제공되며, 다른 이유가 없다면 MessagePack을 사용하는 것이 좋습니다.
+**A** . MessagePack은 JSON과 유사한 구조지만, Binary이며 JSON보다 더 빠르고 더 작은 크기를 가집니다. 또한, MessagePack는 JSON에 비해 [더 많은 타입](https://github.com/msgpack/msgpack/blob/master/spec.md#type-system)을 지원합니다. Dart와 Rust 간에 전송되는 메시지의 직렬화에는 [MessagePack](https://msgpack.org/)을 사용하세요. 이는 Rust 템플릿에서 기본적으로 제공되며, 다른 이유가 없다면 MessagePack을 사용하는 것이 좋습니다.
 
-1. Rust crate들로부터 생성된 라이브러리 파일들은 어디에 있나요?
+**Q** .Rust crate들로부터 생성된 라이브러리 파일들은 어디에 있나요?
 
-   Rust-In-Flutter의 빌드 설정은 Rust crate들로부터 컴파일된 모든 라이브러리 파일들이 최종 빌드에 올바르게 포함되어 배포 준비가 되었음을 보장합니다. 따라서 라이브러리 파일을 번들링하는 것에 대해 걱정할 필요는 없습니다.
+**A** . Rust-In-Flutter의 빌드 설정은 Rust crate들로부터 컴파일된 모든 라이브러리 파일들이 최종 빌드에 올바르게 포함되어 배포 준비가 되었음을 보장합니다. 따라서 라이브러리 파일을 번들링하는 것에 대해 걱정할 필요는 없습니다.
 
-1. 안드로이드 앱을 빌드하는 데에 실패했습니다. 어떻게 해야 하나요?
+**Q** .안드로이드 앱을 빌드하는 데에 실패했습니다. 어떻게 해야 하나요?
 
-   안드로이드 앱을 빌드하려면 [이 이슈](https://github.com/rust-lang/rust/pull/85806)로 인해 Rust 1.68 이상을 사용해야 합니다. 또한 `./android/app/build.gradle` 파일에 `ndkVersion` 변수가 존재해야 하지만, 해당 Flutter 프로젝트를 Flutter SDK 3.7 이하 버전으로 생성했다면 이 변수가 누락되어 있을 수 있습니다. 이 문제를 해결하려면 [이 토론](https://github.com/cunarist/rust-in-flutter/discussions/60)를 참고하세요.
+**A** . 안드로이드 앱을 빌드하려면 [이 이슈](https://github.com/rust-lang/rust/pull/85806)로 인해 Rust 1.68 이상을 사용해야 합니다. 또한 `./android/app/build.gradle` 파일에 `ndkVersion` 변수가 존재해야 하지만, 해당 Flutter 프로젝트를 Flutter SDK 3.7 이하 버전으로 생성했다면 이 변수가 누락되어 있을 수 있습니다. 이 문제를 해결하려면 [이 토론](https://github.com/cunarist/rust-in-flutter/discussions/60)를 참고하세요.
 
-1. 도움이 필요할 땐 어떻게 하나요?
+**Q** .도움이 필요할 땐 어떻게 하나요?
 
-   문제가 발생했다면 [토론 페이지](https://github.com/cunarist/rust-in-flutter/discussions)에서 Q&A 스레드를 열고 도움을 받으실 수 있습니다. 추가적인 안내를 읽거나 소통이 필요할 땐 이곳을 방문해 주세요.
+**A** . 문제가 발생했다면 [토론 페이지](https://github.com/cunarist/rust-in-flutter/discussions)에서 Q&A 스레드를 열고 도움을 받으실 수 있습니다. 추가적인 안내를 읽거나 소통이 필요할 땐 이곳을 방문해 주세요.
 
 # ☕ 개발 지원하기
 
