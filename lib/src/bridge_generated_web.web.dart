@@ -6,10 +6,10 @@ import "bridge_definitions.dart";
 import 'dart:convert';
 import 'dart:async';
 import 'package:meta/meta.dart';
-import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
+import 'frb_engine/flutter_rust_bridge.dart';
 import 'package:uuid/uuid.dart';
-import 'bridge_generated.dart';
-export 'bridge_generated.dart';
+import 'bridge_generated_web.dart';
+export 'bridge_generated_web.dart';
 
 class BridgePlatform extends FlutterRustBridgeBase<BridgeWire>
     with FlutterRustBridgeSetupMixin {
@@ -68,14 +68,14 @@ class BridgeWasmModule implements WasmModule {
   external dynamic /* void */ wire_prepare_rust_response_stream(
       NativePortType port_);
 
-  external dynamic /* void */ wire_prepare_channels();
+  external dynamic /* void */ wire_prepare_channels(NativePortType port_);
 
   external dynamic /* void */ wire_check_rust_streams(NativePortType port_);
 
   external dynamic /* void */ wire_start_rust_logic(NativePortType port_);
 
   external dynamic /* void */ wire_request_to_rust(
-      List<dynamic> request_unique);
+      NativePortType port_, List<dynamic> request_unique);
 }
 
 // Section: WASM wire connector
@@ -90,8 +90,8 @@ class BridgeWire extends FlutterRustBridgeWasmWireBase<BridgeWasmModule> {
   void wire_prepare_rust_response_stream(NativePortType port_) =>
       wasmModule.wire_prepare_rust_response_stream(port_);
 
-  dynamic /* void */ wire_prepare_channels() =>
-      wasmModule.wire_prepare_channels();
+  void wire_prepare_channels(NativePortType port_) =>
+      wasmModule.wire_prepare_channels(port_);
 
   void wire_check_rust_streams(NativePortType port_) =>
       wasmModule.wire_check_rust_streams(port_);
@@ -99,6 +99,7 @@ class BridgeWire extends FlutterRustBridgeWasmWireBase<BridgeWasmModule> {
   void wire_start_rust_logic(NativePortType port_) =>
       wasmModule.wire_start_rust_logic(port_);
 
-  dynamic /* void */ wire_request_to_rust(List<dynamic> request_unique) =>
-      wasmModule.wire_request_to_rust(request_unique);
+  void wire_request_to_rust(
+          NativePortType port_, List<dynamic> request_unique) =>
+      wasmModule.wire_request_to_rust(port_, request_unique);
 }

@@ -6,15 +6,17 @@ edition = "2021"
 [lib]
 crate-type = ["lib", "cdylib", "staticlib"]
 
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+tokio = { version = "1.28.2", features = ["rt-multi-thread"] }
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+wasm-bindgen-futures = "0.4.37"
+
 [dependencies]
-# Published
-flutter_rust_bridge = { version = "1.79.0", features = [
-    "worker-single",
-    "zero-copy",
-] }
-tokio = { version = "1.28.2", features = ["full"] }
+frb_engine = { path = "../frb_engine" }
+tokio = { version = "1.28.2", features = ["sync", "macros"] }
+async-std = "1.12.0"
 serde = { version = "1.0.164", features = ["derive"] }
 rmp-serde = "1.1.1"
 lazy_static = "1.4.0"
-# In workspace
 sample_crate = { path = "../sample_crate" }

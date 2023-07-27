@@ -12,13 +12,24 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
   plugin_platform_interface: ^2.0.2
   ffi: ^2.0.2
-  flutter_rust_bridge: ^1.79.0
   uuid: ^3.0.7
   meta: ^1.8.0
   package_config: ^2.1.0
   path: ^1.8.3
+  js: ^0.6.4
+  args: ^2.3.1
+  build_cli_annotations: ^2.1.0
+  puppeteer: ^3.1.1
+  shelf: ^1.3.2
+  shelf_static: ^1.1.1
+  shelf_web_socket: ^1.0.2
+  web_socket_channel: ^2.2.0
+  yaml: ^3.1.1
+  tuple: ^2.0.1
 
 dev_dependencies:
   ffigen: ^8.0.0
@@ -55,6 +66,9 @@ flutter:
         ffiPlugin: true
       windows:
         ffiPlugin: true
+      web:
+        pluginClass: RustInFlutterWeb
+        fileName: rust_in_flutter_web.dart
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:

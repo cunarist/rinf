@@ -13,12 +13,19 @@
 
 use crate::bridge::api::*;
 use core::panic::UnwindSafe;
-use flutter_rust_bridge::rust2dart::IntoIntoDart;
-use flutter_rust_bridge::*;
+use frb_engine::rust2dart::IntoIntoDart;
+use frb_engine::*;
 use std::ffi::c_void;
 use std::sync::Arc;
 
 // Section: imports
+
+use crate::bridge::api::RustOperation;
+use crate::bridge::api::RustRequest;
+use crate::bridge::api::RustRequestUnique;
+use crate::bridge::api::RustResponse;
+use crate::bridge::api::RustResponseUnique;
+use crate::bridge::api::RustSignal;
 
 // Section: wire functions
 
@@ -200,13 +207,6 @@ impl rust2dart::IntoIntoDart<RustSignal> for RustSignal {
 support::lazy_static! {
     pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler = Default::default();
 }
-
-/// cbindgen:ignore
-#[cfg(target_family = "wasm")]
-#[path = "bridge_generated.web.rs"]
-mod web;
-#[cfg(target_family = "wasm")]
-pub use web::*;
 
 #[cfg(not(target_family = "wasm"))]
 #[path = "bridge_generated.io.rs"]

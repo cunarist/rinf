@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
-use flutter_rust_bridge::StreamSink;
-use flutter_rust_bridge::SyncReturn;
+use frb_engine::StreamSink;
+use frb_engine::SyncReturn;
 use lazy_static::lazy_static;
 use std::cell::RefCell;
 use std::sync::Arc;
@@ -138,7 +138,10 @@ pub fn check_rust_streams() -> bool {
 /// Start the main function of Rust.
 pub fn start_rust_logic() {
     // Thread 1 running Rust
+    #[cfg(not(target_family = "wasm"))]
     crate::main();
+    #[cfg(target_family = "wasm")]
+    wasm_bindgen_futures::spawn_local(crate::main());
 }
 
 /// Send a request to Rust and receive a response in Dart.

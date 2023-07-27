@@ -6,10 +6,10 @@ import "bridge_definitions.dart";
 import 'dart:convert';
 import 'dart:async';
 import 'package:meta/meta.dart';
-import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
+import 'frb_engine/flutter_rust_bridge.dart';
 import 'package:uuid/uuid.dart';
-import 'bridge_generated.dart';
-export 'bridge_generated.dart';
+import 'bridge_generated_web.dart';
+export 'bridge_generated_web.dart';
 import 'dart:ffi' as ffi;
 
 class BridgePlatform extends FlutterRustBridgeBase<BridgeWire> {
@@ -84,76 +84,6 @@ class BridgeWire implements FlutterRustBridgeWireBase {
       ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
           lookup)
       : _lookup = lookup;
-
-  void store_dart_post_cobject(
-    DartPostCObjectFnType ptr,
-  ) {
-    return _store_dart_post_cobject(
-      ptr,
-    );
-  }
-
-  late final _store_dart_post_cobjectPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(DartPostCObjectFnType)>>(
-          'store_dart_post_cobject');
-  late final _store_dart_post_cobject = _store_dart_post_cobjectPtr
-      .asFunction<void Function(DartPostCObjectFnType)>();
-
-  Object get_dart_object(
-    int ptr,
-  ) {
-    return _get_dart_object(
-      ptr,
-    );
-  }
-
-  late final _get_dart_objectPtr =
-      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.UintPtr)>>(
-          'get_dart_object');
-  late final _get_dart_object =
-      _get_dart_objectPtr.asFunction<Object Function(int)>();
-
-  void drop_dart_object(
-    int ptr,
-  ) {
-    return _drop_dart_object(
-      ptr,
-    );
-  }
-
-  late final _drop_dart_objectPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.UintPtr)>>(
-          'drop_dart_object');
-  late final _drop_dart_object =
-      _drop_dart_objectPtr.asFunction<void Function(int)>();
-
-  int new_dart_opaque(
-    Object handle,
-  ) {
-    return _new_dart_opaque(
-      handle,
-    );
-  }
-
-  late final _new_dart_opaquePtr =
-      _lookup<ffi.NativeFunction<ffi.UintPtr Function(ffi.Handle)>>(
-          'new_dart_opaque');
-  late final _new_dart_opaque =
-      _new_dart_opaquePtr.asFunction<int Function(Object)>();
-
-  int init_frb_dart_api_dl(
-    ffi.Pointer<ffi.Void> obj,
-  ) {
-    return _init_frb_dart_api_dl(
-      obj,
-    );
-  }
-
-  late final _init_frb_dart_api_dlPtr =
-      _lookup<ffi.NativeFunction<ffi.IntPtr Function(ffi.Pointer<ffi.Void>)>>(
-          'init_frb_dart_api_dl');
-  late final _init_frb_dart_api_dl = _init_frb_dart_api_dlPtr
-      .asFunction<int Function(ffi.Pointer<ffi.Void>)>();
 
   void wire_prepare_rust_signal_stream(
     int port_,
@@ -275,6 +205,76 @@ class BridgeWire implements FlutterRustBridgeWireBase {
           'free_WireSyncReturn');
   late final _free_WireSyncReturn =
       _free_WireSyncReturnPtr.asFunction<void Function(WireSyncReturn)>();
+
+  void store_dart_post_cobject(
+    DartPostCObjectFnType ptr,
+  ) {
+    return _store_dart_post_cobject(
+      ptr,
+    );
+  }
+
+  late final _store_dart_post_cobjectPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(DartPostCObjectFnType)>>(
+          'store_dart_post_cobject');
+  late final _store_dart_post_cobject = _store_dart_post_cobjectPtr
+      .asFunction<void Function(DartPostCObjectFnType)>();
+
+  Object get_dart_object(
+    int ptr,
+  ) {
+    return _get_dart_object(
+      ptr,
+    );
+  }
+
+  late final _get_dart_objectPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.UintPtr)>>(
+          'get_dart_object');
+  late final _get_dart_object =
+      _get_dart_objectPtr.asFunction<Object Function(int)>();
+
+  void drop_dart_object(
+    int ptr,
+  ) {
+    return _drop_dart_object(
+      ptr,
+    );
+  }
+
+  late final _drop_dart_objectPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.UintPtr)>>(
+          'drop_dart_object');
+  late final _drop_dart_object =
+      _drop_dart_objectPtr.asFunction<void Function(int)>();
+
+  int new_dart_opaque(
+    Object handle,
+  ) {
+    return _new_dart_opaque(
+      handle,
+    );
+  }
+
+  late final _new_dart_opaquePtr =
+      _lookup<ffi.NativeFunction<ffi.UintPtr Function(ffi.Handle)>>(
+          'new_dart_opaque');
+  late final _new_dart_opaque =
+      _new_dart_opaquePtr.asFunction<int Function(Object)>();
+
+  int init_frb_dart_api_dl(
+    ffi.Pointer<ffi.Void> obj,
+  ) {
+    return _init_frb_dart_api_dl(
+      obj,
+    );
+  }
+
+  late final _init_frb_dart_api_dlPtr =
+      _lookup<ffi.NativeFunction<ffi.IntPtr Function(ffi.Pointer<ffi.Void>)>>(
+          'init_frb_dart_api_dl');
+  late final _init_frb_dart_api_dl = _init_frb_dart_api_dlPtr
+      .asFunction<int Function(ffi.Pointer<ffi.Void>)>();
 }
 
 final class _Dart_Handle extends ffi.Opaque {}

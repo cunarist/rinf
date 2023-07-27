@@ -1,5 +1,4 @@
 use bridge::respond_to_dart;
-use tokio::task::spawn;
 
 mod bridge;
 mod sample_functions;
@@ -11,27 +10,39 @@ mod with_request;
 /// equivalent to the number of cores on the computer.
 /// This is much more efficient and scalable than switching threads.
 /// Always use non-blocking async functions in `tokio`'s core threads,
-/// such as `tokio::time::sleep` or `tokio::fs::File::open`.
-#[tokio::main]
+/// such as `async_std::task::sleep` or `tokio::fs::File::open`.
+#[cfg_attr(not(target_family = "wasm"), tokio::main)]
+#[cfg_attr(target_family = "wasm", allow(unused_variables))]
 async fn main() {
     // This is `tokio::sync::mpsc::Reciver` that receives the requests in an async manner.
     let mut request_receiver = bridge::get_request_receiver();
     // These are used for telling the tasks to stop running.
-    let (shutdown_signal_sender, shutdown_signal_receiver) = tokio::sync::oneshot::channel();
-    let root_join_handle = spawn(async move {
-        // Repeat `tokio::task::spawn` anywhere in your code
+    let (restart_sender, restart_receiver) = tokio::sync::oneshot::channel();
+    let root_join_handle = crate::spawn(async move {
+        // Repeat `crate::spawn` anywhere in your code
         // if more concurrent tasks are needed.
-        spawn(sample_functions::keep_drawing_mandelbrot());
+        crate::spawn(sample_functions::keep_drawing_mandelbrot());
         while let Some(request_unique) = request_receiver.recv().await {
-            spawn(async { respond_to_dart(with_request::handle_request(request_unique).await) });
+            crate::spawn(async {
+                respond_to_dart(with_request::handle_request(request_unique).await)
+            });
         }
         // Send the shutdown signal after the request channel is closed,
         // which is typically triggered by Dart's hot restart.
-        shutdown_signal_sender.send(()).ok();
+        restart_sender.send(()).ok();
     });
     // Begin the tasks and terminate them upon receiving the shutdown signal
+    #[cfg(not(target_family = "wasm"))]
     tokio::select! {
         _ = root_join_handle => {}
-        _ = shutdown_signal_receiver => {}
+        _ = restart_receiver => {}
     }
 }
+
+/// On the web, async tasks are executed in the JavaScript event loop,
+/// unlike when we run the app on native platforms with a `tokio` runtime.
+/// That's why we need this `spawn` alias on the web.
+#[cfg(not(target_family = "wasm"))]
+use tokio::task::spawn;
+#[cfg(target_family = "wasm")]
+use wasm_bindgen_futures::spawn_local as spawn;

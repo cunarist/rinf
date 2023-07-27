@@ -8,8 +8,17 @@ use api::RustResponseUnique;
 use api::RustSignal;
 use tokio::sync::mpsc::Receiver;
 
+#[cfg(not(target_family = "wasm"))]
 pub mod api;
+#[cfg(not(target_family = "wasm"))]
 mod bridge_generated;
+
+#[cfg(target_family = "wasm")]
+pub mod api_web;
+#[cfg(target_family = "wasm")]
+pub use api_web as api;
+#[cfg(target_family = "wasm")]
+mod bridge_generated_web;
 
 /// This function is expected to be used only once
 /// during the initialization of the Rust logic.
@@ -21,8 +30,7 @@ pub fn get_request_receiver() -> Receiver<api::RustRequestUnique> {
 
 /// Sending the signal will notify the Flutter widgets
 /// and trigger the rebuild.
-/// No memory copy is involved as the bytes are moved directly to Dart,
-/// thanks to the `zero-copy` feature of `flutter_rust_bridge`.
+/// No memory copy is involved as the bytes are moved directly to Dart.
 pub fn send_rust_signal(rust_signal: RustSignal) {
     api::SIGNAL_STREAM.with(|inner| {
         let mut borrowed = inner.borrow_mut();
@@ -38,6 +46,8 @@ pub fn send_rust_signal(rust_signal: RustSignal) {
     });
 }
 
+/// Send a response to Dart with a unique interaction ID
+/// to remember which request that response corresponds to.
 pub fn respond_to_dart(response_unique: RustResponseUnique) {
     api::RESPONSE_STREAM.with(|inner| {
         let mut borrowed = inner.borrow_mut();

@@ -6,11 +6,11 @@ use crate::bridge::api::RustRequest;
 use crate::bridge::api::RustResponse;
 use crate::bridge::api::RustSignal;
 use crate::bridge::send_rust_signal;
+use async_std::task::sleep;
 use rmp_serde::from_slice;
 use rmp_serde::to_vec_named;
 use serde::Deserialize;
 use serde::Serialize;
-use tokio::task::spawn_blocking;
 
 pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
@@ -64,7 +64,7 @@ pub async fn keep_drawing_mandelbrot() {
     loop {
         // Never use `std::thread::sleep` in `tokio`'s core threads
         // because it will block the async runtime.
-        tokio::time::sleep(std::time::Duration::from_millis(20)).await;
+        sleep(std::time::Duration::from_millis(20)).await;
         scale *= 0.95;
         if scale < 1e-7 {
             scale = 1.0
@@ -76,22 +76,18 @@ pub async fn keep_drawing_mandelbrot() {
         // In real-world async scenarios,
         // thread blocking tasks that take more than 10 microseconds
         // are considered better to be sent to an outer thread.
-        let join_handle = spawn_blocking(move || {
-            sample_crate::mandelbrot(
-                sample_crate::Size {
-                    width: 64,
-                    height: 64,
-                },
-                sample_crate::Point {
-                    x: 0.360,
-                    y: -0.641,
-                },
-                scale,
-                4,
-            )
-            .unwrap()
-        });
-        let calculated = join_handle.await;
+        let calculated = sample_crate::mandelbrot(
+            sample_crate::Size {
+                width: 64,
+                height: 64,
+            },
+            sample_crate::Point {
+                x: 0.360,
+                y: -0.641,
+            },
+            scale,
+            4,
+        );
         if let Ok(mandelbrot) = calculated {
             let rust_signal = RustSignal {
                 address: String::from("sampleCategory.mandelbrot"),

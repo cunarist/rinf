@@ -299,12 +299,10 @@ Rust에서 Dart로 매 초마다 증가하는 숫자를 보내고 싶다고 가�
 ```diff
     // native/hub/src/lib.rs
     ...
-    use tokio::task::spawn;
-    ...
     mod sample_functions;
     ...
-    spawn(sample_functions::keep_drawing_mandelbrot());
-+   spawn(sample_functions::keep_sending_numbers());
+    crate::spawn(sample_functions::keep_drawing_mandelbrot());
++   crate::spawn(sample_functions::keep_sending_numbers());
     while let Some(request_unique) = request_receiver.recv().await {
     ...
 ```
@@ -324,7 +322,7 @@ Rust에서 Dart로 매 초마다 증가하는 숫자를 보내고 싶다고 가�
 +   pub async fn keep_sending_numbers() {
 +       let mut current_number: i32 = 1;
 +       loop {
-+           tokio::time::sleep(std::time::Duration::from_secs(1)).await;
++           async_std::task::sleep(std::time::Duration::from_secs(1)).await;
 +
 +           #[derive(Serialize)]
 +           struct RustSignalSchema {
