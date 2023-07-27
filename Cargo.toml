@@ -1,2 +1,3 @@
 [workspace]
 members = ["./example/native/hub", "./connectors/cargokit/build_tool"]
+resolver = "2"
