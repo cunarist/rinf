@@ -427,6 +427,10 @@ flutter: ZERO-COST ABSTRACTION
 
 **A**. 在 Rust 中使用各种不同的构建目标时，也许会遇到问题。不管遇到任何情况，您可以随时到[讨论页](https://github.com/cunarist/rust-in-flutter/discussions)发起一个 Q&A 来寻求帮助！请访问该页面以阅读额外的指南并提问。
 
+**Q**. 并发在底层是如何工作的？
+
+**A**. 在本机平台上，Dart 通常在单个线程中运行，而 Rust 利用`tokio`运行时来充分利用计算机上的所有核心，从而使异步任务在该运行时内高效运行。这样可以更好地利用资源并改进性能。在 Web 上，Dart 仍然在主线程中运行，而 Rust 则在单个 Web Worker（线程）中运行。这是必要的限制，因为 Web Worker 不共享内存，但仍允许 Rust 在该专用线程内执行并发操作。
+
 # ☕ 支持我们
 
 😉 如果您从 Rust-In-Flutter 的功能中受益，并认为它对您非常有帮助，为什么不考虑下支持这个项目呢？您的慷慨捐助将有助于 Rust-In-Flutter 项目的维护和开发，确保其不断改进、发展！

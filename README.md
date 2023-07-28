@@ -429,6 +429,10 @@ Finally, receive the signals in Dart with `StreamBuilder`, filter them by addres
 
 **A**. If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/rust-in-flutter/discussions) and open a Q&A thread for assistance. Please visit this page to read additional guides and ask questions.
 
+**Q**. How does concurrency work under the hood?
+
+**A**. On native platforms, Dart runs in a single thread as usual, while Rust utilizes the `tokio` runtime to take advantage of all cores on the computer, allowing async tasks to run efficiently within that runtime. This enables better utilization of resources and improved performance. On the web, Dart still runs in the main thread, but Rust operates within a single web worker (thread). This is a necessary constraint because web workers do not share memory, but it still allows Rust to perform concurrent operations within that one dedicated thread.
+
 # ☕ Support Us
 
 😉 If you are benefiting from the features of Rust-In-Flutter and find it helpful, why not consider supporting this project? Your generous donations contribute to the maintenance and development of Rust-In-Flutter, ensuring its continuous improvement and growth.
