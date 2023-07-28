@@ -4,7 +4,6 @@ use crate::{ffi::*, DartSafe};
 /// We need this separate trait because we need to implement it for Vec<T> etc.
 /// These blanket implementations allow us to accept external types in various places.
 /// The initial reason for this was to allow mirrored types in StreamSink<>.
-/// See also [PR 1285](https://github.com/fzyzcjy/flutter_rust_bridge/pull/1285)
 pub trait IntoIntoDart<D: IntoDart> {
     fn into_into_dart(self) -> D;
 }

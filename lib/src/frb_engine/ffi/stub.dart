@@ -86,13 +86,9 @@ const anonymous = _Anonymous();
 dynamic eval(String script) => throw UnimplementedError();
 
 /// A JS function that returns a Promise to a WASM module.
-/// See [this file](https://github.com/fzyzcjy/flutter_rust_bridge/blob/ffc9c2f530daa72ebd2f77e45e67b4fa7a65c172/frb_example/pure_dart/dart/lib/ffi.web.dart)
-/// for an example of how to obtain and initialize this type.
 ///
 /// ## Enabling cross-origin isolation
 /// Rust WASM modules do not work without cross-origin isolation.
-/// Please refer to [Setting up the web server](http://cjycode.com/flutter_rust_bridge/build_wasm.html#setting-up-the-web-server)
-/// for an example of a Dart web server that accomplishes this task.
 abstract class WasmModule {
   Object call([String? moduleName]);
 

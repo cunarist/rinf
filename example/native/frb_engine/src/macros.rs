@@ -50,7 +50,7 @@ macro_rules! transfer {
 /// Example:
 /// ```
 /// let (tx, rx) = std::sync::mpsc::channel();
-/// flutter_rust_bridge::spawn!(|| {
+/// crate::spawn!(|| {
 ///     tx.send(true).unwrap();
 /// });
 /// assert_eq!(rx.recv(), Ok(true));
@@ -72,7 +72,7 @@ macro_rules! transfer {
 /// onmessage.forget();
 /// let port2 = channel.port2();
 /// // Declare the transferable with the same name and type
-/// flutter_rust_bridge::spawn!(|port2: MessagePort| {
+/// crate::spawn!(|port2: MessagePort| {
 ///     port2.post_message(&JsValue::from(true)).unwrap();
 /// });
 /// # } #[cfg(not(target_family = "wasm"))] fn main() {}

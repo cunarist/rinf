@@ -97,7 +97,7 @@ pub fn wire2api_uuids(ids: Vec<u8>) -> Vec<uuid::Uuid> {
 /// be used across the FFI border:
 ///
 /// ```rust
-/// use flutter_rust_bridge::*;
+/// use crate::*;
 /// use std::fmt::Debug;
 /// use std::panic::{UnwindSafe, RefUnwindSafe};
 ///
@@ -275,7 +275,7 @@ impl Drop for DartOpaque {
 /// Example:
 /// ```rust
 /// use std::fmt::Debug;
-/// use flutter_rust_bridge::*;
+/// use crate::*;
 ///
 /// pub trait MyDebug: DartSafe + Debug {}
 ///
