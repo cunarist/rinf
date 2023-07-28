@@ -8,7 +8,7 @@
 #![allow(dead_code)]
 
 // On the web, async tasks are executed in the JavaScript event loop,
-// unlike when we run the app on native platforms with a `tokio` runtime.
+// unlike when we run the app on native platforms with the `tokio` runtime.
 
 #[cfg(not(target_family = "wasm"))]
 pub use tokio::task::spawn;
