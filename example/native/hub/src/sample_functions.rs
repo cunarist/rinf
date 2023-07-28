@@ -68,13 +68,6 @@ pub async fn keep_drawing_mandelbrot() {
         if scale < 1e-7 {
             scale = 1.0
         };
-        // Because drawing a mandelbrot image is
-        // a CPU-intensive blocking task,
-        // we use `spawn_blocking` instead of `spawn`
-        // to delegate this task to `tokio`'s blocking threads.
-        // In real-world async scenarios,
-        // thread blocking tasks that take more than 10 microseconds
-        // are considered better to be sent to an outer thread.
         let calculated = sample_crate::mandelbrot(
             sample_crate::Size {
                 width: 64,
