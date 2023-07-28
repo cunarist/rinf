@@ -1,7 +1,9 @@
 use bridge::respond_to_dart;
+use web_alias::*;
 
 mod bridge;
 mod sample_functions;
+mod web_alias;
 mod with_request;
 
 /// This `hub` crate is the entry point for the Rust logic.
@@ -10,7 +12,7 @@ mod with_request;
 /// equivalent to the number of cores on the computer.
 /// This is much more efficient and scalable than switching threads.
 /// Always use non-blocking async functions in `tokio`'s core threads,
-/// such as `async_std::task::sleep` or `tokio::fs::File::open`.
+/// such as `tokio::fs::File::open`.
 #[cfg_attr(not(target_family = "wasm"), tokio::main)]
 #[cfg_attr(target_family = "wasm", allow(unused_variables))]
 async fn main() {
@@ -37,11 +39,3 @@ async fn main() {
         _ = shutdown_receiver => {}
     }
 }
-
-/// On the web, async tasks are executed in the JavaScript event loop,
-/// unlike when we run the app on native platforms with a `tokio` runtime.
-/// That's why we need this `spawn` alias on the web.
-#[cfg(not(target_family = "wasm"))]
-use tokio::task::spawn;
-#[cfg(target_family = "wasm")]
-use wasm_bindgen_futures::spawn_local as spawn;

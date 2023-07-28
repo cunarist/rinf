@@ -7,15 +7,16 @@ edition = "2021"
 crate-type = ["lib", "cdylib", "staticlib"]
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-tokio = { version = "1.28.2", features = ["rt-multi-thread"] }
+tokio = { version = "1.28.2", features = ["rt-multi-thread", "time"] }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 wasm-bindgen-futures = "0.4.37"
+js-sys = "0.3.64"
+web-sys = { version = "0.3.64", features = ["Window"] }
 
 [dependencies]
 frb_engine = { path = "../frb_engine" }
 tokio = { version = "1.28.2", features = ["sync", "macros"] }
-async-std = "1.12.0"
 serde = { version = "1.0.164", features = ["derive"] }
 rmp-serde = "1.1.1"
 lazy_static = "1.4.0"

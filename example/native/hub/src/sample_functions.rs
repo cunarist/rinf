@@ -6,7 +6,7 @@ use crate::bridge::api::RustRequest;
 use crate::bridge::api::RustResponse;
 use crate::bridge::api::RustSignal;
 use crate::bridge::send_rust_signal;
-use async_std::task::sleep;
+use crate::sleep;
 use rmp_serde::from_slice;
 use rmp_serde::to_vec_named;
 use serde::Deserialize;
