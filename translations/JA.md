@@ -88,6 +88,40 @@ dart run rust_in_flutter:apply_template
 
 これで、`./native/hub/src/lib.rs`に移動して、Rust のコードを書き始めることができます！
 
+# 👟 実行とビルド
+
+## ネイティブプラットフォーム向け
+
+以下のコマンドを使用して、ネイティブプラットフォーム向けの Flutter アプリを実行およびビルドできます。
+
+アプリを実行するには：
+
+```bash
+flutter run
+```
+
+特定のプラットフォーム向けにアプリをビルドするには：
+
+```bash
+flutter build (platform)
+```
+
+## ウェブ向け
+
+`flutter run` コマンドは、クロスオリジンポリシーの制限のため動作しないことがあります。その代わりに、ウェブ開発には以下のコマンドを使用してください。
+
+ウェブアプリケーションを提供するには：
+
+```bash
+dart run rust_in_flutter:serve_web
+```
+
+最適化されたリリースバージョンのウェブアプリケーションをビルドするには：
+
+```bash
+dart run rust_in_flutter:serve_web --release
+```
+
 # 🧱 コードの書き方
 
 ## Dart からのリクエスト、Rust からのレスポンス

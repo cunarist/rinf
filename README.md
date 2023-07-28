@@ -88,6 +88,40 @@ Don't forget to read the `./native/README.md` file first. Various comments are w
 
 Now by heading over to `./native/hub/src/lib.rs`, you can start writing Rust!
 
+# 👟 Running and Building
+
+## For Native Platforms
+
+The following commands can be used to run and build Flutter apps for native platforms.
+
+To run the app:
+
+```bash
+flutter run
+```
+
+To build the app for a specific platform:
+
+```bash
+flutter build (platform)
+```
+
+## For the Web
+
+The command `flutter run` might not work due to cross-origin policy restrictions. Instead, you should use the commands below for web development.
+
+To serve the web application:
+
+```bash
+dart run rust_in_flutter:serve_web
+```
+
+To build the optimized release version of the web application:
+
+```bash
+dart run rust_in_flutter:serve_web --release
+```
+
 # 🧱 How to Write Code
 
 ## Request from Dart, Response from Rust

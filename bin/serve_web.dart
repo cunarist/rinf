@@ -21,8 +21,6 @@ final YamlMap? pubspec = () {
   }
 }();
 
-String get version => pubspec?['version'] ?? '';
-
 final which = Platform.isWindows ? 'where.exe' : 'which';
 final open = const {
       'linux': 'xdg-open',
@@ -163,38 +161,22 @@ extension on Opts {
 }
 
 void main(List<String> args) async {
-  const exec = 'flutter_rust_bridge_serve';
   final config = parseOpts(args);
   if (config.help) {
-    print("""
-$exec $version
-Develop Rust WASM modules with cross-origin isolation.
-
-USAGE:
-\t$exec [OPTIONS] [..REST]
-\t$exec --dart-input <ENTRY> --root <ROOT> [OPTIONS] [..REST]
-
-OPTIONS:""");
     print(_$parserForOpts.usage);
     return;
   }
 
-  await system(which, ['wasm-pack']).catchError((_) {
-    bail(
-      'wasm-pack is required, but not found in the path.\n'
-      'Please install wasm-pack by following the instructions at https://rustwasm.github.io/wasm-pack/\n'
-      'or running `cargo install wasm-pack`.',
-    );
-  });
-
-  if (config.shouldRunBindgen) {
-    await system(which, ['wasm-bindgen']).catchError((_) {
-      bail(
-        'wasm-bindgen flags are enabled, but wasm-bindgen could not be found in the path.\n'
-        'Please install wasm-bindgen using `cargo install -f wasm-bindgen-cli`.',
-      );
-    });
-  }
+  Process.runSync("rustup", ["toolchain", "install", "nightly"]);
+  Process.runSync("rustup", ["+nightly", "component", "add", "rust-src"]);
+  Process.runSync("rustup", [
+    "+nightly",
+    "target",
+    "add",
+    "wasm32-unknown-unknown",
+  ]);
+  Process.runSync("cargo", ["install", "wasm-pack"]);
+  Process.runSync("cargo", ["install", "wasm-bindgen-cli"]);
 
   final String root;
   final String wasmOutput;
@@ -228,7 +210,9 @@ OPTIONS:""");
       args: args,
     );
   }
-  await runServer(config, root: root);
+  if (!config.release) {
+    await runServer(config, root: root);
+  }
 }
 
 Future<void> build(
