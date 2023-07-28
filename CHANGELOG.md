@@ -1,3 +1,7 @@
+## 2.0.0
+
+- Added web support.
+
 ## 1.6.6
 
 - Improved guides.
