@@ -23,7 +23,7 @@ use std::sync::Arc;
 // Section: wire functions
 
 fn wire_prepare_rust_signal_stream_impl(port_: MessagePort) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap::<_, _, _, ()>(
+    FRB_HANDLER.wrap::<_, _, _, ()>(
         WrapInfo {
             debug_name: "prepare_rust_signal_stream",
             port: Some(port_),
@@ -39,7 +39,7 @@ fn wire_prepare_rust_signal_stream_impl(port_: MessagePort) {
     )
 }
 fn wire_prepare_rust_response_stream_impl(port_: MessagePort) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap::<_, _, _, ()>(
+    FRB_HANDLER.wrap::<_, _, _, ()>(
         WrapInfo {
             debug_name: "prepare_rust_response_stream",
             port: Some(port_),
@@ -55,7 +55,7 @@ fn wire_prepare_rust_response_stream_impl(port_: MessagePort) {
     )
 }
 fn wire_prepare_channels_impl(port_: MessagePort) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap::<_, _, _, ()>(
+    FRB_HANDLER.wrap::<_, _, _, ()>(
         WrapInfo {
             debug_name: "prepare_channels",
             port: Some(port_),
@@ -65,7 +65,7 @@ fn wire_prepare_channels_impl(port_: MessagePort) {
     )
 }
 fn wire_check_rust_streams_impl(port_: MessagePort) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap::<_, _, _, bool>(
+    FRB_HANDLER.wrap::<_, _, _, bool>(
         WrapInfo {
             debug_name: "check_rust_streams",
             port: Some(port_),
@@ -75,7 +75,7 @@ fn wire_check_rust_streams_impl(port_: MessagePort) {
     )
 }
 fn wire_start_rust_logic_impl(port_: MessagePort) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap::<_, _, _, ()>(
+    FRB_HANDLER.wrap::<_, _, _, ()>(
         WrapInfo {
             debug_name: "start_rust_logic",
             port: Some(port_),
@@ -88,7 +88,7 @@ fn wire_request_to_rust_impl(
     port_: MessagePort,
     request_unique: impl Wire2Api<RustRequestUnique> + UnwindSafe,
 ) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap::<_, _, _, ()>(
+    FRB_HANDLER.wrap::<_, _, _, ()>(
         WrapInfo {
             debug_name: "request_to_rust",
             port: Some(port_),
@@ -199,7 +199,7 @@ impl rust2dart::IntoIntoDart<RustSignal> for RustSignal {
 // Section: executor
 
 support::lazy_static! {
-    pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler = Default::default();
+    pub static ref FRB_HANDLER: support::DefaultHandler = Default::default();
 }
 
 /// cbindgen:ignore

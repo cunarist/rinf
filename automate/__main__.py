@@ -12,15 +12,17 @@ def replace_string_in_files(directory: str, search_string: str, replace_string: 
     for filename in os.listdir(directory):
         if not os.path.isdir(os.path.join(directory, filename)):
             filepath = os.path.join(directory, filename)
-            replace_string_in_file(filepath, search_string, replace_string)
+            with open(filepath, mode="r", encoding="utf8") as file:
+                content: str = file.read()
+            content = content.replace(search_string, replace_string)
+            with open(filepath, mode="w", encoding="utf8") as file:
+                file.write(content)
 
 
-def replace_string_in_file(filepath: str, search_string: str, replace_string: str):
-    with open(filepath, mode="r", encoding="utf8") as file:
-        content: str = file.read()
-    content = content.replace(search_string, replace_string)
-    with open(filepath, mode="w", encoding="utf8") as file:
-        file.write(content)
+def remove_files_in_folder(directory: str, prefix: str):
+    for filename in os.listdir(directory):
+        if filename.startswith(prefix):
+            os.remove(os.path.join(directory, filename))
 
 
 print("")
@@ -29,6 +31,10 @@ if len(sys.argv) == 1:
     print("Automation option is not provided.")
 
 elif sys.argv[1] == "bridge-gen":
+    # Delete previous bridge files.
+    remove_files_in_folder("./example/native/hub/src/bridge", "bridge")
+    remove_files_in_folder("./lib/src", "bridge")
+
     # Generate files for the web platform.
     filepath = "./example/native/hub/src/bridge/api.rs"
     with open(filepath, mode="r", encoding="utf8") as file:
@@ -90,6 +96,9 @@ elif sys.argv[1] == "bridge-gen":
     replace_string_in_files(directory_path, search_string, replace_string)
     search_string = "crate::bridge::api_web::"
     replace_string = "crate::bridge::api::"
+    replace_string_in_files(directory_path, search_string, replace_string)
+    search_string = "FLUTTER_RUST_BRIDGE_HANDLER"
+    replace_string = "FRB_HANDLER"
     replace_string_in_files(directory_path, search_string, replace_string)
 
 else:
