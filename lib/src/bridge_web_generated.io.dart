@@ -85,127 +85,6 @@ class BridgeWebWire implements FlutterRustBridgeWireBase {
           lookup)
       : _lookup = lookup;
 
-  void wire_prepare_rust_signal_stream(
-    int port_,
-  ) {
-    return _wire_prepare_rust_signal_stream(
-      port_,
-    );
-  }
-
-  late final _wire_prepare_rust_signal_streamPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
-          'wire_prepare_rust_signal_stream');
-  late final _wire_prepare_rust_signal_stream =
-      _wire_prepare_rust_signal_streamPtr.asFunction<void Function(int)>();
-
-  void wire_prepare_rust_response_stream(
-    int port_,
-  ) {
-    return _wire_prepare_rust_response_stream(
-      port_,
-    );
-  }
-
-  late final _wire_prepare_rust_response_streamPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
-          'wire_prepare_rust_response_stream');
-  late final _wire_prepare_rust_response_stream =
-      _wire_prepare_rust_response_streamPtr.asFunction<void Function(int)>();
-
-  WireSyncReturn wire_prepare_channels() {
-    return _wire_prepare_channels();
-  }
-
-  late final _wire_prepare_channelsPtr =
-      _lookup<ffi.NativeFunction<WireSyncReturn Function()>>(
-          'wire_prepare_channels');
-  late final _wire_prepare_channels =
-      _wire_prepare_channelsPtr.asFunction<WireSyncReturn Function()>();
-
-  void wire_check_rust_streams(
-    int port_,
-  ) {
-    return _wire_check_rust_streams(
-      port_,
-    );
-  }
-
-  late final _wire_check_rust_streamsPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
-          'wire_check_rust_streams');
-  late final _wire_check_rust_streams =
-      _wire_check_rust_streamsPtr.asFunction<void Function(int)>();
-
-  void wire_start_rust_logic(
-    int port_,
-  ) {
-    return _wire_start_rust_logic(
-      port_,
-    );
-  }
-
-  late final _wire_start_rust_logicPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
-          'wire_start_rust_logic');
-  late final _wire_start_rust_logic =
-      _wire_start_rust_logicPtr.asFunction<void Function(int)>();
-
-  WireSyncReturn wire_request_to_rust(
-    ffi.Pointer<wire_RustRequestUnique> request_unique,
-  ) {
-    return _wire_request_to_rust(
-      request_unique,
-    );
-  }
-
-  late final _wire_request_to_rustPtr = _lookup<
-      ffi.NativeFunction<
-          WireSyncReturn Function(
-              ffi.Pointer<wire_RustRequestUnique>)>>('wire_request_to_rust');
-  late final _wire_request_to_rust = _wire_request_to_rustPtr.asFunction<
-      WireSyncReturn Function(ffi.Pointer<wire_RustRequestUnique>)>();
-
-  ffi.Pointer<wire_RustRequestUnique> new_box_autoadd_rust_request_unique_0() {
-    return _new_box_autoadd_rust_request_unique_0();
-  }
-
-  late final _new_box_autoadd_rust_request_unique_0Ptr = _lookup<
-          ffi.NativeFunction<ffi.Pointer<wire_RustRequestUnique> Function()>>(
-      'new_box_autoadd_rust_request_unique_0');
-  late final _new_box_autoadd_rust_request_unique_0 =
-      _new_box_autoadd_rust_request_unique_0Ptr
-          .asFunction<ffi.Pointer<wire_RustRequestUnique> Function()>();
-
-  ffi.Pointer<wire_uint_8_list> new_uint_8_list_0(
-    int len,
-  ) {
-    return _new_uint_8_list_0(
-      len,
-    );
-  }
-
-  late final _new_uint_8_list_0Ptr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<wire_uint_8_list> Function(
-              ffi.Int32)>>('new_uint_8_list_0');
-  late final _new_uint_8_list_0 = _new_uint_8_list_0Ptr
-      .asFunction<ffi.Pointer<wire_uint_8_list> Function(int)>();
-
-  void free_WireSyncReturn(
-    WireSyncReturn ptr,
-  ) {
-    return _free_WireSyncReturn(
-      ptr,
-    );
-  }
-
-  late final _free_WireSyncReturnPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(WireSyncReturn)>>(
-          'free_WireSyncReturn');
-  late final _free_WireSyncReturn =
-      _free_WireSyncReturnPtr.asFunction<void Function(WireSyncReturn)>();
-
   void store_dart_post_cobject(
     DartPostCObjectFnType ptr,
   ) {
@@ -275,6 +154,133 @@ class BridgeWebWire implements FlutterRustBridgeWireBase {
           'init_frb_dart_api_dl');
   late final _init_frb_dart_api_dl = _init_frb_dart_api_dlPtr
       .asFunction<int Function(ffi.Pointer<ffi.Void>)>();
+
+  void wire_prepare_rust_signal_stream(
+    int port_,
+  ) {
+    return _wire_prepare_rust_signal_stream(
+      port_,
+    );
+  }
+
+  late final _wire_prepare_rust_signal_streamPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
+          'wire_prepare_rust_signal_stream');
+  late final _wire_prepare_rust_signal_stream =
+      _wire_prepare_rust_signal_streamPtr.asFunction<void Function(int)>();
+
+  void wire_prepare_rust_response_stream(
+    int port_,
+  ) {
+    return _wire_prepare_rust_response_stream(
+      port_,
+    );
+  }
+
+  late final _wire_prepare_rust_response_streamPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
+          'wire_prepare_rust_response_stream');
+  late final _wire_prepare_rust_response_stream =
+      _wire_prepare_rust_response_streamPtr.asFunction<void Function(int)>();
+
+  void wire_prepare_channels(
+    int port_,
+  ) {
+    return _wire_prepare_channels(
+      port_,
+    );
+  }
+
+  late final _wire_prepare_channelsPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
+          'wire_prepare_channels');
+  late final _wire_prepare_channels =
+      _wire_prepare_channelsPtr.asFunction<void Function(int)>();
+
+  void wire_check_rust_streams(
+    int port_,
+  ) {
+    return _wire_check_rust_streams(
+      port_,
+    );
+  }
+
+  late final _wire_check_rust_streamsPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
+          'wire_check_rust_streams');
+  late final _wire_check_rust_streams =
+      _wire_check_rust_streamsPtr.asFunction<void Function(int)>();
+
+  void wire_start_rust_logic(
+    int port_,
+  ) {
+    return _wire_start_rust_logic(
+      port_,
+    );
+  }
+
+  late final _wire_start_rust_logicPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
+          'wire_start_rust_logic');
+  late final _wire_start_rust_logic =
+      _wire_start_rust_logicPtr.asFunction<void Function(int)>();
+
+  void wire_request_to_rust(
+    int port_,
+    ffi.Pointer<wire_RustRequestUnique> request_unique,
+  ) {
+    return _wire_request_to_rust(
+      port_,
+      request_unique,
+    );
+  }
+
+  late final _wire_request_to_rustPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Int64,
+              ffi.Pointer<wire_RustRequestUnique>)>>('wire_request_to_rust');
+  late final _wire_request_to_rust = _wire_request_to_rustPtr
+      .asFunction<void Function(int, ffi.Pointer<wire_RustRequestUnique>)>();
+
+  ffi.Pointer<wire_RustRequestUnique> new_box_autoadd_rust_request_unique_0() {
+    return _new_box_autoadd_rust_request_unique_0();
+  }
+
+  late final _new_box_autoadd_rust_request_unique_0Ptr = _lookup<
+          ffi.NativeFunction<ffi.Pointer<wire_RustRequestUnique> Function()>>(
+      'new_box_autoadd_rust_request_unique_0');
+  late final _new_box_autoadd_rust_request_unique_0 =
+      _new_box_autoadd_rust_request_unique_0Ptr
+          .asFunction<ffi.Pointer<wire_RustRequestUnique> Function()>();
+
+  ffi.Pointer<wire_uint_8_list> new_uint_8_list_0(
+    int len,
+  ) {
+    return _new_uint_8_list_0(
+      len,
+    );
+  }
+
+  late final _new_uint_8_list_0Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<wire_uint_8_list> Function(
+              ffi.Int32)>>('new_uint_8_list_0');
+  late final _new_uint_8_list_0 = _new_uint_8_list_0Ptr
+      .asFunction<ffi.Pointer<wire_uint_8_list> Function(int)>();
+
+  void free_WireSyncReturn(
+    WireSyncReturn ptr,
+  ) {
+    return _free_WireSyncReturn(
+      ptr,
+    );
+  }
+
+  late final _free_WireSyncReturnPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(WireSyncReturn)>>(
+          'free_WireSyncReturn');
+  late final _free_WireSyncReturn =
+      _free_WireSyncReturnPtr.asFunction<void Function(WireSyncReturn)>();
 }
 
 final class _Dart_Handle extends ffi.Opaque {}
