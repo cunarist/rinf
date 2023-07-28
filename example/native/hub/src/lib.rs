@@ -17,7 +17,7 @@ async fn main() {
     // This is `tokio::sync::mpsc::Reciver` that receives the requests in an async manner.
     let mut request_receiver = bridge::get_request_receiver();
     // These are used for telling the tasks to stop running.
-    let (restart_sender, restart_receiver) = tokio::sync::oneshot::channel();
+    let (shutdown_sender, shutdown_receiver) = tokio::sync::oneshot::channel();
     let root_future = async move {
         // Repeat `crate::spawn` anywhere in your code
         // if more concurrent tasks are needed.
@@ -29,12 +29,12 @@ async fn main() {
         }
         // Send the shutdown signal after the request channel is closed,
         // which is typically triggered by Dart's hot restart.
-        restart_sender.send(()).ok();
+        shutdown_sender.send(()).ok();
     };
     // Begin the tasks and terminate them upon receiving the shutdown signal
     tokio::select! {
         _ = root_future => {}
-        _ = restart_receiver => {}
+        _ = shutdown_receiver => {}
     }
 }
 
