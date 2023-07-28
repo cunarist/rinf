@@ -6,7 +6,7 @@ import "bridge_web_definitions.dart";
 import 'dart:convert';
 import 'dart:async';
 import 'package:meta/meta.dart';
-import 'frb_engine/flutter_rust_bridge.dart';
+import 'frb_engine/exports.dart';
 import 'package:uuid/uuid.dart';
 import 'bridge_web_generated.io.dart'
     if (dart.library.html) 'bridge_web_generated.web.dart';

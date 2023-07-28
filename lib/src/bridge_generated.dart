@@ -6,13 +6,13 @@ import "bridge_definitions.dart";
 import 'dart:convert';
 import 'dart:async';
 import 'package:meta/meta.dart';
-import 'frb_engine/flutter_rust_bridge.dart';
+import 'frb_engine/exports.dart';
 import 'package:uuid/uuid.dart';
 
 import 'dart:convert';
 import 'dart:async';
 import 'package:meta/meta.dart';
-import 'frb_engine/flutter_rust_bridge.dart';
+import 'frb_engine/exports.dart';
 import 'package:uuid/uuid.dart';
 
 import 'dart:ffi' as ffi;

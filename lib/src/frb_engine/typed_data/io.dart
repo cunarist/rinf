@@ -2,7 +2,7 @@ export 'dart:typed_data' hide Int64List, Uint64List;
 import 'dart:collection';
 import 'dart:typed_data' as $data;
 
-import 'package:rust_in_flutter/src/frb_engine/flutter_rust_bridge.dart';
+import 'package:rust_in_flutter/src/frb_engine/exports.dart';
 
 abstract class _TypedList<T> extends ListMixin<T> {
   List<int> get inner;

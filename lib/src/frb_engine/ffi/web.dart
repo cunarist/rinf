@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:html';
 
-import 'package:rust_in_flutter/src/frb_engine/flutter_rust_bridge.dart';
+import 'package:rust_in_flutter/src/frb_engine/exports.dart';
 export 'package:js/js.dart';
 import 'package:js/js_util.dart';
 export 'package:js/js_util.dart' show promiseToFuture, getProperty;
