@@ -71,7 +71,7 @@ type RustResponseStream = StreamSink<RustResponseUnique>;
 type RustRequestSender = Sender<RustRequestUnique>;
 type RustRequestReceiver = Receiver<RustRequestUnique>;
 
-// For thread 0 running Dart
+// For thread 1 running Rust
 thread_local! {
     pub static REQUEST_SENDER: Cell<RustRequestSender> = RefCell::new(None);
 }
@@ -109,7 +109,7 @@ pub fn prepare_rust_response_stream(response_stream: StreamSink<RustResponseUniq
 
 /// Prepare channels that are used in the Rust world.
 pub fn prepare_channels() {
-    // Thread 0 running Dart
+    // Thread 1 running Rust
     let (request_sender, request_receiver) = channel(1024);
     REQUEST_SENDER.with(move |inner| {
         inner.replace(Some(request_sender));
@@ -145,7 +145,7 @@ pub fn start_rust_logic() {
 
 /// Send a request to Rust and receive a response in Dart.
 pub fn request_to_rust(request_unique: RustRequestUnique) {
-    // Thread 0 running Dart
+    // Thread 1 running Rust
     REQUEST_SENDER.with(move |inner| {
         let borrowed = inner.borrow();
         let sender = borrowed.as_ref().unwrap();

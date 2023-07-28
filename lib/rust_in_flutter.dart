@@ -5,13 +5,12 @@
 import 'dart:math';
 import 'dart:async';
 import 'dart:typed_data';
-import 'src/bridge_definitions.dart';
-import 'src/ffi.dart' if (dart.library.html) 'src/ffi_web.dart';
+import 'src/exports.dart';
 
-export 'src/bridge_definitions.dart' show RustOperation;
-export 'src/bridge_definitions.dart' show RustRequest;
-export 'src/bridge_definitions.dart' show RustResponse;
-export 'src/bridge_definitions.dart' show RustSignal;
+export 'src/exports.dart' show RustOperation;
+export 'src/exports.dart' show RustRequest;
+export 'src/exports.dart' show RustResponse;
+export 'src/exports.dart' show RustSignal;
 
 /// Listens to a stream from Rust and broadcasts the data in Dart.
 /// You can see the usage example at

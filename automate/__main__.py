@@ -37,6 +37,12 @@ elif sys.argv[1] == "bridge-gen":
     temp_api_content = original_api_content.replace(" -> SyncReturn<()>", "")
     temp_api_content = temp_api_content.replace("use frb_engine::SyncReturn;", "")
     temp_api_content = re.sub(r";\s*SyncReturn\(\(\)\)", ";", temp_api_content)
+    temp_api_content = temp_api_content.replace(
+        "// Thread 0 running Dart", "// Thread 1 running Rust"
+    )
+    temp_api_content = temp_api_content.replace(
+        "// For thread 0 running Dart", "// For thread 1 running Rust"
+    )
 
     filepath = "./example/native/hub/src/bridge/api_web.rs"
     with open(filepath, mode="w", encoding="utf8") as file:
@@ -44,10 +50,10 @@ elif sys.argv[1] == "bridge-gen":
 
     command = "flutter_rust_bridge_codegen"
     command += " --rust-input ./example/native/hub/src/bridge/api_web.rs"
-    command += " --rust-output ./example/native/hub/src/bridge/bridge_generated_web.rs"
-    command += " --dart-output ./lib/src/bridge_generated_web.dart"
-    command += " --dart-decl-output ./lib/src/bridge_definitions.dart"
-    command += " --class-name Bridge"
+    command += " --rust-output ./example/native/hub/src/bridge/bridge_web_generated.rs"
+    command += " --dart-output ./lib/src/bridge_web_generated.dart"
+    command += " --dart-decl-output ./lib/src/bridge_web_definitions.dart"
+    command += " --class-name BridgeWeb"
     command += " --wasm"
     command += " --inline-rust"
     os.system(command)
