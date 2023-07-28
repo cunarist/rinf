@@ -6,7 +6,6 @@ use crate::bridge::api::RustRequest;
 use crate::bridge::api::RustResponse;
 use crate::bridge::api::RustSignal;
 use crate::bridge::send_rust_signal;
-use crate::sleep;
 use rmp_serde::from_slice;
 use rmp_serde::to_vec_named;
 use serde::Deserialize;
@@ -64,7 +63,7 @@ pub async fn keep_drawing_mandelbrot() {
     loop {
         // Never use `std::thread::sleep` in `tokio`'s core threads
         // because it will block the async runtime.
-        sleep(std::time::Duration::from_millis(20)).await;
+        crate::sleep(std::time::Duration::from_millis(500)).await;
         scale *= 0.95;
         if scale < 1e-7 {
             scale = 1.0
