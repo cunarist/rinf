@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-
 import 'rust_in_flutter_platform_interface.dart';
 
 /// An implementation of [RustInFlutterPlatform] that uses method channels.
@@ -11,7 +10,8 @@ class MethodChannelRustInFlutter extends RustInFlutterPlatform {
 
   @override
   Future<String?> getPlatformVersion() async {
-    final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
+    final version =
+        await methodChannel.invokeMethod<String>('getPlatformVersion');
     return version;
   }
 }
