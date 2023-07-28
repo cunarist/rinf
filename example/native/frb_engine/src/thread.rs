@@ -1,7 +1,7 @@
 #[cfg(not(wasm))]
 mod io {
     use lazy_static::lazy_static;
-    use parking_lot::Mutex;
+    use std::sync::Mutex;
     use threadpool::ThreadPool;
 
     lazy_static! {

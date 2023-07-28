@@ -1,7 +1,8 @@
-use build_target::{self, Family};
+use std::env;
 
 fn main() {
-    if let Ok(Family::Wasm) = build_target::target_family() {
+    let target = env::var("TARGET").unwrap();
+    if target.contains("wasm32") {
         println!("cargo:rustc-cfg=wasm");
     }
 }
