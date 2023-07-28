@@ -65,6 +65,7 @@ elif sys.argv[1] == "bridge-gen":
     command += " --dart-output ./lib/src/bridge_generated.dart"
     command += " --dart-decl-output ./lib/src/bridge_definitions.dart"
     command += " --class-name Bridge"
+    command += " --inline-rust"
     os.system(command)
 
     # Remove an unnecessary root import
