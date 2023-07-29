@@ -26,10 +26,10 @@ web-sys = { version = "0.3.64", features = [
     "Window",
     "console",
 ] }
-
 wasm-bindgen = { version = "0.2.87" }
 wasm-bindgen-futures = "0.4.37"
 js-sys = "0.3.64"
+
 [dependencies]
 tokio = { version = "1.28.2", features = ["sync", "macros"] }
 bytemuck = "1.11.0"
