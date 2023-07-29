@@ -13,7 +13,7 @@ macro_rules! transfer {
 
         #[cfg(target_family = "wasm")]
         {
-            $crate::ffi::TransferClosure::new(vec![], vec![], move |_: &[JsValue]| $block)
+            crate::ffi::TransferClosure::new(vec![], vec![], move |_: &[JsValue]| $block)
         }
     }};
     (|$($param:ident: $ty:ty),*| $block:block) => {{
@@ -25,7 +25,7 @@ macro_rules! transfer {
         #[cfg(target_family = "wasm")]
         {
             use wasm_bindgen::JsValue;
-            use $crate::ffi::Transfer;
+            use crate::ffi::Transfer;
             #[allow(unused_variables)]
             let worker = move |transfer: &[JsValue]| {
                 let idx = 0;
@@ -36,7 +36,7 @@ macro_rules! transfer {
                 $block
             };
             let transferables = [$($param.transferables()),*].concat();
-            $crate::ffi::TransferClosure::new(vec![$($param.serialize()),*], transferables, worker)
+            crate::ffi::TransferClosure::new(vec![$($param.serialize()),*], transferables, worker)
         }
     }};
 }
@@ -80,16 +80,16 @@ macro_rules! transfer {
 #[macro_export]
 macro_rules! spawn {
     ($($tt:tt)*) => {{
-        let worker = $crate::transfer!($($tt)*);
+        let worker = crate::transfer!($($tt)*);
         #[cfg(not(target_family = "wasm"))]
         {
-            $crate::thread::THREAD_POOL.lock().unwrap().execute(worker)
+            crate::thread::THREAD_POOL.lock().unwrap().execute(worker)
         }
 
         #[cfg(target_family = "wasm")]
         {
             use anyhow::anyhow;
-            let res = $crate::thread::WORKER_POOL.with(|pool| {
+            let res = crate::thread::WORKER_POOL.with(|pool| {
                 if let Some(pool) = pool.as_ref() {
                     pool.run(worker).map_err(|err| anyhow!("worker error: {:?}", err))
                 } else {
@@ -97,7 +97,7 @@ macro_rules! spawn {
                 }
             });
             if let Err(err) = res {
-                $crate::console_error!("worker error: {:?}", err);
+                crate::console_error!("worker error: {:?}", err);
             }
         }
     }};
@@ -106,9 +106,9 @@ macro_rules! spawn {
 #[macro_export]
 macro_rules! console_error {
     ($lit:literal) => {
-        $crate::error($lit)
+        crate::error($lit)
     };
     ($($tt:tt)*) => {
-        $crate::error(&format!($($tt)*))
+        crate::error(&format!($($tt)*))
     };
 }

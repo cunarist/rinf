@@ -286,6 +286,6 @@ impl Drop for DartOpaque {
 #[macro_export]
 macro_rules! opaque_dyn {
     ($ex:expr) => {
-        $crate::RustOpaque::new(::std::boxed::Box::new($ex))
+        crate::RustOpaque::new(::std::boxed::Box::new($ex))
     };
 }
