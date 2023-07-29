@@ -12,7 +12,7 @@ tokio = { version = "1.28.2", features = ["rt-multi-thread", "time"] }
 [target.'cfg(target_family = "wasm")'.dependencies]
 wasm-bindgen-futures = "0.4.37"
 js-sys = "0.3.64"
-web-sys = { version = "0.3.64", features = ["Window"] }
+web-sys = { version = "0.3.64", features = ["Window", "console"] }
 
 [dependencies]
 frb_engine = { path = "../frb_engine" }

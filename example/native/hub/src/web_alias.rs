@@ -5,20 +5,20 @@
 //! To address this issue, this module offers functions and macros
 //! with the same names as the original native ones,
 //! providing workarounds for these constraints.
-#![allow(dead_code)]
+#![allow(dead_code, unused_imports, unused_macros)]
 
 // On the web, async tasks are executed in the JavaScript event loop,
 // unlike when we run the app on native platforms with the `tokio` runtime.
 
 #[cfg(not(target_family = "wasm"))]
-pub use tokio::task::spawn;
+pub(crate) use tokio::task::spawn;
 #[cfg(target_family = "wasm")]
-pub use wasm_bindgen_futures::spawn_local as spawn;
+pub(crate) use wasm_bindgen_futures::spawn_local as spawn;
 
 // On the web, `tokio` cannot access the system time.
 
 #[cfg(target_family = "wasm")]
-pub async fn sleep(duration: std::time::Duration) {
+pub(crate) async fn sleep(duration: std::time::Duration) {
     let mut cb = |resolve: js_sys::Function, _reject: js_sys::Function| {
         web_sys::window()
             .unwrap()
@@ -32,4 +32,16 @@ pub async fn sleep(duration: std::time::Duration) {
     let _ = wasm_bindgen_futures::JsFuture::from(promise).await;
 }
 #[cfg(not(target_family = "wasm"))]
-pub use tokio::time::sleep;
+pub(crate) use tokio::time::sleep;
+
+// On the web, `println!` macro does not print to the console.
+
+#[macro_export]
+#[cfg(target_family = "wasm")]
+macro_rules! print {
+    ( $( $t:tt )* ) => {
+        web_sys::console::log_1(&format!( $( $t )* ).into());
+    }
+}
+#[cfg(not(target_family = "wasm"))]
+pub(crate) use println as print;

@@ -28,7 +28,7 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
             }
             let slice = rust_request.bytes.as_slice();
             let received: RustRequestSchema = from_slice(slice).unwrap();
-            println!("{:?}", received.letter);
+            crate::print!("{:?}", received.letter);
 
             let before_value = received.before_number;
             let after_value = sample_crate::add_seven(before_value);
