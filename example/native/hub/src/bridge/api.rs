@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
-use bridge_engine::StreamSink;
-use bridge_engine::SyncReturn;
+use crate::bridge::bridge_engine::StreamSink;
+use crate::bridge::bridge_engine::SyncReturn;
 use lazy_static::lazy_static;
 use std::cell::RefCell;
 use std::sync::Arc;

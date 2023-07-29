@@ -85,19 +85,33 @@ class BridgeWebWire implements FlutterRustBridgeWireBase {
           lookup)
       : _lookup = lookup;
 
-  void store_dart_post_cobject(
-    DartPostCObjectFnType ptr,
+  void error(
+    ffi.Pointer<ffi.Int> msg,
   ) {
-    return _store_dart_post_cobject(
-      ptr,
+    return _error(
+      msg,
     );
   }
 
-  late final _store_dart_post_cobjectPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(DartPostCObjectFnType)>>(
-          'store_dart_post_cobject');
-  late final _store_dart_post_cobject = _store_dart_post_cobjectPtr
-      .asFunction<void Function(DartPostCObjectFnType)>();
+  late final _errorPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Int>)>>(
+          'error');
+  late final _error =
+      _errorPtr.asFunction<void Function(ffi.Pointer<ffi.Int>)>();
+
+  int new_dart_opaque(
+    Object handle,
+  ) {
+    return _new_dart_opaque(
+      handle,
+    );
+  }
+
+  late final _new_dart_opaquePtr =
+      _lookup<ffi.NativeFunction<ffi.UintPtr Function(ffi.Handle)>>(
+          'new_dart_opaque');
+  late final _new_dart_opaque =
+      _new_dart_opaquePtr.asFunction<int Function(Object)>();
 
   Object get_dart_object(
     int ptr,
@@ -127,25 +141,11 @@ class BridgeWebWire implements FlutterRustBridgeWireBase {
   late final _drop_dart_object =
       _drop_dart_objectPtr.asFunction<void Function(int)>();
 
-  int new_dart_opaque(
-    Object handle,
-  ) {
-    return _new_dart_opaque(
-      handle,
-    );
-  }
-
-  late final _new_dart_opaquePtr =
-      _lookup<ffi.NativeFunction<ffi.UintPtr Function(ffi.Handle)>>(
-          'new_dart_opaque');
-  late final _new_dart_opaque =
-      _new_dart_opaquePtr.asFunction<int Function(Object)>();
-
   int init_frb_dart_api_dl(
-    ffi.Pointer<ffi.Void> obj,
+    ffi.Pointer<ffi.Void> data,
   ) {
     return _init_frb_dart_api_dl(
-      obj,
+      data,
     );
   }
 
@@ -154,6 +154,20 @@ class BridgeWebWire implements FlutterRustBridgeWireBase {
           'init_frb_dart_api_dl');
   late final _init_frb_dart_api_dl = _init_frb_dart_api_dlPtr
       .asFunction<int Function(ffi.Pointer<ffi.Void>)>();
+
+  void store_dart_post_cobject(
+    DartPostCObjectFnType ptr,
+  ) {
+    return _store_dart_post_cobject(
+      ptr,
+    );
+  }
+
+  late final _store_dart_post_cobjectPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(DartPostCObjectFnType)>>(
+          'store_dart_post_cobject');
+  late final _store_dart_post_cobject = _store_dart_post_cobjectPtr
+      .asFunction<void Function(DartPostCObjectFnType)>();
 
   void wire_prepare_rust_signal_stream(
     int port_,
@@ -284,6 +298,8 @@ class BridgeWebWire implements FlutterRustBridgeWireBase {
 }
 
 final class _Dart_Handle extends ffi.Opaque {}
+
+final class Result_JsValue extends ffi.Opaque {}
 
 final class wire_uint_8_list extends ffi.Struct {
   external ffi.Pointer<ffi.Uint8> ptr;

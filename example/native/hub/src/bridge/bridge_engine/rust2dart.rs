@@ -6,8 +6,8 @@ use std::marker::PhantomData;
 ///
 /// Its implementation lies with the Dart language and therefore should not be
 /// depended on to be stable.
-pub use crate::ffi::*;
-pub use crate::into_into_dart::IntoIntoDart;
+pub use crate::bridge::bridge_engine::ffi::*;
+pub use crate::bridge::bridge_engine::into_into_dart::IntoIntoDart;
 
 /// A wrapper around a Dart [`Isolate`].
 #[derive(Clone)]
@@ -89,7 +89,7 @@ impl TaskCallback {
 pub struct ChannelHandle(pub String);
 
 impl ChannelHandle {
-    #[cfg(wasm)]
+    #[cfg(target_family = "wasm")]
     pub fn port(&self) -> MessagePort {
         PortLike::broadcast(&self.0)
     }
@@ -100,9 +100,9 @@ impl ChannelHandle {
 /// [`Stream`](https://api.dart.dev/stable/dart-async/Stream-class.html).
 #[derive(Clone)]
 pub struct StreamSink<T> {
-    #[cfg(not(wasm))]
+    #[cfg(not(target_family = "wasm"))]
     rust2dart: Rust2Dart,
-    #[cfg(wasm)]
+    #[cfg(target_family = "wasm")]
     handle: ChannelHandle,
     _phantom_data: PhantomData<T>,
 }
@@ -110,25 +110,25 @@ pub struct StreamSink<T> {
 impl<T> StreamSink<T> {
     /// Create a new sink from a port wrapper.
     pub fn new(rust2dart: Rust2Dart) -> Self {
-        #[cfg(wasm)]
+        #[cfg(target_family = "wasm")]
         let name = rust2dart
             .channel
             .broadcast_name()
             .expect("Not a BroadcastChannel");
         Self {
-            #[cfg(not(wasm))]
+            #[cfg(not(target_family = "wasm"))]
             rust2dart,
-            #[cfg(wasm)]
+            #[cfg(target_family = "wasm")]
             handle: ChannelHandle(name),
             _phantom_data: PhantomData,
         }
     }
 
     fn rust2dart(&self) -> Rust2Dart {
-        #[cfg(not(wasm))]
+        #[cfg(not(target_family = "wasm"))]
         return self.rust2dart.clone();
 
-        #[cfg(wasm)]
+        #[cfg(target_family = "wasm")]
         Rust2Dart::new(self.handle.port())
     }
 

@@ -15,7 +15,7 @@ mod into_into_dart;
 pub mod rust2dart;
 pub mod support;
 
-#[cfg(wasm)]
+#[cfg(target_family = "wasm")]
 mod wasm_bindgen_src;
 
 /// Use this struct in return type of your function, in order to tell the code generator

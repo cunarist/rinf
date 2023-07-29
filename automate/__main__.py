@@ -22,7 +22,9 @@ def replace_string_in_files(directory: str, search_string: str, replace_string: 
 def remove_files_in_folder(directory: str, prefix: str):
     for filename in os.listdir(directory):
         if filename.startswith(prefix):
-            os.remove(os.path.join(directory, filename))
+            filepath = os.path.join(directory, filename)
+            if os.path.isfile(filepath):
+                os.remove(filepath)
 
 
 print("")
@@ -41,7 +43,9 @@ elif sys.argv[1] == "bridge-gen":
         original_api_content = file.read()
 
     temp_api_content = original_api_content.replace(" -> SyncReturn<()>", "")
-    temp_api_content = temp_api_content.replace("use bridge_engine::SyncReturn;", "")
+    temp_api_content = temp_api_content.replace(
+        "\nuse crate::bridge::bridge_engine::SyncReturn;", ""
+    )
     temp_api_content = re.sub(r";\s*SyncReturn\(\(\)\)", ";", temp_api_content)
     temp_api_content = temp_api_content.replace(
         "// Thread 0 running Dart", "// Thread 1 running Rust"
@@ -86,19 +90,19 @@ elif sys.argv[1] == "bridge-gen":
 
     # Modify imports
     directory_path = "./lib/src/"
-    search_string = "package:flutter_rust_bridge/"
-    replace_string = "bridge_engine/"
+    search_string = "package:flutter_rust_bridge/flutter_rust_bridge.dart"
+    replace_string = "bridge_engine/exports.dart"
     replace_string_in_files(directory_path, search_string, replace_string)
 
     directory_path = "./example/native/hub/src/bridge"
     search_string = "flutter_rust_bridge::"
-    replace_string = "bridge_engine::"
+    replace_string = "crate::bridge::bridge_engine::"
     replace_string_in_files(directory_path, search_string, replace_string)
     search_string = "crate::bridge::api_web::"
     replace_string = "crate::bridge::api::"
     replace_string_in_files(directory_path, search_string, replace_string)
     search_string = "FLUTTER_RUST_BRIDGE_HANDLER"
-    replace_string = "FRB_HANDLER"
+    replace_string = "BRIDGE_HANDLER"
     replace_string_in_files(directory_path, search_string, replace_string)
 
 else:

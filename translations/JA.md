@@ -69,10 +69,6 @@ dart run rust_in_flutter:apply_template
     │   └── ...
     ├── linux/
 +   ├── native/
-+   │   ├── bridge_engine/
-+   │   │   ├── src/
-+   │   │   ├── build.rs
-+   │   │   └── Cargo.toml
 +   │   ├── hub/
 +   │   │   ├── src/
 +   │   │   └── Cargo.toml

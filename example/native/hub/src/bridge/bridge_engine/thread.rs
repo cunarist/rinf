@@ -1,9 +1,9 @@
-#[cfg(not(wasm))]
+#[cfg(not(target_family = "wasm"))]
 pub use std::thread::spawn;
 
-#[cfg(wasm)]
+#[cfg(target_family = "wasm")]
 mod web {
-    use crate::{script_path, wasm_bindgen_src::pool::WorkerPool};
+    use crate::bridge::bridge_engine::{script_path, wasm_bindgen_src::pool::WorkerPool};
 
     thread_local! {
         pub static WORKER_POOL: Option<WorkerPool> = WorkerPool::new(
@@ -12,5 +12,5 @@ mod web {
     }
 }
 
-#[cfg(wasm)]
+#[cfg(target_family = "wasm")]
 pub use web::WORKER_POOL;

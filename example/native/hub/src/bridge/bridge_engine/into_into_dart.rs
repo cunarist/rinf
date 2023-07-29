@@ -1,4 +1,4 @@
-use crate::{ffi::*, DartSafe};
+use crate::bridge::bridge_engine::{ffi::*, DartSafe};
 
 /// Basically the Into trait.
 /// We need this separate trait because we need to implement it for Vec<T> etc.
@@ -175,7 +175,7 @@ impl_into_into_dart!(DartOpaque);
 #[cfg(not(target_family = "wasm"))]
 impl_into_into_dart!(allo_isolate::ffi::DartCObject);
 #[cfg(target_family = "wasm")]
-impl_into_into_dart!(crate::JsValue);
+impl_into_into_dart!(wasm_bindgen::JsValue);
 #[cfg(feature = "uuid")]
 impl_into_into_dart!(uuid::Uuid);
 

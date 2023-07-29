@@ -1,4 +1,4 @@
-use crate::ffi::web::*;
+use crate::bridge::bridge_engine::ffi::web::*;
 use js_sys::{global, Array};
 use std::iter::FromIterator;
 use web_sys::{DedicatedWorkerGlobalScope, Worker};

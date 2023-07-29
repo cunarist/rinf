@@ -8,15 +8,31 @@ crate-type = ["lib", "cdylib", "staticlib"]
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 tokio = { version = "1.28.2", features = ["rt-multi-thread", "time"] }
+allo-isolate = { version = "0.1.18", features = ["zero-copy"] }
+libc = "0.2"
+dart-sys = { version = "4.0.2" }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
+web-sys = { version = "0.3.64", features = [
+    "DedicatedWorkerGlobalScope",
+    "MessageEvent",
+    "MessagePort",
+    "ErrorEvent",
+    "Blob",
+    "BlobPropertyBag",
+    "Worker",
+    "Url",
+    "BroadcastChannel",
+    "Window",
+    "console",
+] }
+
+wasm-bindgen = { version = "0.2.87" }
 wasm-bindgen-futures = "0.4.37"
 js-sys = "0.3.64"
-web-sys = { version = "0.3.64", features = ["Window", "console"] }
-
 [dependencies]
-bridge_engine = { path = "../bridge_engine" }
 tokio = { version = "1.28.2", features = ["sync", "macros"] }
+bytemuck = "1.11.0"
 serde = { version = "1.0.164", features = ["derive"] }
 rmp-serde = "1.1.1"
 lazy_static = "1.4.0"

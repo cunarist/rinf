@@ -1,4 +1,4 @@
-use crate::Channel;
+use crate::bridge::bridge_engine::Channel;
 
 pub use super::DartAbi;
 pub use super::MessagePort;

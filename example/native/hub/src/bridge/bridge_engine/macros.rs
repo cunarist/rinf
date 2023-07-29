@@ -25,7 +25,7 @@ macro_rules! transfer {
         #[cfg(target_family = "wasm")]
         {
             use wasm_bindgen::JsValue;
-            use crate::ffi::Transfer;
+            use crate::bridge::bridge_engine::ffi::Transfer;
             #[allow(unused_variables)]
             let worker = move |transfer: &[JsValue]| {
                 let idx = 0;
@@ -36,7 +36,7 @@ macro_rules! transfer {
                 $block
             };
             let transferables = [$($param.transferables()),*].concat();
-            crate::ffi::TransferClosure::new(vec![$($param.serialize()),*], transferables, worker)
+            crate::bridge::bridge_engine::ffi::TransferClosure::new(vec![$($param.serialize()),*], transferables, worker)
         }
     }};
 }
@@ -78,16 +78,16 @@ macro_rules! transfer {
 /// # } #[cfg(not(target_family = "wasm"))] fn main() {}
 /// ```
 #[macro_export]
-macro_rules! spawn {
+macro_rules! spawn_for_bridge {
     ($($tt:tt)*) => {{
         let worker = crate::transfer!($($tt)*);
         #[cfg(not(target_family = "wasm"))]
         {
-            crate::thread::spawn(worker);
+            crate::bridge::bridge_engine::thread::spawn(worker);
         }
         #[cfg(target_family = "wasm")]
         {
-            crate::thread::WORKER_POOL.with(|pool| {
+            crate::bridge::bridge_engine::thread::WORKER_POOL.with(|pool| {
                 if let Some(pool) = pool.as_ref() {
                     pool.run(worker).map_err(|err| println!("worker error: {:?}", err)).ok();
                 } else {
@@ -104,6 +104,6 @@ macro_rules! console_error {
         crate::error($lit)
     };
     ($($tt:tt)*) => {
-        crate::error(&format!($($tt)*))
+        crate::bridge::bridge_engine::error(&format!($($tt)*))
     };
 }

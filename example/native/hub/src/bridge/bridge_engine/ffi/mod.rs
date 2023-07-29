@@ -1,50 +1,50 @@
-#[cfg(wasm)]
+#[cfg(target_family = "wasm")]
 pub type DartAbi = wasm_bindgen::JsValue;
-#[cfg(not(wasm))]
+#[cfg(not(target_family = "wasm"))]
 pub type DartAbi = allo_isolate::ffi::DartCObject;
-#[cfg(not(wasm))]
+#[cfg(not(target_family = "wasm"))]
 use dart_sys::Dart_PersistentHandle;
 
 use std::{mem, ops, sync::Arc, thread::ThreadId};
 
-#[cfg(not(wasm))]
+#[cfg(not(target_family = "wasm"))]
 pub use allo_isolate::IntoDart;
 
-#[cfg(wasm)]
+#[cfg(target_family = "wasm")]
 pub type MessagePort = web::PortLike;
-#[cfg(not(wasm))]
+#[cfg(not(target_family = "wasm"))]
 pub type MessagePort = i64;
 
-#[cfg(wasm)]
+#[cfg(target_family = "wasm")]
 pub type OpaqueMessagePort = wasm_bindgen::JsValue;
-#[cfg(not(wasm))]
+#[cfg(not(target_family = "wasm"))]
 pub type OpaqueMessagePort = i64;
 
-#[cfg(wasm)]
+#[cfg(target_family = "wasm")]
 pub type DartWrapObject = wasm_bindgen::JsValue;
-#[cfg(not(wasm))]
+#[cfg(not(target_family = "wasm"))]
 pub type DartWrapObject = DartHandleWrap;
 
-#[cfg(wasm)]
+#[cfg(target_family = "wasm")]
 pub type DartObject = wasm_bindgen::JsValue;
-#[cfg(not(wasm))]
+#[cfg(not(target_family = "wasm"))]
 pub type DartObject = Dart_PersistentHandle;
 
-#[cfg(wasm)]
+#[cfg(target_family = "wasm")]
 pub mod web;
-#[cfg(wasm)]
+#[cfg(target_family = "wasm")]
 pub use web::*;
 
-#[cfg(not(wasm))]
+#[cfg(not(target_family = "wasm"))]
 pub type Channel = allo_isolate::Isolate;
 
-#[cfg(not(wasm))]
+#[cfg(not(target_family = "wasm"))]
 pub mod io;
 
-#[cfg(not(wasm))]
+#[cfg(not(target_family = "wasm"))]
 pub use io::*;
 
-use crate::DartSafe;
+use crate::bridge::bridge_engine::DartSafe;
 
 /// see [uuid::Bytes](https://docs.rs/uuid/1.1.2/uuid/type.Bytes.html)
 #[cfg(feature = "uuid")]

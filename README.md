@@ -68,11 +68,6 @@ Once you've run the command, there will be some new files and folders that will 
 *   │   ├── main.dart
     │   └── ...
     ├── linux/
-+   ├── native/
-+   │   ├── bridge_engine/
-+   │   │   ├── src/
-+   │   │   ├── build.rs
-+   │   │   └── Cargo.toml
 +   │   ├── hub/
 +   │   │   ├── src/
 +   │   │   └── Cargo.toml

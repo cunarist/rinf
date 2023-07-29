@@ -2,11 +2,11 @@ use std::iter::FromIterator;
 
 use super::DartAbi;
 use super::MessagePort;
-use crate::support;
-pub use crate::wasm_bindgen_src::transfer::*;
-use crate::DartOpaque;
-use crate::DartSafe;
-use crate::RustOpaque;
+use crate::bridge::bridge_engine::support;
+pub use crate::bridge::bridge_engine::wasm_bindgen_src::transfer::*;
+use crate::bridge::bridge_engine::DartOpaque;
+use crate::bridge::bridge_engine::DartSafe;
+use crate::bridge::bridge_engine::RustOpaque;
 pub use js_sys;
 pub use js_sys::Array as JsArray;
 use js_sys::*;
@@ -16,7 +16,7 @@ pub use wasm_bindgen::prelude::*;
 pub use wasm_bindgen::JsCast;
 use web_sys::BroadcastChannel;
 
-pub use crate::wasm_bindgen_src::transfer::*;
+pub use crate::bridge::bridge_engine::wasm_bindgen_src::transfer::*;
 pub trait IntoDart {
     fn into_dart(self) -> DartAbi;
 }

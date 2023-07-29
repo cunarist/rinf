@@ -8,6 +8,8 @@ use api::RustResponseUnique;
 use api::RustSignal;
 use tokio::sync::mpsc::Receiver;
 
+pub mod bridge_engine;
+
 #[cfg(not(target_family = "wasm"))]
 pub mod api;
 #[cfg(not(target_family = "wasm"))]

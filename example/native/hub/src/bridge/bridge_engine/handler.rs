@@ -4,11 +4,12 @@ use std::any::Any;
 use std::panic;
 use std::panic::{RefUnwindSafe, UnwindSafe};
 
-use crate::ffi::{IntoDart, MessagePort};
+use crate::bridge::bridge_engine::ffi::{IntoDart, MessagePort};
 
-use crate::rust2dart::{IntoIntoDart, Rust2Dart, TaskCallback};
-use crate::support::WireSyncReturn;
-use crate::{spawn, SyncReturn};
+use crate::bridge::bridge_engine::rust2dart::{IntoIntoDart, Rust2Dart, TaskCallback};
+use crate::bridge::bridge_engine::support::WireSyncReturn;
+use crate::bridge::bridge_engine::SyncReturn;
+use crate::spawn_for_bridge;
 
 /// The types of return values for a particular Rust function.
 #[derive(Copy, Clone)]
@@ -198,7 +199,7 @@ impl<EH: ErrorHandler> Executor for ThreadPoolExecutor<EH> {
 
         let WrapInfo { port, mode, .. } = wrap_info;
 
-        spawn!(|port: Option<MessagePort>| {
+        spawn_for_bridge!(|port: Option<MessagePort>| {
             let port2 = port.as_ref().cloned();
             let thread_result = panic::catch_unwind(move || {
                 let port2 = port2.expect("(worker) thread");
@@ -310,9 +311,9 @@ impl ErrorHandler for ReportDartErrorHandler {
 fn wire_sync_from_data<T: IntoDart>(data: T, success: bool) -> WireSyncReturn {
     let sync_return = vec![data.into_dart(), success.into_dart()].into_dart();
 
-    #[cfg(not(wasm))]
-    return crate::support::new_leak_box_ptr(sync_return);
+    #[cfg(not(target_family = "wasm"))]
+    return crate::bridge::bridge_engine::support::new_leak_box_ptr(sync_return);
 
-    #[cfg(wasm)]
+    #[cfg(target_family = "wasm")]
     return sync_return;
 }

@@ -4,10 +4,10 @@
 
 use std::mem;
 
-pub use crate::ffi::*;
+pub use crate::bridge::bridge_engine::ffi::*;
 pub use lazy_static::lazy_static;
 
-pub use crate::handler::DefaultHandler;
+pub use crate::bridge::bridge_engine::handler::DefaultHandler;
 
 // ref https://stackoverflow.com/questions/39224904/how-to-expose-a-rust-vect-to-ffi
 pub fn new_leak_vec_ptr<T: Clone>(fill: T, length: i32) -> *mut T {
@@ -65,11 +65,11 @@ pub fn slice_from_byte_buffer<T: bytemuck::Pod>(buffer: Vec<u8>) -> Box<[T]> {
     }
 }
 
-#[cfg(not(wasm))]
+#[cfg(not(target_family = "wasm"))]
 use allo_isolate::ffi::DartCObject;
 
-#[cfg(not(wasm))]
+#[cfg(not(target_family = "wasm"))]
 pub type WireSyncReturn = *mut DartCObject;
 
-#[cfg(wasm)]
+#[cfg(target_family = "wasm")]
 pub type WireSyncReturn = wasm_bindgen::JsValue;
