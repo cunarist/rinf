@@ -433,7 +433,7 @@ flutter: ZERO-COST ABSTRACTION
 
 **Q**. 并发在底层是如何工作的？
 
-**A**. 在本机平台上，Dart 通常在单个线程中运行，而 Rust 利用`tokio`运行时来充分利用计算机上的所有核心，从而使异步任务在该运行时内高效运行。这样可以更好地利用资源并改进性能。在 Web 上，Dart 仍然在主线程中运行，而 Rust 则在单个 Web Worker（线程）中运行。这是必要的限制，因为 Web Worker 不共享内存，但仍允许 Rust 在该专用线程内执行并发操作。
+**A**. 在本机平台上，Dart 通常在单个线程中运行，而 Rust 利用`tokio`运行时来充分利用计算机上的所有核心，允许异步任务在该运行时内高效运行。这样可以更好地利用资源并提高性能。在 Web 上，Dart 仍然在主线程中运行，但 Rust 在单个 Web Worker（线程）内运行。这是一个必要的限制，因为 Web Worker 不共享内存，但它仍然允许 Rust 通过将 Rust 的`Future`转换为 JavaScript 的`Promise`来在该专用线程内执行并发操作。
 
 # ☕ 支持我们
 
