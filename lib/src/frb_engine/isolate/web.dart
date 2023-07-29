@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_web_libraries_in_flutter
+
 /// Shims for dart:isolate on the web.
 library html_isolate;
 

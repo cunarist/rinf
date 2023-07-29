@@ -1,3 +1,9 @@
+## 2.0.1
+
+- Improved guides.
+- Added `print!` web alias macro.
+- Organized exposed Dart APIs.
+
 ## 2.0.0
 
 - Added web support.
