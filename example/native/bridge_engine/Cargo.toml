@@ -5,9 +5,7 @@ edition = "2021"
 
 [dependencies]
 bytemuck = "1.11.0"
-anyhow = "1.0.64"
 lazy_static = "1.4.0"
-log = "0.4"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 allo-isolate = { version = "0.1.18", features = ["zero-copy"] }

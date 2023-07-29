@@ -5,7 +5,6 @@ pub type DartAbi = allo_isolate::ffi::DartCObject;
 #[cfg(not(wasm))]
 use dart_sys::Dart_PersistentHandle;
 
-use log::warn;
 use std::{mem, ops, sync::Arc, thread::ThreadId};
 
 #[cfg(not(wasm))]
@@ -259,10 +258,10 @@ impl Drop for DartOpaque {
                     let ptr = inner.into_raw();
 
                     if !channel.post(ptr) {
-                        warn!("Drop DartOpaque after closing the port.");
+                        println!("Drop DartOpaque after closing the port.");
                     };
                 } else {
-                    warn!("Drop non droppable DartOpaque.");
+                    println!("Drop non droppable DartOpaque.");
                 }
             }
         }

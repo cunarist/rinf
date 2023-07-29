@@ -5,7 +5,6 @@ use std::panic;
 use std::panic::{RefUnwindSafe, UnwindSafe};
 
 use crate::ffi::{IntoDart, MessagePort};
-use anyhow::Result;
 
 use crate::rust2dart::{IntoIntoDart, Rust2Dart, TaskCallback};
 use crate::support::WireSyncReturn;
@@ -47,7 +46,7 @@ pub trait Handler {
     fn wrap<PrepareFn, TaskFn, TaskRet, D>(&self, wrap_info: WrapInfo, prepare: PrepareFn)
     where
         PrepareFn: FnOnce() -> TaskFn + UnwindSafe,
-        TaskFn: FnOnce(TaskCallback) -> Result<TaskRet> + Send + UnwindSafe + 'static,
+        TaskFn: FnOnce(TaskCallback) -> Result<TaskRet, BridgeError> + Send + UnwindSafe + 'static,
         TaskRet: IntoIntoDart<D>,
         D: IntoDart;
 
@@ -59,7 +58,7 @@ pub trait Handler {
         sync_task: SyncTaskFn,
     ) -> WireSyncReturn
     where
-        SyncTaskFn: FnOnce() -> Result<SyncReturn<TaskRet>> + UnwindSafe,
+        SyncTaskFn: FnOnce() -> Result<SyncReturn<TaskRet>, BridgeError> + UnwindSafe,
         TaskRet: IntoDart;
 }
 
@@ -96,7 +95,7 @@ impl<E: Executor, EH: ErrorHandler> Handler for SimpleHandler<E, EH> {
     fn wrap<PrepareFn, TaskFn, TaskRet, D>(&self, wrap_info: WrapInfo, prepare: PrepareFn)
     where
         PrepareFn: FnOnce() -> TaskFn + UnwindSafe,
-        TaskFn: FnOnce(TaskCallback) -> Result<TaskRet> + Send + UnwindSafe + 'static,
+        TaskFn: FnOnce(TaskCallback) -> Result<TaskRet, BridgeError> + Send + UnwindSafe + 'static,
         TaskRet: IntoIntoDart<D>,
         D: IntoDart,
     {
@@ -115,7 +114,7 @@ impl<E: Executor, EH: ErrorHandler> Handler for SimpleHandler<E, EH> {
                 self.executor.execute(wrap_info2, task);
             }) {
                 self.error_handler
-                    .handle_error(wrap_info.port.unwrap(), Error::Panic(error));
+                    .handle_error(wrap_info.port.unwrap(), BridgeError::Panic(error));
             }
         });
     }
@@ -127,7 +126,7 @@ impl<E: Executor, EH: ErrorHandler> Handler for SimpleHandler<E, EH> {
     ) -> WireSyncReturn
     where
         TaskRet: IntoDart,
-        SyncTaskFn: FnOnce() -> Result<SyncReturn<TaskRet>> + UnwindSafe,
+        SyncTaskFn: FnOnce() -> Result<SyncReturn<TaskRet>, BridgeError> + UnwindSafe,
     {
         // NOTE This extra [catch_unwind] **SHOULD** be put outside **ALL** code!
         // For reason, see comments in [wrap]
@@ -135,13 +134,15 @@ impl<E: Executor, EH: ErrorHandler> Handler for SimpleHandler<E, EH> {
             let catch_unwind_result = panic::catch_unwind(move || {
                 match self.executor.execute_sync(wrap_info, sync_task) {
                     Ok(data) => wire_sync_from_data(data.0, true),
-                    Err(err) => self
+                    Err(_err) => self
                         .error_handler
-                        .handle_error_sync(Error::ResultError(err)),
+                        .handle_error_sync(BridgeError::ResultError),
                 }
             });
-            catch_unwind_result
-                .unwrap_or_else(|error| self.error_handler.handle_error_sync(Error::Panic(error)))
+            catch_unwind_result.unwrap_or_else(|error| {
+                self.error_handler
+                    .handle_error_sync(BridgeError::Panic(error))
+            })
         })
         .unwrap_or_else(|_| wire_sync_from_data(None::<()>, false))
     }
@@ -156,7 +157,7 @@ pub trait Executor: RefUnwindSafe {
     /// value, i.e. types that implement [`IntoDart`].
     fn execute<TaskFn, TaskRet, D>(&self, wrap_info: WrapInfo, task: TaskFn)
     where
-        TaskFn: FnOnce(TaskCallback) -> Result<TaskRet> + Send + UnwindSafe + 'static,
+        TaskFn: FnOnce(TaskCallback) -> Result<TaskRet, BridgeError> + Send + UnwindSafe + 'static,
         TaskRet: IntoIntoDart<D>,
         D: IntoDart;
 
@@ -165,9 +166,9 @@ pub trait Executor: RefUnwindSafe {
         &self,
         wrap_info: WrapInfo,
         sync_task: SyncTaskFn,
-    ) -> Result<SyncReturn<TaskRet>>
+    ) -> Result<SyncReturn<TaskRet>, BridgeError>
     where
-        SyncTaskFn: FnOnce() -> Result<SyncReturn<TaskRet>> + UnwindSafe,
+        SyncTaskFn: FnOnce() -> Result<SyncReturn<TaskRet>, BridgeError> + UnwindSafe,
         TaskRet: IntoDart;
 }
 
@@ -188,7 +189,7 @@ impl<EH: ErrorHandler> ThreadPoolExecutor<EH> {
 impl<EH: ErrorHandler> Executor for ThreadPoolExecutor<EH> {
     fn execute<TaskFn, TaskRet, D>(&self, wrap_info: WrapInfo, task: TaskFn)
     where
-        TaskFn: FnOnce(TaskCallback) -> Result<TaskRet> + Send + UnwindSafe + 'static,
+        TaskFn: FnOnce(TaskCallback) -> Result<TaskRet, BridgeError> + Send + UnwindSafe + 'static,
         TaskRet: IntoIntoDart<D>,
         D: IntoDart,
     {
@@ -221,14 +222,14 @@ impl<EH: ErrorHandler> Executor for ThreadPoolExecutor<EH> {
                             }
                         }
                     }
-                    Err(error) => {
-                        eh2.handle_error(port2, Error::ResultError(error));
+                    Err(_error) => {
+                        eh2.handle_error(port2, BridgeError::ResultError);
                     }
                 };
             });
 
             if let Err(error) = thread_result {
-                eh.handle_error(port.expect("(worker) eh"), Error::Panic(error));
+                eh.handle_error(port.expect("(worker) eh"), BridgeError::Panic(error));
             }
         });
     }
@@ -237,9 +238,9 @@ impl<EH: ErrorHandler> Executor for ThreadPoolExecutor<EH> {
         &self,
         _wrap_info: WrapInfo,
         sync_task: SyncTaskFn,
-    ) -> Result<SyncReturn<TaskRet>>
+    ) -> Result<SyncReturn<TaskRet>, BridgeError>
     where
-        SyncTaskFn: FnOnce() -> Result<SyncReturn<TaskRet>> + UnwindSafe,
+        SyncTaskFn: FnOnce() -> Result<SyncReturn<TaskRet>, BridgeError> + UnwindSafe,
         TaskRet: IntoDart,
     {
         sync_task()
@@ -248,27 +249,26 @@ impl<EH: ErrorHandler> Executor for ThreadPoolExecutor<EH> {
 
 /// Errors that occur from normal code execution.
 #[derive(Debug)]
-pub enum Error {
-    /// Errors from an [anyhow::Error].
-    ResultError(anyhow::Error),
+pub enum BridgeError {
+    ResultError,
     /// Exceptional errors from panicking.
     Panic(Box<dyn Any + Send>),
 }
 
-impl Error {
+impl BridgeError {
     /// The identifier of the type of error.
     pub fn code(&self) -> &'static str {
         match self {
-            Error::ResultError(_) => "RESULT_ERROR",
-            Error::Panic(_) => "PANIC_ERROR",
+            BridgeError::ResultError => "RESULT_ERROR",
+            BridgeError::Panic(_) => "PANIC_ERROR",
         }
     }
 
     /// The message of the error.
     pub fn message(&self) -> String {
         match self {
-            Error::ResultError(e) => format!("{e:?}"),
-            Error::Panic(panic_err) => match panic_err.downcast_ref::<&'static str>() {
+            BridgeError::ResultError => "There was a result error inside the bridge".into(),
+            BridgeError::Panic(panic_err) => match panic_err.downcast_ref::<&'static str>() {
                 Some(s) => *s,
                 None => match panic_err.downcast_ref::<String>() {
                     Some(s) => &s[..],
@@ -287,10 +287,10 @@ impl Error {
 /// or to an external logging service.
 pub trait ErrorHandler: UnwindSafe + RefUnwindSafe + Copy + Send + 'static {
     /// The default error handler.
-    fn handle_error(&self, port: MessagePort, error: Error);
+    fn handle_error(&self, port: MessagePort, error: BridgeError);
 
     /// Special handler only used for synchronous code.
-    fn handle_error_sync(&self, error: Error) -> WireSyncReturn;
+    fn handle_error_sync(&self, error: BridgeError) -> WireSyncReturn;
 }
 
 /// The default error handler used by generated code.
@@ -298,11 +298,11 @@ pub trait ErrorHandler: UnwindSafe + RefUnwindSafe + Copy + Send + 'static {
 pub struct ReportDartErrorHandler;
 
 impl ErrorHandler for ReportDartErrorHandler {
-    fn handle_error(&self, port: MessagePort, error: Error) {
+    fn handle_error(&self, port: MessagePort, error: BridgeError) {
         Rust2Dart::new(port).error(error.code().to_string(), error.message());
     }
 
-    fn handle_error_sync(&self, error: Error) -> WireSyncReturn {
+    fn handle_error_sync(&self, error: BridgeError) -> WireSyncReturn {
         wire_sync_from_data(format!("{}: {}", error.code(), error.message()), false)
     }
 }

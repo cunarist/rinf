@@ -85,20 +85,15 @@ macro_rules! spawn {
         {
             crate::thread::THREAD_POOL.lock().unwrap().execute(worker)
         }
-
         #[cfg(target_family = "wasm")]
         {
-            use anyhow::anyhow;
-            let res = crate::thread::WORKER_POOL.with(|pool| {
+            crate::thread::WORKER_POOL.with(|pool| {
                 if let Some(pool) = pool.as_ref() {
-                    pool.run(worker).map_err(|err| anyhow!("worker error: {:?}", err))
+                    pool.run(worker).map_err(|err| println!("worker error: {:?}", err)).ok();
                 } else {
-                    Err(anyhow!("Worker was not initialized."))
+                    println!("Worker was not initialized.");
                 }
             });
-            if let Err(err) = res {
-                crate::console_error!("worker error: {:?}", err);
-            }
         }
     }};
 }
