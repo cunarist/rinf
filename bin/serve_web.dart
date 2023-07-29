@@ -174,7 +174,12 @@ void main(List<String> args) async {
     "target",
     "add",
     "wasm32-unknown-unknown",
-  ]);
+  ]); // For actual building
+  Process.runSync("rustup", [
+    "target",
+    "add",
+    "wasm32-unknown-unknown",
+  ]); // For Rust-analyzer
   Process.runSync("cargo", ["install", "wasm-pack"]);
   Process.runSync("cargo", ["install", "wasm-bindgen-cli"]);
 
