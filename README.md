@@ -69,7 +69,7 @@ Once you've run the command, there will be some new files and folders that will 
     │   └── ...
     ├── linux/
 +   ├── native/
-+   │   ├── frb_engine/
++   │   ├── bridge_engine/
 +   │   │   ├── src/
 +   │   │   ├── build.rs
 +   │   │   └── Cargo.toml

@@ -7,7 +7,7 @@ import 'package:js/js_util.dart';
 
 import 'dart:typed_data' hide Int64List, Uint64List;
 
-import 'package:rust_in_flutter/src/frb_engine/helpers.dart'
+import 'package:rust_in_flutter/src/bridge_engine/helpers.dart'
     show UnmodifiableTypedListException;
 export 'dart:typed_data' hide Int64List, Uint64List;
 

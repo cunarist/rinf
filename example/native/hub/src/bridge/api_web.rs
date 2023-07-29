@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use frb_engine::StreamSink;
+use bridge_engine::StreamSink;
 
 use lazy_static::lazy_static;
 use std::cell::RefCell;

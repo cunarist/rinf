@@ -41,7 +41,7 @@ elif sys.argv[1] == "bridge-gen":
         original_api_content = file.read()
 
     temp_api_content = original_api_content.replace(" -> SyncReturn<()>", "")
-    temp_api_content = temp_api_content.replace("use frb_engine::SyncReturn;", "")
+    temp_api_content = temp_api_content.replace("use bridge_engine::SyncReturn;", "")
     temp_api_content = re.sub(r";\s*SyncReturn\(\(\)\)", ";", temp_api_content)
     temp_api_content = temp_api_content.replace(
         "// Thread 0 running Dart", "// Thread 1 running Rust"
@@ -87,12 +87,12 @@ elif sys.argv[1] == "bridge-gen":
     # Modify imports
     directory_path = "./lib/src/"
     search_string = "package:flutter_rust_bridge/"
-    replace_string = "frb_engine/"
+    replace_string = "bridge_engine/"
     replace_string_in_files(directory_path, search_string, replace_string)
 
     directory_path = "./example/native/hub/src/bridge"
     search_string = "flutter_rust_bridge::"
-    replace_string = "frb_engine::"
+    replace_string = "bridge_engine::"
     replace_string_in_files(directory_path, search_string, replace_string)
     search_string = "crate::bridge::api_web::"
     replace_string = "crate::bridge::api::"

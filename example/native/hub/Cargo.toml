@@ -15,7 +15,7 @@ js-sys = "0.3.64"
 web-sys = { version = "0.3.64", features = ["Window", "console"] }
 
 [dependencies]
-frb_engine = { path = "../frb_engine" }
+bridge_engine = { path = "../bridge_engine" }
 tokio = { version = "1.28.2", features = ["sync", "macros"] }
 serde = { version = "1.0.164", features = ["derive"] }
 rmp-serde = "1.1.1"

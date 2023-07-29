@@ -5,7 +5,7 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:meta/meta.dart';
-import 'frb_engine/exports.dart';
+import 'bridge_engine/exports.dart';
 import 'package:uuid/uuid.dart';
 
 abstract class Bridge {

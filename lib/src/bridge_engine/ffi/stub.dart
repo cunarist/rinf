@@ -11,7 +11,7 @@ export 'io.dart' if (dart.library.html) 'web.dart'
         NativePortType,
         PlatformPointer,
         OpaqueTypeFinalizer;
-import 'package:rust_in_flutter/src/frb_engine/isolate.dart' show SendPort;
+import 'package:rust_in_flutter/src/bridge_engine/isolate.dart' show SendPort;
 
 /// This class, together with its subclasses, are only for internal usage.
 /// Usually it should not be used by normal users.
