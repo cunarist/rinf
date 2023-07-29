@@ -67,8 +67,6 @@ flutter:
       windows:
         ffiPlugin: true
       web:
-        pluginClass: RustInFlutterWeb
-        fileName: rust_in_flutter_web.dart
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
