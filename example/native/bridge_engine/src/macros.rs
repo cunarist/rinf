@@ -83,7 +83,7 @@ macro_rules! spawn {
         let worker = crate::transfer!($($tt)*);
         #[cfg(not(target_family = "wasm"))]
         {
-            crate::thread::THREAD_POOL.lock().unwrap().execute(worker)
+            crate::thread::spawn(worker);
         }
         #[cfg(target_family = "wasm")]
         {

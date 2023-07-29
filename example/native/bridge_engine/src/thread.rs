@@ -1,17 +1,5 @@
 #[cfg(not(wasm))]
-mod io {
-    use lazy_static::lazy_static;
-    use std::sync::Mutex;
-    use threadpool::ThreadPool;
-
-    lazy_static! {
-        pub static ref THREAD_POOL: Mutex<ThreadPool> =
-            Mutex::new(ThreadPool::with_name("frb_workerpool".into(), 1));
-    }
-}
-
-#[cfg(not(wasm))]
-pub use io::THREAD_POOL;
+pub use std::thread::spawn;
 
 #[cfg(wasm)]
 mod web {
