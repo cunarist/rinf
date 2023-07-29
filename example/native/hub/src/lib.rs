@@ -14,7 +14,6 @@ mod with_request;
 /// Always use non-blocking async functions in `tokio`'s core threads,
 /// such as `tokio::fs::File::open`.
 #[cfg_attr(not(target_family = "wasm"), tokio::main)]
-#[cfg_attr(target_family = "wasm", allow(unused_variables))]
 async fn main() {
     // This is `tokio::sync::mpsc::Reciver` that receives the requests in an async manner.
     let mut request_receiver = bridge::get_request_receiver();
