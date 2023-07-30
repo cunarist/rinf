@@ -4,7 +4,11 @@ macro_rules! execute_entry {
         let worker = crate::transfer!($($tt)*);
         #[cfg(not(target_family = "wasm"))]
         {
-            std::thread::spawn(worker);
+            use crate::bridge::bridge_engine::thread::SENDER;
+            use std::sync::mpsc::Sender;
+            let _ = SENDER.with(|sender: &Sender<Box<dyn FnOnce() + Send>>| {
+                sender.send(Box::new(worker))
+            });
         }
         #[cfg(target_family = "wasm")]
         {

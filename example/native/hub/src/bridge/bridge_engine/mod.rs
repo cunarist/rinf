@@ -2,16 +2,14 @@ use std::panic::{RefUnwindSafe, UnwindSafe};
 
 pub use handler::{FfiCallMode, Handler, WrapInfo};
 pub use rust2dart::StreamSink;
-
 pub mod ffi;
 pub use ffi::*;
-
 pub mod handler;
-#[macro_use]
-mod macros;
 mod into_into_dart;
+mod macros;
 pub mod rust2dart;
 pub mod support;
+pub mod thread;
 
 #[cfg(target_family = "wasm")]
 mod wasm_bindgen_src;
