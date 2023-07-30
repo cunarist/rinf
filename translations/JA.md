@@ -356,7 +356,7 @@ Rust から Dart に毎秒増加する数値を送信したいとします。こ
 +   pub async fn keep_sending_numbers() {
 +       let mut current_number: i32 = 1;
 +       loop {
-+           crate::sleep(std::time::Duration::from_secs(1)).await;
++           crate::time::sleep(std::time::Duration::from_secs(1)).await;
 +
 +           #[derive(Serialize)]
 +           struct RustSignalSchema {
