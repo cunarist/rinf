@@ -176,16 +176,3 @@ impl_into_into_dart!(DartOpaque);
 impl_into_into_dart!(allo_isolate::ffi::DartCObject);
 #[cfg(target_family = "wasm")]
 impl_into_into_dart!(wasm_bindgen::JsValue);
-#[cfg(feature = "uuid")]
-impl_into_into_dart!(uuid::Uuid);
-
-#[cfg(feature = "chrono")]
-mod chrono_impls {
-    use chrono::{Local, Utc};
-
-    use super::IntoIntoDart;
-    impl_into_into_dart!(chrono::Duration);
-    impl_into_into_dart!(chrono::NaiveDateTime);
-    impl_into_into_dart!(chrono::DateTime<Local>);
-    impl_into_into_dart!(chrono::DateTime<Utc>);
-}
