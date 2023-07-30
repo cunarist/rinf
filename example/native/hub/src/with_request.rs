@@ -1,6 +1,6 @@
 //! This module runs the corresponding function
-//! with the received requests
-//! and returns the response.
+//! when a `RustRequest` was received from Dart
+//! and returns `RustResponse`.
 
 use crate::bridge::api::RustRequestUnique;
 use crate::bridge::api::RustResponse;

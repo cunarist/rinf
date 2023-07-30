@@ -4,7 +4,7 @@
 //! and other crates due to these limitations.
 //!
 //! To address this issue, this module offers functions and macros
-//! with the same names as the original native ones,
+//! with the **same names** as the original native ones,
 //! providing workarounds for these constraints.
 //!
 //! You might encounter situations
