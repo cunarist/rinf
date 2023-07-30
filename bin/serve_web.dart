@@ -167,8 +167,8 @@ void main(List<String> args) async {
     return;
   }
 
-  print("Verifying Rust toolchain for the web.");
-  print("This might take a while if there are new updates to be installed.");
+  print("Verifying Rust toolchain for the web." +
+      " This might take a while if there are new updates to be installed.");
   Process.runSync("rustup", ["toolchain", "install", "nightly"]);
   Process.runSync("rustup", ["+nightly", "component", "add", "rust-src"]);
   Process.runSync("rustup", [
