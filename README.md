@@ -68,6 +68,7 @@ Once you've run the command, there will be some new files and folders that will 
 *   │   ├── main.dart
     │   └── ...
     ├── linux/
++   ├── native/
 +   │   ├── hub/
 +   │   │   ├── src/
 +   │   │   └── Cargo.toml
