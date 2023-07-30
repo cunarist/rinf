@@ -36,25 +36,30 @@ void main() async {
   final cargoDestination = File('$projectPath/Cargo.toml');
   cargoSource.copySync(cargoDestination.path);
 
+  // Create `.cargo/config.toml` file
+  final cargoConfigFile = File('$projectPath/.cargo/config.toml');
+  if (!cargoConfigFile.existsSync()) {
+    cargoConfigFile.createSync(recursive: true);
+  }
+  const cargoConfigContent = '''
+[build]
+# Uncomment the line below to switch Rust-analyzer to perform
+# type checking and linting in webassembly mode, for the web target.
+# target = "wasm32-unknown-unknown"
+''';
+  cargoConfigFile.writeAsStringSync(cargoConfigContent);
+
   // Add some lines to `.gitignore`
-  final sectionTop = '# Rust related';
+  final sectionTitle = '# Rust related';
   final gitignoreFile = File('$projectPath/.gitignore');
-  String contents;
-  try {
-    contents = gitignoreFile.readAsStringSync();
-  } on FileSystemException {
-    contents = '';
+  if (!gitignoreFile.existsSync()) {
+    gitignoreFile.createSync(recursive: true);
   }
-  var doesRustSectionExist = false;
-  var splitted = contents.split('\n\n');
+  final gitignoreContent = gitignoreFile.readAsStringSync();
+  var splitted = gitignoreContent.split('\n\n');
   splitted = splitted.map((s) => s.trim()).toList();
-  for (final piece in splitted) {
-    if (piece.contains(sectionTop)) {
-      doesRustSectionExist = true;
-    }
-  }
-  if (!doesRustSectionExist) {
-    var text = sectionTop;
+  if (!gitignoreContent.contains(sectionTitle)) {
+    var text = sectionTitle;
     text += '\n' + '.cargo/';
     text += '\n' + 'target/';
     splitted.add(text);
