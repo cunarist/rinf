@@ -60,10 +60,9 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
 
 pub async fn keep_drawing_mandelbrot() {
     let mut scale: f64 = 1.0;
+    let mut interval = crate::time::interval(std::time::Duration::from_millis(50));
     loop {
-        // Never use `std::thread::sleep` in `tokio`'s core threads
-        // because it will block the async runtime.
-        crate::time::sleep(std::time::Duration::from_millis(20)).await;
+        interval.tick().await;
         scale *= 0.95;
         if scale < 1e-7 {
             scale = 1.0
