@@ -1,3 +1,21 @@
+#[macro_export]
+macro_rules! execute_entry {
+    ($($tt:tt)*) => {{
+        let worker = crate::transfer!($($tt)*);
+        #[cfg(not(target_family = "wasm"))]
+        {
+            std::thread::spawn(worker);
+        }
+        #[cfg(target_family = "wasm")]
+        {
+            use web_sys::Worker;
+            crate::bridge::bridge_engine::wasm_bindgen_src::worker::WEB_WORKER.with(|web_worker: &Worker| {
+                let _ = worker.apply(web_worker);
+            });
+        }
+    }};
+}
+
 /// On WASM, [JsValue][wasm_bindgen::JsValue]s cannot be shared between scopes but instead can be
 /// ["transferred"]. Rust however is not aware of transferables and therefore cannot
 /// capture these values. This macro wraps a closure and returns a [TransferClosure][crate::ffi::TransferClosure] on WASM platforms
@@ -37,63 +55,6 @@ macro_rules! transfer {
             };
             let transferables = [$($param.transferables()),*].concat();
             crate::bridge::bridge_engine::ffi::TransferClosure::new(vec![$($param.serialize()),*], transferables, worker)
-        }
-    }};
-}
-
-/// Spawn a task using the internal thread pool.
-/// Interprets the parameters as a list of captured transferables to
-/// send to this thread.
-///
-/// Also see [`transfer`].
-///
-/// Example:
-/// ```
-/// let (tx, rx) = std::sync::mpsc::channel();
-/// crate::spawn!(|| {
-///     tx.send(true).unwrap();
-/// });
-/// assert_eq!(rx.recv(), Ok(true));
-/// ```
-///
-/// Sending a JS transferable:
-///
-/// ```
-/// # #[cfg(target_family = "wasm")] fn main() {
-/// use web_sys::{MessagePort, MessageEvent};
-/// use wasm_bindgen::prelude::*;
-///
-/// let channel = web_sys::MessageChannel::new().unwrap();
-///
-/// let onmessage = Closure::new(move |event: MessageEvent| {
-///     assert!(event.data() == true);
-/// });
-/// channel.port1().set_onmessage(Some(onmessage.as_ref().unchecked_ref()));
-/// onmessage.forget();
-/// let port2 = channel.port2();
-/// // Declare the transferable with the same name and type
-/// crate::spawn!(|port2: MessagePort| {
-///     port2.post_message(&JsValue::from(true)).unwrap();
-/// });
-/// # } #[cfg(not(target_family = "wasm"))] fn main() {}
-/// ```
-#[macro_export]
-macro_rules! spawn_for_bridge {
-    ($($tt:tt)*) => {{
-        let worker = crate::transfer!($($tt)*);
-        #[cfg(not(target_family = "wasm"))]
-        {
-            crate::bridge::bridge_engine::thread::spawn(worker);
-        }
-        #[cfg(target_family = "wasm")]
-        {
-            crate::bridge::bridge_engine::thread::WORKER_POOL.with(|pool| {
-                if let Some(pool) = pool.as_ref() {
-                    pool.run(worker).map_err(|err| println!("worker error: {:?}", err)).ok();
-                } else {
-                    println!("Worker was not initialized.");
-                }
-            });
         }
     }};
 }

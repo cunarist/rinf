@@ -6,8 +6,6 @@ pub use rust2dart::StreamSink;
 pub mod ffi;
 pub use ffi::*;
 
-pub mod thread;
-
 pub mod handler;
 #[macro_use]
 mod macros;
