@@ -431,6 +431,14 @@ flutter: ZERO-COST ABSTRACTION
 
 **A**. 在本地平台上，Dart 像往常一样在单个线程中运行，而 Rust 则利用异步的`tokio`运行时，以充分利用计算机上的所有核心，使得异步任务能够高效地在该运行时中运行。在 Web 上，Dart 仍然在主线程中运行，但 Rust 仅在单个 Web Worker（线程）中运行。这是一个必要的限制，因为 Web Worker 不共享内存，但仍然可以通过将 Rust 的`Future`转换为 JavaScript 的`Promise`并将它们传递到 JavaScript 事件循环中，在这一个专用线程内执行并发操作。
 
+**Q**. 如何使消息完全类型安全？
+
+**A**. 当使用 MessagePack 序列化时，诸如 VSCode 等 IDE 可能无法提供完整的智能感知支持，从而可能导致类型相关的问题。为了确保在 IDE 中进行完全类型安全的检查，您可以选择使用 Protobuf 替代 MessagePack。Protobuf 是一种类型安全的序列化方法，有助于避免数据类型相关的错误。尽管将 Protobuf 集成到此包之外超出了范围，但您可以参考其[官方文档](https://protobuf.dev/)来了解实现细节。
+
+**Q**. 构建后的 Web 版本在浏览器控制台显示与跨域策略有关的错误。
+
+**A**. 在构建二进制文件并准备部署后，请确保您的 Web 服务器配置响应中包含以下头信息：`Cross-Origin-Resource-Policy` 的值设置为 `same-origin`，以及 `Cross-Origin-Embedder-Policy` 设置为 `require-corp`。
+
 # ☕ 支持我们
 
 😉 如果您从 Rust-In-Flutter 的功能中受益，并认为它对您非常有帮助，为什么不考虑下支持这个项目呢？您的慷慨捐助将有助于 Rust-In-Flutter 项目的维护和开发，确保其不断改进、发展！

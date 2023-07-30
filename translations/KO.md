@@ -433,6 +433,14 @@ Rust에서 Dart로 매 초마다 증가하는 숫자를 보내고 싶다고 가�
 
 **A**. 네이티브 플랫폼에서의 Dart는 당연히 단일 스레드에서 실행되며, Rust는 비동기 방식의 `tokio` 런타임을 활용하여 컴퓨터의 모든 코어를 활용하고, 비동기 작업들이 그 런타임 내에서 효율적으로 실행될 수 있도록 합니다. 웹에서도 마찬가지로 Dart는 메인 스레드에서 실행되지만, Rust는 하나의 Web worker(스레드) 내에서만 작동합니다. Web worker는 메모리를 공유하지 않기 때문에 이 제약이 불가피하지만, 그 하나의 스레드 내에서나마 Rust가 비동기 방식으로 작업을 수행한다는 점은 같으며, 이는 Rust의 `Future`를 JavaScript의 `Promise`로 변환하고 JavaScript의 이벤트 루프 속으로 전달함으로써 이루어집니다.
 
+**Q**. 메시지에 어떻게 완전한 정적 타입을 사용할 수 있나요?
+
+**A**. MessagePack 직렬화를 사용하면, VSCode와 같은 IDE의 인텔리센스로부터 완벽한 지원을 받기는 힘들 수 있으며, 이는 잠재적인 타입 관련 문제를 야기할 수도 있습니다. IDE의 완전한 타입 검사를 사용하기 위해선 MessagePack 대신 Protobuf를 선택할 수도 있습니다. Protobuf는 데이터 타입 관련 오류를 방지하는 정적 타입의 직렬화 방식입니다. Protobuf를 통합하는 방법은 이 패키지의 지원 범위를 벗어나므로, [공식 문서](https://protobuf.dev/)를 참조하시기 바랍니다.
+
+**Q**. 빌드된 웹 버전을 실행하면 브라우저에 Cross origin policy와 관련된 오류가 표시됩니다.
+
+**A**. 바이너리를 빌드하고 배포하기 전에, 웹 서버가 특정 값의 헤더를 응답에 포함시키도록 해야 합니다. `Cross-Origin-Resource-Policy`의 값으로 `same-origin`을, 그리고 `Cross-Origin-Embedder-Policy`를 `require-corp`로 설정학세요.
+
 # ☕ 개발 지원하기
 
 😉 Rust-In-Flutter의 기능이 도움이 되었다면, 이 프로젝트를 지원해주세요. 여러분의 너그러운 후원은 Rust-In-Flutter의 유지보수에 큰 도움이 됩니다.

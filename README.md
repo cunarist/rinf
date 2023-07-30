@@ -432,6 +432,14 @@ Finally, receive the signals in Dart with `StreamBuilder`, filter them by addres
 
 **A**. On native platforms, Dart runs in a single thread as usual, while Rust utilizes the async `tokio` runtime to take advantage of all cores on the computer, allowing async tasks to run efficiently within that runtime. On the web, Dart still runs in the main thread, but Rust operates only within a single web worker (thread). This is a necessary constraint because web workers do not share memory, but it is still possible for Rust to perform concurrent operations within that one dedicated thread by converting Rust `Future`s into JavaScript `Promise`s and passing them into the JavaScript event loop.
 
+**Q**. How do I make messages completely type-safe?
+
+**A**. When using MessagePack serialization, IDEs like VSCode might not provide full intellisense support, leading to potential type-related issues. To ensure proper type checking in IDEs, you can choose Protobuf instead of MessagePack. Protobuf is a type-safe serialization method that can help prevent data type-related errors. Although integrating Protobuf is beyond the scope of this package, you can refer to its [official documentation](https://protobuf.dev/) for implementation details.
+
+**Q**. The built web version shows errors related to cross-origin policy in the browser console.
+
+**A**. After building your binary and preparing it for deployment, ensure your web server is configured to include the following headers in its responses: `Cross-Origin-Resource-Policy` with a value of `same-origin`, and `Cross-Origin-Embedder-Policy` set to `require-corp`.
+
 # ☕ Support Us
 
 😉 If you are benefiting from the features of Rust-In-Flutter and find it helpful, why not consider supporting this project? Your generous donations contribute to the maintenance and development of Rust-In-Flutter, ensuring its continuous improvement and growth.
