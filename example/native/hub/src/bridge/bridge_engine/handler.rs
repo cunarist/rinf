@@ -9,7 +9,7 @@ use crate::bridge::bridge_engine::ffi::{IntoDart, MessagePort};
 use crate::bridge::bridge_engine::rust2dart::{IntoIntoDart, Rust2Dart, TaskCallback};
 use crate::bridge::bridge_engine::support::WireSyncReturn;
 use crate::bridge::bridge_engine::SyncReturn;
-use crate::execute_entry;
+use crate::spawn_bridge_task;
 
 /// The types of return values for a particular Rust function.
 #[derive(Copy, Clone)]
@@ -199,7 +199,7 @@ impl<EH: ErrorHandler> Executor for ThreadPoolExecutor<EH> {
 
         let WrapInfo { port, mode, .. } = wrap_info;
 
-        execute_entry!(|port: Option<MessagePort>| {
+        spawn_bridge_task!(|port: Option<MessagePort>| {
             let port2 = port.as_ref().cloned();
             let thread_result = panic::catch_unwind(move || {
                 let port2 = port2.expect("(worker) thread");

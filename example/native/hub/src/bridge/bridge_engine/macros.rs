@@ -1,5 +1,5 @@
 #[macro_export]
-macro_rules! execute_entry {
+macro_rules! spawn_bridge_task {
     ($($tt:tt)*) => {{
         let worker = crate::transfer!($($tt)*);
         #[cfg(not(target_family = "wasm"))]
