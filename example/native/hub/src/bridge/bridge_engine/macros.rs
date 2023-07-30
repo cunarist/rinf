@@ -32,7 +32,6 @@ macro_rules! transfer {
     (|| $block:block) => {{
         #[cfg(not(target_family = "wasm"))]
         { move || $block }
-
         #[cfg(target_family = "wasm")]
         {
             crate::ffi::TransferClosure::new(vec![], vec![], move |_: &[JsValue]| $block)
@@ -43,7 +42,6 @@ macro_rules! transfer {
         {
             move || $block
         }
-
         #[cfg(target_family = "wasm")]
         {
             use wasm_bindgen::JsValue;
