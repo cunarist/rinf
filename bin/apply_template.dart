@@ -73,10 +73,15 @@ void main() async {
   await Process.run('dart', ['format', './lib/main.dart']);
   var mainText = mainFile.readAsStringSync();
   if (!mainText.contains('package:rust_in_flutter/rust_in_flutter.dart')) {
-    mainText = mainText.replaceFirst(
-      '\n\n',
+    final lines = mainText.split("\n");
+    final lastImportIndex = lines.lastIndexWhere(
+      (line) => line.startsWith('import '),
+    );
+    lines.insert(
+      lastImportIndex + 1,
       "import 'package:rust_in_flutter/rust_in_flutter.dart';",
     );
+    mainText = lines.join("\n");
   }
   if (mainText.contains('main() {')) {
     mainText = mainText.replaceFirst(
