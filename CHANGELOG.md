@@ -1,3 +1,9 @@
+## 2.1.1
+
+- Optimized the bridge thread on native platforms.
+- Updated many minor errors in the guides.
+- Fixed a problem with import statement not being written in `./lib/main.dart` when applying Rust template.
+
 ## 2.1.0
 
 - Merged `frb_engine` crate into `hub`.
