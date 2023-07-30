@@ -36,6 +36,7 @@ web-sys = { version = "0.3.64", features = [
     "Window",
     "console",
 ] }
+wasmtimer = "0.2.0"
 
 [dependencies]
 bytemuck = "1.11.0"

@@ -63,7 +63,7 @@ pub async fn keep_drawing_mandelbrot() {
     loop {
         // Never use `std::thread::sleep` in `tokio`'s core threads
         // because it will block the async runtime.
-        crate::sleep(std::time::Duration::from_millis(500)).await;
+        crate::time::sleep(std::time::Duration::from_millis(20)).await;
         scale *= 0.95;
         if scale < 1e-7 {
             scale = 1.0
