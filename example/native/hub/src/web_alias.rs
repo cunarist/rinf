@@ -2,9 +2,15 @@
 //! which prevents the use of native threads, atomics, and time functionalities.
 //! Consequently, certain features are missing from Rust's `std`
 //! and other crates due to these limitations.
+//!
 //! To address this issue, this module offers functions and macros
 //! with the same names as the original native ones,
 //! providing workarounds for these constraints.
+//!
+//! You might encounter situations
+//! where you cannot use native Rust code directly on the web.
+//! Add more custom aliases if needed.
+
 #![allow(dead_code, unused_imports, unused_macros)]
 
 // On the web, async tasks are executed in the JavaScript event loop,
