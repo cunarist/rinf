@@ -40,7 +40,7 @@ pub(crate) async fn sleep(duration: std::time::Duration) {
 #[cfg(not(target_family = "wasm"))]
 pub(crate) use tokio::time::sleep;
 
-// On the web, `println!` macro does not print to the console.
+// On the web, `println!` macro does not print to the browser console.
 
 #[macro_export]
 #[cfg(target_family = "wasm")]
