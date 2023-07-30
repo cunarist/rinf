@@ -1,3 +1,10 @@
+## 2.1.0
+
+- Merged `frb_engine` crate into `hub`.
+- Removed unneeded intermediate worker pools.
+- Added `time` web alias import.
+- Added many guides and comments.
+
 ## 2.0.1
 
 - Improved guides.
