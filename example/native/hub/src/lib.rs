@@ -17,7 +17,7 @@ mod with_request;
 async fn main() {
     // This is `tokio::sync::mpsc::Reciver` that receives the requests in an async manner.
     let mut request_receiver = bridge::get_request_receiver();
-    // These are used for telling the tasks to stop running.
+    // These are used for telling all the tasks to stop running.
     let (shutdown_sender, shutdown_receiver) = tokio::sync::oneshot::channel();
     let root_future = async move {
         // Repeat `crate::spawn` anywhere in your code

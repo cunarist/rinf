@@ -15,20 +15,30 @@
 
 // On the web, async tasks are executed in the JavaScript event loop,
 // unlike when we run the app on native platforms with the `tokio` runtime.
+// Crate `wasm_bindgen_futures` has the ability
+// to convert Rust `Future`s into JavaScript `Promise`s.
 
 #[cfg(not(target_family = "wasm"))]
-pub(crate) use tokio::task::spawn;
+pub(crate) fn spawn<T>(future: T)
+where
+    T: std::future::Future + Send + 'static,
+    T::Output: Send + 'static,
+{
+    tokio::task::spawn(future);
+}
 #[cfg(target_family = "wasm")]
 pub(crate) use wasm_bindgen_futures::spawn_local as spawn;
 
 // On the web, `tokio` cannot access the system time.
+// Crate `wasmtimer` is the exact complement for `tokio::time` on the web.
 
 #[cfg(not(target_family = "wasm"))]
 pub(crate) use tokio::time;
 #[cfg(target_family = "wasm")]
 pub(crate) use wasmtimer::tokio as time;
 
-// On the web, `println!` macro does not print to the browser console.
+// On the web, the `println!` macro does not print to the browser console.
+// Crate `web_sys` does something exactly like `console.log` in JavaScript.
 
 #[macro_export]
 #[cfg(target_family = "wasm")]
