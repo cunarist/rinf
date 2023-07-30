@@ -1,3 +1,8 @@
+## 2.1.2
+
+- Improved web alias module.
+- Fixed small things.
+
 ## 2.1.1
 
 - Optimized the bridge thread on native platforms.
