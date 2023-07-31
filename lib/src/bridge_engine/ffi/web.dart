@@ -38,8 +38,8 @@ abstract class Modules {
       case true:
       case null:
         // On some browsers, this global variable is not available,
-        // which means Dart cannot determine
-        // wheather the browser supports buffer sharing.
+        // which means that Dart cannot determine
+        // whether the browser supports buffer sharing.
         return;
     }
   }
