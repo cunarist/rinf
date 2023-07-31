@@ -1,3 +1,8 @@
+## 2.2.0
+
+- Improved the procedure of building for the web.
+- Simplfied unneeded complexities.
+
 ## 2.1.2
 
 - Improved web alias module.
