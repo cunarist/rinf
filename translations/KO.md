@@ -103,23 +103,25 @@ flutter run
 특정 플랫폼을 위해 앱을 빌드하기:
 
 ```bash
-flutter build (platform)
+flutter build (platform)  # Replace it with an actual platform name
 ```
 
 ## 웹용
 
-명령어 `flutter run`은 브라우저 정책으로 인하여 제대로 실행되지 않습니다. 대신 아래 명령어를 사용하세요.
+웹앱을 실행하기 위해선 Rust로부터 WebAssembly 모듈을 수동으로 빌드해야 합니다. Flutter 웹앱은 디버그 모드일 때 상당히 느릴 수 있다고 알려져 있습니다.
 
 웹앱을 실행하기:
 
 ```bash
-dart run rust_in_flutter:serve_web
+dart run rust_in_flutter:build_wasm
+flutter run  # Choose web
 ```
 
 최적화된 배포 버전으로 웹앱을 빌드하기:
 
 ```bash
-dart run rust_in_flutter:serve_web --release
+dart run rust_in_flutter:build_wasm --release
+flutter build web
 ```
 
 # 🧱 코드 작성법

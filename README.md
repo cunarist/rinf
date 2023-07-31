@@ -103,23 +103,25 @@ flutter run
 To build the app for a specific platform:
 
 ```bash
-flutter build (platform)
+flutter build (platform) # Replace it with an actual platform name
 ```
 
 ## For the Web
 
-The command `flutter run` might not work due to cross-origin policy restrictions. Instead, you should use the commands below for web development.
+You need to manually build webassembly module from Rust before running or building the app for the web. Note that Flutter apps are known to be quite slow in debug mode on the web.
 
 To serve the web application:
 
 ```bash
-dart run rust_in_flutter:serve_web
+dart run rust_in_flutter:build_wasm
+flutter run  # Choose web
 ```
 
 To build the optimized release version of the web application:
 
 ```bash
-dart run rust_in_flutter:serve_web --release
+dart run rust_in_flutter:build_wasm --release
+flutter build web
 ```
 
 # 🧱 How to Write Code

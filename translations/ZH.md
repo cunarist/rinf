@@ -103,23 +103,25 @@ flutter run
 为特定平台构建应用程序：
 
 ```bash
-flutter build (platform)
+flutter build (platform)  # Replace it with an actual platform name
 ```
 
 ## 适用于 Web
 
-命令 `flutter run` 可能由于跨域策略限制而无法工作。相反，您应该使用以下命令进行 Web 开发。
+在运行或构建 Web 上的应用程序之前，您需要从 Rust 手动构建 WebAssembly 模块。请注意，已知 Flutter 应用程序在 Web 上的调试模式下可能会相当慢。
 
 启动 Web 应用程序：
 
 ```bash
-dart run rust_in_flutter:serve_web
+dart run rust_in_flutter:build_wasm
+flutter run  # Choose web
 ```
 
 构建优化的发布版本 Web 应用程序：
 
 ```bash
-dart run rust_in_flutter:serve_web --release
+dart run rust_in_flutter:build_wasm --release
+flutter build web
 ```
 
 # 🧱 如何编写代码

@@ -8,6 +8,7 @@ export 'package:js/js.dart';
 import 'package:js/js_util.dart';
 export 'package:js/js_util.dart' show promiseToFuture, getProperty;
 
+@JS()
 abstract class WasmModule {
   Object call([String? moduleName]);
 
