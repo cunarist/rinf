@@ -37,8 +37,9 @@ abstract class Modules {
         throw const MissingHeaderException();
       case true:
       case null:
-        warn(
-            'Warning: crossOriginIsolated is null, browser might not support buffer sharing.');
+        // On some browsers, this global variable is not available,
+        // which means Dart cannot determine
+        // wheather the browser supports buffer sharing.
         return;
     }
   }
