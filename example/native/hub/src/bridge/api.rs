@@ -153,8 +153,6 @@ pub fn start_rust_logic() {
     }
     #[cfg(target_family = "wasm")]
     {
-        // use crate::bridge::bridge_engine::wasm_bindgen_src::worker;
-        // worker::create_new_web_worker();
         wasm_bindgen_futures::spawn_local(crate::main());
     }
 }
