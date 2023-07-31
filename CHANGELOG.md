@@ -1,3 +1,7 @@
+## 2.3.0
+
+- Improved Dart's hot restart process on native platforms.
+
 ## 2.2.0
 
 - Improved the procedure of building for the web.
