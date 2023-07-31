@@ -113,7 +113,7 @@ flutter build (platform)  # Replace it with an actual platform name
 웹앱을 실행하기:
 
 ```bash
-dart run rust_in_flutter:build_wasm
+dart run rust_in_flutter:build_wasm --debug
 flutter run  # Choose web
 ```
 

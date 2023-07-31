@@ -3,6 +3,14 @@ import 'dart:io';
 import 'package:path/path.dart';
 
 void main(List<String> args) async {
+  final isDebugMode = args.contains("--debug");
+  final isReleaseMode = args.contains("--release");
+
+  if (!isDebugMode && !isReleaseMode) {
+    print("A valid build mode was not provided.");
+    return;
+  }
+
   // Verify Rust toolchain.
   print("Verifying Rust toolchain for the web." +
       " This might take a while if there are new updates to be installed.");
@@ -36,7 +44,7 @@ void main(List<String> args) async {
   await _compile(
     crateDir: './native/hub',
     wasmOutput: canonicalize('web/pkg'),
-    isReleaseMode: args.contains("--release"),
+    isReleaseMode: isReleaseMode,
   );
 }
 

@@ -113,7 +113,7 @@ flutter build (platform)  # Replace it with an actual platform name
 启动 Web 应用程序：
 
 ```bash
-dart run rust_in_flutter:build_wasm
+dart run rust_in_flutter:build_wasm --debug
 flutter run  # Choose web
 ```
 

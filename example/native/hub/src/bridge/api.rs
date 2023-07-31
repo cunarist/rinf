@@ -139,7 +139,7 @@ pub fn check_rust_streams() -> bool {
 pub fn start_rust_logic() {
     // Thread 1 running Rust
     #[cfg(not(target_family = "wasm"))]
-    crate::main();
+    let a = crate::main();
     #[cfg(target_family = "wasm")]
     wasm_bindgen_futures::spawn_local(crate::main());
 }

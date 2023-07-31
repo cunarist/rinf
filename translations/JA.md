@@ -113,7 +113,7 @@ Web 上でアプリを実行またはビルドする前に、Rust から手動�
 ウェブアプリケーションを提供するには：
 
 ```bash
-dart run rust_in_flutter:build_wasm
+dart run rust_in_flutter:build_wasm --debug
 flutter run  # Choose web
 ```
 

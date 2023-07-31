@@ -113,7 +113,7 @@ You need to manually build webassembly module from Rust before running or buildi
 To serve the web application:
 
 ```bash
-dart run rust_in_flutter:build_wasm
+dart run rust_in_flutter:build_wasm --debug
 flutter run  # Choose web
 ```
 
