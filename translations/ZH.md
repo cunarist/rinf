@@ -437,7 +437,7 @@ flutter: ZERO-COST ABSTRACTION
 
 **Q**. 构建后的 Web 版本在浏览器控制台显示与跨域策略有关的错误。
 
-**A**. 在构建二进制文件并准备部署后，请确保您的 Web 服务器配置响应中包含以下头信息：`Cross-Origin-Resource-Policy` 的值设置为 `same-origin`，以及 `Cross-Origin-Embedder-Policy` 设置为 `require-corp`。
+**A**. 在构建二进制文件并准备部署之后，确保您的 Web 服务器在其响应中配置了跨域相关的 HTTP 头。将`cross-origin-opener-policy`设置为`same-origin`，将`cross-origin-embedder-policy`设置为`require-corp`。
 
 # ☕ 支持我们
 

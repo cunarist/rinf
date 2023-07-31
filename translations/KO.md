@@ -439,7 +439,7 @@ Rust에서 Dart로 매 초마다 증가하는 숫자를 보내고 싶다고 가�
 
 **Q**. 빌드된 웹 버전을 실행하면 브라우저에 Cross origin policy와 관련된 오류가 표시됩니다.
 
-**A**. 웹앱을 빌드하고 배포하기 위해선, 웹 서버가 특정 값의 헤더를 응답에 포함시키도록 해야 합니다. `Cross-Origin-Resource-Policy`의 값으로 `same-origin`을, 그리고 `Cross-Origin-Embedder-Policy`를 `require-corp`로 설정하세요.
+**A**. 웹앱을 빌드하고 배포하기 위해선, 웹 서버가 Cross-origin과 관련된 HTTP 헤더를 응답에 포함시키도록 해야 합니다. `cross-origin-opener-policy`의 값으로 `same-origin`을, 그리고 `cross-origin-embedder-policy`를 `require-corp`로 설정하세요.
 
 # ☕ 개발 지원하기
 

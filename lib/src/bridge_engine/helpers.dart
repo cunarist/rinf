@@ -104,12 +104,11 @@ mixin FlutterRustBridgeTimeoutMixin<T extends FlutterRustBridgeWireBase>
 /// [cross-origin isolated]: https://developer.mozilla.org/en-US/docs/Web/API/crossOriginIsolated
 class MissingHeaderException implements Exception {
   const MissingHeaderException();
-  static const _message =
-      '''
+  static const _message = '''
 Buffers cannot be shared due to missing cross-origin headers.
 Make sure your web server responds with the following headers:
-- Cross-Origin-Opener-Policy: same-origin
-- Cross-Origin-Embedder-Policy: credentialless OR require-corp
+- cross-origin-opener-policy: same-origin
+- cross-origin-embedder-policy: credentialless OR require-corp
 
 If running from Flutter, consider `flutter build web` and running a custom static-file server.''';
 

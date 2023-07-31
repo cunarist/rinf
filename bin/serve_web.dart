@@ -311,8 +311,8 @@ Future<void> runServer(Opts config, {required String root}) async {
     return (req) async {
       final res = await handler(req);
       return res.change(headers: {
-        'Cross-Origin-Opener-Policy': 'same-origin',
-        'Cross-Origin-Embedder-Policy':
+        'cross-origin-opener-policy': 'same-origin',
+        'cross-origin-embedder-policy':
             shouldRelaxCoep ? 'credentialless' : 'require-corp',
       });
     };

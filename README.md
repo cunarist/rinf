@@ -439,7 +439,7 @@ Finally, receive the signals in Dart with `StreamBuilder`, filter them by addres
 
 **Q**. The built web version shows errors related to cross-origin policy in the browser console.
 
-**A**. After building your binary and preparing it for deployment, ensure your web server is configured to include the following headers in its responses: `Cross-Origin-Resource-Policy` with a value of `same-origin`, and `Cross-Origin-Embedder-Policy` set to `require-corp`.
+**A**. After building your binary and preparing it for deployment, ensure your web server is configured to include cross-origin related HTTP headers in its responses. Set `cross-origin-opener-policy` to `same-origin` and `cross-origin-embedder-policy` to `require-corp`.
 
 # ☕ Support Us
 
