@@ -93,6 +93,9 @@ elif sys.argv[1] == "bridge-gen":
     search_string = "package:flutter_rust_bridge/flutter_rust_bridge.dart"
     replace_string = "bridge_engine/exports.dart"
     replace_string_in_files(directory_path, search_string, replace_string)
+    search_string = "\nimport 'package:uuid/uuid.dart';"
+    replace_string = ""
+    replace_string_in_files(directory_path, search_string, replace_string)
 
     directory_path = "./example/native/hub/src/bridge"
     search_string = "flutter_rust_bridge::"

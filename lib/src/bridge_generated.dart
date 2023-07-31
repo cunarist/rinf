@@ -7,13 +7,11 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:meta/meta.dart';
 import 'bridge_engine/exports.dart';
-import 'package:uuid/uuid.dart';
 
 import 'dart:convert';
 import 'dart:async';
 import 'package:meta/meta.dart';
 import 'bridge_engine/exports.dart';
-import 'package:uuid/uuid.dart';
 
 import 'dart:ffi' as ffi;
 

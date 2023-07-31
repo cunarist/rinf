@@ -8,7 +8,6 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:meta/meta.dart';
 import 'bridge_engine/exports.dart';
-import 'package:uuid/uuid.dart';
 
 abstract class BridgeWeb {
   /// Returns a stream object in Dart that listens to Rust.

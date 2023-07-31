@@ -16,7 +16,6 @@ dependencies:
     sdk: flutter
   plugin_platform_interface: ^2.0.2
   ffi: ^2.0.2
-  uuid: ^3.0.7
   meta: ^1.8.0
   package_config: ^2.1.0
   path: ^1.8.3
