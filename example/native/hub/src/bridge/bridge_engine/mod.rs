@@ -9,10 +9,9 @@ mod into_into_dart;
 mod macros;
 pub mod rust2dart;
 pub mod support;
-pub mod thread;
 
 #[cfg(target_family = "wasm")]
-mod wasm_bindgen_src;
+pub mod wasm_bindgen_src;
 
 /// Use this struct in return type of your function, in order to tell the code generator
 /// the function should return synchronously. Otherwise, it is by default asynchronously.

@@ -1,20 +1,15 @@
 #[macro_export]
 macro_rules! spawn_bridge_task {
     ($($tt:tt)*) => {{
-        let worker = crate::transfer!($($tt)*);
+        let bridge_task = crate::transfer!($($tt)*);
         #[cfg(not(target_family = "wasm"))]
         {
-            use crate::bridge::bridge_engine::thread::SENDER;
-            use std::sync::mpsc::Sender;
-            let _ = SENDER.with(|sender: &Sender<Box<dyn FnOnce() + Send>>| {
-                sender.send(Box::new(worker))
-            });
+            bridge_task();
         }
         #[cfg(target_family = "wasm")]
         {
-            use web_sys::Worker;
-            crate::bridge::bridge_engine::wasm_bindgen_src::worker::WEB_WORKER.with(|web_worker: &Worker| {
-                let _ = worker.apply(web_worker);
+            crate::bridge::bridge_engine::wasm_bindgen_src::worker::WEB_WORKER.with(|web_worker| {
+                let _ = bridge_task.apply(web_worker);
             });
         }
     }};

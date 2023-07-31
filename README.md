@@ -114,7 +114,7 @@ To serve the web application:
 
 ```bash
 dart run rust_in_flutter:build_wasm --debug
-flutter run  # Choose web
+flutter run  # Choose a browser
 ```
 
 To build the optimized release version of the web application:

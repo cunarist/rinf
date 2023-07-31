@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 
 use crate::bridge::bridge_engine::StreamSink;
-use crate::bridge::bridge_engine::SyncReturn;
 use lazy_static::lazy_static;
 use std::cell::RefCell;
 use std::sync::Arc;
@@ -71,19 +70,24 @@ type RustResponseStream = StreamSink<RustResponseUnique>;
 type RustRequestSender = Sender<RustRequestUnique>;
 type RustRequestReceiver = Receiver<RustRequestUnique>;
 
-// For thread 0 running Dart
+// Native: Main thread
+// Web: Main thread
 thread_local! {
     pub static REQUEST_SENDER: Cell<RustRequestSender> = RefCell::new(None);
+    #[cfg(not(target_family="wasm"))]
+    pub static TOKIO_RUNTIME: Cell<tokio::runtime::Runtime> = RefCell::new(None);
 }
 
-// For thread 1~N running Rust
+// Native: `tokio` runtime threads
+// Web: Worker thread
 thread_local! {
     pub static SIGNAL_STREAM: Cell<RustSignalStream> = RefCell::new(None);
     pub static RESPONSE_STREAM: Cell<RustResponseStream> = RefCell::new(None);
     pub static RESPONSE_SENDER: Cell<RustResponseUnique> = RefCell::new(None);
 }
 
-// For sharing between threads
+// Native: All threads
+// Web: Worker thread
 lazy_static! {
     pub static ref SIGNAL_STREAM_SHARED: SharedCell<RustSignalStream> =
         Arc::new(Mutex::new(RefCell::new(None)));
@@ -95,34 +99,29 @@ lazy_static! {
 
 /// Returns a stream object in Dart that listens to Rust.
 pub fn prepare_rust_signal_stream(signal_stream: StreamSink<RustSignal>) {
-    // Thread 1 running Rust
     let cell = SIGNAL_STREAM_SHARED.lock().unwrap();
     cell.replace(Some(signal_stream));
 }
 
 /// Returns a stream object in Dart that returns responses from Rust.
 pub fn prepare_rust_response_stream(response_stream: StreamSink<RustResponseUnique>) {
-    // Thread 1 running Rust
     let cell = RESPONSE_STREAM_SHARED.lock().unwrap();
     cell.replace(Some(response_stream));
 }
 
 /// Prepare channels that are used in the Rust world.
-pub fn prepare_channels() -> SyncReturn<()> {
-    // Thread 0 running Dart
+pub fn prepare_channels() {
     let (request_sender, request_receiver) = channel(1024);
     REQUEST_SENDER.with(move |inner| {
         inner.replace(Some(request_sender));
     });
     let cell = REQUST_RECEIVER_SHARED.lock().unwrap();
     cell.replace(Some(request_receiver));
-    SyncReturn(())
 }
 
 /// Check if the streams are ready in Rust.
 /// This should be done before starting the Rust logic.
 pub fn check_rust_streams() -> bool {
-    // Thread 1 running Rust
     let mut are_all_ready = true;
     let cell = SIGNAL_STREAM_SHARED.lock().unwrap();
     if cell.borrow().is_none() {
@@ -137,20 +136,34 @@ pub fn check_rust_streams() -> bool {
 
 /// Start the main function of Rust.
 pub fn start_rust_logic() {
-    // Thread 1 running Rust
     #[cfg(not(target_family = "wasm"))]
-    let a = crate::main();
+    {
+        TOKIO_RUNTIME.with(move |inner| {
+            let popped = inner.replace(None);
+            if let Some(previous_runtime) = popped {
+                previous_runtime.shutdown_background()
+            };
+            let tokio_runtime = tokio::runtime::Builder::new_multi_thread()
+                .enable_all()
+                .build()
+                .unwrap();
+            tokio_runtime.spawn(crate::main());
+            inner.replace(Some(tokio_runtime));
+        });
+    }
     #[cfg(target_family = "wasm")]
-    wasm_bindgen_futures::spawn_local(crate::main());
+    {
+        // use crate::bridge::bridge_engine::wasm_bindgen_src::worker;
+        // worker::create_new_web_worker();
+        wasm_bindgen_futures::spawn_local(crate::main());
+    }
 }
 
 /// Send a request to Rust and receive a response in Dart.
-pub fn request_to_rust(request_unique: RustRequestUnique) -> SyncReturn<()> {
-    // Thread 0 running Dart
+pub fn request_to_rust(request_unique: RustRequestUnique) {
     REQUEST_SENDER.with(move |inner| {
         let borrowed = inner.borrow();
         let sender = borrowed.as_ref().unwrap();
         sender.try_send(request_unique).ok();
     });
-    SyncReturn(())
 }

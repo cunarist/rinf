@@ -13,8 +13,13 @@
 
 #![allow(dead_code, unused_imports, unused_macros)]
 
-// On the web, async tasks are executed in the JavaScript event loop,
-// unlike when we run the app on native platforms with the `tokio` runtime.
+// On native platforms,`tokio`'s async runtime
+// allows millions of concurrent tasks to run the same time
+// utilizing only the number of threads
+// equivalent to the number of cores on the computer.
+// This is much more efficient and scalable than switching threads.
+//
+// On the web, async tasks are executed in the JavaScript event loop.
 // Crate `wasm_bindgen_futures` has the ability
 // to convert Rust `Future`s into JavaScript `Promise`s.
 

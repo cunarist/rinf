@@ -24,7 +24,7 @@ class RustInFlutter {
   /// Makes sure that the Rust side is ready.
   /// Don't forget to call this function in the `main` function of Dart.
   static Future<void> ensureInitialized() async {
-    api.prepareChannels();
+    await api.prepareChannels();
     final rustSignalStream = api.prepareRustSignalStream();
     rustSignalStream.listen((rustSignal) {
       rustBroadcaster.add(rustSignal);

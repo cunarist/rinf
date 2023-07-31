@@ -114,7 +114,7 @@ Web 上でアプリを実行またはビルドする前に、Rust から手動�
 
 ```bash
 dart run rust_in_flutter:build_wasm --debug
-flutter run  # Choose web
+flutter run  # Choose a browser
 ```
 
 最適化されたリリースバージョンのウェブアプリケーションをビルドするには：

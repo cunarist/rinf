@@ -10,17 +10,8 @@ use tokio::sync::mpsc::Receiver;
 
 pub mod bridge_engine;
 
-#[cfg(not(target_family = "wasm"))]
 pub mod api;
-#[cfg(not(target_family = "wasm"))]
 mod bridge_generated;
-
-#[cfg(target_family = "wasm")]
-pub mod api_web;
-#[cfg(target_family = "wasm")]
-pub use api_web as api;
-#[cfg(target_family = "wasm")]
-mod bridge_web_generated;
 
 /// This function is expected to be used only once
 /// during the initialization of the Rust logic.
