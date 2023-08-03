@@ -71,7 +71,7 @@ type RustRequestSender = Sender<RustRequestUnique>;
 type RustRequestReceiver = Receiver<RustRequestUnique>;
 
 // Native: Main thread
-// Web: Main thread
+// Web: Worker thread
 thread_local! {
     pub static REQUEST_SENDER: Cell<RustRequestSender> = RefCell::new(None);
     #[cfg(not(target_family="wasm"))]
