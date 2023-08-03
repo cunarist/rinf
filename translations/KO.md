@@ -452,6 +452,10 @@ Rust에서 Dart로 매 초마다 증가하는 숫자를 보내고 싶다고 가�
 
 **A**. 웹앱을 빌드하고 배포하기 위해선, 웹 서버가 Cross-origin과 관련된 HTTP 헤더를 응답에 포함시키도록 해야 합니다. `cross-origin-opener-policy`의 값으로 `same-origin`을, 그리고 `cross-origin-embedder-policy`를 `require-corp`로 설정하세요.
 
+**Q**. Rust 코드가 변경되면 Dart의 Hot restart에 적용되나요?
+
+**A**. 아니요, 업데이트된 Rust 코드는 Dart의 Hot restart 시에 로딩되지 않습니다. 변경사항을 적용하려면 앱을 다시 컴파일해야 합니다. 이는 새로 컴파일된 Rust 라이브러리 파일과 앱 바이너리를 다시 연결해야 하기 때문입니다. 이 제약은 Hot restart를 지원하지 않는 러스트의 컴파일 방식으로부터 비롯됩니다. 그렇지만 Dart의 Hot restart가 Rust 로직, 즉 `main()` 함수를 다시 시작하는 것은 맞습니다.
+
 # ☕ 개발 지원하기
 
 😉 Rust-In-Flutter의 기능이 도움이 되었다면, 이 프로젝트를 지원해주세요. 여러분의 너그러운 후원은 Rust-In-Flutter의 유지보수에 큰 도움이 됩니다.
