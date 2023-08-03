@@ -1,3 +1,7 @@
+## 2.4.0
+
+- Fixed the problem with dangling threads from the `tokio` runtime remaining after closing the Flutter app. Even after the app window was closed, `tokio` threads were still running, resulting in becoming a background process without a window. Now the `tokio` runtime will properly be shut down.
+
 ## 2.3.2
 
 - Re-publishing due to `pub.dev`'s `[UNKNOWN PLATFORMS]` error.
