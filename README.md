@@ -117,13 +117,13 @@ flutter build (platform) # Replace it with an actual platform name
 
 ## For the Web
 
-You need to manually build webassembly module from Rust before running or building the app for the web. Note that Flutter apps are known to be quite slow in debug mode on the web.
+You need to manually build webassembly module from Rust before running or building the app for the web.
 
 To serve the web application:
 
 ```bash
 dart run rust_in_flutter:build_wasm --debug
-flutter run  # Choose a browser
+flutter run --profile  # Choose a browser
 ```
 
 To build the optimized release version of the web application:

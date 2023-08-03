@@ -123,7 +123,7 @@ flutter build (platform)  # Replace it with an actual platform name
 
 ```bash
 dart run rust_in_flutter:build_wasm --debug
-flutter run  # Choose a browser
+flutter run --profile  # Choose a browser
 ```
 
 최적화된 배포 버전으로 웹앱을 빌드하기:

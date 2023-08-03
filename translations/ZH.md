@@ -125,7 +125,7 @@ flutter build (platform)  # Replace it with an actual platform name
 
 ```bash
 dart run rust_in_flutter:build_wasm --debug
-flutter run  # Choose a browser
+flutter run --profile  # Choose a browser
 ```
 
 构建优化的发布版本 Web 应用程序：
