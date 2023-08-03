@@ -74,8 +74,6 @@ type RustRequestReceiver = Receiver<RustRequestUnique>;
 // Web: Worker thread
 thread_local! {
     pub static REQUEST_SENDER: Cell<RustRequestSender> = RefCell::new(None);
-    #[cfg(not(target_family="wasm"))]
-    pub static TOKIO_RUNTIME: Cell<tokio::runtime::Runtime> = RefCell::new(None);
 }
 
 // Native: `tokio` runtime threads
@@ -95,6 +93,12 @@ lazy_static! {
         Arc::new(Mutex::new(RefCell::new(None)));
     pub static ref REQUST_RECEIVER_SHARED: SharedCell<RustRequestReceiver> =
         Arc::new(Mutex::new(RefCell::new(None)));
+}
+
+#[cfg(not(target_family = "wasm"))]
+lazy_static! {
+    pub static ref TOKIO_RUNTIME: os_thread_local::ThreadLocal<RefCell<Option<tokio::runtime::Runtime>>> =
+        os_thread_local::ThreadLocal::new(|| RefCell::new(None));
 }
 
 /// Returns a stream object in Dart that listens to Rust.
@@ -139,10 +143,6 @@ pub fn start_rust_logic() {
     #[cfg(not(target_family = "wasm"))]
     {
         TOKIO_RUNTIME.with(move |inner| {
-            let popped = inner.replace(None);
-            if let Some(previous_runtime) = popped {
-                previous_runtime.shutdown_background()
-            };
             let tokio_runtime = tokio::runtime::Builder::new_multi_thread()
                 .enable_all()
                 .build()
