@@ -1,3 +1,8 @@
+## 2.5.0
+
+- Now Rust logic will be restarted upon Dart's hot restart on the web too.
+- CLI commands are shortened.
+
 ## 2.4.0
 
 - Fixed the problem with dangling threads from the `tokio` runtime remaining after closing the Flutter app. Even after the app window was closed, `tokio` threads were still running, resulting in becoming a background process without a window. Now the `tokio` runtime will properly be shut down.
