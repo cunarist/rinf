@@ -112,7 +112,7 @@ flutter run
 特定のプラットフォーム向けにアプリをビルドするには：
 
 ```bash
-flutter build (platform)  # Replace it with an actual platform name
+flutter build (platform)  # Replace it with a platform name
 ```
 
 ## ウェブ向け

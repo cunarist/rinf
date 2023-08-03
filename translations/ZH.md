@@ -114,7 +114,7 @@ flutter run
 为特定平台构建应用程序：
 
 ```bash
-flutter build (platform)  # Replace it with an actual platform name
+flutter build (platform)  # Replace it with a platform name
 ```
 
 ## 适用于 Web
