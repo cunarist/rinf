@@ -68,7 +68,8 @@ where
     }
 }
 
-// These tuple impls should probably be a macro, but that is not easily possible with macro_rules because of the field access
+// These tuple impls should probably be a macro,
+// but that is not easily possible with macro_rules because of the field access.
 impl<A, AD, B, BD> IntoIntoDart<(AD, BD)> for (A, B)
 where
     A: IntoIntoDart<AD>,

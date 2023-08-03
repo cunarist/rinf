@@ -17,10 +17,12 @@ macro_rules! spawn_bridge_task {
     }};
 }
 
-/// On WASM, [JsValue][wasm_bindgen::JsValue]s cannot be shared between scopes but instead can be
-/// ["transferred"]. Rust however is not aware of transferables and therefore cannot
-/// capture these values. This macro wraps a closure and returns a [TransferClosure][crate::ffi::TransferClosure] on WASM platforms
-/// which will capture these special values, or a normal [FnOnce] on other platforms.
+/// On WASM, [JsValue][wasm_bindgen::JsValue]s cannot be shared between scopes
+/// but instead can be ["transferred"].
+/// Rust however is not aware of transferables and therefore cannot capture these values.
+/// This macro wraps a closure and returns a [TransferClosure][crate::ffi::TransferClosure]
+/// on WASM platforms which will capture these special values,
+/// or a normal [FnOnce] on other platforms.
 /// Note that the parameter names must match available variables/bindings from the outer scope.
 ///
 /// ["transferred"]: https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects
@@ -53,7 +55,11 @@ macro_rules! transfer {
                 $block
             };
             let transferables = [$($param.transferables()),*].concat();
-            crate::bridge::bridge_engine::ffi::TransferClosure::new(vec![$($param.serialize()),*], transferables, worker)
+            crate::bridge::bridge_engine::ffi::TransferClosure::new(
+                vec![$($param.serialize()),*],
+                transferables,
+                worker,
+            )
         }
     }};
 }

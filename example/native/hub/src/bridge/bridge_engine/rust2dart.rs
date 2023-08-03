@@ -19,7 +19,8 @@ const RUST2DART_ACTION_SUCCESS: i32 = 0;
 const RUST2DART_ACTION_ERROR: i32 = 1;
 const RUST2DART_ACTION_CLOSE_STREAM: i32 = 2;
 
-// api signatures is similar to Flutter Android's callback https://api.flutter.dev/javadoc/io/flutter/plugin/common/MethodChannel.Result.html
+// API signatures is similar to Flutter Android's callback
+// https://api.flutter.dev/javadoc/io/flutter/plugin/common/MethodChannel.Result.html
 impl Rust2Dart {
     /// Create a new wrapper from a raw port.
     pub fn new(port: MessagePort) -> Self {
