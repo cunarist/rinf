@@ -1,3 +1,7 @@
+## 2.3.2
+
+- Re-publishing due to `pub.dev`'s `[UNKNOWN PLATFORMS]` error.
+
 ## 2.3.1
 
 - Restored the benefits section in the first guide.
