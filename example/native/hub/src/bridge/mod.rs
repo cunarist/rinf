@@ -40,6 +40,7 @@ pub fn send_rust_signal(rust_signal: RustSignal) {
 
 /// Send a response to Dart with a unique interaction ID
 /// to remember which request that response corresponds to.
+/// No memory copy is involved as the bytes are moved directly to Dart.
 pub fn respond_to_dart(response_unique: RustResponseUnique) {
     api::RESPONSE_STREAM.with(|inner| {
         let mut borrowed = inner.borrow_mut();
