@@ -21,6 +21,15 @@ All the challenging build settings are automatically handled by this package.
 - ✅ iOS: Tested and supported
 - ✅ Web: Tested and supported
 
+## Benefits
+
+- Rust integration with the ability to use an arbitrary number of library crates
+- Async interaction with no blocking
+- RESTful API with easy request from Dart and response from Rust
+- Streaming from Rust to Dart
+- Restarting Rust logic on Dart's hot restart
+- No memory copy when sending native data
+
 ## Why Use Rust?
 
 While Dart excels as an amazing object-oriented language for GUI apps, its non-native garbage collection may not always meet demanding performance requirements. This is where Rust steps in, offering an incredible speed advantage of roughly [2~40 times faster](https://programming-language-benchmarks.vercel.app/dart-vs-rust) than Dart, alongside the ability to leverage multiple threads.

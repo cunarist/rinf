@@ -21,6 +21,17 @@
 - ✅ iOS: 支持，已完成测试
 - ✅ Web: 支持，已完成测试
 
+## 好处
+
+- Rust 与 Flutter 集成，能够使用任意数量的库 crate
+- 异步交互，无阻塞
+- RESTful API，Dart 发起请求，Rust 作出响应，简单易用
+- 从 Rust 流式传输到 Dart
+- 在 Dart 的热重启上重新启动 Rust 逻辑
+- 发送本地数据时无需进行内存复制
+
+这是中文版本。
+
 ## 为什么使用 Rust？
 
 虽然 Dart 是一种出色的、面向对象的、现代化的语言，但由于它具有垃圾回收等特性，性能并不是极致的。这就是 Rust 的用武之地。Rust 的性能被认为比 Dart 快大约[2~40 倍](https://programming-language-benchmarks.vercel.app/dart-vs-rust)(甚至无需使用多线程)。

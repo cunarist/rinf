@@ -21,6 +21,15 @@ Rust를 활용해서 Flutter 앱의 속도를 극적으로 향상시켜 보세�
 - ✅ iOS: 지원 및 작동 확인됨
 - ✅ Web: 지원 및 작동 확인됨
 
+## 혜택
+
+- Rust를 Flutter에 통합하고 원하는 만큼의 Crate를 사용 가능함
+- Blocking 없는 비동기 상호작용
+- 손쉬운 Dart로부터의 요청과 Rust에서의 응답으로 이루어진 RESTful API
+- Rust에서 Dart로의 스트리밍
+- Dart의 Hot restart 시 자동으로 재시작되는 Rust 로직
+- 네이티브 데이터 전송 시 메모리 복사 없음
+
 ## 왜 Rust를 사용해야 할까요?
 
 Dart는 GUI 앱 개발에 최적화된 훌륭한 객체지향형 언어이지만, Garbage collection을 동원하며 네이티브가 아닌 언어이기 때문에 성능이 불충분할 때가 있습니다. 이럴 경우 Rust를 사용해야 합니다. Rust의 성능은 Dart보다 [대략 2~40배 빠르다](https://programming-language-benchmarks.vercel.app/dart-vs-rust)고 알려져 있으며, Rust에서는 멀티스레딩을 활용할 수도 있습니다.
