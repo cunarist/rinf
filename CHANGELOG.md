@@ -1,3 +1,7 @@
+## 2.5.2
+
+- Optimized web binary size.
+
 ## 2.5.1
 
 - Optimized web performance.
