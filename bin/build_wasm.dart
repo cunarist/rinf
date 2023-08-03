@@ -89,7 +89,7 @@ httpServer.defaultResponseHeaders.add(
   'credentialless',
 );""");
   serverFileContent = lines.join("\n");
-  serverFile.writeAsStringSync(serverFileContent);
+  await serverFile.writeAsString(serverFileContent);
 
   // Remove the stamp file to make it re-generated.
   final flutterToolsStampPath = '$flutterPath/bin/cache/flutter_tools.stamp';

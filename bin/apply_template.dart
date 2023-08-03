@@ -29,17 +29,17 @@ void main() async {
   // Copy the `native` folder
   final templateSource = Directory('$packagePath/example/native');
   final templateDestination = Directory('$projectPath/native');
-  _copyDirectory(templateSource, templateDestination);
+  await _copyDirectory(templateSource, templateDestination);
 
   // Copy `Cargo.toml`
   final cargoSource = File('$packagePath/example/Cargo.toml');
   final cargoDestination = File('$projectPath/Cargo.toml');
-  cargoSource.copySync(cargoDestination.path);
+  await cargoSource.copy(cargoDestination.path);
 
   // Create `.cargo/config.toml` file
   final cargoConfigFile = File('$projectPath/.cargo/config.toml');
-  if (!cargoConfigFile.existsSync()) {
-    cargoConfigFile.createSync(recursive: true);
+  if (!(await cargoConfigFile.exists())) {
+    await cargoConfigFile.create(recursive: true);
   }
   const cargoConfigContent = '''
 [build]
@@ -48,15 +48,15 @@ void main() async {
 # You might have to restart Rust-analyzer for this change to take effect.
 # target = "wasm32-unknown-unknown"
 ''';
-  cargoConfigFile.writeAsStringSync(cargoConfigContent);
+  await cargoConfigFile.writeAsString(cargoConfigContent);
 
   // Add some lines to `.gitignore`
   final sectionTitle = '# Rust related';
   final gitignoreFile = File('$projectPath/.gitignore');
-  if (!gitignoreFile.existsSync()) {
-    gitignoreFile.createSync(recursive: true);
+  if (!(await gitignoreFile.exists())) {
+    await gitignoreFile.create(recursive: true);
   }
-  final gitignoreContent = gitignoreFile.readAsStringSync();
+  final gitignoreContent = await gitignoreFile.readAsString();
   var splitted = gitignoreContent.split('\n\n');
   splitted = splitted.map((s) => s.trim()).toList();
   if (!gitignoreContent.contains(sectionTitle)) {
@@ -65,14 +65,14 @@ void main() async {
     text += '\n' + 'target/';
     splitted.add(text);
   }
-  gitignoreFile.writeAsStringSync(splitted.join('\n\n'));
+  await gitignoreFile.writeAsString(splitted.join('\n\n'));
 
   // Add `msgpack_dart` to Dart dependencies
   await Process.run('dart', ['pub', 'add', 'msgpack_dart']);
 
   // Modify `./lib/main.dart`
   await Process.run('dart', ['format', './lib/main.dart']);
-  var mainText = mainFile.readAsStringSync();
+  var mainText = await mainFile.readAsString();
   if (!mainText.contains('package:rust_in_flutter/rust_in_flutter.dart')) {
     final lines = mainText.split("\n");
     final lastImportIndex = lines.lastIndexWhere(
@@ -96,25 +96,25 @@ void main() async {
       'main() async { await RustInFlutter.ensureInitialized();',
     );
   }
-  mainFile.writeAsStringSync(mainText);
+  await mainFile.writeAsString(mainText);
   await Process.run('dart', ['format', './lib/main.dart']);
 
   print("\n🎉 Rust template is now ready! 🎉 \n");
 }
 
-void _copyDirectory(Directory source, Directory destination) {
-  var newDirectory = Directory(destination.path);
-  newDirectory.createSync();
-  source.listSync(recursive: false).forEach(
-    (var entity) {
+Future<void> _copyDirectory(Directory source, Directory destination) async {
+  final newDirectory = Directory(destination.path);
+  await newDirectory.create();
+  await source.list(recursive: false).forEach(
+    (entity) async {
       if (entity is Directory) {
-        var newDirectory = Directory(
+        final newDirectory = Directory(
           path.join(destination.absolute.path, path.basename(entity.path)),
         );
-        newDirectory.createSync();
+        await newDirectory.create();
         _copyDirectory(entity.absolute, newDirectory);
       } else if (entity is File) {
-        entity.copySync(
+        await entity.copy(
           path.join(destination.path, path.basename(entity.path)),
         );
       }
