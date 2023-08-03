@@ -27,7 +27,7 @@ All the challenging build settings are automatically handled by this package.
 - Async interaction with no blocking
 - RESTful API with easy request from Dart and response from Rust
 - Streaming from Rust to Dart
-- Restarting Rust logic on Dart's hot restart
+- Automatic restart of Rust logic on Dart's hot restart
 - No memory copy when sending native data
 
 ## Why Use Rust?
