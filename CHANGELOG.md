@@ -1,3 +1,7 @@
+## 2.3.1
+
+- Restored the benefits section in the first guide.
+
 ## 2.3.0
 
 - Improved Dart's hot restart process on native platforms.
