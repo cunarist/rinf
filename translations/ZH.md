@@ -66,7 +66,7 @@ flutter pub add rust_in_flutter
 只需在命令行中运行以下命令：
 
 ```bash
-dart run rust_in_flutter:apply_template
+dart run rust_in_flutter template
 ```
 
 运行命令后，会出现一些新的文件和文件夹，它们将成为 Rust 项目的初始模板。
@@ -124,14 +124,14 @@ flutter build (platform)  # Replace it with an actual platform name
 启动 Web 应用程序：
 
 ```bash
-dart run rust_in_flutter:build_wasm --debug
+dart run rust_in_flutter wasm
 flutter run --profile  # Choose a browser
 ```
 
 构建优化的发布版本 Web 应用程序：
 
 ```bash
-dart run rust_in_flutter:build_wasm --release
+dart run rust_in_flutter wasm --release
 flutter build web
 ```
 

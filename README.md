@@ -64,7 +64,7 @@ flutter pub add rust_in_flutter
 Then, simply run this in the command-line from your Flutter project's directory.
 
 ```bash
-dart run rust_in_flutter:apply_template
+dart run rust_in_flutter template
 ```
 
 Once you've run the command, there will be some new files and folders that will be your starter Rust template.
@@ -122,14 +122,14 @@ You need to manually build webassembly module from Rust before running or buildi
 To serve the web application:
 
 ```bash
-dart run rust_in_flutter:build_wasm --debug
+dart run rust_in_flutter wasm
 flutter run --profile  # Choose a browser
 ```
 
 To build the optimized release version of the web application:
 
 ```bash
-dart run rust_in_flutter:build_wasm --release
+dart run rust_in_flutter wasm --release
 flutter build web
 ```
 

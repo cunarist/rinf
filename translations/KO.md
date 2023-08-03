@@ -64,7 +64,7 @@ flutter pub add rust_in_flutter
 그리고 다음 명령을 터미널에서 실행하세요.
 
 ```bash
-dart run rust_in_flutter:apply_template
+dart run rust_in_flutter template
 ```
 
 이 명령을 실행하면 기본 Rust 템플릿으로서의 새로운 파일과 폴더들이 생성됩니다.
@@ -122,14 +122,14 @@ flutter build (platform)  # Replace it with an actual platform name
 웹앱을 실행하기:
 
 ```bash
-dart run rust_in_flutter:build_wasm --debug
+dart run rust_in_flutter wasm
 flutter run --profile  # Choose a browser
 ```
 
 최적화된 배포 버전으로 웹앱을 빌드하기:
 
 ```bash
-dart run rust_in_flutter:build_wasm --release
+dart run rust_in_flutter wasm --release
 flutter build web
 ```
 

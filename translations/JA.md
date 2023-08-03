@@ -64,7 +64,7 @@ flutter pub add rust_in_flutter
 単純に、Flutter プロジェクトのディレクトリで以下のコマンドをコマンドラインで実行してください。
 
 ```bash
-dart run rust_in_flutter:apply_template
+dart run rust_in_flutter template
 ```
 
 このコマンドを実行した後、新しいファイルとフォルダが生成され、スターター Rust テンプレートとなります。
@@ -122,14 +122,14 @@ Web 上でアプリを実行またはビルドする前に、Rust から手動�
 ウェブアプリケーションを提供するには：
 
 ```bash
-dart run rust_in_flutter:build_wasm --debug
+dart run rust_in_flutter wasm
 flutter run --profile  # Choose a browser
 ```
 
 最適化されたリリースバージョンのウェブアプリケーションをビルドするには：
 
 ```bash
-dart run rust_in_flutter:build_wasm --release
+dart run rust_in_flutter wasm --release
 flutter build web
 ```
 
