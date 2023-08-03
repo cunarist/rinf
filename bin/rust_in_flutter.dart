@@ -171,6 +171,7 @@ Future<void> _buildWebassembly({bool isReleaseMode = false}) async {
   await _verifyServerHeaders();
 
   // Build the webassembly module.
+  print("Compiling Rust...");
   await _compile(
     crateDir: './native/hub',
     wasmOutput: canonicalize('web/pkg'),
