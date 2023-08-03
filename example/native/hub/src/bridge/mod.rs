@@ -8,9 +8,8 @@ use api::RustResponseUnique;
 use api::RustSignal;
 use tokio::sync::mpsc::Receiver;
 
-pub mod bridge_engine;
-
 pub mod api;
+pub mod bridge_engine;
 mod bridge_generated;
 
 /// This function is expected to be used only once
