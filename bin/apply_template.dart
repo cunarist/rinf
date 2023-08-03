@@ -45,6 +45,7 @@ void main() async {
 [build]
 # Uncomment the line below to switch Rust-analyzer to perform
 # type checking and linting in webassembly mode, for the web target.
+# You might have to restart Rust-analyzer for this change to take effect.
 # target = "wasm32-unknown-unknown"
 ''';
   cargoConfigFile.writeAsStringSync(cargoConfigContent);
