@@ -1,3 +1,7 @@
+## 2.5.1
+
+- Optimized web performance.
+
 ## 2.5.0
 
 - Now Rust logic will be restarted upon Dart's hot restart on the web too.
