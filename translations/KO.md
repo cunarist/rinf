@@ -1,5 +1,7 @@
 > 영어 이외의 언어로 된 문서에서는 문장이 어색할 수 있습니다. 문서 개선에 기여하고 싶으신 분은 [Pull request](https://github.com/cunarist/rust-in-flutter/pulls)를 남겨주세요. 언제나 도움에 감사드립니다.
 
+[![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter?label=Pub%20Popularity)](https://pub.dev/packages/rust_in_flutter) [![Pub Points](https://img.shields.io/pub/points/rust_in_flutter?label=Pub%20Points)](https://pub.dev/packages/rust_in_flutter)
+
 # 🆎 Rust-In-Flutter
 
 Rust를 활용해서 Flutter 앱의 속도를 극적으로 향상시켜 보세요!
