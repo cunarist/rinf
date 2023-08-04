@@ -1,3 +1,7 @@
+## 2.5.3
+
+- Improved guides and CLI messages.
+
 ## 2.5.2
 
 - Optimized web binary size.
