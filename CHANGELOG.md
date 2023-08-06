@@ -1,3 +1,7 @@
+## 2.5.4
+
+- Updated example code.
+
 ## 2.5.3
 
 - Improved guides and CLI messages.
