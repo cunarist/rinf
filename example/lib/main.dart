@@ -105,8 +105,7 @@ class Home extends StatelessWidget {
       // This is a button that calls the state update method.
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          final provider = Provider.of<HomeNotifier>(context, listen: false);
-          provider.increment();
+          context.read<HomeNotifier>().increment();
         },
         child: const Icon(Icons.add),
       ),
