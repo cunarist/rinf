@@ -251,8 +251,8 @@ fn build_for_target(target: &Target) -> Result<()> {
     cmd.env(rustflags_key, &rust_flags_value);
     cmd.env(cflags_key, &cflags_value);
     cmd.env(cxx_flags_key, &cxx_flags_value);
-    cmd.env("_CARGOKIT_LINK_TARGET", target_arg); // Recognized by main() so we know when we're acting as a wrapper
-    cmd.env("_CARGOKIT_LINK_CLANG", &cc_value);
+    cmd.env("_CARGOKIT_NDK_LINK_TARGET", target_arg); // Recognized by main() so we know when we're acting as a wrapper
+    cmd.env("_CARGOKIT_NDK_LINK_CLANG", &cc_value);
 
     run_command(cmd)?;
 
