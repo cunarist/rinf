@@ -30,30 +30,12 @@ impl Target {
         }
     }
 
-    fn ndk_prefix(&self) -> &'static str {
-        match self {
-            Target::ArmV7 => "armv-linux-androideabi",
-            Target::Arm64 => "aarch64-linux-android",
-            Target::X86 => "i686-linux-android",
-            Target::X86_64 => "x86_64-linux-android",
-        }
-    }
-
     fn target_dir(&self) -> &'static str {
         match self {
             Target::ArmV7 => "armeabi-v7a",
             Target::Arm64 => "arm64-v8a",
             Target::X86 => "x86",
             Target::X86_64 => "x86_64",
-        }
-    }
-
-    fn ndk_prefix_clang(&self) -> &'static str {
-        match self {
-            Target::ArmV7 => "armv7a-linux-androideabi",
-            Target::Arm64 => "aarch64-linux-android",
-            Target::X86 => "i686-linux-android",
-            Target::X86_64 => "x86_64-linux-android",
         }
     }
 
@@ -100,12 +82,6 @@ const ARCH: &str = "darwin-x86_64";
 const ARCH: &str = "linux-x86_64";
 #[cfg(target_os = "windows")]
 const ARCH: &str = "windows-x86_64";
-
-#[cfg(target_os = "windows")]
-const CLANG_TOOL_EXTENSION: &str = ".cmd";
-
-#[cfg(not(target_os = "windows"))]
-const CLANG_TOOL_EXTENSION: &str = "";
 
 // Workaround for libgcc missing in NDK23, inspired by cargo-ndk
 fn libgcc_workaround(build_dir: &Path, ndk_version: &Version) -> Result<String> {
@@ -203,27 +179,23 @@ fn build_for_target(target: &Target) -> Result<()> {
 
     let ar_key = format!("AR_{}", target.rust_target());
     let ar_value = pick_existing(vec![
-        toolchain_path.join(format!("{}-ar", target.ndk_prefix())),
+        toolchain_path.join(format!("{}-ar", target.rust_target())),
         toolchain_path.join("llvm-ar"),
         toolchain_path.join("llvm-ar.exe"),
     ])
     .expect("Did not find ar tool");
 
+    let target_arg = format!("--target={}{}", target.rust_target(), min_version);
+
     let cc_key = format!("CC_{}", target.rust_target());
-    let cc_value = toolchain_path.join(format!(
-        "{}{}-clang{}",
-        target.ndk_prefix_clang(),
-        min_version,
-        CLANG_TOOL_EXTENSION
-    ));
+    let cc_value = toolchain_path.join("clang");
+    let cflags_key = format!("CFLAGS_{}", target.rust_target());
+    let cflags_value = target_arg.clone();
 
     let cxx_key = format!("CXX_{}", target.rust_target());
-    let cxx_value = toolchain_path.join(format!(
-        "{}{}-clang++{}",
-        target.ndk_prefix_clang(),
-        min_version,
-        CLANG_TOOL_EXTENSION
-    ));
+    let cxx_value = toolchain_path.join("clang++");
+    let cxx_flags_key = format!("CXXFLAGS_{}", target.rust_target());
+    let cxx_flags_value = target_arg.clone();
 
     let rustflags_key = "CARGO_ENCODED_RUSTFLAGS";
 
@@ -232,7 +204,6 @@ fn build_for_target(target: &Target) -> Result<()> {
         target.rust_target().replace('-', "_")
     )
     .to_ascii_uppercase();
-    let linker_value = cc_value.clone();
 
     let ranlib_key = format!("RANLIB_{}", target.rust_target());
     let ranlib_value = toolchain_path.join("llvm-ranlib");
@@ -244,12 +215,20 @@ fn build_for_target(target: &Target) -> Result<()> {
     let ndk_version = Version::parse(&ndk_version)?;
     let rust_flags_value = libgcc_workaround(&build_dir, &ndk_version)?;
 
+    // Workaround for https://github.com/android/ndk/issues/1856
+    // based on cargo-ndk solution.
+    // https://github.com/bbqsrc/cargo-ndk/commit/d6cdbf4feef48ebea5eee8958e9c98431c3c5f32
+    let self_path = std::fs::canonicalize(std::env::args().next().unwrap())
+        .expect("Failed to canonicalize absolute path to build_android");
+
     debug!("ENV {}={}", ar_key, ar_value.display());
     debug!("ENV {}={}", cc_key, cc_value.display());
     debug!("ENV {}={}", cxx_key, cxx_value.display());
-    debug!("ENV {}={}", linker_key, linker_value.display());
+    debug!("ENV {}={}", linker_key, self_path.display());
     debug!("ENV {}={}", rustflags_key, rust_flags_value);
     debug!("ENV {}={}", ranlib_key, ranlib_value.display());
+    debug!("ENV {}={}", cflags_key, cflags_value);
+    debug!("ENV {}={}", cxx_flags_key, cxx_flags_value);
 
     let mut cmd = Command::new("cargo");
     cmd.arg("build");
@@ -265,11 +244,15 @@ fn build_for_target(target: &Target) -> Result<()> {
     cmd.arg("--target-dir");
     cmd.arg(&build_dir);
 
-    cmd.env(ar_key, ar_value);
-    cmd.env(cc_key, cc_value);
-    cmd.env(cxx_key, cxx_value);
-    cmd.env(linker_key, linker_value);
-    cmd.env(rustflags_key, rust_flags_value);
+    cmd.env(ar_key, &ar_value);
+    cmd.env(cc_key, &cc_value);
+    cmd.env(cxx_key, &cxx_value);
+    cmd.env(linker_key, &self_path);
+    cmd.env(rustflags_key, &rust_flags_value);
+    cmd.env(cflags_key, &cflags_value);
+    cmd.env(cxx_flags_key, &cxx_flags_value);
+    cmd.env("_CARGOKIT_LINK_TARGET", target_arg); // Recognized by main() so we know when we're acting as a wrapper
+    cmd.env("_CARGOKIT_LINK_CLANG", &cc_value);
 
     run_command(cmd)?;
 
@@ -287,6 +270,29 @@ fn build_for_target(target: &Target) -> Result<()> {
         .with_context(|| format!("src: {:?}", src))?;
 
     Ok(())
+}
+
+pub fn clang_linker_wrapper() -> ! {
+    let args = std::env::args_os().skip(1);
+    let clang = std::env::var("_CARGOKIT_NDK_LINK_CLANG")
+        .expect("cargo-ndk rustc linker: didn't find _CARGOKIT_NDK_LINK_CLANG env var");
+    let target = std::env::var("_CARGOKIT_NDK_LINK_TARGET")
+        .expect("cargo-ndk rustc linker: didn't find _CARGOKIT_NDK_LINK_TARGET env var");
+
+    let mut child = std::process::Command::new(&clang)
+        .arg(target)
+        .args(args)
+        .spawn()
+        .unwrap_or_else(|err| {
+            eprintln!("cargokit: Failed to spawn {clang:?} as linker: {err}");
+            std::process::exit(1)
+        });
+    let status = child.wait().unwrap_or_else(|err| {
+        eprintln!("cargokit (as linker): Failed to wait for {clang:?} to complete: {err}");
+        std::process::exit(1);
+    });
+
+    std::process::exit(status.code().unwrap_or(1))
 }
 
 pub fn build_android() -> Result<()> {
