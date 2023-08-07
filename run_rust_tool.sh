@@ -8,7 +8,7 @@ BASEDIR=$(dirname "$0")
 # which does not support rustup installed targets.
 CARGO="$HOME/.cargo/bin/cargo"
 
-if ! command -v cargo --version >/dev/null 2>&1
+if ! command -v $CARGO --version >/dev/null 2>&1
 then
     echo "|"
     echo "| cargo not found. Expected in $CARGO."
