@@ -452,7 +452,7 @@ flutter: ZERO-COST ABSTRACTION
 
 **Q**. 构建后的 Web 版本在浏览器控制台显示与跨域策略有关的错误。
 
-**A**. 在构建二进制文件并准备部署之后，确保您的 Web 服务器在其响应中配置了跨域相关的 HTTP 头。将`cross-origin-opener-policy`设置为`same-origin`，将`cross-origin-embedder-policy`设置为`require-corp`。
+**A**. 在构建好二进制文件并准备部署之后，请确保配置您的网络服务器以在其响应中包含与跨域相关的 HTTP 标头。将 `cross-origin-opener-policy` 设置为 `same-origin`，`cross-origin-embedder-policy` 设置为 `require-corp` 或 `credentialless`。这些标头使得使用您的网站的客户端能够访问所需的 `SharedArrayBuffer` 网络 API，而该 API 是该框架所必需的。`SharedArrayBuffer` 在网络上类似于共享内存的功能。
 
 **Q**. Rust 代码的更改会在 Dart 的热重启中生效吗？
 

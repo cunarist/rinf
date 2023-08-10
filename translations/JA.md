@@ -454,7 +454,7 @@ Rust から Dart に毎秒増加する数値を送信したいとします。こ
 
 **Q**. ビルドした Web バージョンで、ブラウザのコンソールにクロスオリジンポリシーに関連するエラーが表示されます。
 
-**A**. バイナリをビルドし、展開の準備をした後、Web サーバーがその応答にクロスオリジン関連の HTTP ヘッダーを含めるように設定してください。`cross-origin-opener-policy`を`same-origin`に設定し、`cross-origin-embedder-policy`を`require-corp`に設定します。
+**A**. バイナリをビルドし、展開の準備を整えたら、ウェブサーバーを設定して、その応答にクロスオリジン関連の HTTP ヘッダーを含めるようにしてください。`cross-origin-opener-policy`を`same-origin`に、`cross-origin-embedder-policy`を`require-corp`または`credentialless`に設定します。これらのヘッダーにより、お客様のウェブサイトを利用するクライアントは、このフレームワークで必要な`SharedArrayBuffer`ウェブ API にアクセスできるようになります。`SharedArrayBuffer`は、ウェブ上の共有メモリのような機能を持っています。
 
 **Q**. Rust のコードの変更は Dart のホットリスタートに反映されますか？
 
