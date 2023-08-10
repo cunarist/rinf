@@ -1,3 +1,7 @@
+## 2.5.5
+
+- Improved guides about HTTP headers.
+
 ## 2.5.4
 
 - Updated example code.
