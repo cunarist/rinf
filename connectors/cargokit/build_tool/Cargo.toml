@@ -1,4 +1,5 @@
 # CargoKit will get symlinked to project, but it's not part of workspace
+[workspace]
 
 [package]
 name = "build_tool"

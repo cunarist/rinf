@@ -52,7 +52,7 @@ abstract class CargoKitBuildTask extends DefaultTask {
         def executableName = Os.isFamily(Os.FAMILY_WINDOWS) ? "run_rust_tool.cmd" : "run_rust_tool.sh"
         def path = Paths.get(new File(pluginFile).parent, "..", executableName);
 
-        def manifestDir = project.cargokit.manifestDir
+        def manifestDir = Paths.get(project.buildscript.sourceFile.parent, project.cargokit.manifestDir)
 
         project.exec {
             executable path

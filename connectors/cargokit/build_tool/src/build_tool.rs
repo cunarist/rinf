@@ -1,6 +1,7 @@
 use std::{env::args, process::exit};
 
 use anyhow::Result;
+use build_android::clang_linker_wrapper;
 use log::{debug, LevelFilter};
 
 mod build_android;
@@ -36,6 +37,10 @@ fn dump_environment() -> Result<()> {
 fn run() -> Result<()> {
     init_logging()?;
     dump_environment()?;
+
+    if std::env::var("_CARGOKIT_NDK_LINK_TARGET").is_ok() {
+        clang_linker_wrapper();
+    }
 
     let mut args = args();
     args.next(); // executable
