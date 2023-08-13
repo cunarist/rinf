@@ -1,0 +1,93 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: CI on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false # important
+      matrix:
+        os: [macOS-latest, ubuntu-latest, windows-latest]
+        # target: [apk, ios, linux, macos, windows]
+    steps:
+      - name: Display workflow information
+        run: |
+          echo "Repository: ${{ github.repository }}"
+          echo "Event Name: ${{ github.event_name }}"
+          echo "SHA: ${{ github.sha }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Workflow: ${{ github.workflow }}"
+          echo "Run ID: ${{ github.run_id }}"
+          echo "Run Number: ${{ github.run_number }}"
+          echo "Workspace: ${{ github.workspace }}"
+          echo "Action: ${{ github.action }}"
+          echo "Event Path: ${{ github.event_path }}"
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Checkout submodules
+        run: git submodule update --init --recursive
+
+      - name: Setup Flutter Toolchain
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      # For Android
+      - name: Setup Java Toolchain
+        uses: actions/setup-java@v2
+        with:
+          distribution: "zulu"
+          java-version: "11"
+
+      # For Linux
+      - name: Setup Ninja and GTK3 Toolchain
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ninja-build libgtk-3-dev
+
+      - name: Fetch Dependencies
+        working-directory: example/
+        run: flutter pub get
+
+      - name: Build Android APK
+        working-directory: example/
+        run: flutter build apk
+
+      - name: Build Android App Bundle
+        working-directory: example/
+        run: flutter build appbundle
+
+      - name: Build iOS App
+        if: matrix.os == 'macOS-latest'
+        working-directory: example/
+        run: flutter build ios --release --no-codesign
+
+      - name: Build Linux Executable
+        if: matrix.os == 'ubuntu-latest'
+        working-directory: example/
+        run: |
+          flutter config --enable-linux-desktop
+          flutter build linux
+
+      - name: Build macOS App
+        if: matrix.os == 'macOS-latest'
+        working-directory: example/
+        run: |
+          flutter config --enable-macos-desktop
+          flutter build macos
+
+      - name: Build Windows Executable
+        if: matrix.os == 'windows-latest'
+        working-directory: example/
+        run: |
+          flutter config --enable-windows-desktop
+          flutter build windows
