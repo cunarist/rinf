@@ -1,0 +1,3 @@
+[submodule "connectors/corrosion"]
+	path = connectors/corrosion
+	url = https://github.com/corrosion-rs/corrosion
