@@ -1,6 +1,6 @@
 ## 2.5.6
 
-- Updated Cargokit.
+- Updated Cargokit. (Thanks @bookshiyi)
 
 ## 2.5.5
 
