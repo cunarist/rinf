@@ -66,6 +66,10 @@ jobs:
         working-directory: example/
         run: flutter build appbundle
 
+      - name: Build Web
+        working-directory: example/
+        run: flutter build web
+
       - name: Build iOS App
         if: matrix.os == 'macOS-latest'
         working-directory: example/
