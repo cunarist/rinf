@@ -1,3 +1,7 @@
+## 2.5.6
+
+- Updated Cargokit.
+
 ## 2.5.5
 
 - Improved guides about HTTP headers.
