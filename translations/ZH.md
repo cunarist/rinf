@@ -458,6 +458,12 @@ flutter: ZERO-COST ABSTRACTION
 
 **A**. 不会，在 Dart 的热重启中，更新的 Rust 代码无法加载。为了使更改生效，需要重新编译应用程序，因为必须将应用程序二进制文件链接到新编译的 Rust 库文件。这是由 Rust 的编译过程引起的限制，因为 Rust 本身不支持热重启特性。不过，Dart 的热重启会重新启动 Rust 逻辑，换句话说，会重新启动`main()`函数。
 
+# 🌟 贡献者们
+
+我们感谢您对这个项目开发的贡献！
+
+[![GitHub 贡献者（通过 allcontributors.org）](https://contrib.rocks/image?repo=cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/graphs/contributors)
+
 # ☕ 支持我们
 
 😉 如果您从 Rust-In-Flutter 的功能中受益，并认为它对您非常有帮助，为什么不考虑下支持这个项目呢？您的慷慨捐助将有助于 Rust-In-Flutter 项目的维护和开发，确保其不断改进、发展！

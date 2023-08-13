@@ -460,6 +460,12 @@ Rust から Dart に毎秒増加する数値を送信したいとします。こ
 
 **A**. いいえ、更新された Rust のコードは Dart のホットリスタートでは読み込まれません。変更を反映させるためには、アプリを再コンパイルする必要があります。アプリのバイナリは再度新しくコンパイルされた Rust のライブラリファイルにリンクされる必要があります。この制限は Rust のコンパイルプロセスによるもので、Rust はホットリスタート機能を本質的にサポートしていないためです。ただし、Dart のホットリスタートは Rust のロジック、つまり`main()`関数を再起動します。
 
+# 🌟 貢献者の皆様へ
+
+このプロジェクトの開発へのご貢献、心から感謝しています！
+
+[![GitHub 貢献者（allcontributors.org経由）](https://contrib.rocks/image?repo=cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/graphs/contributors)
+
 # ☕ サポートをお願いします
 
 😉 Rust-In-Flutter の機能を活用し、役立つと感じている場合は、このプロジェクトのサポートを検討してみてください。寄付いただいた方々の寛大な支援により、Rust-In-Flutter の保守と開発が行われ、継続的な改善と成長が実現されます。

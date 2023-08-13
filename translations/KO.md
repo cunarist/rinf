@@ -458,6 +458,12 @@ Rust에서 Dart로 매 초마다 증가하는 숫자를 보내고 싶다고 가�
 
 **A**. 아니요, 업데이트된 Rust 코드는 Dart의 Hot restart 시에 로딩되지 않습니다. 변경사항을 적용하려면 앱을 다시 컴파일해야 합니다. 이는 새로 컴파일된 Rust 라이브러리 파일과 앱 바이너리를 다시 연결해야 하기 때문입니다. 이 제약은 Hot restart를 지원하지 않는 러스트의 컴파일 방식으로부터 비롯됩니다. 그렇지만 Dart의 Hot restart가 Rust 로직, 즉 `main()` 함수를 다시 시작하는 것은 맞습니다.
 
+# 🌟 기여자들
+
+이 프로젝트의 개발을 도와주신 것에 감사드립니다!
+
+[![GitHub 기여자 목록 (allcontributors.org 통해서)](https://contrib.rocks/image?repo=cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/graphs/contributors)
+
 # ☕ 개발 지원하기
 
 😉 Rust-In-Flutter의 기능이 도움이 되었다면, 이 프로젝트를 지원해주세요. 여러분의 너그러운 후원은 Rust-In-Flutter의 유지보수에 큰 도움이 됩니다.

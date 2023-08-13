@@ -458,6 +458,12 @@ Finally, receive the signals in Dart with `StreamBuilder`, filter them by addres
 
 **A**. No, the updated Rust code cannot be loaded upon Dart's hot restart. To incorporate the changes, the app needs to be re-compiled, as the app binary must be linked to the newly compiled Rust library files again. This limitation arises from the Rust compilation process, as Rust does not inherently support a hot restart feature. Still, Dart's hot restart does restart the Rust logic, in other words, the `main()` function.
 
+# 🌟 Contributors
+
+We appreciate your contribution to the development of this project!
+
+[![GitHub contributors (via allcontributors.org)](https://contrib.rocks/image?repo=cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/graphs/contributors)
+
 # ☕ Support Us
 
 😉 If you are benefiting from the features of Rust-In-Flutter and find it helpful, why not consider supporting this project? Your generous donations contribute to the maintenance and development of Rust-In-Flutter, ensuring its continuous improvement and growth.
