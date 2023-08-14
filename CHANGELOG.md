@@ -1,3 +1,7 @@
+## 2.7.0
+
+- Stabilized web-related Rust toolchain's auto-installation (Thanks @bookshiyi)
+
 ## 2.6.0
 
 - Applied continuous integration for checking builds and improving project stability (Thanks @bookshiyi)
