@@ -67,6 +67,12 @@ jobs:
         working-directory: example/
         run: flutter pub get
 
+      - name: Build Web
+        working-directory: example/
+        run: |
+          dart run rust_in_flutter wasm --release
+          flutter build web
+
       - name: Build Android APK
         working-directory: example/
         run: flutter build apk
@@ -74,12 +80,6 @@ jobs:
       - name: Build Android App Bundle
         working-directory: example/
         run: flutter build appbundle
-
-      - name: Build Web
-        working-directory: example/
-        run: |
-          dart run rust_in_flutter wasm --release
-          flutter build web
 
       - name: Build iOS App
         if: matrix.os == 'macOS-latest'
