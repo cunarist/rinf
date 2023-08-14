@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   build:
-    name: CI on ${{ matrix.os }}
+    name: Build Test on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
