@@ -1,6 +1,6 @@
 > 英語以外の言語で書かれたドキュメントでは、文章が不自然になることがあります。ドキュメントの改善にご協力いただける方は、[Pull request](https://github.com/cunarist/rust-in-flutter/pulls)をお願いいたします。いつもご協力に感謝いたします。
 
-[![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter?label=Pub%20Popularity)](https://pub.dev/packages/rust_in_flutter) [![Pub Points](https://img.shields.io/pub/points/rust_in_flutter?label=Pub%20Points)](https://pub.dev/packages/rust_in_flutter) [![Build Test (main)](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml/badge.svg?branch=main&event=push)](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml)
+[![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter?label=Pub%20Popularity)](https://pub.dev/packages/rust_in_flutter) [![Pub Points](https://img.shields.io/pub/points/rust_in_flutter?label=Pub%20Points)](https://pub.dev/packages/rust_in_flutter) [![Build Test (main)](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml/badge.svg)](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml)
 
 # 🆎 Rust-In-Flutter
 
