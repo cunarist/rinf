@@ -73,7 +73,9 @@ jobs:
       - name: Build example Flutter app
         if: matrix.target == 'android'
         working-directory: example/
-        run: flutter build apk
+        run: |
+          flutter build apk
+          flutter build appbundle
 
       - name: Build example Flutter app
         if: matrix.target == 'windows'
