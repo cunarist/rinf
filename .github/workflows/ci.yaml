@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false # important
       matrix:
-        os: [macOS-latest, ubuntu-latest, windows-latest]
+        os: [macos-latest, ubuntu-latest, windows-latest]
         # target: [apk, ios, linux, macos, windows]
     steps:
       - name: Display workflow information
@@ -82,7 +82,7 @@ jobs:
         run: flutter build appbundle
 
       - name: Build iOS App
-        if: matrix.os == 'macOS-latest'
+        if: matrix.os == 'macos-latest'
         working-directory: example/
         run: flutter build ios --release --no-codesign
 
@@ -94,7 +94,7 @@ jobs:
           flutter build linux
 
       - name: Build macOS App
-        if: matrix.os == 'macOS-latest'
+        if: matrix.os == 'macos-latest'
         working-directory: example/
         run: |
           flutter config --enable-macos-desktop
