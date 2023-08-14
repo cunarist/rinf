@@ -69,9 +69,7 @@ jobs:
 
       - name: Build Web
         working-directory: example/
-        run: |
-          dart run rust_in_flutter wasm --release
-          flutter build web
+        run: flutter build web
 
       - name: Build Android APK
         working-directory: example/
