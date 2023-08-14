@@ -32,7 +32,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Checkout submodules
         run: git submodule update --init --recursive
@@ -54,7 +54,7 @@ jobs:
 
       - name: Setup Java Toolchain (Only Android target)
         if: matrix.target == 'apk' || matrix.target == 'appbundle'
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           distribution: "zulu"
           java-version: "11"
