@@ -26,7 +26,7 @@ jobs:
           - os: macos # For macOS platform
             target: macos
           - os: macos # For macOS platform
-            target: ios --no-codesign
+            target: ios
           - os: windows # For Windows platform
             target: windows
 
@@ -64,11 +64,16 @@ jobs:
         working-directory: example/
         run: flutter pub get
 
-      - name: Build Wasm (Only Web target)
+      - name: Build Webassembly (Only Web target)
         if: matrix.target == 'web'
         working-directory: example/
         run: dart run rust_in_flutter wasm --release
 
       - name: Build Target ${{ matrix.target }}
         working-directory: example/
-        run: flutter build ${{ matrix.target }}
+        run: |
+          if [ "${{ matrix.target }}" == "ios" ]; then
+            flutter build ios --no-codesign
+          else
+            flutter build ${{ matrix.target }}
+          fi
