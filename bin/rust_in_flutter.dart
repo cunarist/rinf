@@ -145,27 +145,25 @@ Future<void> _buildWebassembly({bool isReleaseMode = false}) async {
   print("Verifying Rust toolchain for the web." +
       " This might take a while if there are new updates to be installed.");
   await Process.run("rustup", ["toolchain", "install", "nightly"]);
-  Future.wait([
-    Process.run("rustup", [
-      "+nightly",
-      "component",
-      "add",
-      "rust-src",
-    ]),
-    Process.run("rustup", [
-      "+nightly",
-      "target",
-      "add",
-      "wasm32-unknown-unknown",
-    ]), // For actual compilation
-    Process.run("rustup", [
-      "target",
-      "add",
-      "wasm32-unknown-unknown",
-    ]), // For Rust-analyzer
-    Process.run("cargo", ["install", "wasm-pack"]),
-    Process.run("cargo", ["install", "wasm-bindgen-cli"]),
+  await Process.run("rustup", [
+    "+nightly",
+    "component",
+    "add",
+    "rust-src",
   ]);
+  await Process.run("rustup", [
+    "+nightly",
+    "target",
+    "add",
+    "wasm32-unknown-unknown",
+  ]); // For actual compilation
+  await Process.run("rustup", [
+    "target",
+    "add",
+    "wasm32-unknown-unknown",
+  ]); // For Rust-analyzer
+  await Process.run("cargo", ["install", "wasm-pack"]);
+  await Process.run("cargo", ["install", "wasm-bindgen-cli"]);
 
   // Verify Flutter SDK web server's response headers.
   await _verifyServerHeaders();
