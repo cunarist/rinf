@@ -13,7 +13,7 @@ concurrency:
 jobs:
   build:
     name: build ${{ matrix.target }} on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
     timeout-minutes: 60
     strategy:
       fail-fast: false # important
