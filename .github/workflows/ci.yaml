@@ -1,10 +1,13 @@
 name: Build Test
 on: [push, pull_request, workflow_dispatch]
 concurrency:
-  # Cancels the workflow when another event in the same context happens.
-  # If it's a PR, context is checked by the pull request number.
+  # Cancels the workflow
+  # when another event in the same context happens.
+  # If it's a PR, context is the pull request number.
   # Otherwise, it uses the Git reference(branch or tag name).
-  group: ${{ github.workflow }} - ${{ github.event.pull_request.number || github.ref }}
+  group: >
+    ${{ github.workflow }}
+    ${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
