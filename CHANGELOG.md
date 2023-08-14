@@ -1,3 +1,7 @@
+## 2.6.0
+
+- Applied continuous integration for checking builds and improving project stability (Thanks @bookshiyi)
+
 ## 2.5.6
 
 - Updated Cargokit. (Thanks @bookshiyi)
