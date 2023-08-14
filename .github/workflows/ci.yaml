@@ -13,22 +13,31 @@ concurrency:
 jobs:
   build:
     name: build ${{ matrix.target }} on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}-latest
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     strategy:
       fail-fast: false # important
       matrix:
-        os: [macos, ubuntu, windows]
+        os: [linux, windows, macos]
+        runner: []
         target: [android, web] # On all platforms
         include:
-          - os: ubuntu # On Linux platform
+          # Specify runners
+          - os: linux
+            runner: ubuntu-latest
+          - os: windows
+            runner: windows-latest
+          - os: macos
+            runner: macos-latest
+          # Specify targets
+          - os: linux
             target: linux
-          - os: macos # On macOS platform
-            target: macos
-          - os: macos # On macOS platform
-            target: ios
-          - os: windows # On Windows platform
+          - os: windows
             target: windows
+          - os: macos
+            target: macos
+          - os: macos
+            target: ios
 
     steps:
       - name: Checkout repository
@@ -47,7 +56,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Setup Ninja and GTK3 toolchain (Only Linux platform)
-        if: matrix.os == 'ubuntu'
+        if: matrix.os == 'linux'
         run: |
           sudo apt-get update -y
           sudo apt-get install -y ninja-build libgtk-3-dev
