@@ -74,7 +74,9 @@ jobs:
 
       - name: Build Web
         working-directory: example/
-        run: flutter build web
+        run: |
+          dart run rust_in_flutter wasm --release
+          flutter build web
 
       - name: Build iOS App
         if: matrix.os == 'macOS-latest'
