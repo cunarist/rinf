@@ -19,15 +19,15 @@ jobs:
       fail-fast: false # important
       matrix:
         os: [macos, ubuntu, windows]
-        target: [apk, appbundle, web] # For all platforms
+        target: [android, web] # On all platforms
         include:
-          - os: ubuntu # For Linux platform
+          - os: ubuntu # On Linux platform
             target: linux
-          - os: macos # For macOS platform
+          - os: macos # On macOS platform
             target: macos
-          - os: macos # For macOS platform
+          - os: macos # On macOS platform
             target: ios
-          - os: windows # For Windows platform
+          - os: windows # On Windows platform
             target: windows
 
     steps:
@@ -37,43 +37,61 @@ jobs:
       - name: Checkout submodules
         run: git submodule update --init --recursive
 
-      - name: Setup Flutter Toolchain
+      - name: Setup Flutter toolchain
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
           cache: true
 
-      - name: Setup Rust Toolchain
+      - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Setup Ninja and GTK3 Toolchain (Only Linux platform)
+      - name: Setup Ninja and GTK3 toolchain (Only Linux platform)
         if: matrix.os == 'ubuntu'
         run: |
           sudo apt-get update -y
           sudo apt-get install -y ninja-build libgtk-3-dev
 
-      - name: Setup Java Toolchain (Only Android target)
-        if: matrix.target == 'apk' || matrix.target == 'appbundle'
+      - name: Setup Java toolchain (Only Android target)
+        if: matrix.target == 'android' || matrix.target == 'appbundle'
         uses: actions/setup-java@v3
         with:
           distribution: "zulu"
           java-version: "11"
           cache: "gradle"
 
-      - name: Fetch Dependencies
+      - name: Fetch dependencies
         working-directory: example/
         run: flutter pub get
 
-      - name: Build Webassembly (Only Web target)
+      - name: Build example Flutter app
+        if: matrix.target == 'linux'
+        working-directory: example/
+        run: flutter build linux
+
+      - name: Build example Flutter app
+        if: matrix.target == 'android'
+        working-directory: example/
+        run: flutter build apk
+
+      - name: Build example Flutter app
+        if: matrix.target == 'windows'
+        working-directory: example/
+        run: flutter build windows
+
+      - name: Build example Flutter app
+        if: matrix.target == 'macos'
+        working-directory: example/
+        run: flutter build macos
+
+      - name: Build example Flutter app
+        if: matrix.target == 'ios'
+        working-directory: example/
+        run: flutter build ios --no-codesign
+
+      - name: Build example Flutter app
         if: matrix.target == 'web'
         working-directory: example/
-        run: dart run rust_in_flutter wasm --release
-
-      - name: Build Target ${{ matrix.target }}
-        working-directory: example/
         run: |
-          if [ "${{ matrix.target }}" == "ios" ]; then
-            flutter build ios --no-codesign
-          else
-            flutter build ${{ matrix.target }}
-          fi
+          dart run rust_in_flutter wasm --release
+          flutter build web
