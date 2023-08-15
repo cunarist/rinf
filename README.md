@@ -1,6 +1,11 @@
 [English Guide](https://github.com/cunarist/rust-in-flutter/blob/main/README.md) · [한국어 설명서](https://github.com/cunarist/rust-in-flutter/blob/main/translations/KO.md) · [中文文档](https://github.com/cunarist/rust-in-flutter/blob/main/translations/ZH.md) · [日本語ガイド](https://github.com/cunarist/rust-in-flutter/blob/main/translations/JA.md)
 
-[![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter?label=Pub%20Popularity)](https://pub.dev/packages/rust_in_flutter) [![Pub Points](https://img.shields.io/pub/points/rust_in_flutter?label=Pub%20Points)](https://pub.dev/packages/rust_in_flutter) [![Build Test](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml/badge.svg)](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml)
+[![Pub Version](https://img.shields.io/pub/v/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
+[![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
+[![Pub Points](https://img.shields.io/pub/points/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
+[![GitHub Stars](https://img.shields.io/github/stars/cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/stargazers)
+[![Build Test](https://img.shields.io/github/actions/workflow/status/cunarist/rust-in-flutter/ci.yaml)](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml)
+[![GitHub License](https://img.shields.io/github/license/cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/blob/main/LICENSE)
 
 # 🆎 Rust-In-Flutter
 
@@ -14,14 +19,13 @@ Designed for ease of use, future scalability, and unparalleled performance, this
 
 ## Platform Support
 
-All the challenging build settings are automatically handled by this package.
+All platforms available with Flutter are [tested](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml) and supported. Also, challenging build settings are automatically handled by this package.
 
-- ✅ Linux: Tested and supported
-- ✅ Android: Tested and supported
-- ✅ Windows: Tested and supported
-- ✅ macOS: Tested and supported
-- ✅ iOS: Tested and supported
-- ✅ Web: Tested and supported
+| Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
+| ------- | ----- | ------- | ------- | ----- | --- | --- |
+| Linux   | ✅    | -       | ✅      | -     | -   | ✅  |
+| Windows | ✅    | -       | -       | -     | ✅  | ✅  |
+| macOS   | ✅    | ✅      | -       | ✅    | -   | ✅  |
 
 ## Benefits
 
@@ -466,6 +470,6 @@ We appreciate your contribution to the development of this project!
 
 # ☕ Support Us
 
-😉 If you are benefiting from the features of Rust-In-Flutter and find it helpful, why not consider supporting this project? Your generous donations contribute to the maintenance and development of Rust-In-Flutter, ensuring its continuous improvement and growth.
+If you are benefiting from the features of Rust-In-Flutter and find it helpful, why not consider supporting this project? Your generous donations contribute to the maintenance and development of Rust-In-Flutter, ensuring its continuous improvement and growth. 😉
 
 If you feel like so, please consider [buying us a coffee](https://www.buymeacoffee.com/cunarist).
