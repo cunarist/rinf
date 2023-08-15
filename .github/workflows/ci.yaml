@@ -76,7 +76,7 @@ jobs:
             ~/.android
             /usr/local/lib/android/
             ./example/build
-          key: manual-cache-${{ matrix.runner }}-${{ hashFiles('**/lockfiles') }}
+          key: manual-cache-${{ matrix.runner }}
 
       - name: Setup Flutter toolchain
         uses: subosito/flutter-action@v2
