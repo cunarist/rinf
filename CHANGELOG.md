@@ -1,3 +1,7 @@
+## 2.7.2
+
+- Organized guides
+
 ## 2.7.1
 
 - Organized guides (Thanks @bookshiyi)
