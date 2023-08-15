@@ -1,6 +1,9 @@
 > 영어 이외의 언어로 된 문서에서는 문장이 어색할 수 있습니다. 문서 개선에 기여하고 싶으신 분은 [Pull request](https://github.com/cunarist/rust-in-flutter/pulls)를 남겨주세요. 언제나 도움에 감사드립니다.
 
-[![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter?label=Pub%20Popularity)](https://pub.dev/packages/rust_in_flutter) [![Pub Points](https://img.shields.io/pub/points/rust_in_flutter?label=Pub%20Points)](https://pub.dev/packages/rust_in_flutter) [![Build Test](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml/badge.svg)](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml)
+[![Pub Version (including pre-releases)](https://img.shields.io/pub/v/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
+[![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter?label=Pub%20Popularity)](https://pub.dev/packages/rust_in_flutter)
+[![Pub Points](https://img.shields.io/pub/points/rust_in_flutter?label=Pub%20Points)](https://pub.dev/packages/rust_in_flutter)
+[![Build Test](https://img.shields.io/github/actions/workflow/status/cunarist/rust-in-flutter/ci.yaml)](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml)
 
 # 🆎 Rust-In-Flutter
 
@@ -16,12 +19,11 @@ Rust를 활용해서 Flutter 앱의 속도를 극적으로 향상시켜 보세�
 
 복잡한 빌드 설정들은 모두 자동으로 처리됩니다.
 
-- ✅ Linux: 지원 및 작동 확인됨
-- ✅ Android: 지원 및 작동 확인됨
-- ✅ Windows: 지원 및 작동 확인됨
-- ✅ macOS: 지원 및 작동 확인됨
-- ✅ iOS: 지원 및 작동 확인됨
-- ✅ Web: 지원 및 작동 확인됨
+| 플랫폼 \ 목표 | Android | iOS/iPadOS | Linux | macOS | Windows | Web |
+| ------------- | ------- | ---------- | ----- | ----- | ------- | --- |
+| Linux         | ✅      | -          | ✅    | -     | -       | ✅  |
+| macOS         | ✅      | ✅         | -     | ✅    | -       | ✅  |
+| Windows       | ✅      | -          | -     | -     | ✅      | ✅  |
 
 ## 혜택
 

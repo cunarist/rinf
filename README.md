@@ -1,6 +1,9 @@
-[English Guide](https://github.com/cunarist/rust-in-flutter/blob/main/README.md) · [한국어 설명서](https://github.com/cunarist/rust-in-flutter/blob/main/translations/KO.md) · [中文文档](https://github.com/cunarist/rust-in-flutter/blob/main/translations/ZH.md) · [日本語ガイド](https://github.com/cunarist/rust-in-flutter/blob/main/translations/JA.md)
+[English Guide](https://github.com/cunarist/rust-in-flutter/blob/main/README.md) · [한국어 설명서](./translations/KO.md) · [中文文档](./translations/ZH.md) · [日本語ガイド](./translations/JA.md)
 
-[![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter?label=Pub%20Popularity)](https://pub.dev/packages/rust_in_flutter) [![Pub Points](https://img.shields.io/pub/points/rust_in_flutter?label=Pub%20Points)](https://pub.dev/packages/rust_in_flutter) [![Build Test](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml/badge.svg)](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml)
+[![Pub Version (including pre-releases)](https://img.shields.io/pub/v/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
+[![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter?label=Pub%20Popularity)](https://pub.dev/packages/rust_in_flutter)
+[![Pub Points](https://img.shields.io/pub/points/rust_in_flutter?label=Pub%20Points)](https://pub.dev/packages/rust_in_flutter)
+[![Build Test](https://img.shields.io/github/actions/workflow/status/cunarist/rust-in-flutter/ci.yaml)](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml)
 
 # 🆎 Rust-In-Flutter
 
@@ -16,12 +19,11 @@ Designed for ease of use, future scalability, and unparalleled performance, this
 
 All the challenging build settings are automatically handled by this package.
 
-- ✅ Linux: Tested and supported
-- ✅ Android: Tested and supported
-- ✅ Windows: Tested and supported
-- ✅ macOS: Tested and supported
-- ✅ iOS: Tested and supported
-- ✅ Web: Tested and supported
+| Platform \ Target | Android | iOS/iPadOS | Linux | macOS | Windows | Web |
+| ----------------- | ------- | ---------- | ----- | ----- | ------- | --- |
+| Linux             | ✅      | -          | ✅    | -     | -       | ✅  |
+| macOS             | ✅      | ✅         | -     | ✅    | -       | ✅  |
+| Windows           | ✅      | -          | -     | -     | ✅      | ✅  |
 
 ## Benefits
 
