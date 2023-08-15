@@ -22,11 +22,11 @@ Designed for ease of use, future scalability, and unparalleled performance, this
 
 All the challenging build settings are automatically handled by this package.
 
-| Platform \ Target | Android | iOS/iPadOS | Linux | macOS | Windows | Web |
-| ----------------- | ------- | ---------- | ----- | ----- | ------- | --- |
-| Linux             | ✅      | -          | ✅    | -     | -       | ✅  |
-| macOS             | ✅      | ✅         | -     | ✅    | -       | ✅  |
-| Windows           | ✅      | -          | -     | -     | ✅      | ✅  |
+| Dev     | Android | iOS | Linux | macOS | Windows | Web |
+| ------- | ------- | --- | ----- | ----- | ------- | --- |
+| Linux   | ✅      | -   | ✅    | -     | -       | ✅  |
+| macOS   | ✅      | ✅  | -     | ✅    | -       | ✅  |
+| Windows | ✅      | -   | -     | -     | ✅      | ✅  |
 
 ## Benefits
 
