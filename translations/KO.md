@@ -23,9 +23,9 @@ Flutter의 모든 플랫폼은 [테스트](https://github.com/cunarist/rust-in-f
 
 | Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
 | ------- | ----- | ------- | ------- | ----- | --- | --- |
-| Linux   | ✅    | -       | ✅      | -     | -   | ✅  |
-| Windows | ✅    | -       | -       | -     | ✅  | ✅  |
-| macOS   | ✅    | ✅      | -       | ✅    | -   | ✅  |
+| Linux   | ✅    | ✅      | -       | -     | -   | ✅  |
+| Windows | -     | ✅      | ✅      | -     | -   | ✅  |
+| macOS   | -     | ✅      | -       | ✅    | ✅  | ✅  |
 
 ## 혜택
 

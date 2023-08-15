@@ -23,9 +23,9 @@ Flutter 支持的所有平台都经过了[测试](https://github.com/cunarist/ru
 
 | Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
 | ------- | ----- | ------- | ------- | ----- | --- | --- |
-| Linux   | ✅    | -       | ✅      | -     | -   | ✅  |
-| Windows | ✅    | -       | -       | -     | ✅  | ✅  |
-| macOS   | ✅    | ✅      | -       | ✅    | -   | ✅  |
+| Linux   | ✅    | ✅      | -       | -     | -   | ✅  |
+| Windows | -     | ✅      | ✅      | -     | -   | ✅  |
+| macOS   | -     | ✅      | -       | ✅    | ✅  | ✅  |
 
 ## 好处
 

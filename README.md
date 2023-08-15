@@ -23,9 +23,9 @@ All platforms available with Flutter are [tested](https://github.com/cunarist/ru
 
 | Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
 | ------- | ----- | ------- | ------- | ----- | --- | --- |
-| Linux   | ✅    | -       | ✅      | -     | -   | ✅  |
-| Windows | ✅    | -       | -       | -     | ✅  | ✅  |
-| macOS   | ✅    | ✅      | -       | ✅    | -   | ✅  |
+| Linux   | ✅    | ✅      | -       | -     | -   | ✅  |
+| Windows | -     | ✅      | ✅      | -     | -   | ✅  |
+| macOS   | -     | ✅      | -       | ✅    | ✅  | ✅  |
 
 ## Benefits
 
