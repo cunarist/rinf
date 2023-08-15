@@ -52,17 +52,17 @@ jobs:
       - name: Checkout submodules
         run: git submodule update --init --recursive
 
-      # Automatic setup cache(Doesn't work )
+      # # Automaticallly setup cache (Doesn't work yet)
       # - name: Setup Nix
-      #   if:  matrix.runner == 'ubuntu-latest' || matrix.runner == 'macos-latest'
+      #   if: matrix.runner == 'ubuntu-latest' || matrix.runner == 'macos-latest'
       #   uses: DeterminateSystems/nix-installer-action@main
 
       # - name: Setup Magic Nix Cache
-      #   if:  matrix.runner == 'ubuntu-latest' ||  matrix.runner == 'macos-latest'
+      #   if: matrix.runner == 'ubuntu-latest' ||  matrix.runner == 'macos-latest'
       #   uses: DeterminateSystems/magic-nix-cache-action@main
 
       # - name: Run Nix Flake Check
-      #   if:  matrix.runner == 'ubuntu-latest' ||  matrix.runner == 'macos-latest'
+      #   if: matrix.runner == 'ubuntu-latest' ||  matrix.runner == 'macos-latest'
       #   run: nix flake check
 
       # Manually setup cache
