@@ -1,3 +1,7 @@
+## 2.7.4
+
+- Fixed CI badge showing rate limit error
+
 ## 2.7.3
 
 - Fixed wrong guides
