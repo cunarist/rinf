@@ -1,3 +1,7 @@
+## 2.7.1
+
+- Organized guides (Thanks @bookshiyi)
+
 ## 2.7.0
 
 - Stabilized web-related Rust toolchain's auto-installation (Thanks @bookshiyi)
