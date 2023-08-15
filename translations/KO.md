@@ -22,7 +22,7 @@ Rust를 활용해서 Flutter 앱의 속도를 극적으로 향상시켜 보세�
 
 복잡한 빌드 설정들은 모두 자동으로 처리됩니다.
 
-| Dev     | Linux | Android | Windows | macOS | iOS | Web |
+| Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
 | ------- | ----- | ------- | ------- | ----- | --- | --- |
 | Linux   | ✅    | -       | ✅      | -     | -   | ✅  |
 | Windows | ✅    | -       | -       | -     | ✅  | ✅  |

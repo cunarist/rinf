@@ -22,7 +22,7 @@ Flutter アプリを驚くほど高速化するために、簡単に Rust を統
 
 すべての難しいビルド設定は、このパッケージによって自動的に処理されます。
 
-| Dev     | Linux | Android | Windows | macOS | iOS | Web |
+| Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
 | ------- | ----- | ------- | ------- | ----- | --- | --- |
 | Linux   | ✅    | -       | ✅      | -     | -   | ✅  |
 | Windows | ✅    | -       | -       | -     | ✅  | ✅  |

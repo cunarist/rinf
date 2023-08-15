@@ -22,7 +22,7 @@
 
 所有复杂的构建设置都会被这个软件包自动处理。
 
-| Dev     | Linux | Android | Windows | macOS | iOS | Web |
+| Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
 | ------- | ----- | ------- | ------- | ----- | --- | --- |
 | Linux   | ✅    | -       | ✅      | -     | -   | ✅  |
 | Windows | ✅    | -       | -       | -     | ✅  | ✅  |

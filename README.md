@@ -22,7 +22,7 @@ Designed for ease of use, future scalability, and unparalleled performance, this
 
 All the challenging build settings are automatically handled by this package.
 
-| Dev     | Linux | Android | Windows | macOS | iOS | Web |
+| Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
 | ------- | ----- | ------- | ------- | ----- | --- | --- |
 | Linux   | ✅    | -       | ✅      | -     | -   | ✅  |
 | Windows | ✅    | -       | -       | -     | ✅  | ✅  |
