@@ -1,3 +1,7 @@
+## 2.7.3
+
+- Fixed wrong guides
+
 ## 2.7.2
 
 - Organized guides
