@@ -1,6 +1,11 @@
 > 感谢您的帮助！非英语语言的文档可能会有语法不太通顺的问题。如果您想要为文档的改进做出贡献，请在 [Pull request](https://github.com/cunarist/rust-in-flutter/pulls) 留下您的意见。我们随时欢迎您的帮助，再次感谢！
 
-[![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter?label=Pub%20Popularity)](https://pub.dev/packages/rust_in_flutter) [![Pub Points](https://img.shields.io/pub/points/rust_in_flutter?label=Pub%20Points)](https://pub.dev/packages/rust_in_flutter) [![Build Test](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml/badge.svg)](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml)
+[![Pub Version](https://img.shields.io/pub/v/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
+[![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
+[![Pub Points](https://img.shields.io/pub/points/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
+[![GitHub Stars](https://img.shields.io/github/stars/cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/stargazers)
+[![Build Test](https://img.shields.io/github/actions/workflow/status/cunarist/rust-in-flutter/ci.yaml)](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml)
+[![GitHub License](https://img.shields.io/github/license/cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/blob/main/LICENSE)
 
 # 🆎 Rust-In-Flutter
 
@@ -14,14 +19,13 @@
 
 ## 平台支持
 
-所有复杂的构建设置都会被这个软件包自动处理。
+Flutter 支持的所有平台都经过了[测试](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml)并得到支持。此外，所有复杂的构建设置都会自动处理。
 
-- ✅ Linux: 支持，已完成测试
-- ✅ Android: 支持，已完成测试
-- ✅ Windows: 支持，已完成测试
-- ✅ macOS: 支持，已完成测试
-- ✅ iOS: 支持，已完成测试
-- ✅ Web: 支持，已完成测试
+| Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
+| ------- | ----- | ------- | ------- | ----- | --- | --- |
+| Linux   | ✅    | -       | ✅      | -     | -   | ✅  |
+| Windows | ✅    | -       | -       | -     | ✅  | ✅  |
+| macOS   | ✅    | ✅      | -       | ✅    | -   | ✅  |
 
 ## 好处
 
@@ -466,6 +470,6 @@ flutter: ZERO-COST ABSTRACTION
 
 # ☕ 支持我们
 
-😉 如果您从 Rust-In-Flutter 的功能中受益，并认为它对您非常有帮助，为什么不考虑下支持这个项目呢？您的慷慨捐助将有助于 Rust-In-Flutter 项目的维护和开发，确保其不断改进、发展！
+如果您从 Rust-In-Flutter 的功能中受益，并认为它对您非常有帮助，为什么不考虑下支持这个项目呢？您的慷慨捐助将有助于 Rust-In-Flutter 项目的维护和开发，确保其不断改进、发展！ 😉
 
 若有此想法，您可以[打赏一下](https://www.buymeacoffee.com/cunarist)我们。

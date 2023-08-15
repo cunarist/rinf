@@ -1,6 +1,11 @@
 > 영어 이외의 언어로 된 문서에서는 문장이 어색할 수 있습니다. 문서 개선에 기여하고 싶으신 분은 [Pull request](https://github.com/cunarist/rust-in-flutter/pulls)를 남겨주세요. 언제나 도움에 감사드립니다.
 
-[![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter?label=Pub%20Popularity)](https://pub.dev/packages/rust_in_flutter) [![Pub Points](https://img.shields.io/pub/points/rust_in_flutter?label=Pub%20Points)](https://pub.dev/packages/rust_in_flutter) [![Build Test](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml/badge.svg)](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml)
+[![Pub Version](https://img.shields.io/pub/v/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
+[![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
+[![Pub Points](https://img.shields.io/pub/points/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
+[![GitHub Stars](https://img.shields.io/github/stars/cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/stargazers)
+[![Build Test](https://img.shields.io/github/actions/workflow/status/cunarist/rust-in-flutter/ci.yaml)](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml)
+[![GitHub License](https://img.shields.io/github/license/cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/blob/main/LICENSE)
 
 # 🆎 Rust-In-Flutter
 
@@ -14,14 +19,13 @@ Rust를 활용해서 Flutter 앱의 속도를 극적으로 향상시켜 보세�
 
 ## 플랫폼 지원
 
-복잡한 빌드 설정들은 모두 자동으로 처리됩니다.
+Flutter의 모든 플랫폼은 [테스트](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml)되었으며 지원됩니다. 또한, 복잡한 빌드 설정들은 모두 자동으로 처리됩니다.
 
-- ✅ Linux: 지원 및 작동 확인됨
-- ✅ Android: 지원 및 작동 확인됨
-- ✅ Windows: 지원 및 작동 확인됨
-- ✅ macOS: 지원 및 작동 확인됨
-- ✅ iOS: 지원 및 작동 확인됨
-- ✅ Web: 지원 및 작동 확인됨
+| Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
+| ------- | ----- | ------- | ------- | ----- | --- | --- |
+| Linux   | ✅    | -       | ✅      | -     | -   | ✅  |
+| Windows | ✅    | -       | -       | -     | ✅  | ✅  |
+| macOS   | ✅    | ✅      | -       | ✅    | -   | ✅  |
 
 ## 혜택
 
@@ -466,6 +470,6 @@ Rust에서 Dart로 매 초마다 증가하는 숫자를 보내고 싶다고 가�
 
 # ☕ 개발 지원하기
 
-😉 Rust-In-Flutter의 기능이 도움이 되었다면, 이 프로젝트를 지원해주세요. 여러분의 너그러운 후원은 Rust-In-Flutter의 유지보수에 큰 도움이 됩니다.
+Rust-In-Flutter의 기능이 도움이 되었다면, 이 프로젝트를 지원해주세요. 여러분의 너그러운 후원은 Rust-In-Flutter의 유지보수에 큰 도움이 됩니다. 😉
 
 만약 지원해 주시기로 결정했다면, [Buy Me a Coffee 페이지](https://www.buymeacoffee.com/cunarist)로 찾아와 주세요.
