@@ -19,7 +19,7 @@ Designed for ease of use, future scalability, and unparalleled performance, this
 
 ## Platform Support
 
-All the challenging build settings are automatically handled by this package.
+All platforms available with Flutter are [tested](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml) and supported. Also, challenging build settings are automatically handled by this package.
 
 | Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
 | ------- | ----- | ------- | ------- | ----- | --- | --- |

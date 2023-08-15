@@ -19,7 +19,7 @@ Flutter アプリを驚くほど高速化するために、簡単に Rust を統
 
 ## プラットフォームサポート
 
-すべての難しいビルド設定は、このパッケージによって自動的に処理されます。
+Flutter で利用可能なすべてのプラットフォームは[テスト](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml)されてサポートされています。さらに、難解なビルド設定はすべてこのパッケージによって自動的に処理されます。
 
 | Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
 | ------- | ----- | ------- | ------- | ----- | --- | --- |
