@@ -19,7 +19,7 @@
 
 ## 平台支持
 
-所有复杂的构建设置都会被这个软件包自动处理。
+Flutter 支持的所有平台都经过了[测试](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml)并得到支持。此外，所有复杂的构建设置都会自动处理。
 
 | Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
 | ------- | ----- | ------- | ------- | ----- | --- | --- |
