@@ -1,9 +1,8 @@
 > 英語以外の言語で書かれたドキュメントでは、文章が不自然になることがあります。ドキュメントの改善にご協力いただける方は、[Pull request](https://github.com/cunarist/rust-in-flutter/pulls)をお願いいたします。いつもご協力に感謝いたします。
 
 [![Pub Version (including pre-releases)](https://img.shields.io/pub/v/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
-[![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter?label=Pub%20Popularity)](https://pub.dev/packages/rust_in_flutter)
-[![Pub Points](https://img.shields.io/pub/points/rust_in_flutter?label=Pub%20Points)](https://pub.dev/packages/rust_in_flutter)
-
+[![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
+[![Pub Points](https://img.shields.io/pub/points/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
 ![GitHub stars](https://img.shields.io/github/stars/cunarist/rust-in-flutter)
 [![Build Test](https://img.shields.io/github/actions/workflow/status/cunarist/rust-in-flutter/ci.yaml)](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml)
 [![GitHub License](https://img.shields.io/github/license/cunarist/rust-in-flutter)](./LICENSE)
