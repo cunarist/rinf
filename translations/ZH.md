@@ -470,6 +470,6 @@ flutter: ZERO-COST ABSTRACTION
 
 # ☕ 支持我们
 
-😉 如果您从 Rust-In-Flutter 的功能中受益，并认为它对您非常有帮助，为什么不考虑下支持这个项目呢？您的慷慨捐助将有助于 Rust-In-Flutter 项目的维护和开发，确保其不断改进、发展！
+如果您从 Rust-In-Flutter 的功能中受益，并认为它对您非常有帮助，为什么不考虑下支持这个项目呢？您的慷慨捐助将有助于 Rust-In-Flutter 项目的维护和开发，确保其不断改进、发展！ 😉
 
 若有此想法，您可以[打赏一下](https://www.buymeacoffee.com/cunarist)我们。
