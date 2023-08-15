@@ -1,5 +1,19 @@
 name: Build Test
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    paths-ignore:
+      - "README.md"
+      - "LICENSE"
+      - "CHANGELOG"
+      - "translations/**"
+  pull_request:
+    paths-ignore:
+      - "README.md"
+      - "LICENSE"
+      - "CHANGELOG"
+      - "translations/**"
+  workflow_dispatch:
+
 concurrency:
   # Cancels the workflow
   # when another event in the same context happens.
@@ -38,6 +52,32 @@ jobs:
       - name: Checkout submodules
         run: git submodule update --init --recursive
 
+      # Automatic setup cache(Doesn't work )
+      # - name: Setup Nix
+      #   if:  matrix.runner == 'ubuntu-latest' || matrix.runner == 'macos-latest'
+      #   uses: DeterminateSystems/nix-installer-action@main
+
+      # - name: Setup Magic Nix Cache
+      #   if:  matrix.runner == 'ubuntu-latest' ||  matrix.runner == 'macos-latest'
+      #   uses: DeterminateSystems/magic-nix-cache-action@main
+
+      # - name: Run Nix Flake Check
+      #   if:  matrix.runner == 'ubuntu-latest' ||  matrix.runner == 'macos-latest'
+      #   run: nix flake check
+
+      # Manually setup cache
+      - name: Setup Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+            ~/.cargo
+            ~/.gradle
+            ~/.android
+            /usr/local/lib/android/
+            ./example/build
+          key: manual-cache-${{ matrix.runner }}-${{ hashFiles('**/lockfiles') }}
+
       - name: Setup Flutter toolchain
         uses: subosito/flutter-action@v2
         with:
@@ -46,6 +86,11 @@ jobs:
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: "rust-cache"
 
       - name: Setup Ninja and GTK3 toolchain (Only Linux platform)
         if: matrix.runner == 'ubuntu-latest'
