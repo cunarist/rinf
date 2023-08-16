@@ -25,10 +25,10 @@ Pod::Spec.new do |s|
   # Include Rust crates in the build process.
   s.script_phase = {
     :name => 'Build a Rust library',
-    :script => 'sh ${PODS_TARGET_SRCROOT}/../connectors/cargokit/build_pod.sh ${PROJECT_DIR}/../../native/hub hub',
+    :script => 'sh ${PODS_TARGET_SRCROOT}/../cargokit/build_pod.sh ${PROJECT_DIR}/../../native/hub hub',
     :execution_position=> :before_compile,
-    :input_files => ['${BUILT_PRODUCTS_DIR}/connectors/cargokit_phony'],
-    :output_files => ['${BUILT_PRODUCTS_DIR}/connectors/cargokit_phony_out', '${BUILT_PRODUCTS_DIR}/output.txt'],
+    :input_files => ['${BUILT_PRODUCTS_DIR}/cargokit_phony'],
+    :output_files => ['${BUILT_PRODUCTS_DIR}/cargokit_phony_out', '${BUILT_PRODUCTS_DIR}/output.txt'],
   }
   s.pod_target_xcconfig = {
     # From default Flutter template.
