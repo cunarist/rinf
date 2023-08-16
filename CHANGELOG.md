@@ -1,3 +1,7 @@
+## 2.8.0
+
+- Removed unneeded dependencies
+
 ## 2.7.4
 
 - Fixed CI badge showing rate limit error

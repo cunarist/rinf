@@ -1,6 +1,6 @@
 name: rust_in_flutter
 description: Easily integrate Rust to make your Flutter app blazingly fast!
-version: 2.7.4
+version: 2.8.0
 repository: https://github.com/cunarist/rust-in-flutter
 funding:
   - https://www.buymeacoffee.com/cunarist
@@ -12,10 +12,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_web_plugins:
-    sdk: flutter
   plugin_platform_interface: ^2.0.2
-  ffi: ^2.0.2
   meta: ^1.8.0
   package_config: ^2.1.0
   path: ^1.8.3
