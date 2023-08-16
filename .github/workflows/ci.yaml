@@ -2,15 +2,15 @@ name: build-test
 on:
   push:
     paths-ignore:
-      - "README.md"
+      - "CHANGELOG.md"
       - "LICENSE"
-      - "CHANGELOG"
+      - "README.md"
       - "translations/**"
   pull_request:
     paths-ignore:
-      - "README.md"
+      - "CHANGELOG.md"
       - "LICENSE"
-      - "CHANGELOG"
+      - "README.md"
       - "translations/**"
   workflow_dispatch:
 
@@ -66,7 +66,7 @@ jobs:
       #   run: nix flake check
 
       # Manually setup cache
-      - name: Setup Cache
+      - name: Setup cache
         uses: actions/cache@v3
         with:
           path: |
@@ -87,13 +87,13 @@ jobs:
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Setup Rust Cache
+      - name: Setup Rust cache
         uses: Swatinem/rust-cache@v2
         with:
           prefix-key: "rust-cache"
 
-      - name: Setup Ninja and GTK3 toolchain (Only Linux platform)
-        if: matrix.runner == 'ubuntu-latest'
+      - name: Setup Ninja and GTK3 toolchain (Only Linux target)
+        if: matrix.target == 'linux'
         run: |
           sudo apt-get update -y
           sudo apt-get install -y ninja-build libgtk-3-dev
