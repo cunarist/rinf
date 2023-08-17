@@ -21,6 +21,7 @@ jobs:
   dart:
     name: dart-code
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -49,6 +50,7 @@ jobs:
   rust:
     name: rust-code
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -78,6 +80,7 @@ jobs:
   config:
     name: config-files
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
