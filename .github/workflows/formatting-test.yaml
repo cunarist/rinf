@@ -86,4 +86,5 @@ jobs:
         uses: creyD/prettier_action@v4.3
         with:
           dry: True
-          prettier_options: --write ./**/*.{md,yaml}
+          prettier_plugins: "prettier-plugin-toml"
+          prettier_options: --write ./**/*.{md,yaml.toml}
