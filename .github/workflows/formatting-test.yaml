@@ -52,12 +52,12 @@ jobs:
   build:
     name: with-dart-analyze
     runs-on: ubuntu-latest
-    container:
-      image: google/dart:latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - name: Install dependencies
-        run: dart pub get
+        uses: actions/checkout@v2
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v1
+      - name: Install Flutter dependencies
+        run: flutter pub get
       - name: Analyze Dart
-        uses: zgosalvez/github-actions-analyze-dart@v1
+        uses: zgosalvez/github-actions-analyze-dart@v2
