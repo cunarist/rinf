@@ -4,7 +4,7 @@
 [![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
 [![Pub Points](https://img.shields.io/pub/points/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
 [![GitHub Stars](https://img.shields.io/github/stars/cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/stargazers)
-[![Build Test](https://github.com/cunarist/rust-in-flutter/actions/workflows/build-test.yaml/badge.svg)](https://github.com/cunarist/rust-in-flutter/actions/workflows/build-test.yaml?query=branch%3Amain)
+[![Build Test](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml/badge.svg)](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml?query=branch%3Amain)
 [![GitHub License](https://img.shields.io/github/license/cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/blob/main/LICENSE)
 
 # 🆎 Rust-In-Flutter
@@ -19,7 +19,7 @@
 
 ## 平台支持
 
-Flutter 支持的所有平台都经过了[测试](https://github.com/cunarist/rust-in-flutter/actions/workflows/build-test.yaml?query=branch%3Amain)并得到支持。此外，所有复杂的构建设置都会自动处理。
+Flutter 支持的所有平台都经过了[测试](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml?query=branch%3Amain)并得到支持。此外，所有复杂的构建设置都会自动处理。
 
 | Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
 | ------- | ----- | ------- | ------- | ----- | --- | --- |
