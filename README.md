@@ -468,6 +468,18 @@ We appreciate your contribution to the development of this project!
 
 [![GitHub contributors (via allcontributors.org)](https://contrib.rocks/image?repo=cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/graphs/contributors)
 
+# 👏 Thanks
+
+These are tools for connecting Flutter and native compilers.
+
+Rust-In-Flutter was not made alone. There were pioneers that gave inspiration to the structure of this package. Credits to these wonderful efforts!
+
+- https://github.com/fzyzcjy/flutter_rust_bridge
+- https://github.com/superlistapp/super_native_extensions
+- https://github.com/brickpop/flutter-rust-ffi
+- https://github.com/corrosion-rs/corrosion
+- https://github.com/irondash/cargokit
+
 # ☕ Support Us
 
 If you are benefiting from the features of Rust-In-Flutter and find it helpful, why not consider supporting this project? Your generous donations contribute to the maintenance and development of Rust-In-Flutter, ensuring its continuous improvement and growth. 😉
