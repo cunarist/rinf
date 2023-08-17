@@ -43,9 +43,6 @@ jobs:
 
       - name: Prettify code
         uses: creyD/prettier_action@v4.3
-        with:
-          prettier_options: --write **/*.{md,yaml}
-          only_changed: True
 
       - name: Verify Changed files
         uses: tj-actions/verify-changed-files@v16
