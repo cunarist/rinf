@@ -1,6 +1,9 @@
 name: build-test
+
 on:
   push:
+    branches:
+      - main
     paths-ignore:
       - "CHANGELOG.md"
       - "LICENSE"
@@ -78,7 +81,7 @@ jobs:
             ./example/build
           key: manual-cache-${{ matrix.runner }}
 
-      - name: Setup Flutter toolchain
+      - name: Setup Flutter SDK
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"

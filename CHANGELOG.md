@@ -1,3 +1,11 @@
+## 2.8.2
+
+- Updated links
+
+## 2.8.1
+
+- Updated links
+
 ## 2.8.0
 
 - Removed unneeded dependencies

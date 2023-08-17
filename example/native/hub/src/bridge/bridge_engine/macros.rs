@@ -1,14 +1,14 @@
 #[macro_export]
 macro_rules! spawn_bridge_task {
     ($($tt:tt)*) => {{
-        let bridge_task = crate::transfer!($($tt)*);
+        let bridge_task = $crate::transfer!($($tt)*);
         #[cfg(not(target_family = "wasm"))]
         {
             bridge_task();
         }
         #[cfg(target_family = "wasm")]
         {
-            crate::bridge::bridge_engine::wasm_bindgen_src::worker::WEB_WORKER.with(|inner:&std::cell::RefCell<Option<web_sys::Worker>>| {
+            $crate::bridge::bridge_engine::wasm_bindgen_src::worker::WEB_WORKER.with(|inner:&std::cell::RefCell<Option<web_sys::Worker>>| {
                 let borrowed = inner.borrow();
                 let web_worker = borrowed.as_ref().unwrap();
                 let _ = bridge_task.apply(web_worker);
@@ -33,7 +33,7 @@ macro_rules! transfer {
         { move || $block }
         #[cfg(target_family = "wasm")]
         {
-            crate::ffi::TransferClosure::new(vec![], vec![], move |_: &[JsValue]| $block)
+            $crate::ffi::TransferClosure::new(vec![], vec![], move |_: &[JsValue]| $block)
         }
     }};
     (|$($param:ident: $ty:ty),*| $block:block) => {{
@@ -44,7 +44,7 @@ macro_rules! transfer {
         #[cfg(target_family = "wasm")]
         {
             use wasm_bindgen::JsValue;
-            use crate::bridge::bridge_engine::ffi::Transfer;
+            use $crate::bridge::bridge_engine::ffi::Transfer;
             #[allow(unused_variables)]
             let worker = move |transfer: &[JsValue]| {
                 let idx = 0;
@@ -55,7 +55,7 @@ macro_rules! transfer {
                 $block
             };
             let transferables = [$($param.transferables()),*].concat();
-            crate::bridge::bridge_engine::ffi::TransferClosure::new(
+            $crate::bridge::bridge_engine::ffi::TransferClosure::new(
                 vec![$($param.serialize()),*],
                 transferables,
                 worker,
@@ -67,9 +67,9 @@ macro_rules! transfer {
 #[macro_export]
 macro_rules! console_error {
     ($lit:literal) => {
-        crate::error($lit)
+        $crate::error($lit)
     };
     ($($tt:tt)*) => {
-        crate::bridge::bridge_engine::error(&format!($($tt)*))
+        $crate::bridge::bridge_engine::error(&format!($($tt)*))
     };
 }
