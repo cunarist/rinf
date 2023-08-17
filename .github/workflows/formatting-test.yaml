@@ -28,16 +28,15 @@ jobs:
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Install rustfmt
-        run: rustup component add rustfmt
-
       - name: Setup Flutter toolchain
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
 
       - name: Format Rust code
-        run: cargo fmt
+        run: |
+          rustup component add clippy
+          cargo clippy --fix
 
       - name: Format Dart code
         run: dart format .
