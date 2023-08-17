@@ -197,7 +197,7 @@ Future<void> _verifyServerHeaders() async {
   }
   flutterPath = flutterPath.trim();
   flutterPath = await File(flutterPath).resolveSymbolicLinks();
-  flutterPath = File(flutterPath).parent.parent.   path;
+  flutterPath = File(flutterPath).parent.parent.path;
 
   // Get the server module file's path.
   final serverFile = File(

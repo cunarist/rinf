@@ -6,7 +6,7 @@
 
 # 0.3.4 (2023-03-02)
 
-## Fixes 
+## Fixes
 
 - Fix hostbuild (when CMake/Cargo is configured for cross-compiling) if clang is used ([#338]).
 
@@ -44,7 +44,7 @@
 
 - Fix clean target when cross-compiling ([#291](https://github.com/corrosion-rs/corrosion/pull/291)).
 - Don't set the linker for Rust static libraries ([#275](https://github.com/corrosion-rs/corrosion/pull/275)).
-- Minor fixes in FindRust [#297](https://github.com/corrosion-rs/corrosion/pull/297): 
+- Minor fixes in FindRust [#297](https://github.com/corrosion-rs/corrosion/pull/297):
   - fix a logic error in the version detection
   - fix a logic error in `QUIET` mode when rustup is not found.
 
@@ -70,18 +70,19 @@
   surfaced on CI when using crates.io. On MacOS 12 and Windows-2022 at least Rust 1.54 is required.
 - MacOS 10 and 11 are no longer officially supported and untested in CI.
 - The minimum required CMake version is now 3.15.
-- Adding a `PRE_BUILD` custom command on a `cargo-build_<target_name>` CMake target will no 
+- Adding a `PRE_BUILD` custom command on a `cargo-build_<target_name>` CMake target will no
   longer work as expected. To support executing user defined commands before cargo build is
   invoked users should use the newly added targets `cargo-prebuild` (before all cargo build invocations)
-  or `cargo-prebuild_<target_name>` as a dependency target. 
+  or `cargo-prebuild_<target_name>` as a dependency target.
   Example: `add_dependencies(cargo-prebuild code_generator_target)`
 
 ### Breaking: Removed previously deprecated functionality
+
 - Removed `add_crate()` function. Use `corrosio_import_crate()` instead.
 - Removed `cargo_link_libraries()` function. Use `corrosion_link_libraries()` instead.
 - Removed experimental CMake option `CORROSION_EXPERIMENTAL_PARSER`.
   The corresponding stable option is `CORROSION_NATIVE_TOOLING` albeit with inverted semantics.
-- Previously Corrosion would set the `HOST_CC` and `HOST_CXX` environment variables when invoking 
+- Previously Corrosion would set the `HOST_CC` and `HOST_CXX` environment variables when invoking
   cargo build, if the environment variables `CC` and `CXX` outside of CMake where set.
   However this did not work as expected in all cases and sometimes the `HOST_CC` variable would be set
   to a cross-compiler for unknown reasons. For this reason `HOST_CC` and `HOST_CXX` are not set by
@@ -119,10 +120,10 @@
   This feature requires at least CMake 3.19 and is enabled by default if supported. Please note that the `OUTPUT_NAME`
   target properties are currently not supported.
   Specifically, the following target properties are now respected:
-  -   [ARCHIVE_OUTPUT_DIRECTORY](https://cmake.org/cmake/help/latest/prop_tgt/ARCHIVE_OUTPUT_DIRECTORY.html)
-  -   [LIBRARY_OUTPUT_DIRECTORY](https://cmake.org/cmake/help/latest/prop_tgt/LIBRARY_OUTPUT_DIRECTORY.html)
-  -   [RUNTIME_OUTPUT_DIRECTORY](https://cmake.org/cmake/help/latest/prop_tgt/RUNTIME_OUTPUT_DIRECTORY.html)
-  -   [PDB_OUTPUT_DIRECTORY](https://cmake.org/cmake/help/latest/prop_tgt/PDB_OUTPUT_DIRECTORY.html)
+  - [ARCHIVE_OUTPUT_DIRECTORY](https://cmake.org/cmake/help/latest/prop_tgt/ARCHIVE_OUTPUT_DIRECTORY.html)
+  - [LIBRARY_OUTPUT_DIRECTORY](https://cmake.org/cmake/help/latest/prop_tgt/LIBRARY_OUTPUT_DIRECTORY.html)
+  - [RUNTIME_OUTPUT_DIRECTORY](https://cmake.org/cmake/help/latest/prop_tgt/RUNTIME_OUTPUT_DIRECTORY.html)
+  - [PDB_OUTPUT_DIRECTORY](https://cmake.org/cmake/help/latest/prop_tgt/PDB_OUTPUT_DIRECTORY.html)
 - Corrosion now supports packages with potentially multiple binaries (bins) and a library (lib) at the
   same time. The only requirement is that the names of all `bin`s and `lib`s in the whole project must be unique.
   Users can set the names in the `Cargo.toml` by adding `name = <unique_name>` in the `[[bin]]` and `[lib]` tables.
@@ -144,7 +145,7 @@
 
 ## Internal Changes
 
-- The CMake Generator written in Rust and `CorrosionGenerator.cmake` which are responsible for parsing 
+- The CMake Generator written in Rust and `CorrosionGenerator.cmake` which are responsible for parsing
   `cargo metadata` output to create corresponding CMake targets for all Rust targets now share most code.
   This greatly simplified the CMake generator written in Rust and makes it much easier maintaining and adding
   new features regardless of how `cargo metadata` is parsed.
@@ -206,14 +207,13 @@
 - Fix a bug which occurred when Corrosion was added multiple times via `add_subdirectory()`
   ([#143](https://github.com/corrosion-rs/corrosion/pull/143)).
 - Set `CC_<target_triple_undercore>` and `CXX_<target_triple_undercore>` environment variables for the invocation of
-  `cargo build` to the compilers selected by CMake  (if any)
+  `cargo build` to the compilers selected by CMake (if any)
   ([#138](https://github.com/corrosion-rs/corrosion/pull/138) and [#161](https://github.com/corrosion-rs/corrosion/pull/161)).
   This should ensure that C dependencies built in cargo buildscripts via [cc-rs](https://github.com/alexcrichton/cc-rs)
   use the same compiler as CMake built dependencies. Users can override the compiler by specifying the higher
   priority environment variable variants with dashes instead of underscores (See cc-rs documentation for details).
 - Fix Ninja-Multiconfig Generator support for CMake versions >= 3.20. Previous CMake versions are missing a feature,
   which prevents us from supporting the Ninja-Multiconfig generator. ([#137](https://github.com/corrosion-rs/corrosion/pull/137))
-
 
 # 0.1.0 (2022-02-01)
 
@@ -222,6 +222,7 @@ Since there are no previous releases, this is not a complete changelog but only 
 September 2021.
 
 ## New features
+
 - [Add --profile support for rust >= 1.57](https://github.com/corrosion-rs/corrosion/pull/130):
   Allows users to specify a custom cargo profile with
   `corrosion_import_crate(... PROFILE <profilename>)`.
@@ -236,13 +237,14 @@ September 2021.
   See the [README](https://github.com/corrosion-rs/corrosion#cargo-feature-selection) for details on
   how to select features.
 
-
 ## Fixes
+
 - [Fix the cargo-clean target](https://github.com/corrosion-rs/corrosion/pull/129)
 - [Fix #84: CorrosionConfig.cmake looks in wrong place for Corrosion::Generator when CMAKE_INSTALL_LIBEXEC is an absolute path](https://github.com/corrosion-rs/corrosion/pull/122/commits/6f29af3ac53917ca2e0638378371e715a18a532d)
 - [Fix #116: (Option CORROSION_INSTALL_EXECUTABLE not working)](https://github.com/corrosion-rs/corrosion/commit/97d44018fac1b1a2a7c095288c628f5bbd9b3184)
 - [Fix building on Windows with rust >= 1.57](https://github.com/corrosion-rs/corrosion/pull/120)
 
 ## Known issues:
+
 - Corrosion is currently not working on macos-11 and newer. See issue [#104](https://github.com/corrosion-rs/corrosion/issues/104).
   Contributions are welcome.
