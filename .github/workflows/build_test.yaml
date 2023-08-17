@@ -128,7 +128,7 @@ jobs:
       - name: Build example Flutter app
         if: matrix.target == 'windows'
         working-directory: example/
-        run: flutter build windows
+        run: flutter build windows -v
 
       - name: Build example Flutter app
         if: matrix.target == 'macos'
