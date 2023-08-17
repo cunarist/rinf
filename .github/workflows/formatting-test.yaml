@@ -34,14 +34,18 @@ jobs:
       - name: Format Rust code
         run: cargo clippy --fix
 
-      - name: Format Dart code
-        run: dart format .
-
       - name: Verify Changed files
+        id: verify-changed-files
         uses: tj-actions/verify-changed-files@v16
         with:
           files: >
             **/*
+
+      - name: Raise error if any of the files has changed.
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        run: |
+          echo "Changed files: ${{ steps.verify-changed-files.outputs.changed_files }}"
+          exit 1
 
   dart:
     name: dart-code
@@ -59,10 +63,17 @@ jobs:
         run: dart format .
 
       - name: Verify Changed files
+        id: verify-changed-files
         uses: tj-actions/verify-changed-files@v16
         with:
           files: >
             **/*
+
+      - name: Raise error if any of the files has changed.
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        run: |
+          echo "Changed files: ${{ steps.verify-changed-files.outputs.changed_files }}"
+          exit 1
 
   config:
     name: config-files
