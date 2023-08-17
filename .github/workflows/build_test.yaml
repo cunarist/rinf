@@ -51,9 +51,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Checkout submodules
-        run: git submodule update --init --recursive
+        with:
+          submodules: true
 
       # # Automaticallly setup cache (Doesn't work yet)
       # - name: Setup Nix
