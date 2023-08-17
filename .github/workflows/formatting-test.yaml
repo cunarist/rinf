@@ -18,8 +18,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  format:
-    name: various-files
+  code:
+    name: code-files
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -41,14 +41,18 @@ jobs:
       - name: Format Dart code
         run: dart format .
 
-      - name: Prettify code
-        uses: creyD/prettier_action@v4.3
-        with:
-          dry: True
-          prettier_options: --write ./**/*.{md,yaml}
-
       - name: Verify Changed files
         uses: tj-actions/verify-changed-files@v16
         with:
           files: >
             **/*
+
+  config:
+    name: config-files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prettify code
+        uses: creyD/prettier_action@v4.3
+        with:
+          dry: True
+          prettier_options: --write ./**/*.{md,yaml}
