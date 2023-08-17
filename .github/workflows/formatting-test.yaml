@@ -71,7 +71,7 @@ jobs:
           files: >
             **/*
 
-      - name: Raise error if any of the files has changed.
+      - name: Raise error if any of the files has changed
         if: steps.verify-changed-files.outputs.files_changed == 'true'
         run: |
           echo "Changed files: ${{ steps.verify-changed-files.outputs.changed_files }}"
