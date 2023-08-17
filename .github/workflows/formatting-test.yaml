@@ -78,16 +78,16 @@ jobs:
           exit 1
 
   config:
-    name: config-files
+    name: other-files
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Prettify code
+      - name: Check files with Prettier
         uses: creyD/prettier_action@v4.3
         with:
           dry: True
-          prettier_plugins: "prettier-plugin-toml"
+          prettier_plugins: ["prettier-plugin-toml"]
           prettier_options: --write ./**/*.{md,yaml,toml}
