@@ -26,7 +26,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Flutter toolchain
+      - name: Setup Flutter SDK
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
