@@ -1,4 +1,5 @@
 # Corrosion
+
 [![Build Status](https://github.com/corrosion-rs/corrosion/actions/workflows/test.yaml/badge.svg)](https://github.com/corrosion-rs/corrosion/actions?query=branch%3Amaster)
 
 Corrosion, formerly known as cmake-cargo, is a tool for integrating Rust into an existing CMake
@@ -6,6 +7,7 @@ project. Corrosion is capable of importing executables, static libraries, and dy
 from a crate.
 
 ## Features
+
 - Automatic Import of Executable, Static, and Shared Libraries from Rust Crate
 - Easy Installation of Rust Executables
 - Trivially Link Rust Executables to C/C++ Libraries in Tree
@@ -13,6 +15,7 @@ from a crate.
 - Simple Cross-Compilation
 
 ## Sample Usage
+
 ```cmake
 cmake_minimum_required(VERSION 3.15)
 project(MyCoolProject LANGUAGES CXX)
@@ -28,6 +31,7 @@ target_link_libraries(cpp-exe PUBLIC rust-lib)
 # Documentation
 
 ## Table of Contents
+
 - [Corrosion](#corrosion)
   - [Features](#features)
   - [Sample Usage](#sample-usage)
@@ -52,8 +56,11 @@ target_link_libraries(cpp-exe PUBLIC rust-lib)
       - [Windows-to-Windows](#windows-to-windows)
       - [Linux-to-Linux](#linux-to-linux)
       - [Android](#android)
+  - [Limitations](#limitations)
+    - [CMake `OUTPUT_DIRECTORY` target properties and `IMPORTED_LOCATION`](#cmake-output_directory-target-properties-and-imported_location)
 
 ## Installation
+
 There are two fundamental installation methods that are supported by Corrosion - installation as a
 CMake package or using it as a subdirectory in an existing CMake project. For CMake versions below
 3.19 Corrosion strongly recommends installing the package, either via a package manager or manually
@@ -76,6 +83,7 @@ Coming soon...
 ### CMake Install
 
 First, download and install Corrosion:
+
 ```bash
 git clone https://github.com/corrosion-rs/corrosion.git
 # Optionally, specify -DCMAKE_INSTALL_PREFIX=<target-install-path>. You can install Corrosion anyway
@@ -93,17 +101,20 @@ Windows it will install to `C:\Program Files (x86)\Corrosion` by default, which 
 
 Once Corrosion is installed and you've ensured the package is available in your `PATH`, you
 can use it from your own project like any other package from your CMakeLists.txt:
+
 ```cmake
 find_package(Corrosion REQUIRED)
 ```
 
 ### FetchContent
+
 If you are using CMake >= 3.19 or installation is difficult or not feasible in
 your environment, you can use the
 [FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html) module to include
 Corrosion. This will download Corrosion and use it as if it were a subdirectory at configure time.
 
 In your CMakeLists.txt:
+
 ```cmake
 include(FetchContent)
 
@@ -117,43 +128,49 @@ FetchContent_MakeAvailable(Corrosion)
 ```
 
 ### Subdirectory
+
 Corrosion can also be used directly as a subdirectory. This solution may work well for small
 projects, but it's discouraged for large projects with many dependencies, especially those which may
 themselves use Corrosion. Either copy the Corrosion library into your source tree, being sure to
 preserve the `LICENSE` file, or add this repository as a git submodule:
+
 ```bash
 git submodule add https://github.com/corrosion-rs/corrosion.git
 ```
 
 From there, using Corrosion is easy. In your CMakeLists.txt:
+
 ```cmake
 add_subdirectory(path/to/corrosion)
 ```
 
 ## Usage
+
 ### Corrosion Options
+
 All of the following variables are evaluated automatically in most cases. In typical cases you
 shouldn't need to alter any of these. If you do want to specify them manually, make sure to set
 them **before** `find_package(Corrosion REQUIRED)`.
 
 - `Rust_TOOLCHAIN:STRING` - Specify a named rustup toolchain to use. Changes to this variable
-resets all other options. Default: If the first-found `rustc` is a `rustup` proxy, then the default
-rustup toolchain (see `rustup show`) is used. Otherwise, the variable is unset by default.
+  resets all other options. Default: If the first-found `rustc` is a `rustup` proxy, then the default
+  rustup toolchain (see `rustup show`) is used. Otherwise, the variable is unset by default.
 - `Rust_ROOT:STRING` - CMake provided. Path to a Rust toolchain to use. This is an alternative if
-you want to select a specific Rust toolchain, but it's not managed by rustup. Default: Nothing
+  you want to select a specific Rust toolchain, but it's not managed by rustup. Default: Nothing
 - `Rust_COMPILER:STRING` - Path to an actual `rustc`. If set to a `rustup` proxy, it will be
-replaced by a path to an actual `rustc`. Default: The `rustc` in the first-found toolchain, either
-from `rustup`, or from a toolchain available in the user's `PATH`.
+  replaced by a path to an actual `rustc`. Default: The `rustc` in the first-found toolchain, either
+  from `rustup`, or from a toolchain available in the user's `PATH`.
 - `Rust_CARGO:STRING` - Path to an actual `cargo`. Default: the `cargo` installed next to
-`${Rust_COMPILER}`.
+  `${Rust_COMPILER}`.
 - `Rust_CARGO_TARGET:STRING` - The default target triple to build for. Alter for cross-compiling.
-Default: On Visual Studio Generator, the matching triple for `CMAKE_VS_PLATFORM_NAME`. Otherwise,
-the default target triple reported by `${Rust_COMPILER} --version --verbose`.
+  Default: On Visual Studio Generator, the matching triple for `CMAKE_VS_PLATFORM_NAME`. Otherwise,
+  the default target triple reported by `${Rust_COMPILER} --version --verbose`.
 - `CORROSION_NATIVE_TOOLING:BOOL` - Use a native tool (written in Rust) as part of Corrosion. This
   option increases the configure-time significantly unless Corrosion is installed.
   Default: `OFF` if CMake >= 3.19.0. Forced `ON` for CMake < 3.19.
 
 #### Developer/Maintainer Options
+
 These options are not used in the course of normal Corrosion usage, but are used to configure how
 Corrosion is built and installed. Only applies to Corrosion builds and subdirectory uses.
 
@@ -175,6 +192,7 @@ toolchain. You can use the CMake version comparison operators
 (e.g. [`VERSION_GREATER_EQUAL`](https://cmake.org/cmake/help/latest/command/if.html#version-comparisons)) on the main
 variable (e.g. `if(Rust_VERSION VERSION_GREATER_EQUAL "1.57.0")`), or you can inspect the major, minor and patch
 versions individually.
+
 - `Rust_VERSION<_MAJOR|_MINOR|_PATCH>` - The version of rustc.
 - `Rust_CARGO_VERSION<_MAJOR|_MINOR|_PATCH>` - The cargo version.
 - `Rust_LLVM_VERSION<_MAJOR|_MINOR|_PATCH>` - The LLVM version used by rustc.
@@ -184,6 +202,7 @@ versions individually.
 ### Adding crate targets
 
 In order to integrate a Rust crate into CMake, you first need to import a crate or Workspace:
+
 ```cmake
 corrosion_import_crate(MANIFEST_PATH <path/to/cargo.toml>
         # Equivalent to --all-features passed to cargo build
@@ -257,8 +276,10 @@ the standard `dev` profile if the CMake config is either `Debug` or unspecified.
 profile is chosen for cargo.
 
 ### Importing C-Style Libraries Written in Rust
+
 Corrosion makes it completely trivial to import a crate into an existing CMake project. Consider
 a project called [rust2cpp](test/rust2cpp/rust2cpp) with the following file structure:
+
 ```
 rust2cpp/
     rust/
@@ -271,6 +292,7 @@ rust2cpp/
 ```
 
 This project defines a simple Rust lib crate, like so, in [`rust2cpp/rust/Cargo.toml`](test/rust2cpp/rust2cpp/rust/Cargo.toml):
+
 ```toml
 [package]
 name = "rust-lib"
@@ -291,6 +313,7 @@ single crate and switch between which is used using the standard
 
 This crate defines a simple crate called `rust-lib`. Importing this crate into your
 [CMakeLists.txt](test/rust2cpp/CMakeLists.txt) is trivial:
+
 ```cmake
 # Note: you must have already included Corrosion for `corrosion_import_crate` to be available. See # the `Installation` section above.
 
@@ -300,6 +323,7 @@ corrosion_import_crate(MANIFEST_PATH rust/Cargo.toml)
 Now that you've imported the crate into CMake, all of the executables, static libraries, and dynamic
 libraries defined in the Rust can be directly referenced. So, merely define your C++ executable as
 normal in CMake and add your crate's library using target_link_libraries:
+
 ```cmake
 add_executable(cpp-exe main.cpp)
 target_link_libraries(cpp-exe PUBLIC rust-lib)
@@ -347,6 +371,7 @@ add_dependencies(cargo-prebuild_<target_name> custom_bindings_target)
 ```
 
 ### Cross Compiling
+
 Corrosion attempts to support cross-compiling as generally as possible, though not all
 configurations are tested. Cross-compiling is explicitly supported in the following scenarios.
 
@@ -365,6 +390,7 @@ For example:
 ```
 
 #### Windows-to-Windows
+
 Corrosion supports cross-compiling between arbitrary Windows architectures using the Visual Studio
 Generator. For example, to cross-compile for ARM64 from any platform, simply set the `-A`
 architecture flag:
@@ -379,6 +405,7 @@ in previous cargo versions, which causes the build-script to incorrectly be buil
 platform.
 
 #### Linux-to-Linux
+
 In order to cross-compile on Linux, you will need to install a cross-compiler. For example, on
 Ubuntu, to cross compile for 64-bit Little-Endian PowerPC Little-Endian, install
 `g++-powerpc64le-linux-gnu` from apt-get:
@@ -418,12 +445,13 @@ follow the instructions in the Android Studio documentation for
 ### CMake `OUTPUT_DIRECTORY` target properties and `IMPORTED_LOCATION`
 
 Corrosion respects the following `OUTPUT_DIRECTORY` target properties on CMake >= 3.19:
--   [ARCHIVE_OUTPUT_DIRECTORY](https://cmake.org/cmake/help/latest/prop_tgt/ARCHIVE_OUTPUT_DIRECTORY.html)
--   [LIBRARY_OUTPUT_DIRECTORY](https://cmake.org/cmake/help/latest/prop_tgt/LIBRARY_OUTPUT_DIRECTORY.html)
--   [RUNTIME_OUTPUT_DIRECTORY](https://cmake.org/cmake/help/latest/prop_tgt/RUNTIME_OUTPUT_DIRECTORY.html)
--   [PDB_OUTPUT_DIRECTORY](https://cmake.org/cmake/help/latest/prop_tgt/PDB_OUTPUT_DIRECTORY.html)
 
-Due to limitations in CMake these target properties are evaluated in a deferred manner, to 
+- [ARCHIVE_OUTPUT_DIRECTORY](https://cmake.org/cmake/help/latest/prop_tgt/ARCHIVE_OUTPUT_DIRECTORY.html)
+- [LIBRARY_OUTPUT_DIRECTORY](https://cmake.org/cmake/help/latest/prop_tgt/LIBRARY_OUTPUT_DIRECTORY.html)
+- [RUNTIME_OUTPUT_DIRECTORY](https://cmake.org/cmake/help/latest/prop_tgt/RUNTIME_OUTPUT_DIRECTORY.html)
+- [PDB_OUTPUT_DIRECTORY](https://cmake.org/cmake/help/latest/prop_tgt/PDB_OUTPUT_DIRECTORY.html)
+
+Due to limitations in CMake these target properties are evaluated in a deferred manner, to
 support the user setting the target properties after the call to `corrosion_import_crate()`.
 This has the side effect that `IMPORTED_LOCATION` will be set late, and users should not
 use `get_property` to read `IMPORTED_LOCATION` at configure time. Instead, generator expressions
