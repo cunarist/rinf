@@ -24,8 +24,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          ref: ${{ github.head_ref }}
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -46,6 +44,7 @@ jobs:
       - name: Prettify code
         uses: creyD/prettier_action@v4.3
         with:
+          dry: True
           prettier_options: --write ./**/*.{md,yaml}
 
       - name: Verify Changed files
