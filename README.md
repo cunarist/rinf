@@ -4,7 +4,7 @@
 [![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
 [![Pub Points](https://img.shields.io/pub/points/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
 [![GitHub Stars](https://img.shields.io/github/stars/cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/stargazers)
-[![Build Test](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml/badge.svg)](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml)
+[![Build Test](https://github.com/cunarist/rust-in-flutter/actions/workflows/build-test.yaml/badge.svg)](https://github.com/cunarist/rust-in-flutter/actions/workflows/build-test.yaml)
 [![GitHub License](https://img.shields.io/github/license/cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/blob/main/LICENSE)
 
 # 🆎 Rust-In-Flutter
@@ -19,7 +19,7 @@ Designed for ease of use, future scalability, and unparalleled performance, this
 
 ## Platform Support
 
-All platforms available with Flutter are [tested](https://github.com/cunarist/rust-in-flutter/actions/workflows/ci.yaml) and supported. Also, challenging build settings are automatically handled by this package.
+All platforms available with Flutter are [tested](https://github.com/cunarist/rust-in-flutter/actions/workflows/build-test.yaml) and supported. Also, challenging build settings are automatically handled by this package.
 
 | Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
 | ------- | ----- | ------- | ------- | ----- | --- | --- |
