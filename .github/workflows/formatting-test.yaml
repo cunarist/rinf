@@ -90,4 +90,4 @@ jobs:
         with:
           dry: True
           prettier_plugins: "prettier-plugin-toml"
-          prettier_options: --write ./**/*.{md,yaml.toml}
+          prettier_options: --write ./**/*.{md,yaml,toml}
