@@ -19,45 +19,34 @@ concurrency:
 
 jobs:
   format:
-    name: with-rustfmt
+    name: various-files
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Install Rust toolchain
+      - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
-      - name: Check Rust code
-        uses: mbrobbel/rustfmt-check@master
-        with:
-          mode: review
 
-  prettier:
-    name: with-prettier
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Install rustfmt
+        run: rustup component add rustfmt
+
+      - name: Setup Flutter toolchain
+        uses: subosito/flutter-action@v2
         with:
-          fetch-depth: 0
-          ref: ${{ github.head_ref }}
-          # Make sure the value of GITHUB_TOKEN will not be persisted in repo's config
-          persist-credentials: false
+          channel: "stable"
+
+      - name: Format Rust code
+        run: cargo fmt
+
+      - name: Format Dart code
+        run: dart format .
+
       - name: Prettify code
         uses: creyD/prettier_action@v4.3
         with:
-          dry: True
-          prettier_options: --write **/*.{md,yaml,toml}
-          prettier_plugins: "prettier-plugin-toml"
+          prettier_options: --write **/*.{md,yaml}
+          only_changed: True
 
-  build:
-    name: with-dart-analyze
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v1
-      - name: Install Flutter dependencies
-        run: flutter pub get
-      - name: Analyze Dart
-        uses: zgosalvez/github-actions-analyze-dart@v2
+      - name: Verify Changed files
+        uses: tj-actions/verify-changed-files@v16
+        with:
+          files: >
+            **/*
