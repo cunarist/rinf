@@ -5,7 +5,7 @@ on:
       - master
   pull_request:
     branches:
-      - '**'
+      - "**"
 jobs:
   test:
     name: Test Corrosion
@@ -77,7 +77,6 @@ jobs:
             generator: default
 
         exclude:
-
           # You cannot build with GNU using Visual Studio on Windows
           - os: windows-2019
             abi: gnu
@@ -197,7 +196,8 @@ jobs:
       - name: Arch Flags
         id: arch_flags
         shell: bash
-        run: | # Cross-compiling is currently only supported on Windows+MSVC with the default generator
+        run:
+          | # Cross-compiling is currently only supported on Windows+MSVC with the default generator
           if [ "${{ runner.os }}" == "Windows" ]; then
             if [ "${{matrix.generator}}" == "default" ]; then
               if [ "${{ matrix.arch }}" == "x86_64" ]; then
@@ -258,7 +258,7 @@ jobs:
       - name: Run Tests
         run: >
           cd build
-          
+
           ctest --verbose --build-config Debug
 
   install:
@@ -274,7 +274,7 @@ jobs:
         include:
           - rust: 1.46.0
           - os: macos-12
-            rust: 1.54.0  # On MacOS-12 linking fails before Rust 1.54
+            rust: 1.54.0 # On MacOS-12 linking fails before Rust 1.54
     steps:
       - uses: actions/checkout@v2
       - name: Setup MSVC Development Environment
