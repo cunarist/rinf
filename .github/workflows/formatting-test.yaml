@@ -29,7 +29,7 @@ jobs:
       - name: Check Rust code
         uses: mbrobbel/rustfmt-check@master
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          mode: review
 
   prettier:
     name: with-prettier
