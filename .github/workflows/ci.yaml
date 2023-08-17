@@ -1,6 +1,9 @@
 name: build-test
+
 on:
   push:
+    branches:
+      - main
     paths-ignore:
       - "CHANGELOG.md"
       - "LICENSE"
