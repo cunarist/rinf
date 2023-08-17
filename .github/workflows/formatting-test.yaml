@@ -34,7 +34,7 @@ jobs:
       - name: Format Dart code
         run: dart format .
 
-      - name: Verify Changed files
+      - name: Verify changed files
         id: verify-changed-files
         uses: tj-actions/verify-changed-files@v16
         with:
@@ -64,7 +64,7 @@ jobs:
       - name: Format Rust code
         run: cargo clippy --fix
 
-      - name: Verify Changed files
+      - name: Verify changed files
         id: verify-changed-files
         uses: tj-actions/verify-changed-files@v16
         with:
