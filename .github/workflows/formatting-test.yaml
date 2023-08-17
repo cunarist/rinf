@@ -18,8 +18,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  code:
-    name: code-files
+  rust:
+    name: rust-code
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -28,15 +28,32 @@ jobs:
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Install Clippy
+        run: rustup component add clippy
+
+      - name: Format Rust code
+        run: cargo clippy --fix
+
+      - name: Format Dart code
+        run: dart format .
+
+      - name: Verify Changed files
+        uses: tj-actions/verify-changed-files@v16
+        with:
+          files: >
+            **/*
+
+  dart:
+    name: dart-code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Setup Flutter toolchain
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-
-      - name: Format Rust code
-        run: |
-          rustup component add clippy
-          cargo clippy --fix
 
       - name: Format Dart code
         run: dart format .
