@@ -34,7 +34,6 @@ jobs:
           channel: "stable"
 
       - name: Format Rust code
-        working-directory: /
         run: cargo fmt
 
       - name: Format Dart code
