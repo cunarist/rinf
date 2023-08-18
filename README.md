@@ -9,13 +9,13 @@
 
 # 🆎 Rust-In-Flutter
 
-Easily integrate Rust to make your Flutter app blazingly fast!
+**"Rust as your Flutter backend, Flutter as your Rust frontend"**
 
 ![preview](https://github.com/cunarist/rust-in-flutter/assets/66480156/be85cf04-2240-497f-8d0d-803c40536d8e)
 
-No messing with sensitive build files, no complicated code generation during development.
-
 Designed for ease of use, future scalability, and unparalleled performance, this lightweight framework takes care of all the complexity behind the scenes. Simply add this package to your Flutter project, and you're all set to write Rust!
+
+No messing with sensitive build files, no complicated code generation during development.
 
 ## Platform Support
 
