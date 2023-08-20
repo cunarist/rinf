@@ -1,3 +1,7 @@
+## 2.8.5
+
+- Fixed a problem with pub.dev score.
+
 ## 2.8.4
 
 - Fixed a problem with pub.dev score.
