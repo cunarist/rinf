@@ -1,38 +1,50 @@
+## 2.8.5
+
+- Fixed a problem with pub.dev score.
+
+## 2.8.4
+
+- Fixed a problem with pub.dev score.
+
+## 2.8.3
+
+- Wrote new catchphrase.
+
 ## 2.8.2
 
-- Updated links
+- Updated links.
 
 ## 2.8.1
 
-- Updated links
+- Updated links.
 
 ## 2.8.0
 
-- Removed unneeded dependencies
+- Removed unneeded dependencies.
 
 ## 2.7.4
 
-- Fixed CI badge showing rate limit error
+- Fixed CI badge showing rate limit error.
 
 ## 2.7.3
 
-- Fixed wrong guides
+- Fixed wrong guides.
 
 ## 2.7.2
 
-- Organized guides
+- Organized guides.
 
 ## 2.7.1
 
-- Organized guides (Thanks @bookshiyi)
+- Organized guides. (Thanks @bookshiyi)
 
 ## 2.7.0
 
-- Stabilized web-related Rust toolchain's auto-installation (Thanks @bookshiyi)
+- Stabilized web-related Rust toolchain's auto-installation. (Thanks @bookshiyi)
 
 ## 2.6.0
 
-- Applied continuous integration for checking builds and improving project stability (Thanks @bookshiyi)
+- Applied continuous integration for checking builds and improving project stability. (Thanks @bookshiyi)
 
 ## 2.5.6
 
