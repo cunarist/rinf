@@ -18,4 +18,4 @@ then
     exit 1
 fi
 
-rustup run stable cargo run --manifest-path=$BASEDIR/build_tool/Cargo.toml --bin build_tool --target-dir=$CARGOKIT_TOOL_TEMP_DIR --quiet -- $@
+rustup run stable cargo run --manifest-path="$BASEDIR/build_tool/Cargo.toml" --bin build_tool --target-dir="$CARGOKIT_TOOL_TEMP_DIR" --quiet -- $@

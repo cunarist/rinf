@@ -17,7 +17,7 @@ export CARGOKIT_PRODUCT_NAME=$PRODUCT_NAME
 export CARGOKIT_TARGET_DIR=$PODS_CONFIGURATION_BUILD_DIR
 export CARGOKIT_TOOL_TEMP_DIR=$TARGET_TEMP_DIR/rust_tool
 
-$BASEDIR/run_rust_tool.sh build_pod $@
+"$BASEDIR/run_rust_tool.sh" build_pod $@
 
 # Make a symlink from built framework to phony file, which will be used as input to
 # build script. This should force rebuild (podspec currently doesn't support alwaysOutOfDate
