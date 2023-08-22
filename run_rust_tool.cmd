@@ -5,12 +5,12 @@ set Path=%HOME%\.cargo\bin;%Path%
 
 SET BASEDIR=%~dp0
 
-WHERE cargo
+WHERE rustup
 
 if errorlevel 1 (
     echo ================================================================
     echo ==
-    echo == cargo not found!
+    echo == rustup not found!
     @REM echo ==
     @REM echo == We looked in Path: "%Path%"
     echo ==
@@ -22,4 +22,4 @@ if errorlevel 1 (
     exit 1
 )
 
-cargo run --manifest-path=%BASEDIR%/build_tool/Cargo.toml --bin build_tool --target-dir=%CARGOKIT_TOOL_TEMP_DIR% --quiet -- %*
+rustup run stable cargo run --manifest-path=%BASEDIR%/build_tool/Cargo.toml --bin build_tool --target-dir=%CARGOKIT_TOOL_TEMP_DIR% --quiet -- %*
