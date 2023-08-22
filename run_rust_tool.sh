@@ -4,14 +4,12 @@ set -e
 
 BASEDIR=$(dirname "$0")
 
-# Only use rustup cargo installation. This is to avoid picking up homebrew's cargo,
-# which does not support rustup installed targets.
-CARGO="$HOME/.cargo/bin/cargo"
+export PATH="~/.cargo/bin:$PATH"
 
-if ! command -v $CARGO --version >/dev/null 2>&1
+if ! command -v rustup --version >/dev/null 2>&1
 then
     echo "|"
-    echo "| cargo not found. Expected in $CARGO."
+    echo "| rustup not found. Expected in ~/.cargo/bin or \$PATH."
     echo "|"
     echo "| Maybe you need to install Rust? It only takes a minute:"
     echo "|"
@@ -20,4 +18,4 @@ then
     exit 1
 fi
 
-$CARGO run --manifest-path=$BASEDIR/build_tool/Cargo.toml --bin build_tool --target-dir=$CARGOKIT_TOOL_TEMP_DIR --quiet -- $@
+rustup run stable cargo run --manifest-path=$BASEDIR/build_tool/Cargo.toml --bin build_tool --target-dir=$CARGOKIT_TOOL_TEMP_DIR --quiet -- $@

@@ -230,7 +230,10 @@ fn build_for_target(target: &Target) -> Result<()> {
     debug!("ENV {}={}", cflags_key, cflags_value);
     debug!("ENV {}={}", cxx_flags_key, cxx_flags_value);
 
-    let mut cmd = Command::new("cargo");
+    let mut cmd = Command::new("rustup");
+    cmd.arg("run");
+    cmd.arg("stable");
+    cmd.arg("cargo");
     cmd.arg("build");
     cmd.arg("--manifest-path");
     cmd.arg(path_from_env("CARGOKIT_MANIFEST_DIR")?.join("Cargo.toml"));

@@ -55,7 +55,10 @@ pub fn build_cmake() -> Result<()> {
         .join("Cargo.toml")
         .canonicalize()?;
 
-    let mut cmd = Command::new("cargo");
+    let mut cmd = Command::new("rustup");
+    cmd.arg("run");
+    cmd.arg("stable");
+    cmd.arg("cargo");
     cmd.arg("build");
     cmd.arg("--manifest-path");
     cmd.arg(manifest_path);
