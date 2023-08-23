@@ -30,7 +30,7 @@ concurrency:
 jobs:
   build:
     name: ${{ matrix.runner }}-${{ matrix.arch }} / ${{ matrix.target }}
-    runs-on: ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}-${{ matrix.arch }}
     timeout-minutes: 60
     strategy:
       fail-fast: false # Important
