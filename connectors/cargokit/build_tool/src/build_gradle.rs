@@ -219,7 +219,7 @@ fn build_for_target(target: &Target) -> Result<()> {
     // based on cargo-ndk solution.
     // https://github.com/bbqsrc/cargo-ndk/commit/d6cdbf4feef48ebea5eee8958e9c98431c3c5f32
     let self_path = std::fs::canonicalize(std::env::args().next().unwrap())
-        .expect("Failed to canonicalize absolute path to build_android");
+        .expect("Failed to canonicalize absolute path to build_gradle");
 
     debug!("ENV {}={}", ar_key, ar_value.display());
     debug!("ENV {}={}", cc_key, cc_value.display());
@@ -230,7 +230,10 @@ fn build_for_target(target: &Target) -> Result<()> {
     debug!("ENV {}={}", cflags_key, cflags_value);
     debug!("ENV {}={}", cxx_flags_key, cxx_flags_value);
 
-    let mut cmd = Command::new("cargo");
+    let mut cmd = Command::new("rustup");
+    cmd.arg("run");
+    cmd.arg("stable");
+    cmd.arg("cargo");
     cmd.arg("build");
     cmd.arg("--manifest-path");
     cmd.arg(path_from_env("CARGOKIT_MANIFEST_DIR")?.join("Cargo.toml"));
@@ -295,7 +298,7 @@ pub fn clang_linker_wrapper() -> ! {
     std::process::exit(status.code().unwrap_or(1))
 }
 
-pub fn build_android() -> Result<()> {
+pub fn build_gradle() -> Result<()> {
     let targets = get_targets();
     debug!("Building for targets: {:?}", targets);
 

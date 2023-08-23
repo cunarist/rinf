@@ -56,7 +56,7 @@ abstract class CargoKitBuildTask extends DefaultTask {
 
         project.exec {
             executable path
-            args "build_android"
+            args "build_gradle"
             environment "CARGOKIT_TOOL_TEMP_DIR", "${buildDir}/rust_tool"
             environment "CARGOKIT_MANIFEST_DIR", manifestDir
             environment "CARGOKIT_LIB_NAME", project.cargokit.libname
