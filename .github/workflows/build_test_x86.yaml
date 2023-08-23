@@ -1,4 +1,4 @@
-name: build-test
+name: build-test-x86
 
 on:
   push:
@@ -29,7 +29,7 @@ concurrency:
 
 jobs:
   build:
-    name: ${{ matrix.runner }} / ${{ matrix.target }}
+    name: ${{ matrix.runner }}-x86 / ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     strategy:
