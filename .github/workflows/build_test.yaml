@@ -1,4 +1,4 @@
-name: build-test-x86
+name: build-test
 
 on:
   push:
@@ -29,13 +29,14 @@ concurrency:
 
 jobs:
   build:
-    name: ${{ matrix.runner }}-x86 / ${{ matrix.target }}
+    name: ${{ matrix.runner }}-${{ matrix.arch }} / ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     strategy:
       fail-fast: false # Important
       matrix:
         runner: [ubuntu-latest, windows-latest, macos-latest]
+        arch: [x86] # On all platforms
         target: [android, web] # On all platforms
         include:
           # Specify targets for each platform
@@ -47,6 +48,13 @@ jobs:
             target: macos
           - runner: macos-latest
             target: ios
+          # Specify architectures for each platform
+          - runner: ubuntu-latest
+            arch: aarch64
+          - runner: ubuntu-latest
+            arch: armv7
+          - runner: ubuntu-latest
+            arch: riscv64
 
     steps:
       - name: Checkout repository
