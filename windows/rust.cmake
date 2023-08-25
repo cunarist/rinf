@@ -14,12 +14,6 @@ include("../cargokit/cmake/cargokit.cmake")
 apply_cargokit(${BINARY_NAME} ${CMAKE_SOURCE_DIR}/../native/hub hub "")
 target_link_libraries(${BINARY_NAME} PUBLIC rust_in_flutter)
 
-set(
-  PLUGIN_BUNDLED_LIBRARIES
-  ${PLUGIN_BUNDLED_LIBRARIES} $<TARGET_FILE:rust_in_flutter>
-  PARENT_SCOPE
-)
-
 set(rust_in_flutter_bundled_libraries
   "${${BINARY_NAME}_cargokit_lib}"
   PARENT_SCOPE
