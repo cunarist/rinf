@@ -1,0 +1,8 @@
+# Remove unnecessary content
+# when publishing the package to pub.dev
+
+.github/
+automate/
+translations/
+target/
+Cargo.toml
