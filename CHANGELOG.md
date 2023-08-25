@@ -1,3 +1,8 @@
+## 2.9.0
+
+- Removed `corrosion`. Now this package solely relies on `cargokit` and is much more slimmer. (Thanks @bookshiyi)
+- Removed unneeded files from pub.dev publication.
+
 ## 2.8.5
 
 - Fixed a problem with pub.dev score.
