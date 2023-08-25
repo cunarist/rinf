@@ -1,8 +1,9 @@
 # Remove unnecessary content
 # when publishing the package to pub.dev
 
+.cargo/
 .github/
 automate/
 translations/
 target/
-Cargo.toml
+**/*.lock
