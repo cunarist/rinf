@@ -51,10 +51,16 @@ pub fn build_cmake() -> Result<()> {
     let build_dir = path_from_env("CARGOKIT_BUILD_DIR")?;
     let output_dir = path_from_env("CARGOKIT_TARGET_DIR")?;
     let lib_name = string_from_env("CARGOKIT_LIB_NAME")?;
-    let manifest_path = path_from_env("CARGOKIT_MANIFEST_DIR")?
+
+    // Different from upstream(Only for Windows target)
+    let mut manifest_path = path_from_env("CARGOKIT_MANIFEST_DIR")?
         .join("Cargo.toml")
         .canonicalize()?;
 
+    // Different from upstream(Only for Windows target)
+    if manifest_path.to_str().unwrap().starts_with(r"\\?\") {
+        manifest_path = std::path::PathBuf::from(&manifest_path.to_str().unwrap()[4..]);
+    }
     let mut cmd = Command::new("rustup");
     cmd.arg("run");
     cmd.arg("stable");
