@@ -59,7 +59,7 @@ android {
 }
 
 // Include Rust crates in the build process
-apply from: "../connectors/cargokit/gradle/plugin.gradle"
+apply from: "../cargokit/gradle/plugin.gradle"
 cargokit {
     manifestDir = "${rootProject.projectDir}/../native/hub"
     libname = "hub"
