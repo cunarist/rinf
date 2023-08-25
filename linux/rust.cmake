@@ -8,13 +8,10 @@ set_target_properties(${BINARY_NAME} PROPERTIES
 )
 
 target_compile_definitions(${BINARY_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
-
 target_link_libraries(${BINARY_NAME} PRIVATE flutter PkgConfig::GTK)
 
 include("../cargokit/cmake/cargokit.cmake")
-
 apply_cargokit(${BINARY_NAME} ${CMAKE_SOURCE_DIR}/../native/hub hub "")
-
 target_link_libraries(${BINARY_NAME} PUBLIC hub)
 
 set(
