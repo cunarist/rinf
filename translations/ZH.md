@@ -469,9 +469,13 @@ flutter: ZERO-COST ABSTRACTION
 
 **A**. 在 Dart 和 Rust 之间传递的数据一般是字节数组(bytes array)，Dart 中称之为 `Uint8List`，而 Rust 中称之为`Vec<u8>`。虽然我们推荐使用`MessagePack`进行序列化，但您也可以发送任何类型的字节数据，例如高分辨率图像或某种文件。若您不需要发送额外的数据信息，可以直接发送一个空的字节数组。
 
-**Q**. 什么是 MessagePack?我们的项目为何使用它?
+~~**Q**.什么是 MessagePack?我们的项目为何使用它?~~
 
-**A**. 我们使用[MessagePack](https://msgpack.org/)来序列化 Dart 和 Rust 之间发送的消息(正如 Rust 模板代码中所呈现的那样)，除非您有其他理由不这么做。MessagePack 是一种嵌套的二进制结构，类似于 JSON，但速度更快、体积更小。MessagePack 也支持比 JSON 更多类型的内部数据，包括二进制数据。您可以在 [这个链接](https://github.com/msgpack/msgpack/blob/master/spec.md#type-system) 里查看详细的类型系统规范。
+~~**A**. 我们使用[MessagePack](https://msgpack.org/)来序列化 Dart 和 Rust 之间发送的消息(正如 Rust 模板代码中所呈现的那样)，除非您有其他理由不这么做。MessagePack 是一种嵌套的二进制结构，类似于 JSON，但速度更快、体积更小。MessagePack 也支持比 JSON 更多类型的内部数据，包括二进制数据。您可以在 [这个链接](https://github.com/msgpack/msgpack/blob/master/spec.md#type-system) 里查看详细的类型系统规范。~~
+
+**Q**. 什么是 Protocol Buffers(简称 Protobuf)?我们的项目为何使用它?
+
+**A**. 截止本项目 3.0.0 版本之前，我们使用 MessagePack 作为序列化方法。现在我们使用[Protobuf](https://developers.google.com/protocol-buffers)来定义 Dart 和 Rust 之间发送的消息的结构。Protobuf 相对于 MessagePack 具有类型安全性、更小的数据尺寸、可扩展性和跨语言支持等优势。Protobuf 是一种语言无关的、平台无关的序列化方法，它可以将结构化数据序列化为高效的二进制格式。您可以在 [官方文档](https://protobuf.dev/) 里查看更多关于 Protobuf 的信息。
 
 **Q**. Rust 项目生成的动态链接库在哪儿?
 

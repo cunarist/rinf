@@ -469,9 +469,13 @@ Finally, receive the signals in Dart with `StreamBuilder`, filter them by addres
 
 **A**. Data being sent between Dart and Rust are basically bytes arrays, represented as `Uint8List` in Dart and `Vec<u8>` in Rust. Though using MessagePack serialization is recommended, you can send any kind of bytes data as you wish such as a high-resolution image or some kind of file data, or just toss in a blank bytes array if you don't need additional details.
 
-**Q**. What is "MessagePack" and why is it recommended?
+~~**Q**. What is "MessagePack" and why is it recommended?~~
 
-**A**. MessagePack is a nested binary structure similar to JSON, but faster and smaller. MessagePack also supports [more types](https://github.com/msgpack/msgpack/blob/master/spec.md#type-system) of inner data compared to JSON, including binaries. Use MessagePack for serializing messages sent between Dart and Rust as provided by the Rust template unless you have other reasons not to do so.
+~~**A**. MessagePack is a nested binary structure similar to JSON, but faster and smaller. MessagePack also supports [more types](https://github.com/msgpack/msgpack/blob/master/spec.md#type-system) of inner data compared to JSON, including binaries. Use MessagePack for serializing messages sent between Dart and Rust as provided by the Rust template unless you have other reasons not to do so.~~
+
+**Q**. What is "Protocol Buffers"(aka. Protobuf) and why is it recommended?
+
+**A**. Up till version 3.0.0 of this project, we use MessagePack as the serialization method. Now we use [Protobuf](https://developers.google.com/protocol-buffers) to define the structure of messages exchanged between Dart and Rust. Relative to MessagePack, Protobuf offers advantages such as type-safety, smaller data size, scalability, and cross-language support. Protobuf is a language-agnostic and platform-independent serialization method that can convert structured data into an efficient binary format. For more information about Protobuf, you can refer to [official documentation](https://protobuf.dev/).
 
 **Q**. Where are the library files generated from Rust crates?
 
