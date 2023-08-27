@@ -21,7 +21,6 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
             let request_message = CounterGetRequest::decode(&rust_request.bytes[..]).unwrap();
             let after_value: i32 = sample_crate::add_seven(request_message.before_number);
 
-            // Encode the Rust message object into raw bytes.
             let response_message = CounterGetResponse {
                 after_number: after_value,
                 dummy_one: request_message.dummy_one,
@@ -29,6 +28,7 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
                 dummy_three: request_message.dummy_three,
             };
 
+            // Encode the Rust message object into raw bytes.
             let mut bytes = Vec::new();
             response_message.encode(&mut bytes).unwrap();
 
