@@ -57,6 +57,43 @@ rustc --version
 flutter doctor
 ```
 
+# 🔨 Installing Protocol Buffers Compiler (aka. protoc)
+
+## For Linux
+
+### Ubuntu
+
+Install the latest version of `protoc` from the official apt repository.
+
+```bash
+sudo apt install protobuf-compiler
+```
+
+### CentOS/Fedora
+
+Install the latest version of `protoc` from the official yum repository.
+
+```bash
+sudo yum install protobuf-compiler
+```
+
+## For macOS
+
+Install the latest version of `protoc` from [Homebrew](https://brew.sh/).
+
+> Homebrew is a package manager for macOS, but it is not default. If you don't have Homebrew installed, visit [Homebrew](https://brew.sh/) and follow the instructions.
+
+```bash
+brew install protobuf
+```
+
+## For Windows
+
+1. Download the latest version of `protoc` from [Official release page](https://github.com/protocolbuffers/protobuf/releases), the file name should be something like `protoc-{version}-win64.zip`
+2. Extract the downloaded zip file, and move the `bin` folder to a desired location.
+3. Add the `bin` folder's absolute path to the `PATH` of environment variable.
+4. Open a new command prompt and run `protoc --version` to check if it is installed properly.
+
 # 👜 Applying Rust Template
 
 > This section assumes that you've already created a Flutter project. If you haven't, go ahead and make one following [this awesome official tutorial](https://docs.flutter.dev/get-started/codelab).

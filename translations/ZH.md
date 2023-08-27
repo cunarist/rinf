@@ -59,6 +59,43 @@ rustc --version
 flutter doctor
 ```
 
+# 🔨 安装 Protocol Buffers 编译器 (简称 protoc)
+
+## 对于 Linux
+
+### Ubuntu
+
+使用 APT 包管理器安装最新版本的`protoc`。
+
+```bash
+sudo apt install protobuf-compiler
+```
+
+### CentOS/Fedora
+
+使用 DNF 包管理器安装最新版本的`protoc`。
+
+```bash
+sudo yum install protobuf-compiler
+```
+
+## 对于 macOS
+
+使用 [Homebrew](https://brew.sh/). 安装最新版本的`protoc`。
+
+> Homebrew 是 macOS 的包管理器，但它不是默认的。如果您尚未安装 Homebrew，请访问 [Homebrew](https://brew.sh/) 并按照说明进行操作。
+
+```bash
+brew install protobuf
+```
+
+## 对于 Windows
+
+1. 从 [官方发布页面](https://github.com/protocolbuffers/protobuf/releases)下载最新版本的`protoc`，文件名类似于`protoc-{version}-win64.zip`。
+2. 解压刚刚下载的 protoc 压缩包，并将其中的`bin`文件夹复制到任意位置。
+3. 将`bin`文件夹所在位置添加到`PATH`环境变量中。
+4. 打开新的命令提示符程序并运行`protoc --version`，以检查是否已正确安装。
+
 # 👜 应用 Rust 模板
 
 > 本部分假设您已经创建了一个 Flutter 项目。如果尚未创建，请按照[这个很棒的官方教程](https://docs.flutter.dev/get-started/codelab)进行创建。
