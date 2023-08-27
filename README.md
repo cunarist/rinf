@@ -86,6 +86,9 @@ Once you've run the command, there will be some new files and folders that will 
 *   │   ├── main.dart
     │   └── ...
     ├── linux/
++   ├── messages/
++   │   ├── entry.proto
++   │   └── sample_schemas.proto
 +   ├── native/
 +   │   ├── hub/
 +   │   │   ├── src/
@@ -152,185 +155,175 @@ Let's say that you want to make a new button that sends an array of numbers and 
 
 Let's start from our [default example](https://github.com/cunarist/rust-in-flutter/tree/main/example). Create a button widget in Dart that will accept the user input.
 
-```diff
-  // lib/main.dart
-  ...
-  child: Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-+     ElevatedButton(
-+       onPressed: () async {},
-+       child: Text("Request to Rust"),
-+     ),
-  ...
+```dart
+// lib/main.dart
+...
+child: Column(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [
+    ElevatedButton(
+      onPressed: () async {},
+      child: Text("Request to Rust"),
+    ),
+...
+```
+
+Then create message schemas with Protobuf.
+
+```proto
+// messages/entry.proto
+...
+message SomeDataGetRequest {
+  repeated int32 input_numbers = 1;
+  string input_string = 2;
+}
+
+message SomeDataGetResponse {
+  repeated int32 output_numbers = 1;
+  string output_string = 2;
+}
+```
+
+Next, generate Dart and Rust message code from `.proto` files. This command invokes `native/hub/build.rs`.
+
+```bash
+cargo check
 ```
 
 `onPressed` function should send a request to Rust. Let's create a `RustRequest` object first.
 
-```diff
-  // lib/main.dart
-  ...
-  import 'package:msgpack_dart/msgpack_dart.dart';
-  import 'package:rust_in_flutter/rust_in_flutter.dart';
-  ...
-  ElevatedButton(
-+   onPressed: () async {
-+     final rustRequest = RustRequest(
-+       address: 'myCategory.someData',
-+       operation: RustOperation.Read,
-+       bytes: serialize(
-+         {
-+           'input_numbers': [3, 4, 5],
-+           'input_string': 'Zero-cost abstraction',
-+         },
-+       ),
-+     );
-+   },
-    child: Text("Request to Rust"),
-  ),
-  ...
+```dart
+// lib/main.dart
+...
+import 'package:my_flutter_project/messages/entry.pbserver.dart';
+import 'package:rust_in_flutter/rust_in_flutter.dart';
+...
+ElevatedButton(
+  onPressed: () async {
+    final requestMessage = SomeDataGetRequest(
+      inputNumbers: [3, 4, 5],
+      inputString: 'Zero-cost abstraction',
+    );
+    final rustRequest = RustRequest(
+      address: 'basic-category/counter-number',
+      operation: RustOperation.Read,
+      bytes: requestMessage.writeToBuffer(),
+    );
+    final rustResponse = await requestToRust(rustRequest)
+  },
+  child: Text("Request to Rust"),
+),
+...
 ```
 
-`address` can be any string that suits your app's design, represented as camelcase strings layered by dots. `operation` can be one of create, read, update, and delete, since this system follows the definition of RESTful API. As the name suggests, `bytes` is just a simple bytes array, usually created by [MessagePack](https://msgpack.org/) serialization.
+`address` can be any string pointing to a virtual resource that suits your app's design, represented as kebabcase strings layered by slashes. `operation` can be one of create, read, update, and delete, since this system follows the definition of RESTful API. As the name suggests, `bytes` is just a simple bytes array, usually created by Protobuf serialization.
 
-Now we should send this request to Rust. `requestToRust` function does this job, which returns a `RustResponse` object.
+`requestToRust` function sends the request to Rust, returning a `RustResponse` object.
 
-```diff
-  // lib/main.dart
-  ...
-  import 'package:msgpack_dart/msgpack_dart.dart';
-  import 'package:rust_in_flutter/rust_in_flutter.dart';
-  ...
-  ElevatedButton(
-    onPressed: () async {
-      final rustRequest = RustRequest(
-        address: 'myCategory.someData',
-        operation: RustOperation.Read,
-        bytes: serialize(
-          {
-            'input_numbers': [3, 4, 5],
-            'input_string': 'Zero-cost abstraction',
-          },
-        ),
-      );
-+     final rustResponse = await requestToRust(rustRequest);
-    },
-    child: Text("Request to Rust"),
-  ),
-    ...
-```
+So, our new API address is `my-category/some-data`. Make sure that the request handler function in Rust accepts this.
 
-So, our new API address is `myCategory.someData`. Make sure that the request handler function in Rust accepts this.
-
-```diff
-    // native/hub/src/with_request.rs
-    ...
-    use crate::bridge::api::RustResponse;
-    use crate::sample_functions;
-    ...
-    let layered: Vec<&str> = rust_request.address.split('.').collect();
-    let rust_response = if layered.is_empty() {
+```rust
+// native/hub/src/with_request.rs
+...
+use crate::bridge::api::RustResponse;
+use crate::sample_functions;
+...
+let layered: Vec<&str> = rust_request.address.split('.').collect();
+let rust_response = if layered.is_empty() {
+    RustResponse::default()
+} else if layered[0] == "basic-category" {
+    if layered.len() == 1 {
         RustResponse::default()
-    } else if layered[0] == "basic-category" {
-        if layered.len() == 1 {
-            RustResponse::default()
-        } else if layered[1] == "counter-number" {
-            sample_functions::calculate_something(rust_request).await
-        } else {
-            RustResponse::default()
-        }
-+   } else if layered[0] == "myCategory" {
-+       if layered.len() == 1 {
-+           RustResponse::default()
-+       } else if layered[1] == "someData" {
-+           sample_functions::some_data(rust_request).await
-+       } else {
-+           RustResponse::default()
-+       }
+    } else if layered[1] == "counter-number" {
+        sample_functions::calculate_something(rust_request).await
     } else {
         RustResponse::default()
-    };
-    ...
+    }
+} else if layered[0] == "my-category" {
+    if layered.len() == 1 {
+        RustResponse::default()
+    } else if layered[1] == "some-data" {
+        sample_functions::some_data(rust_request).await
+    } else {
+        RustResponse::default()
+    }
+} else {
+    RustResponse::default()
+};
+...
 ```
 
-This `sample_functions::some_data` is our new endpoint Rust function. This simple API endpoint will add one to each element in the array, capitalize all letters in the string, and return them. Message schema is defined in the match statement because it will be different by the operation type.
+This `sample_functions::some_data` is our new endpoint Rust function. This simple API endpoint will add one to each element in the array, capitalize all letters in the string, and return them. Message schema is imported in the match statement because it will be different by the operation type.
 
-```diff
-    // native/hub/src/sample_functions.rs
-    ...
-    use crate::bridge::api::RustOperation;
-    use crate::bridge::api::RustRequest;
-    use crate::bridge::api::RustResponse;
-    use rmp_serde::from_slice;
-    use rmp_serde::to_vec_named;
-    use serde::Deserialize;
-    use serde::Serialize;
-    ...
-+   pub async fn some_data(rust_request: RustRequest) -> RustResponse {
-+       match rust_request.operation {
-+           RustOperation::Create => RustResponse::default(),
-+           RustOperation::Read => {
-+               #[allow(dead_code)]
-+               #[derive(Deserialize)]
-+               struct RustRequestSchema {
-+                   input_numbers: Vec<i8>,
-+                   input_string: String,
-+               }
-+               let slice = rust_request.bytes.as_slice();
-+               let received: RustRequestSchema = from_slice(slice).unwrap();
-+
-+               let new_numbers = received.input_numbers.into_iter().map(|x| x + 1).collect();
-+               let new_string = received.input_string.to_uppercase();
-+
-+               #[derive(Serialize)]
-+               struct RustResponseSchema {
-+                   output_numbers: Vec<i8>,
-+                   output_string: String,
-+               }
-+               RustResponse {
-+                   successful: true,
-+                   bytes: to_vec_named(&RustResponseSchema {
-+                       output_numbers: new_numbers,
-+                       output_string: new_string,
-+                   })
-+                   .unwrap(),
-+               }
-+           }
-+           RustOperation::Update => RustResponse::default(),
-+           RustOperation::Delete => RustResponse::default(),
-+       }
-+   }
-    ...
+```rust
+// native/hub/src/sample_functions.rs
+...
+use crate::bridge::api::RustOperation;
+use crate::bridge::api::RustRequest;
+use crate::bridge::api::RustResponse;
+...
+pub async fn some_data(rust_request: RustRequest) -> RustResponse {
+    match rust_request.operation {
+        RustOperation::Create => RustResponse::default(),
+        RustOperation::Read => {
+            use messages::entry::{SomeDataGetRequest, SomeDataGetResponse};
+
+            let request_message = SomeDataGetRequest::decode(&rust_request.bytes[..]).unwrap();
+
+            let new_numbers: Vec<i32> = request_message
+                .input_numbers
+                .into_iter()
+                .map(|x| x + 1)
+                .collect();
+            let new_string = request_message.input_string.to_uppercase();
+
+            let response_message = SomeDataGetResponse {
+                output_numbers: new_numbers,
+                output_string: new_string,
+            };
+
+            RustResponse {
+                successful: true,
+                bytes: response_message.encode_to_vec(),
+            }
+        }
+        RustOperation::Update => RustResponse::default(),
+        RustOperation::Delete => RustResponse::default(),
+    }
+}
+...
 ```
 
 Finally, when you receive a response from Rust in Dart, you can do anything with the bytes data in it.
 
-```diff
-  // lib/main.dart
-  ...
-  import 'package:msgpack_dart/msgpack_dart.dart';
-  import 'package:rust_in_flutter/rust_in_flutter.dart';
-  ...
-  ElevatedButton(
-    onPressed: () async {
-      final rustRequest = RustRequest(
-        address: 'myCategory.someData',
-        operation: RustOperation.Read,
-        bytes: serialize(
-          {
-            'input_numbers': [3, 4, 5],
-            'input_string': 'Zero-cost abstraction',
-          },
-        ),
-      );
-      final rustResponse = await requestToRust(rustRequest);
-+     final message = deserialize(rustResponse.bytes) as Map;
-+     print(message["output_numbers"]);
-+     print(message["output_string"]);
-    },
-    child: Text("Request to Rust"),
-  ),
-    ...
+```dart
+// lib/main.dart
+...
+import 'package:my_flutter_project/messages/entry.pbserver.dart';
+import 'package:rust_in_flutter/rust_in_flutter.dart';
+...
+ElevatedButton(
+  onPressed: () async {
+    final requestMessage = SomeDataGetRequest(
+      inputNumbers: [3, 4, 5],
+      inputString: 'Zero-cost abstraction',
+    );
+    final rustRequest = RustRequest(
+      address: 'basic-category/counter-number',
+      operation: RustOperation.Read,
+      // Convert Dart message object into raw bytes.
+      bytes: requestMessage.writeToBuffer(),
+    );
+    final rustResponse = await requestToRust(rustRequest);
+    final responseMessage = SomeDataGetResponse.fromBuffer(
+      rustResponse.bytes,
+    );
+    print(responseMessage.outputNumbers);
+    print(responseMessage.outputString);
+  },
+  child: Text("Request to Rust"),
+),
+...
 ```
 
 And we can see the printed output in the command-line!
@@ -350,77 +343,87 @@ Let's say that you want to send increasing numbers every second from Rust to Dar
 
 Let's start from our [default example](https://github.com/cunarist/rust-in-flutter/tree/main/example). Spawn an async function in Rust.
 
-```diff
-    // native/hub/src/lib.rs
-    ...
-    mod sample_functions;
-    ...
-    crate::spawn(sample_functions::keep_drawing_mandelbrot());
-+   crate::spawn(sample_functions::keep_sending_numbers());
-    while let Some(request_unique) = request_receiver.recv().await {
-    ...
+```rust
+// native/hub/src/lib.rs
+...
+mod sample_functions;
+...
+crate::spawn(sample_functions::keep_drawing_mandelbrot());
+crate::spawn(sample_functions::keep_sending_numbers());
+while let Some(request_unique) = request_receiver.recv().await {
+...
+```
+
+Define the message schema.
+
+```proto
+// messages/entry.proto
+...
+message IncreasingNumbersSignal { int32 current_number = 1; }
+...
+```
+
+Generate Dart and Rust message code from `.proto` files.
+
+```bash
+cargo check
 ```
 
 Define the async Rust function that runs forever, sending numbers to Dart every second.
 
-```diff
-    // native/hub/src/sample_functions.rs
-    ...
-    use crate::bridge::api::RustSignal;
-    use crate::bridge::send_rust_signal;
-    ...
-    use rmp_serde::to_vec_named;
-    ...
-    use serde::Serialize;
-    ...
-+   pub async fn keep_sending_numbers() {
-+       let mut current_number: i32 = 1;
-+       loop {
-+           crate::time::sleep(std::time::Duration::from_secs(1)).await;
-+
-+           #[derive(Serialize)]
-+           struct RustSignalSchema {
-+               current_number: i32,
-+           }
-+           let rust_signal = RustSignal {
-+               address: String::from("myCategory.increasingNumbers"),
-+               bytes: to_vec_named(&RustSignalSchema {
-+                   current_number: current_number,
-+               })
-+               .unwrap(),
-+           };
-+           send_rust_signal(rust_signal);
-+           current_number += 1;
-+       }
-+   }
-    ...
+```rust
+// native/hub/src/sample_functions.rs
+...
+use crate::bridge::api::RustSignal;
+use crate::bridge::send_rust_signal;
+...
+pub async fn keep_sending_numbers() {
+    let mut current_number: i32 = 1;
+    loop {
+        use messages::entry::IncreasingNumbersSignal;
+
+        crate::time::sleep(std::time::Duration::from_secs(1)).await;
+
+        let signal_message = IncreasingNumbersSignal { current_number };
+
+        let rust_signal = RustSignal {
+            address: String::from("my-category/increasing-numbers"),
+            bytes: signal_message.encode_to_vec(),
+        };
+        send_rust_signal(rust_signal);
+        current_number += 1;
+    }
+}
+...
 ```
 
 Finally, receive the signals in Dart with `StreamBuilder`, filter them by address with the `where` method, and rebuild the widget.
 
-```diff
-  // lib/main.dart
-  ...
-  import 'package:msgpack_dart/msgpack_dart.dart';
-  import 'package:rust_in_flutter/rust_in_flutter.dart';
-  ...
-  children: [
-+   StreamBuilder<RustSignal>(
-+     stream: rustBroadcaster.stream.where((rustSignal) {
-+       return rustSignal.address == "myCategory.increasingNumbers";
-+     }),
-+     builder: (context, snapshot) {
-+       final received = snapshot.data;
-+       if (received == null) {
-+         return Text("Nothing received yet");
-+       } else {
-+         final singal = deserialize(received.bytes) as Map;
-+         final currentNumber = singal["current_number"] as int;
-+         return Text(currentNumber.toString());
-+       }
-+     },
-+   ),
-  ...
+```dart
+// lib/main.dart
+...
+import 'package:my_flutter_project/messages/entry.pbserver.dart';
+import 'package:rust_in_flutter/rust_in_flutter.dart';
+...
+children: [
+  StreamBuilder<RustSignal>(
+    stream: rustBroadcaster.stream.where((rustSignal) {
+      return rustSignal.address == "my-category/increasing-numbers";
+    }),
+    builder: (context, snapshot) {
+      final received = snapshot.data;
+      if (received == null) {
+        return Text("Nothing received yet");
+      } else {
+        final singal = IncreasingNumbersSignal.fromBuffer(
+          received.bytes,
+        );
+        final currentNumber = singal.currentNumber;
+        return Text(currentNumber.toString());
+      }
+    },
+  ),
+...
 ```
 
 # ✋ FAQ
@@ -432,10 +435,6 @@ Finally, receive the signals in Dart with `StreamBuilder`, filter them by addres
 **Q**. How are data passed between Dart and Rust?
 
 **A**. Data being sent between Dart and Rust are basically bytes arrays, represented as `Uint8List` in Dart and `Vec<u8>` in Rust. Though using MessagePack serialization is recommended, you can send any kind of bytes data as you wish such as a high-resolution image or some kind of file data, or just toss in a blank bytes array if you don't need additional details.
-
-**Q**. What is "MessagePack" and why is it recommended?
-
-**A**. MessagePack is a nested binary structure similar to JSON, but faster and smaller. MessagePack also supports [more types](https://github.com/msgpack/msgpack/blob/master/spec.md#type-system) of inner data compared to JSON, including binaries. Use MessagePack for serializing messages sent between Dart and Rust as provided by the Rust template unless you have other reasons not to do so.
 
 **Q**. Where are the library files generated from Rust crates?
 
@@ -452,10 +451,6 @@ Finally, receive the signals in Dart with `StreamBuilder`, filter them by addres
 **Q**. How does concurrency work under the hood?
 
 **A**. On native platforms, Dart runs in a single thread as usual, while Rust utilizes the async `tokio` runtime to take advantage of all cores on the computer, allowing async tasks to run efficiently within that runtime. On the web, Dart still runs in the main thread, but Rust operates only within a single web worker (thread). This is a necessary constraint because web workers do not share memory, but it is still possible for Rust to perform concurrent operations within that one dedicated thread by converting Rust `Future`s into JavaScript `Promise`s and passing them into the JavaScript event loop.
-
-**Q**. How do I make messages completely type-safe?
-
-**A**. When using MessagePack serialization, IDEs like VSCode might not provide full intellisense support, leading to potential type-related issues. To ensure proper type checking in IDEs, you can choose Protobuf instead of MessagePack. Protobuf is a type-safe serialization method that can help prevent data type-related errors. Although integrating Protobuf is beyond the scope of this package, you can refer to its [official documentation](https://protobuf.dev/) for implementation details.
 
 **Q**. The built web version shows errors related to cross-origin policy in the browser console.
 

@@ -29,14 +29,10 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
                 dummy_three: request_message.dummy_three,
             };
 
-            // Encode the Rust message object into raw bytes.
-            let mut bytes = Vec::new();
-            response_message.encode(&mut bytes).unwrap();
-
             // Return the response object.
             RustResponse {
                 successful: true,
-                bytes,
+                bytes: response_message.encode_to_vec(),
             }
         }
         RustOperation::Update => RustResponse::default(),
