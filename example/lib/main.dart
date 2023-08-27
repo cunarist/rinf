@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 import 'package:rust_in_flutter_example/messages/entry.pbserver.dart';
 import 'package:rust_in_flutter_example/messages/sample_schemas.pbserver.dart';
@@ -16,17 +15,44 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // This example uses providers for very simple state management.
-      home: ChangeNotifierProvider(
-        create: (context) => HomeNotifier(),
-        child: const Home(),
-      ),
+      home: Home(),
     );
   }
 }
 
 class Home extends StatelessWidget {
-  const Home({super.key});
+  final ValueNotifier<int> _countNotifier = ValueNotifier<int>(0);
+
+  // This method interacts with Rust.
+  void _incrementCount() async {
+    final requestMessage = CounterGetRequest(
+      letter: "Hello from Dart!",
+      beforeNumber: _countNotifier.value,
+      dummyOne: 1,
+      dummyTwo: SampleSchema(
+        sampleFieldOne: true,
+        sampleFieldTwo: false,
+      ),
+      dummyThree: [3, 4, 5],
+    );
+
+    final rustRequest = RustRequest(
+      address: 'basic-category/counter-number',
+      operation: RustOperation.Read,
+      // Convert Dart message object into raw bytes.
+      bytes: requestMessage.writeToBuffer(),
+    );
+
+    // Use `requestToRust` from `rust_in_flutter.dart`
+    // to send the request to Rust and get the response.
+    final rustResponse = await requestToRust(rustRequest);
+
+    if (rustResponse.successful) {
+      // Convert raw bytes into Dart message objects.
+      final responseMessage = CounterGetResponse.fromBuffer(rustResponse.bytes);
+      _countNotifier.value = responseMessage.afterNumber;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,67 +113,58 @@ class Home extends StatelessWidget {
                 }
               },
             ),
-            // Update the text according to the state.
-            Consumer<HomeNotifier>(
-              builder: (context, notifier, child) {
-                final currentCount = notifier.count;
-                if (currentCount == 0) {
-                  return const Text("Not calculated yet");
-                } else {
-                  return Text(
-                    "Current value is ${currentCount.toString()}",
-                  );
-                }
-              },
-            )
+            CurrentValueText(
+              countNotifier: _countNotifier,
+            ), // Display current value
           ],
         ),
       ),
-      // This is a button that calls the state update method.
+      // This is a button that calls the increment method.
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.read<HomeNotifier>().increment();
-        },
+        onPressed: _incrementCount,
         child: const Icon(Icons.add),
       ),
     );
   }
 }
 
-class HomeNotifier extends ChangeNotifier {
-  int _count = 0;
-  int get count => _count;
+class CurrentValueText extends StatefulWidget {
+  final ValueNotifier<int> countNotifier;
+  const CurrentValueText({required this.countNotifier});
+  @override
+  _CurrentValueTextState createState() => _CurrentValueTextState();
+}
 
-  // This state update method interacts with Rust.
-  void increment() async {
-    final requestMessage = CounterGetRequest(
-      letter: "Hello from Dart!",
-      beforeNumber: _count,
-      dummyOne: 1,
-      dummyTwo: SampleSchema(
-        sampleFieldOne: true,
-        sampleFieldTwo: false,
-      ),
-      dummyThree: [3, 4, 5],
-    );
+class _CurrentValueTextState extends State<CurrentValueText> {
+  late int _currentCount;
 
-    final rustRequest = RustRequest(
-      address: 'basic-category/counter-number',
-      operation: RustOperation.Read,
-      // Convert Dart message object into raw bytes.
-      bytes: requestMessage.writeToBuffer(),
-    );
-    // Use `requestToRust` from `rust_in_flutter.dart`
-    // to send the request to Rust and get the response.
-    final rustResponse = await requestToRust(rustRequest);
+  @override
+  void initState() {
+    super.initState();
+    _currentCount = widget.countNotifier.value;
+    widget.countNotifier.addListener(_updateCurrentCount);
+  }
 
-    if (!rustResponse.successful) {
-      return;
+  void _updateCurrentCount() {
+    setState(() {
+      _currentCount = widget.countNotifier.value;
+    });
+  }
+
+  @override
+  void dispose() {
+    widget.countNotifier.removeListener(_updateCurrentCount);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_currentCount == 0) {
+      return const Text("Not calculated yet");
     } else {
-      // Convert raw bytes into Dart message objects.
-      final responseMessage = CounterGetResponse.fromBuffer(rustResponse.bytes);
-      _count = responseMessage.afterNumber;
-      notifyListeners();
+      return Text(
+        "Current value is $_currentCount",
+      );
     }
   }
 }

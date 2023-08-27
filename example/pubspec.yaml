@@ -43,7 +43,6 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
 
-  provider: ^6.0.5
   protobuf: ^3.1.0
 
 dev_dependencies:
