@@ -19,7 +19,7 @@
 
 ## 플랫폼 지원
 
-Flutter의 모든 플랫폼은 [테스트](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml?query=branch%3Amain)되었으며 지원됩니다. 또한, 복잡한 빌드 설정들은 모두 자동으로 처리됩니다.
+Flutter의 모든 플랫폼은 [테스트](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml?query=branch%3Amain)되었으며 지원됩니다. 복잡한 빌드 설정들은 모두 자동으로 처리됩니다.
 
 | Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
 | ------- | ----- | ------- | ------- | ----- | --- | --- |

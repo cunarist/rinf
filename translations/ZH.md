@@ -17,7 +17,7 @@
 
 ## 平台支持
 
-Flutter 支持的所有平台都经过了[测试](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml?query=branch%3Amain)并得到支持。此外，所有复杂的构建设置都会自动处理。
+Flutter 支持的所有平台都经过了[测试](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml?query=branch%3Amain)并得到支持。具有挑战性的构建设置会由该软件包自动处理。
 
 | Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
 | ------- | ----- | ------- | ------- | ----- | --- | --- |

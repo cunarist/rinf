@@ -17,7 +17,7 @@
 
 ## プラットフォームサポート
 
-Flutter で利用可能なすべてのプラットフォームは[テスト](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml?query=branch%3Amain)されてサポートされています。さらに、難解なビルド設定はすべてこのパッケージによって自動的に処理されます。
+Flutter で利用可能なすべてのプラットフォームは[テスト](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml?query=branch%3Amain)されてサポートされています。難しいビルド設定は、このパッケージによって自動的に処理されます。
 
 | Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
 | ------- | ----- | ------- | ------- | ----- | --- | --- |
