@@ -228,10 +228,10 @@ Dart에서 Rust로 숫자 배열과 문자열을 보내어 계산을 수행하�
     let layered: Vec<&str> = rust_request.address.split('.').collect();
     let rust_response = if layered.is_empty() {
         RustResponse::default()
-    } else if layered[0] == "basicCategory" {
+    } else if layered[0] == "basic-category" {
         if layered.len() == 1 {
             RustResponse::default()
-        } else if layered[1] == "counterNumber" {
+        } else if layered[1] == "counter-number" {
             sample_functions::calculate_something(rust_request).await
         } else {
             RustResponse::default()

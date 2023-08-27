@@ -66,7 +66,7 @@ pub async fn keep_drawing_mandelbrot() {
         );
         if let Ok(mandelbrot) = calculated {
             let rust_signal = RustSignal {
-                address: String::from("sampleCategory.mandelbrot"),
+                address: String::from("sample-category/mandelbrot"),
                 bytes: mandelbrot,
             };
             send_rust_signal(rust_signal);

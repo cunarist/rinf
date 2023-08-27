@@ -45,7 +45,7 @@ class Home extends StatelessWidget {
               // only when there are signals
               // with the specific address it is interested in.
               stream: rustBroadcaster.stream.where((rustSignal) {
-                return rustSignal.address == 'sampleCategory.mandelbrot';
+                return rustSignal.address == 'sample-category/mandelbrot';
               }),
               builder: (context, snapshot) {
                 // If the app has just started and widget is built
@@ -128,7 +128,7 @@ class HomeNotifier extends ChangeNotifier {
     );
 
     final rustRequest = RustRequest(
-      address: 'basicCategory.counterNumber',
+      address: 'basic-category/counter-number',
       operation: RustOperation.Read,
       // Convert Dart message object into raw bytes.
       bytes: requestMessage.writeToBuffer(),
