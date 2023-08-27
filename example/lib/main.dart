@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
-import 'package:rust_in_flutter_example/src/gen/counter.pbserver.dart';
+import 'package:rust_in_flutter_example/messages/entry.pbserver.dart';
 
 void main() async {
   // Wait for initialization to be completed first.
@@ -119,34 +119,30 @@ class HomeNotifier extends ChangeNotifier {
 
   // This state update method interacts with Rust.
   void increment() async {
-    CounterRequest request = CounterRequest();
-    request.letter = "Hello from Dart!";
-    request.beforeNumber = _count;
-    request.dummyOne = 1;
-    request.dummyTwo = 2;
-    request.dummyThree.addAll([3, 4, 5]);
+    final requestMessage = CounterGetRequest(
+      letter: "Hello from Dart!",
+      beforeNumber: _count,
+      dummyOne: 1,
+      dummyTwo: 2,
+      dummyThree: [3, 4, 5],
+    );
 
     final rustRequest = RustRequest(
       address: 'basicCategory.counterNumber',
       operation: RustOperation.Read,
-      // Use the `serialize` function
-      // provided by `msgpack_dart.dart`
-      // to convert Dart objects into raw bytes.
-      bytes: request.writeToBuffer(),
+      // Convert Dart message object into raw bytes.
+      bytes: requestMessage.writeToBuffer(),
     );
     // Use `requestToRust` from `rust_in_flutter.dart`
     // to send the request to Rust and get the response.
     final rustResponse = await requestToRust(rustRequest);
+
     if (!rustResponse.successful) {
       return;
     } else {
-      // Use the `deserialize` function
-      // provided by `msgpack_dart.dart`
-      // to convert raw bytes into Dart objects.
-      // You have to explicitly tell the deserialized type
-      // with `as` keyword for proper type checking in Dart.
-      final counterResponse = CounterResponse.fromBuffer(rustResponse.bytes);
-      _count = counterResponse.afterNumber;
+      // Convert raw bytes into Dart message objects.
+      final responseMessage = CounterGetResponse.fromBuffer(rustResponse.bytes);
+      _count = responseMessage.afterNumber;
       notifyListeners();
     }
   }

@@ -6,53 +6,36 @@ use crate::bridge::api::RustRequest;
 use crate::bridge::api::RustResponse;
 use crate::bridge::api::RustSignal;
 use crate::bridge::send_rust_signal;
-use serde::Deserialize;
+use crate::messages;
 use prost::Message;
-
-pub mod counter {
-    include!(concat!(env!("OUT_DIR"), "/counter.rs"));
-}
-
-use counter::{CounterRequest, CounterResponse};
-
 
 pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
         RustOperation::Read => {
-            // We declare MessagePack structs in this match condition
+            // We import message structs in this match condition
             // because schema will differ by the operation type.
-            #[allow(dead_code)]
-            #[derive(Deserialize)]
-            struct RustRequestSchema {
-                letter: String,
-                before_number: i32,
-                dummy_one: i32,
-                dummy_two: i32,
-                dummy_three: Vec<i32>,
-            }
+            use messages::entry::{CounterGetRequest, CounterGetResponse};
 
-            // Decode the byte array back into a CounterRequest message.
-            // Decode the byte array back into a CounterRequest message.
-            let counter_request = CounterRequest::decode(&rust_request.bytes[..]).unwrap();
-            let after_value:i32 = counter_request.before_number as i32 + 5;
+            // Decode raw bytes into a Rust message object.
+            let request_message = CounterGetRequest::decode(&rust_request.bytes[..]).unwrap();
+            let after_value: i32 = sample_crate::add_seven(request_message.before_number);
 
-            // Encode the CounterResponse message into a byte array.
-            let mut counter_response = CounterResponse::default();
-            counter_response.after_number = after_value;
-            counter_response.dummy_one = counter_request.dummy_one as i32;
-            counter_response.dummy_two = counter_request.dummy_two as i32;
-            counter_response.dummy_three = vec![3, 4, 5];
+            // Encode the Rust message object into raw bytes.
+            let response_message = CounterGetResponse {
+                after_number: after_value,
+                dummy_one: request_message.dummy_one,
+                dummy_two: request_message.dummy_two,
+                dummy_three: request_message.dummy_three,
+            };
 
             let mut bytes = Vec::new();
-            counter_response.encode(&mut bytes).unwrap();
-      
+            response_message.encode(&mut bytes).unwrap();
 
-            
+            // Return the response object.
             RustResponse {
                 successful: true,
-                // Use `to_vec_named` from `rmp_serde`
-                bytes:  bytes,
+                bytes,
             }
         }
         RustOperation::Update => RustResponse::default(),

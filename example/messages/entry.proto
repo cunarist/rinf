@@ -1,0 +1,19 @@
+syntax = "proto3";
+package entry;
+
+import "sample.proto";
+
+message CounterGetRequest {
+  string letter = 1;
+  int32 before_number = 2;
+  uint32 dummy_one = 3;
+  uint32 dummy_two = 4;
+  repeated int32 dummy_three = 5;
+}
+
+message CounterGetResponse {
+  int32 after_number = 1;
+  uint32 dummy_one = 2;
+  uint32 dummy_two = 3;
+  repeated int32 dummy_three = 4;
+}
