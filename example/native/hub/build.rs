@@ -29,7 +29,16 @@ fn main() {
     }
 
     // Generate Rust message files.
-    let _ = fs::create_dir("src/messages");
+    let output_path = "src/messages";
+    let _ = fs::create_dir(output_path);
+    for result in fs::read_dir(output_path).unwrap() {
+        let entry_path = result.unwrap().path();
+        if entry_path.is_dir() {
+            fs::remove_dir_all(&entry_path).unwrap();
+        } else {
+            fs::remove_file(&entry_path).unwrap();
+        }
+    }
     let result = tonic_build::configure()
         .out_dir("src/messages")
         .compile(&proto_filenames, &["../../messages"]);
@@ -72,7 +81,16 @@ fn main() {
         .expect("Cannot globally install `protoc_plugin` Dart package");
 
     // Generate Dart message files.
-    let _ = fs::create_dir("../../lib/messages");
+    let output_path = "../../lib/messages";
+    let _ = fs::create_dir(output_path);
+    for result in fs::read_dir(output_path).unwrap() {
+        let entry_path = result.unwrap().path();
+        if entry_path.is_dir() {
+            fs::remove_dir_all(&entry_path).unwrap();
+        } else {
+            fs::remove_file(&entry_path).unwrap();
+        }
+    }
     let working_directory = env::current_dir().unwrap();
     let flutter_project_path = working_directory.parent().unwrap().parent().unwrap();
     let mut command = Command::new("protoc");
