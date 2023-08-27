@@ -64,9 +64,12 @@ fn main() {
     fs::write(mod_rs_path, mod_rs_content).expect("Failed to write mod.rs");
 
     // Install `protoc_plugin` for Dart.
-    let mut command = Command::new("dart");
+    let dart_path = which::which("dart").unwrap(); // https://github.com/rust-lang/rust/issues/37519
+    let mut command = Command::new(dart_path);
     command.args(["pub", "global", "activate", "protoc_plugin"]);
-    let _ = command.output();
+    command
+        .output()
+        .expect("Cannot globally install `protoc_plugin` Dart package");
 
     // Generate Dart message files.
     let _ = fs::create_dir("../../lib/messages");
