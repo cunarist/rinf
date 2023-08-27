@@ -4,10 +4,6 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 fn main() {
-    // Watch original `.proto` message files.
-    println!("cargo:rerun-if-changed=../../messages");
-    println!("cargo:rerun-if-changed=../../messages/entry.proto");
-
     // Get the list of `.proto` files.
     let proto_folder = Path::new("../../messages");
     #[allow(clippy::if_same_then_else)]
@@ -25,6 +21,12 @@ fn main() {
             }
         })
         .collect();
+
+    // Watch original `.proto` message files.
+    println!("cargo:rerun-if-changed=../../messages");
+    for proto_file in &proto_files {
+        println!("cargo:rerun-if-changed=../../messages/{proto_file}");
+    }
 
     // Generate Rust message files.
     let _ = fs::create_dir("src/messages");
