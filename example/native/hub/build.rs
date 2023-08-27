@@ -8,11 +8,29 @@ fn main() {
     println!("cargo:rerun-if-changed=../../messages");
     println!("cargo:rerun-if-changed=../../messages/entry.proto");
 
+    // Get the list of `.proto` files.
+    let proto_folder = Path::new("../../messages");
+    #[allow(clippy::if_same_then_else)]
+    let proto_files: Vec<String> = fs::read_dir(proto_folder)
+        .expect("Failed to read directory")
+        .filter_map(|entry| {
+            let entry = entry.expect("Error reading directory entry");
+            let path = entry.path();
+            if path.is_dir() {
+                None
+            } else if path.extension().map(|ext| ext != "proto").unwrap_or(true) {
+                None
+            } else {
+                Some(entry.file_name().to_str().unwrap().to_owned())
+            }
+        })
+        .collect();
+
     // Generate Rust message files.
     let _ = fs::create_dir("src/messages");
     let result = tonic_build::configure()
         .out_dir("src/messages")
-        .compile(&["../../messages/entry.proto"], &["../../messages"]);
+        .compile(&proto_files, &["../../messages"]);
     result.expect("Could not compile `.proto` files into Rust");
 
     // Generate the `mod.rs` content for messages module in Rust.
@@ -57,8 +75,9 @@ fn main() {
     command.args([
         "--proto_path=messages",
         "--dart_out=lib/messages",
-        "messages/entry.proto",
+        "--fatal_warnings",
     ]);
+    command.args(proto_files);
     let result = command.output();
     result.expect("Could not compile `.proto` files into Dart");
 }

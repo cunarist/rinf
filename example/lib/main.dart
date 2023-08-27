@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 import 'package:rust_in_flutter_example/messages/entry.pbserver.dart';
+import 'package:rust_in_flutter_example/messages/sample.pbserver.dart';
 
 void main() async {
   // Wait for initialization to be completed first.
@@ -123,7 +124,10 @@ class HomeNotifier extends ChangeNotifier {
       letter: "Hello from Dart!",
       beforeNumber: _count,
       dummyOne: 1,
-      dummyTwo: 2,
+      dummyTwo: SampleSchema(
+        sampleFieldOne: true,
+        sampleFieldTwo: false,
+      ),
       dummyThree: [3, 4, 5],
     );
 
