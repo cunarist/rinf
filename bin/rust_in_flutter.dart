@@ -89,8 +89,7 @@ Future<void> _applyTemplate() async {
   }
   if (!gitignoreContent.contains(messageSectionTitle)) {
     var text = messageSectionTitle;
-    text += '\n' + 'native/hub/src/messages';
-    text += '\n' + 'lib/messages';
+    text += '\n' + '*/**/messages/';
     splitted.add(text);
   }
   await gitignoreFile.writeAsString(splitted.join('\n\n'));

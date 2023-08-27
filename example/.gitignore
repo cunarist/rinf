@@ -48,5 +48,4 @@ app.*.map.json
 target/
 
 # Generated messages
-native/hub/src/messages
-lib/messages
+*/**/messages/
