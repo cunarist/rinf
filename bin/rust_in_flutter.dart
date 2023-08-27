@@ -95,7 +95,7 @@ Future<void> _applyTemplate() async {
   }
   await gitignoreFile.writeAsString(splitted.join('\n\n'));
 
-  // Add `msgpack_dart` to Dart dependencies
+  // Add Dart dependencies
   await Process.run('dart', ['pub', 'add', 'protobuf']);
 
   // Modify `./lib/main.dart`
