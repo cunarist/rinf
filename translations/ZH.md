@@ -46,16 +46,19 @@ Rust 在 Stack Overflow 上被评为[最受喜爱的编程语言](https://survey
 
 要深入了解 Rust 的世界，请查阅官方书籍：[https://doc.rust-lang.org/book/foreword.html](https://doc.rust-lang.org/book/foreword.html)。
 
-# 🛠️ 安装 Rust 工具链
+# 🛠️ 安装组件
 
 > 这部分假设您的系统已安装[Flutter SDK](https://docs.flutter.dev/get-started/install)。
 
 安装 Rust 工具链非常简单。只需前往[官方安装页面](https://www.rust-lang.org/tools/install)并按照说明进行操作即可。
 
-Rust 工具链安装完成后，请检查系统是否准备就绪。Flutter SDK 可能需要一些额外的组件来定位各种平台。如果输出没有问题，你就可以开始使用了！
+同时，您还需要在您的系统上安装[Protobuf](https://protobuf.dev/)编译器。对于那些不太熟悉的人，Protobuf 是由 Google 制作的一种流行的、与语言无关的用于结构化消息的二进制序列化格式。按照[官方文档](https://grpc.io/docs/protoc-installation/)中的描述安装 Protobuf 编译器也非常简单。
+
+安装完成后，请检查您的系统是否准备就绪。Flutter SDK 可能需要一些额外的组件来定位不同的平台。如果输出没有问题，您就可以开始使用了！
 
 ```bash
 rustc --version
+protoc --version
 flutter doctor
 ```
 

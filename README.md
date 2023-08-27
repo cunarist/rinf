@@ -44,16 +44,19 @@ Rust has garnered a devoted following, being [the most loved programming languag
 
 To delve deeper into the world of Rust, check out the official book: [https://doc.rust-lang.org/book/foreword.html](https://doc.rust-lang.org/book/foreword.html).
 
-# 🛠️ Installing Rust Toolchain
+# 🛠️ Installing Components
 
 > This section assumes that [Flutter SDK](https://docs.flutter.dev/get-started/install) is installed on your system.
 
 Installing Rust toolchain is very easy. Just head over to the [official installation page](https://www.rust-lang.org/tools/install) and follow the instructions.
 
-Once Rust toolchain installation is completed, check that your system is ready. Flutter SDK might require some additional components to target various platforms. If there are no issues in the output, you are good to go!
+You also need to have [Protobuf](https://protobuf.dev/) compiler installed on your system. For those who aren't familiar, Protobuf is a popular, language-neutral, binary serialization format for structured messages, made by Google. Installing Protobuf compiler is also easy as described in the [official docs](https://grpc.io/docs/protoc-installation/).
+
+Once installation is completed, check that your system is ready. Flutter SDK might require some additional components to target various platforms. If there are no issues in the output, you are good to go!
 
 ```bash
 rustc --version
+protoc --version
 flutter doctor
 ```
 

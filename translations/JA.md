@@ -44,16 +44,19 @@ Rust は Stack Overflow で[最も愛されているプログラミング言語]
 
 Rust の世界をさらに探求するには、公式の書籍をご覧ください：[https://doc.rust-lang.org/book/foreword.html](https://doc.rust-lang.org/book/foreword.html)。
 
-# 🛠️ Rust ツールチェーンのインストール
+# 🛠️ コンポーネントのインストール
 
 > このセクションでは、システムに[Flutter SDK](https://docs.flutter.dev/get-started/install)がインストールされていることを前提としています。
 
 Rust ツールチェーンのインストールは非常に簡単です。[公式のインストールページ](https://www.rust-lang.org/tools/install)にアクセスして、指示に従うだけです。
 
-Rust ツールチェーンのインストールが完了したら、システムが正常に準備されているか確認してください。Flutter SDK は、さまざまなプラットフォームを対象とするためにいくつかの追加コンポーネントが必要になる場合があります。出力に問題がなければ、準備完了です！
+また、[Protobuf](https://protobuf.dev/)コンパイラをシステムにインストールする必要があります。詳しく知らない方のために説明すると、Protobuf は Google によって作成された人気のある言語中立の構造化メッセージ用のバイナリシリアル化形式です。[公式ドキュメント](https://grpc.io/docs/protoc-installation/)に記載されている方法に従えば、Protobuf コンパイラのインストールは簡単です。
+
+インストールが完了したら、システムが準備できているか確認してください。Flutter SDK はさまざまなプラットフォームを対象とするためにいくつかの追加コンポーネントが必要かもしれません。出力に問題がなければ、準備が整っています！
 
 ```bash
 rustc --version
+protoc --version
 flutter doctor
 ```
 
