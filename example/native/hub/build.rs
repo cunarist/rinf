@@ -24,8 +24,8 @@ fn main() {
 
     // Watch original `.proto` message files.
     println!("cargo:rerun-if-changed=../../messages");
-    for proto_file in &proto_filenames {
-        println!("cargo:rerun-if-changed=../../messages/{proto_file}");
+    for proto_filename in &proto_filenames {
+        println!("cargo:rerun-if-changed=../../messages/{proto_filename}");
     }
 
     // Generate Rust message files.
