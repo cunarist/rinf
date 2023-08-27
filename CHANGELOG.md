@@ -1,3 +1,7 @@
+## 3.0.0
+
+- Adopted Protobuf for message serialization. Now communication between Dart and Rust is much more type-safe and faster than before. Because the template has now changed, you need to run `dart run rust_in_flutter template` again when migrating from version 2. (Thanks @wheregmis and @bookshiyi)
+
 ## 2.9.0
 
 - Removed `corrosion`. Now this package solely relies on `cargokit` and is much more slimmer. (Thanks @bookshiyi)
