@@ -73,7 +73,11 @@ fn main() {
     fs::write(mod_rs_path, mod_rs_content).expect("Failed to write mod.rs");
 
     // Install `protoc_plugin` for Dart.
-    let dart_path = which::which("dart").unwrap(); // https://github.com/rust-lang/rust/issues/37519
+    let result = which::which("dart"); // https://github.com/rust-lang/rust/issues/37519
+    let dart_path = match result {
+        Ok(i) => i,
+        Err(_) => return, // For CI where Flutter is not installed
+    };
     let mut command = Command::new(dart_path);
     command.args(["pub", "global", "activate", "protoc_plugin"]);
     command
