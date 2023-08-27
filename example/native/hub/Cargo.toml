@@ -11,6 +11,10 @@ edition = "2021"
 # `cdylib` is for all other platforms.
 crate-type = ["lib", "cdylib", "staticlib"]
 
+# These are dependencies for `build.rs`.
+[build-dependencies]
+tonic-build = "0.9.2"
+
 # These are dependencies for non-web platforms.
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 libc = "0.2"
@@ -46,7 +50,3 @@ prost = "0.11.9"
 prost-derive = "0.11.9"
 bytes = "1.0"
 sample_crate = { path = "../sample_crate" }
-
-
-[build-dependencies]
-tonic-build = "0.9.2"
