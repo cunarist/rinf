@@ -60,6 +60,14 @@ jobs:
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Setup Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: "rust-cache"
+
+      - name: Setup Protobuf compiler
+        uses: arduino/setup-protoc@v2
+
       - name: Install Clippy
         run: rustup component add clippy
 

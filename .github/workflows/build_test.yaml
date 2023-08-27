@@ -94,7 +94,7 @@ jobs:
         with:
           prefix-key: "rust-cache"
 
-      - name: Setup Protobuf toolchain
+      - name: Setup Protobuf compiler
         uses: arduino/setup-protoc@v2
 
       - name: Setup Ninja and GTK3 toolchain (Only Linux target)
