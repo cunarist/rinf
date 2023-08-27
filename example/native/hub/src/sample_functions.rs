@@ -21,6 +21,7 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
             let request_message = CounterGetRequest::decode(&rust_request.bytes[..]).unwrap();
             let after_value: i32 = sample_crate::add_seven(request_message.before_number);
 
+            // Prepare the response message.
             let response_message = CounterGetResponse {
                 after_number: after_value,
                 dummy_one: request_message.dummy_one,
