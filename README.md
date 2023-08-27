@@ -59,6 +59,8 @@ flutter doctor
 
 # 🔨 Installing Protocol Buffers Compiler (aka. protoc)
 
+Here are only some methods of installing pre-built binary `protoc` on common platforms. If you want to install on other development platforms, or non-binary installation methods, you can refer to [official documents](https://github.com/protocolbuffers/protobuf/blob/main/README.md).
+
 ## For Linux
 
 ### Ubuntu

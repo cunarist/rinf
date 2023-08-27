@@ -61,6 +61,8 @@ flutter doctor
 
 # 🔨 安装 Protocol Buffers 编译器 (简称 protoc)
 
+这里只提到了一些在常见平台上安装预编译的二进制 `protoc` 的方法，如果你想在其他开发平台安装，或者非二进制安装方式，可以参考[官方文档](https://github.com/protocolbuffers/protobuf/blob/main/README.md)。
+
 ## 对于 Linux
 
 ### Ubuntu
