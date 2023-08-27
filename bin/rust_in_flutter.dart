@@ -16,7 +16,7 @@ Future<void> main(List<String> args) async {
       await _buildWebassembly(isReleaseMode: false);
     }
   } else {
-    print("No availableoperation is provided");
+    print("No available operation is provided");
   }
 }
 
@@ -44,10 +44,13 @@ Future<void> _applyTemplate() async {
     return;
   }
 
-  // Copy the `native` folder
+  // Copy basic folders needed for Rust to work
   final templateSource = Directory('$packagePath/example/native');
   final templateDestination = Directory('$projectPath/native');
   await _copyDirectory(templateSource, templateDestination);
+  final messagesSource = Directory('$packagePath/example/messages');
+  final messagesDestination = Directory('$projectPath/messages');
+  await _copyDirectory(messagesSource, messagesDestination);
 
   // Copy `Cargo.toml`
   final cargoSource = File('$packagePath/example/Cargo.toml');
@@ -69,7 +72,8 @@ Future<void> _applyTemplate() async {
   await cargoConfigFile.writeAsString(cargoConfigContent);
 
   // Add some lines to `.gitignore`
-  final sectionTitle = '# Rust related';
+  final rustSectionTitle = '# Rust related';
+  final messageSectionTitle = '# Generated messages';
   final gitignoreFile = File('$projectPath/.gitignore');
   if (!(await gitignoreFile.exists())) {
     await gitignoreFile.create(recursive: true);
@@ -77,16 +81,21 @@ Future<void> _applyTemplate() async {
   final gitignoreContent = await gitignoreFile.readAsString();
   var splitted = gitignoreContent.split('\n\n');
   splitted = splitted.map((s) => s.trim()).toList();
-  if (!gitignoreContent.contains(sectionTitle)) {
-    var text = sectionTitle;
+  if (!gitignoreContent.contains(rustSectionTitle)) {
+    var text = rustSectionTitle;
     text += '\n' + '.cargo/';
     text += '\n' + 'target/';
     splitted.add(text);
   }
+  if (!gitignoreContent.contains(messageSectionTitle)) {
+    var text = messageSectionTitle;
+    text += '\n' + '*/**/messages/';
+    splitted.add(text);
+  }
   await gitignoreFile.writeAsString(splitted.join('\n\n'));
 
-  // Add `msgpack_dart` to Dart dependencies
-  await Process.run('dart', ['pub', 'add', 'msgpack_dart']);
+  // Add Dart dependencies
+  await Process.run('dart', ['pub', 'add', 'protobuf']);
 
   // Modify `./lib/main.dart`
   await Process.run('dart', ['format', './lib/main.dart']);

@@ -94,8 +94,10 @@ jobs:
         with:
           prefix-key: "rust-cache"
 
-      - name: Setup Protobuf toolchain
+      - name: Setup Protobuf compiler
         uses: arduino/setup-protoc@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Ninja and GTK3 toolchain (Only Linux target)
         if: matrix.target == 'linux'
@@ -114,6 +116,10 @@ jobs:
       - name: Fetch dependencies
         working-directory: example/
         run: flutter pub get
+
+      - name: Generate message files
+        working-directory: example/
+        run: cargo check
 
       - name: Build example Flutter app
         if: matrix.target == 'linux'

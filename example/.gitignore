@@ -46,3 +46,6 @@ app.*.map.json
 # Rust related
 .cargo/
 target/
+
+# Generated messages
+*/**/messages/

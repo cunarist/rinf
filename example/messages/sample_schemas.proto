@@ -1,0 +1,6 @@
+package sample_schemas;
+
+message SampleSchema {
+  required bool sample_field_one = 1;
+  required bool sample_field_two = 2;
+}

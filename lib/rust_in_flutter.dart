@@ -44,7 +44,7 @@ class RustInFlutter {
 /// and is very similar to HTTP request.
 /// Returns `RustResponse` object that is somehow calculated
 /// from the Rust side.
-/// If the Rust doesn't respond for 10 seconds,
+/// If the Rust doesn't respond for 60 seconds,
 /// this function will return a failed `RustResponse` object.
 /// You can see the usage example at
 /// https://pub.dev/packages/rust_in_flutter/example.
@@ -56,7 +56,7 @@ Future<RustResponse> requestToRust(RustRequest rustRequest) async {
     return responseUnique.id == id;
   });
   final responseUnique = await future.timeout(
-    const Duration(seconds: 10),
+    const Duration(seconds: 60),
     onTimeout: () {
       return RustResponseUnique(
         id: id,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:msgpack_dart/msgpack_dart.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
+import 'package:rust_in_flutter_example/messages/entry.pbserver.dart';
+import 'package:rust_in_flutter_example/messages/sample_schemas.pbserver.dart';
 
 void main() async {
   // Wait for initialization to be completed first.
@@ -15,17 +15,44 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // This example uses providers for very simple state management.
-      home: ChangeNotifierProvider(
-        create: (context) => HomeNotifier(),
-        child: const Home(),
-      ),
+      home: Home(),
     );
   }
 }
 
 class Home extends StatelessWidget {
-  const Home({super.key});
+  final ValueNotifier<int> _countNotifier = ValueNotifier<int>(0);
+
+  // This method interacts with Rust.
+  void _incrementCount() async {
+    final requestMessage = CounterGetRequest(
+      letter: "Hello from Dart!",
+      beforeNumber: _countNotifier.value,
+      dummyOne: 1,
+      dummyTwo: SampleSchema(
+        sampleFieldOne: true,
+        sampleFieldTwo: false,
+      ),
+      dummyThree: [3, 4, 5],
+    );
+
+    final rustRequest = RustRequest(
+      address: 'basic-category/counter-number',
+      operation: RustOperation.Read,
+      // Convert Dart message object into raw bytes.
+      bytes: requestMessage.writeToBuffer(),
+    );
+
+    // Use `requestToRust` from `rust_in_flutter.dart`
+    // to send the request to Rust and get the response.
+    final rustResponse = await requestToRust(rustRequest);
+
+    if (rustResponse.successful) {
+      // Convert raw bytes into Dart message objects.
+      final responseMessage = CounterGetResponse.fromBuffer(rustResponse.bytes);
+      _countNotifier.value = responseMessage.afterNumber;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +72,7 @@ class Home extends StatelessWidget {
               // only when there are signals
               // with the specific address it is interested in.
               stream: rustBroadcaster.stream.where((rustSignal) {
-                return rustSignal.address == 'sampleCategory.mandelbrot';
+                return rustSignal.address == 'sample-category/mandelbrot';
               }),
               builder: (context, snapshot) {
                 // If the app has just started and widget is built
@@ -86,71 +113,58 @@ class Home extends StatelessWidget {
                 }
               },
             ),
-            // Update the text according to the state.
-            Consumer<HomeNotifier>(
-              builder: (context, notifier, child) {
-                final currentCount = notifier.count;
-                if (currentCount == 0) {
-                  return const Text("Not calculated yet");
-                } else {
-                  return Text(
-                    "Current value is ${currentCount.toString()}",
-                  );
-                }
-              },
-            )
+            CurrentValueText(
+              countNotifier: _countNotifier,
+            ), // Display current value
           ],
         ),
       ),
-      // This is a button that calls the state update method.
+      // This is a button that calls the increment method.
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.read<HomeNotifier>().increment();
-        },
+        onPressed: _incrementCount,
         child: const Icon(Icons.add),
       ),
     );
   }
 }
 
-class HomeNotifier extends ChangeNotifier {
-  int _count = 0;
-  int get count => _count;
+class CurrentValueText extends StatefulWidget {
+  final ValueNotifier<int> countNotifier;
+  const CurrentValueText({required this.countNotifier});
+  @override
+  _CurrentValueTextState createState() => _CurrentValueTextState();
+}
 
-  // This state update method interacts with Rust.
-  void increment() async {
-    final rustRequest = RustRequest(
-      address: 'basicCategory.counterNumber',
-      operation: RustOperation.Read,
-      // Use the `serialize` function
-      // provided by `msgpack_dart.dart`
-      // to convert Dart objects into raw bytes.
-      bytes: serialize(
-        // The message schema is declared at the Rust side.
-        // You can customize the schemas as you want.
-        {
-          'letter': 'Hello from Dart!',
-          'before_number': _count,
-          'dummy_one': 1,
-          'dummy_two': 2,
-          'dummy_three': [3, 4, 5]
-        },
-      ),
-    );
-    // Use `requestToRust` from `rust_in_flutter.dart`
-    // to send the request to Rust and get the response.
-    final rustResponse = await requestToRust(rustRequest);
-    if (!rustResponse.successful) {
-      return;
+class _CurrentValueTextState extends State<CurrentValueText> {
+  late int _currentCount;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentCount = widget.countNotifier.value;
+    widget.countNotifier.addListener(_updateCurrentCount);
+  }
+
+  void _updateCurrentCount() {
+    setState(() {
+      _currentCount = widget.countNotifier.value;
+    });
+  }
+
+  @override
+  void dispose() {
+    widget.countNotifier.removeListener(_updateCurrentCount);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_currentCount == 0) {
+      return const Text("Not calculated yet");
+    } else {
+      return Text(
+        "Current value is $_currentCount",
+      );
     }
-    // Use the `deserialize` function
-    // provided by `msgpack_dart.dart`
-    // to convert raw bytes into Dart objects.
-    // You have to explicitly tell the deserialized type
-    // with `as` keyword for proper type checking in Dart.
-    final message = deserialize(rustResponse.bytes) as Map;
-    final innerValue = message['after_number'] as int;
-    _count = innerValue;
-    notifyListeners();
   }
 }

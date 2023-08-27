@@ -6,51 +6,33 @@ use crate::bridge::api::RustRequest;
 use crate::bridge::api::RustResponse;
 use crate::bridge::api::RustSignal;
 use crate::bridge::send_rust_signal;
-use rmp_serde::from_slice;
-use rmp_serde::to_vec_named;
-use serde::Deserialize;
-use serde::Serialize;
+use crate::messages;
+use prost::Message;
 
 pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
         RustOperation::Read => {
-            // We declare MessagePack structs in this match condition
+            // We import message structs in this match condition
             // because schema will differ by the operation type.
-            #[allow(dead_code)]
-            #[derive(Deserialize)]
-            struct RustRequestSchema {
-                letter: String,
-                before_number: i32,
-                dummy_one: i32,
-                dummy_two: i32,
-                dummy_three: Vec<i32>,
-            }
-            let slice = rust_request.bytes.as_slice();
-            let received: RustRequestSchema = from_slice(slice).unwrap();
-            crate::print!("{:?}", received.letter);
+            use messages::entry::{CounterGetRequest, CounterGetResponse};
 
-            let before_value = received.before_number;
-            let after_value = sample_crate::add_seven(before_value);
+            // Decode raw bytes into a Rust message object.
+            let request_message = CounterGetRequest::decode(&rust_request.bytes[..]).unwrap();
+            let after_value: i32 = sample_crate::add_seven(request_message.before_number);
 
-            #[derive(Serialize)]
-            struct RustResponseSchema {
-                after_number: i32,
-                dummy_one: i32,
-                dummy_two: i32,
-                dummy_three: Vec<i32>,
-            }
+            // Prepare the response message.
+            let response_message = CounterGetResponse {
+                after_number: after_value,
+                dummy_one: request_message.dummy_one,
+                dummy_two: request_message.dummy_two,
+                dummy_three: request_message.dummy_three,
+            };
+
+            // Return the response object.
             RustResponse {
                 successful: true,
-                // Use `to_vec_named` from `rmp_serde`
-                // to serialize the message.
-                bytes: to_vec_named(&RustResponseSchema {
-                    after_number: after_value,
-                    dummy_one: 1,
-                    dummy_two: 2,
-                    dummy_three: vec![3, 4, 5],
-                })
-                .unwrap(),
+                bytes: response_message.encode_to_vec(),
             }
         }
         RustOperation::Update => RustResponse::default(),
@@ -81,7 +63,7 @@ pub async fn keep_drawing_mandelbrot() {
         );
         if let Ok(mandelbrot) = calculated {
             let rust_signal = RustSignal {
-                address: String::from("sampleCategory.mandelbrot"),
+                address: String::from("sample-category/mandelbrot"),
                 bytes: mandelbrot,
             };
             send_rust_signal(rust_signal);
