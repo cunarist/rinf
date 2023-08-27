@@ -32,6 +32,7 @@ Flutter 支持的所有平台都经过了[测试](https://github.com/cunarist/ru
 - Rust 与 Flutter 集成，能够使用任意数量的库 crate
 - 异步交互，无阻塞
 - RESTful API，Dart 发起请求，Rust 作出响应，简单易用
+- 基于 Protobuf 的类型安全且灵活的消息处理
 - 从 Rust 流式传输到 Dart
 - 在 Dart 的热重启上重新启动 Rust 逻辑
 - 发送本地数据时无需进行内存复制

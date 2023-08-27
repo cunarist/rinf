@@ -32,6 +32,7 @@ Flutter의 모든 플랫폼은 [테스트](https://github.com/cunarist/rust-in-f
 - Rust를 Flutter에 통합하고 원하는 만큼의 Crate를 사용 가능함
 - Blocking 없는 비동기 상호작용
 - 손쉬운 Dart로부터의 요청과 Rust에서의 응답으로 이루어진 RESTful API
+- Protobuf로 구현되어 타입 안전하고 유연한 메시지 처리
 - Rust에서 Dart로의 스트리밍
 - Dart의 Hot restart 시 자동으로 재시작되는 Rust 로직
 - 네이티브 데이터 전송 시 메모리 복사 없음

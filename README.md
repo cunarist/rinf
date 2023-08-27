@@ -32,6 +32,7 @@ All platforms available with Flutter are [tested](https://github.com/cunarist/ru
 - Rust integration with the ability to use an arbitrary number of library crates
 - Async interaction with no blocking
 - RESTful API with easy request from Dart and response from Rust
+- Type-safe and flexible messages powered by Protobuf
 - Streaming from Rust to Dart
 - Automatic restart of Rust logic on Dart's hot restart
 - No memory copy when sending native data
