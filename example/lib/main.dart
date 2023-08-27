@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:msgpack_dart/msgpack_dart.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
+import 'package:rust_in_flutter_example/src/gen/counter.pbserver.dart';
 
 void main() async {
   // Wait for initialization to be completed first.
@@ -119,38 +119,35 @@ class HomeNotifier extends ChangeNotifier {
 
   // This state update method interacts with Rust.
   void increment() async {
+    CounterRequest request = CounterRequest();
+    request.letter = "Hello from Dart!";
+    request.beforeNumber = _count;
+    request.dummyOne = 1;
+    request.dummyTwo = 2;
+    request.dummyThree.addAll([3, 4, 5]);
+
     final rustRequest = RustRequest(
       address: 'basicCategory.counterNumber',
       operation: RustOperation.Read,
       // Use the `serialize` function
       // provided by `msgpack_dart.dart`
       // to convert Dart objects into raw bytes.
-      bytes: serialize(
-        // The message schema is declared at the Rust side.
-        // You can customize the schemas as you want.
-        {
-          'letter': 'Hello from Dart!',
-          'before_number': _count,
-          'dummy_one': 1,
-          'dummy_two': 2,
-          'dummy_three': [3, 4, 5]
-        },
-      ),
+      bytes: request.writeToBuffer(),
     );
     // Use `requestToRust` from `rust_in_flutter.dart`
     // to send the request to Rust and get the response.
     final rustResponse = await requestToRust(rustRequest);
     if (!rustResponse.successful) {
       return;
+    } else {
+      // Use the `deserialize` function
+      // provided by `msgpack_dart.dart`
+      // to convert raw bytes into Dart objects.
+      // You have to explicitly tell the deserialized type
+      // with `as` keyword for proper type checking in Dart.
+      final counterResponse = CounterResponse.fromBuffer(rustResponse.bytes);
+      _count = counterResponse.afterNumber;
+      notifyListeners();
     }
-    // Use the `deserialize` function
-    // provided by `msgpack_dart.dart`
-    // to convert raw bytes into Dart objects.
-    // You have to explicitly tell the deserialized type
-    // with `as` keyword for proper type checking in Dart.
-    final message = deserialize(rustResponse.bytes) as Map;
-    final innerValue = message['after_number'] as int;
-    _count = innerValue;
-    notifyListeners();
   }
 }
