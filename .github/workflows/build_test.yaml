@@ -117,6 +117,10 @@ jobs:
         working-directory: example/
         run: flutter pub get
 
+      - name: Generate message files
+        working-directory: example/
+        run: cargo check
+
       - name: Build example Flutter app
         if: matrix.target == 'linux'
         working-directory: example/
