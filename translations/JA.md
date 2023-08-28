@@ -302,18 +302,6 @@ pub async fn some_data(rust_request: RustRequest) -> RustResponse {
 import 'package:my_flutter_project/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
-ElevatedButton(
-  onPressed: () async {
-    final requestMessage = SomeDataGetRequest(
-      inputNumbers: [3, 4, 5],
-      inputString: 'Zero-cost abstraction',
-    );
-    final rustRequest = RustRequest(
-      address: 'basic-category/counter-number',
-      operation: RustOperation.Read,
-      // Convert Dart message object into raw bytes.
-      bytes: requestMessage.writeToBuffer(),
-    );
     final rustResponse = await requestToRust(rustRequest);
     final responseMessage = SomeDataGetResponse.fromBuffer(
       rustResponse.bytes,
