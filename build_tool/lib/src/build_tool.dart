@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:build_tool/src/verify_binaries.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart';
 import 'package:github/github.dart';
 import 'package:hex/hex.dart';
@@ -16,6 +15,7 @@ import 'options.dart';
 import 'precompile_binaries.dart';
 import 'target.dart';
 import 'util.dart';
+import 'verify_binaries.dart';
 
 final log = Logger('build_tool');
 
