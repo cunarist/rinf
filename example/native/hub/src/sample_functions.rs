@@ -6,7 +6,6 @@ use crate::bridge::api::RustRequest;
 use crate::bridge::api::RustResponse;
 use crate::bridge::api::RustSignal;
 use crate::bridge::send_rust_signal;
-use crate::messages;
 use prost::Message;
 
 pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
@@ -15,7 +14,7 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
         RustOperation::Read => {
             // We import message structs in this match condition
             // because schema will differ by the operation type.
-            use messages::entry::{CounterGetRequest, CounterGetResponse};
+            use crate::messages::entry::{CounterGetRequest, CounterGetResponse};
 
             // Decode raw bytes into a Rust message object.
             let request_message = CounterGetRequest::decode(&rust_request.bytes[..]).unwrap();

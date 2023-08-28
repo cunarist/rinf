@@ -267,7 +267,7 @@ pub async fn some_data(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
         RustOperation::Read => {
-            use messages::entry::{SomeDataGetRequest, SomeDataGetResponse};
+            use crate::messages::entry::{SomeDataGetRequest, SomeDataGetResponse};
 
             let request_message = SomeDataGetRequest::decode(&rust_request.bytes[..]).unwrap();
 
@@ -282,7 +282,6 @@ pub async fn some_data(rust_request: RustRequest) -> RustResponse {
                 output_numbers: new_numbers,
                 output_string: new_string,
             };
-
             RustResponse {
                 successful: true,
                 bytes: response_message.encode_to_vec(),
@@ -381,7 +380,7 @@ use crate::bridge::send_rust_signal;
 pub async fn keep_sending_numbers() {
     let mut current_number: i32 = 1;
     loop {
-        use messages::entry::IncreasingNumbersSignal;
+        use crate::messages::entry::IncreasingNumbersSignal;
 
         crate::time::sleep(std::time::Duration::from_secs(1)).await;
 
