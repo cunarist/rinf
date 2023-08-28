@@ -14,10 +14,10 @@ cd "$CARGOKIT_TOOL_TEMP_DIR"
 
 BUILD_TOOL_PKG_DIR="$BASEDIR/build_tool"
 
-if [[ -v FLUTTER_ROOT ]]; then
-  DART="$FLUTTER_ROOT/bin/cache/dart-sdk/bin/dart"
-else
+if [[ -z $FLUTTER_ROOT ]]; then # not defined
   DART=dart
+else
+  DART="$FLUTTER_ROOT/bin/cache/dart-sdk/bin/dart"
 fi
 
 cat << EOF > "pubspec.yaml"
