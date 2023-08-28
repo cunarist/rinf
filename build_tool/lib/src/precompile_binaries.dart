@@ -157,7 +157,8 @@ class PrecompileBinaries {
               rethrow;
             }
             ++retryCount;
-            _log.shout('Upload failed (attempt $retryCount, will retry): ${e.toString()}');
+            _log.shout(
+                'Upload failed (attempt $retryCount, will retry): ${e.toString()}');
             await Future.delayed(Duration(seconds: 2));
           }
         }
