@@ -19,17 +19,17 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
 
             // Decode raw bytes into a Rust message object.
             let request_message = CounterGetRequest::decode(&rust_request.bytes[..]).unwrap();
+
+            // Perform a simple calculation.
             let after_value: i32 = sample_crate::add_seven(request_message.before_number);
 
-            // Prepare the response message.
+            // Return the response that will be sent to Dart.
             let response_message = CounterGetResponse {
                 after_number: after_value,
                 dummy_one: request_message.dummy_one,
                 dummy_two: request_message.dummy_two,
                 dummy_three: request_message.dummy_three,
             };
-
-            // Return the response object.
             RustResponse {
                 successful: true,
                 bytes: response_message.encode_to_vec(),
@@ -43,12 +43,15 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
 pub async fn keep_drawing_mandelbrot() {
     let mut scale: f64 = 1.0;
     let mut interval = crate::time::interval(std::time::Duration::from_millis(50));
+
     loop {
         interval.tick().await;
+
         scale *= 0.95;
         if scale < 1e-7 {
             scale = 1.0
         };
+
         let calculated = sample_crate::mandelbrot(
             sample_crate::Size {
                 width: 64,
@@ -61,7 +64,9 @@ pub async fn keep_drawing_mandelbrot() {
             scale,
             4,
         );
+
         if let Ok(mandelbrot) = calculated {
+            // Stream the signal to Dart.
             let rust_signal = RustSignal {
                 address: String::from("sample-category/mandelbrot"),
                 bytes: mandelbrot,

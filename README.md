@@ -91,6 +91,7 @@ Once you've run the command, there will be some new files and folders that will 
 +   ├── native/
 +   │   ├── hub/
 +   │   │   ├── src/
++   │   │   ├── build.rs
 +   │   │   └── Cargo.toml
 +   │   ├── sample_crate/
 +   │   │   ├── src/
@@ -172,6 +173,7 @@ Then create message schemas with Protobuf.
 ```proto
 // messages/entry.proto
 ...
+
 message SomeDataGetRequest {
   repeated int32 input_numbers = 1;
   string input_string = 2;
@@ -204,7 +206,7 @@ ElevatedButton(
       inputString: 'Zero-cost abstraction',
     );
     final rustRequest = RustRequest(
-      address: 'basic-category/counter-number',
+      address: 'my-category/some-data',
       operation: RustOperation.Read,
       bytes: requestMessage.writeToBuffer(),
     );
@@ -227,7 +229,7 @@ So, our new API address is `my-category/some-data`. Make sure that the request h
 use crate::bridge::api::RustResponse;
 use crate::sample_functions;
 ...
-let layered: Vec<&str> = rust_request.address.split('.').collect();
+let layered: Vec<&str> = rust_request.address.split('/').collect();
 let rust_response = if layered.is_empty() {
     RustResponse::default()
 } else if layered[0] == "basic-category" {
@@ -348,7 +350,7 @@ Let's start from our [default example](https://github.com/cunarist/rust-in-flutt
 mod sample_functions;
 ...
 crate::spawn(sample_functions::keep_drawing_mandelbrot());
-crate::spawn(sample_functions::keep_sending_numbers());
+crate::spawn(sample_functions::keep_sending_numbers()); // ADD THIS LINE
 while let Some(request_unique) = request_receiver.recv().await {
 ...
 ```
@@ -384,12 +386,12 @@ pub async fn keep_sending_numbers() {
         crate::time::sleep(std::time::Duration::from_secs(1)).await;
 
         let signal_message = IncreasingNumbersSignal { current_number };
-
         let rust_signal = RustSignal {
             address: String::from("my-category/increasing-numbers"),
             bytes: signal_message.encode_to_vec(),
         };
         send_rust_signal(rust_signal);
+
         current_number += 1;
     }
 }
