@@ -54,6 +54,7 @@ class CrateHash {
 
     final data = ByteData(8);
     for (final file in files) {
+      input.add(utf8.encode(file.path));
       final stat = file.statSync();
       data.setUint64(0, stat.size);
       input.add(data.buffer.asUint8List());
