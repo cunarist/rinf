@@ -80,6 +80,16 @@ fn main() {
         .output()
         .expect("Cannot globally install `protoc_plugin` Dart package");
 
+    //Add protoc-gen-dart's parent folder to environment variable `PATH`.
+    env::set_var(
+        "PATH",
+        format!(
+            "{}:{}/.pub-cache/bin",
+            env::var("PATH").unwrap(),
+            env::var("HOME").unwrap(),
+        ),
+    );
+
     // Generate Dart message files.
     let output_path = "../../lib/messages";
     let _ = fs::create_dir(output_path);
