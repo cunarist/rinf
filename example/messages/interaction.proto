@@ -1,5 +1,5 @@
 syntax = "proto3";
-package entry;
+package interaction;
 
 import "sample_schemas.proto";
 

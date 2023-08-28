@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
-import 'package:rust_in_flutter_example/messages/entry.pbserver.dart';
+import 'package:rust_in_flutter_example/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter_example/messages/sample_schemas.pbserver.dart';
 
 void main() async {

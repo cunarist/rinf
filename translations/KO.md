@@ -88,7 +88,7 @@ dart run rust_in_flutter template
     │   └── ...
     ├── linux/
 +   ├── messages/
-+   │   ├── entry.proto
++   │   ├── interaction.proto
 +   │   └── sample_schemas.proto
 +   ├── native/
 +   │   ├── hub/
@@ -173,7 +173,7 @@ child: Column(
 그리고 Protobuf를 사용하여 메시지 형식을 만드세요.
 
 ```proto
-// messages/entry.proto
+// messages/interaction.proto
 ...
 
 message SomeDataGetRequest {
@@ -198,7 +198,7 @@ cargo check
 ```dart
 // lib/main.dart
 ...
-import 'package:my_flutter_project/messages/entry.pbserver.dart';
+import 'package:my_flutter_project/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
 ElevatedButton(
@@ -269,7 +269,7 @@ pub async fn some_data(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
         RustOperation::Read => {
-            use crate::messages::entry::{SomeDataGetRequest, SomeDataGetResponse};
+            use crate::messages::interaction::{SomeDataGetRequest, SomeDataGetResponse};
 
             let request_message = SomeDataGetRequest::decode(&rust_request.bytes[..]).unwrap();
 
@@ -301,7 +301,7 @@ pub async fn some_data(rust_request: RustRequest) -> RustResponse {
 ```dart
 // lib/main.dart
 ...
-import 'package:my_flutter_project/messages/entry.pbserver.dart';
+import 'package:my_flutter_project/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
 ElevatedButton(
@@ -359,7 +359,7 @@ while let Some(request_unique) = request_receiver.recv().await {
 메시지 유형을 정의하세요.
 
 ```proto
-// messages/entry.proto
+// messages/interaction.proto
 ...
 message IncreasingNumbersSignal { int32 current_number = 1; }
 ...
@@ -382,7 +382,7 @@ use crate::bridge::send_rust_signal;
 pub async fn keep_sending_numbers() {
     let mut current_number: i32 = 1;
     loop {
-        use crate::messages::entry::IncreasingNumbersSignal;
+        use crate::messages::interaction::IncreasingNumbersSignal;
 
         crate::time::sleep(std::time::Duration::from_secs(1)).await;
 
@@ -404,7 +404,7 @@ pub async fn keep_sending_numbers() {
 ```dart
 // lib/main.dart
 ...
-import 'package:my_flutter_project/messages/entry.pbserver.dart';
+import 'package:my_flutter_project/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
 children: [

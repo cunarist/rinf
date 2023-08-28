@@ -86,7 +86,7 @@ Once you've run the command, there will be some new files and folders that will 
     │   └── ...
     ├── linux/
 +   ├── messages/
-+   │   ├── entry.proto
++   │   ├── interaction.proto
 +   │   └── sample_schemas.proto
 +   ├── native/
 +   │   ├── hub/
@@ -171,7 +171,7 @@ child: Column(
 Then create message schemas with Protobuf.
 
 ```proto
-// messages/entry.proto
+// messages/interaction.proto
 ...
 
 message SomeDataGetRequest {
@@ -196,7 +196,7 @@ cargo check
 ```dart
 // lib/main.dart
 ...
-import 'package:my_flutter_project/messages/entry.pbserver.dart';
+import 'package:my_flutter_project/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
 ElevatedButton(
@@ -267,7 +267,7 @@ pub async fn some_data(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
         RustOperation::Read => {
-            use crate::messages::entry::{SomeDataGetRequest, SomeDataGetResponse};
+            use crate::messages::interaction::{SomeDataGetRequest, SomeDataGetResponse};
 
             let request_message = SomeDataGetRequest::decode(&rust_request.bytes[..]).unwrap();
 
@@ -299,7 +299,7 @@ Finally, when you receive a response from Rust in Dart, you can do anything with
 ```dart
 // lib/main.dart
 ...
-import 'package:my_flutter_project/messages/entry.pbserver.dart';
+import 'package:my_flutter_project/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
 ElevatedButton(
@@ -357,7 +357,7 @@ while let Some(request_unique) = request_receiver.recv().await {
 Define the message schema.
 
 ```proto
-// messages/entry.proto
+// messages/interaction.proto
 ...
 message IncreasingNumbersSignal { int32 current_number = 1; }
 ...
@@ -380,7 +380,7 @@ use crate::bridge::send_rust_signal;
 pub async fn keep_sending_numbers() {
     let mut current_number: i32 = 1;
     loop {
-        use crate::messages::entry::IncreasingNumbersSignal;
+        use crate::messages::interaction::IncreasingNumbersSignal;
 
         crate::time::sleep(std::time::Duration::from_secs(1)).await;
 
@@ -402,7 +402,7 @@ Finally, receive the signals in Dart with `StreamBuilder`, filter them by addres
 ```dart
 // lib/main.dart
 ...
-import 'package:my_flutter_project/messages/entry.pbserver.dart';
+import 'package:my_flutter_project/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
 children: [

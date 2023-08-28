@@ -14,7 +14,7 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
         RustOperation::Read => {
             // We import message structs in this match condition
             // because schema will differ by the operation type.
-            use crate::messages::entry::{CounterGetRequest, CounterGetResponse};
+            use crate::messages::interaction::{CounterGetRequest, CounterGetResponse};
 
             // Decode raw bytes into a Rust message object.
             let request_message = CounterGetRequest::decode(&rust_request.bytes[..]).unwrap();
