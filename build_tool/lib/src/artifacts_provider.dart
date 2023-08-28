@@ -16,8 +16,22 @@ class Artifact {
   /// File system location of the artifact.
   final String path;
 
-  /// Actual file name that the artifact should have in destination folder.ƒ
+  /// Actual file name that the artifact should have in destination folder.
   final String finalFileName;
+
+  AritifactType get type {
+    if (finalFileName.endsWith('.dll') ||
+        finalFileName.endsWith('.dll.lib') ||
+        finalFileName.endsWith('.pdb') ||
+        finalFileName.endsWith('.so') ||
+        finalFileName.endsWith('.dylib')) {
+      return AritifactType.dylib;
+    } else if (finalFileName.endsWith('.lib') || finalFileName.endsWith('.a')) {
+      return AritifactType.staticlib;
+    } else {
+      throw Exception('Unknown artifact type for $finalFileName');
+    }
+  }
 
   Artifact({
     required this.path,
@@ -50,18 +64,29 @@ class ArtifactProvider {
     for (final target in targets) {
       final builder = RustBuilder(target: target, environment: environment);
       builder.prepare(rustup);
-      final targetDir = await builder.build();
-      final artifactNames = getArtifactNames(
-        target: target,
-        libraryName: environment.libName,
-        remote: false,
-      );
       _log.info('Building ${environment.libName} for $target');
+      final targetDir = await builder.build();
+      // For local build accept both static and dynamic libraries.
+      final artifactNames = <String>{
+        ...getArtifactNames(
+          target: target,
+          libraryName: environment.libName,
+          aritifactType: AritifactType.dylib,
+          remote: false,
+        ),
+        ...getArtifactNames(
+          target: target,
+          libraryName: environment.libName,
+          aritifactType: AritifactType.staticlib,
+          remote: false,
+        )
+      };
       final artifacts = artifactNames
           .map((artifactName) => Artifact(
                 path: path.join(targetDir, artifactName),
                 finalFileName: artifactName,
               ))
+          .where((element) => File(element.path).existsSync())
           .toList();
       result[target] = artifacts;
     }

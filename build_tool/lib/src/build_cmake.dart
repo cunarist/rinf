@@ -28,8 +28,10 @@ class BuildCMake {
     final libs = artifacts[target]!;
 
     for (final lib in libs) {
-      File(lib.path)
-          .copySync(path.join(Environment.outputDir, lib.finalFileName));
+      if (lib.type == AritifactType.dylib) {
+        File(lib.path)
+            .copySync(path.join(Environment.outputDir, lib.finalFileName));
+      }
     }
   }
 }

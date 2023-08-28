@@ -39,14 +39,46 @@ class BuildPod {
       ]);
     }
 
-    final finalTargetFile =
-        path.join(Environment.outputDir, "lib${environment.libName}.a");
-    Directory(Environment.outputDir).createSync(recursive: true);
+    final outputDir = Environment.outputDir;
 
-    final libraries = artifacts.values.map(
-      (e) => e.first.path,
-    );
+    Directory(outputDir).createSync(recursive: true);
 
-    performLipo(finalTargetFile, libraries);
+    final staticLibs = artifacts.values
+        .expand((element) => element)
+        .where((element) => element.type == AritifactType.staticlib)
+        .toList();
+    final dynamicLibs = artifacts.values
+        .expand((element) => element)
+        .where((element) => element.type == AritifactType.dylib)
+        .toList();
+
+    // If there is static lib, use it and link it with pod
+    if (staticLibs.isNotEmpty) {
+      final finalTargetFile =
+          path.join(outputDir, "lib${environment.libName}.a");
+      performLipo(finalTargetFile, staticLibs.map((e) => e.path));
+    } else {
+      // Otherwise try to replace bundle dylib with our dylib
+      final bundlePaths = [
+        '${environment.libName}.framework/Versions/A/${environment.libName}',
+        '${environment.libName}.framework/${environment.libName}',
+      ];
+
+      for (final bundlePath in bundlePaths) {
+        final targetFile = path.join(outputDir, bundlePath);
+        if (File(targetFile).existsSync()) {
+          performLipo(targetFile, dynamicLibs.map((e) => e.path));
+
+          // Replace absolute id with @rpath one so that it works properly
+          // when moved to Frameworks.
+          runCommand("install_name_tool", [
+            '-id',
+            '@rpath/$bundlePath',
+            targetFile,
+          ]);
+        }
+      }
+      throw Exception('Unable to find bundle for dynamic library');
+    }
   }
 }

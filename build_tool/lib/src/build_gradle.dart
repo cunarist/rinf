@@ -37,7 +37,9 @@ class BuildGradle {
       Directory(outputDir).createSync(recursive: true);
 
       for (final lib in libs) {
-        File(lib.path).copySync(path.join(outputDir, lib.finalFileName));
+        if (lib.type == AritifactType.dylib) {
+          File(lib.path).copySync(path.join(outputDir, lib.finalFileName));
+        }
       }
     }
   }
