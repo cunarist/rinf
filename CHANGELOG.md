@@ -1,3 +1,7 @@
+## 3.0.2
+
+- Polished guides, comments and template code.
+
 ## 3.0.1
 
 - Fixed and organized tutorials and comments.
