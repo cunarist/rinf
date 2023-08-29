@@ -1,6 +1,5 @@
 use std::env;
 use std::fs;
-use std::path::{Path, PathBuf};
 use std::process::Command;
 
 fn main() {
@@ -48,14 +47,13 @@ fn main() {
         }
     }
     let result = tonic_build::configure()
-        .out_dir("src/messages")
-        .compile(&proto_filenames, &["../../messages"]);
+        .out_dir(rust_output_path.to_str().unwrap())
+        .compile(&proto_filenames, &[proto_path.to_str().unwrap()]);
     result.expect("Could not compile `.proto` files into Rust");
 
     // Generate `mod.rs` for `messages` module in Rust.
-    let module_folder = Path::new("src/messages");
     #[allow(clippy::if_same_then_else)]
-    let message_files = fs::read_dir(module_folder)
+    let message_files = fs::read_dir(&rust_output_path)
         .expect("Failed to read directory")
         .filter_map(|entry| {
             let entry = entry.expect("Error reading directory entry");
@@ -77,7 +75,7 @@ fn main() {
         })
         .collect::<Vec<_>>()
         .join("\n");
-    let mod_rs_path = PathBuf::from(module_folder).join("mod.rs");
+    let mod_rs_path = rust_output_path.join("mod.rs");
     fs::write(mod_rs_path, mod_rs_content).expect("Failed to write mod.rs");
 
     // Install `protoc_plugin` for Dart.
@@ -101,8 +99,8 @@ fn main() {
     let mut command = Command::new("protoc");
     command.current_dir(flutter_project_path);
     command.args([
-        "--proto_path=messages",
-        "--dart_out=lib/messages",
+        &format!("--proto_path={}", proto_path.to_str().unwrap()),
+        &format!("--dart_out={}", dart_output_path.to_str().unwrap()),
         "--fatal_warnings",
     ]);
     command.args(proto_filenames);
