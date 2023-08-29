@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
-import 'package:rust_in_flutter_example/messages/entry.pbserver.dart';
+import 'package:rust_in_flutter_example/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter_example/messages/sample_schemas.pbserver.dart';
 
 void main() async {
@@ -25,7 +25,7 @@ class Home extends StatelessWidget {
 
   // This method interacts with Rust.
   void _incrementCount() async {
-    final requestMessage = CounterGetRequest(
+    final requestMessage = CounterReadRequest(
       letter: "Hello from Dart!",
       beforeNumber: _countNotifier.value,
       dummyOne: 1,
@@ -49,7 +49,8 @@ class Home extends StatelessWidget {
 
     if (rustResponse.successful) {
       // Convert raw bytes into Dart message objects.
-      final responseMessage = CounterGetResponse.fromBuffer(rustResponse.bytes);
+      final responseMessage =
+          CounterReadResponse.fromBuffer(rustResponse.bytes);
       _countNotifier.value = responseMessage.afterNumber;
     }
   }

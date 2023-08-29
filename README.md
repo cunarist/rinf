@@ -35,13 +35,17 @@ All platforms available with Flutter are [tested](https://github.com/cunarist/ru
 - Automatic restart of Rust logic on Dart's hot restart
 - No memory copy when sending native data
 
+## Why Use Flutter?
+
+While Rust is a powerful language for high-performance native programming, its ecosystem for building graphical user interfaces is far from being mature. Though it already has some GUI frameworks like `iced`, `egui`, `gtk-rs`, and others, it doesn't compete with extensive support and smooth development experience that Flutter provides. It's only Flutter that compiles to all 6 major platforms from a single codebase.
+
+Flutter is a powerful and versatile framework that has gained immense popularity for building cross-platform applications with stunning user interfaces. It provides declarative pattern, beautiful widgets, hot reload, convenient debugging tools, and dedicated packages for user interfaces right out-of-the-box.
+
 ## Why Use Rust?
 
 While Dart excels as an amazing object-oriented language for GUI apps, its non-native garbage collection may not always meet demanding performance requirements. This is where Rust steps in, offering an incredible speed advantage of roughly [2~40 times faster](https://programming-language-benchmarks.vercel.app/dart-vs-rust) than Dart, alongside the ability to leverage multiple threads.
 
 Rust has garnered a devoted following, being [the most loved programming language](https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages) on Stack Overflow. Its native performance, thanks to the zero-cost abstraction philosophy, ensures high productivity. Many developers foresee Rust potentially replacing C++ in the future. Rust's simplicity, memory safety, superior performance in various scenarios, vibrant community, and robust tooling support contribute to its growing popularity.
-
-To delve deeper into the world of Rust, check out the official book: [https://doc.rust-lang.org/book/foreword.html](https://doc.rust-lang.org/book/foreword.html).
 
 # 🛠️ Installing Components
 
@@ -86,11 +90,12 @@ Once you've run the command, there will be some new files and folders that will 
     │   └── ...
     ├── linux/
 +   ├── messages/
-+   │   ├── entry.proto
++   │   ├── interaction.proto
 +   │   └── sample_schemas.proto
 +   ├── native/
 +   │   ├── hub/
 +   │   │   ├── src/
++   │   │   ├── build.rs
 +   │   │   └── Cargo.toml
 +   │   ├── sample_crate/
 +   │   │   ├── src/
@@ -170,20 +175,21 @@ child: Column(
 Then create message schemas with Protobuf.
 
 ```proto
-// messages/entry.proto
+// messages/interaction.proto
 ...
-message SomeDataGetRequest {
+
+message SomeDataReadRequest {
   repeated int32 input_numbers = 1;
   string input_string = 2;
 }
 
-message SomeDataGetResponse {
+message SomeDataReadResponse {
   repeated int32 output_numbers = 1;
   string output_string = 2;
 }
 ```
 
-Next, generate Dart and Rust message code from `.proto` files. This command invokes `native/hub/build.rs`.
+Next, generate Dart and Rust message code from `.proto` files. This command invokes `./native/hub/build.rs`.
 
 ```bash
 cargo check
@@ -194,17 +200,17 @@ cargo check
 ```dart
 // lib/main.dart
 ...
-import 'package:my_flutter_project/messages/entry.pbserver.dart';
+import 'package:my_flutter_project/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
 ElevatedButton(
   onPressed: () async {
-    final requestMessage = SomeDataGetRequest(
+    final requestMessage = SomeDataReadRequest(
       inputNumbers: [3, 4, 5],
       inputString: 'Zero-cost abstraction',
     );
     final rustRequest = RustRequest(
-      address: 'basic-category/counter-number',
+      address: 'my-category/some-data',
       operation: RustOperation.Read,
       bytes: requestMessage.writeToBuffer(),
     );
@@ -227,7 +233,7 @@ So, our new API address is `my-category/some-data`. Make sure that the request h
 use crate::bridge::api::RustResponse;
 use crate::sample_functions;
 ...
-let layered: Vec<&str> = rust_request.address.split('.').collect();
+let layered: Vec<&str> = rust_request.address.split('/').collect();
 let rust_response = if layered.is_empty() {
     RustResponse::default()
 } else if layered[0] == "basic-category" {
@@ -265,9 +271,9 @@ pub async fn some_data(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
         RustOperation::Read => {
-            use messages::entry::{SomeDataGetRequest, SomeDataGetResponse};
+            use crate::messages::interaction::{SomeDataReadRequest, SomeDataReadResponse};
 
-            let request_message = SomeDataGetRequest::decode(&rust_request.bytes[..]).unwrap();
+            let request_message = SomeDataReadRequest::decode(&rust_request.bytes[..]).unwrap();
 
             let new_numbers: Vec<i32> = request_message
                 .input_numbers
@@ -276,11 +282,10 @@ pub async fn some_data(rust_request: RustRequest) -> RustResponse {
                 .collect();
             let new_string = request_message.input_string.to_uppercase();
 
-            let response_message = SomeDataGetResponse {
+            let response_message = SomeDataReadResponse {
                 output_numbers: new_numbers,
                 output_string: new_string,
             };
-
             RustResponse {
                 successful: true,
                 bytes: response_message.encode_to_vec(),
@@ -298,23 +303,11 @@ Finally, when you receive a response from Rust in Dart, you can do anything with
 ```dart
 // lib/main.dart
 ...
-import 'package:my_flutter_project/messages/entry.pbserver.dart';
+import 'package:my_flutter_project/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
-ElevatedButton(
-  onPressed: () async {
-    final requestMessage = SomeDataGetRequest(
-      inputNumbers: [3, 4, 5],
-      inputString: 'Zero-cost abstraction',
-    );
-    final rustRequest = RustRequest(
-      address: 'basic-category/counter-number',
-      operation: RustOperation.Read,
-      // Convert Dart message object into raw bytes.
-      bytes: requestMessage.writeToBuffer(),
-    );
     final rustResponse = await requestToRust(rustRequest);
-    final responseMessage = SomeDataGetResponse.fromBuffer(
+    final responseMessage = SomeDataReadResponse.fromBuffer(
       rustResponse.bytes,
     );
     print(responseMessage.outputNumbers);
@@ -348,7 +341,7 @@ Let's start from our [default example](https://github.com/cunarist/rust-in-flutt
 mod sample_functions;
 ...
 crate::spawn(sample_functions::keep_drawing_mandelbrot());
-crate::spawn(sample_functions::keep_sending_numbers());
+crate::spawn(sample_functions::keep_sending_numbers()); // ADD THIS LINE
 while let Some(request_unique) = request_receiver.recv().await {
 ...
 ```
@@ -356,7 +349,7 @@ while let Some(request_unique) = request_receiver.recv().await {
 Define the message schema.
 
 ```proto
-// messages/entry.proto
+// messages/interaction.proto
 ...
 message IncreasingNumbersSignal { int32 current_number = 1; }
 ...
@@ -379,17 +372,17 @@ use crate::bridge::send_rust_signal;
 pub async fn keep_sending_numbers() {
     let mut current_number: i32 = 1;
     loop {
-        use messages::entry::IncreasingNumbersSignal;
+        use crate::messages::interaction::IncreasingNumbersSignal;
 
         crate::time::sleep(std::time::Duration::from_secs(1)).await;
 
         let signal_message = IncreasingNumbersSignal { current_number };
-
         let rust_signal = RustSignal {
             address: String::from("my-category/increasing-numbers"),
             bytes: signal_message.encode_to_vec(),
         };
         send_rust_signal(rust_signal);
+
         current_number += 1;
     }
 }
@@ -401,7 +394,7 @@ Finally, receive the signals in Dart with `StreamBuilder`, filter them by addres
 ```dart
 // lib/main.dart
 ...
-import 'package:my_flutter_project/messages/entry.pbserver.dart';
+import 'package:my_flutter_project/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
 children: [

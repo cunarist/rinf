@@ -1,9 +1,9 @@
 syntax = "proto3";
-package entry;
+package interaction;
 
 import "sample_schemas.proto";
 
-message CounterGetRequest {
+message CounterReadRequest {
   string letter = 1;
   int32 before_number = 2;
   uint32 dummy_one = 3;
@@ -11,7 +11,7 @@ message CounterGetRequest {
   repeated int32 dummy_three = 5;
 }
 
-message CounterGetResponse {
+message CounterReadResponse {
   int32 after_number = 1;
   uint32 dummy_one = 2;
   sample_schemas.SampleSchema dummy_two = 3;

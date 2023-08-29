@@ -35,13 +35,17 @@ Flutter で利用可能なすべてのプラットフォームは[テスト](htt
 - Dart のホットリスタート時に Rust ロジックを再起動
 - ネイティブデータの送信時のメモリコピーなし
 
+## Flutter の利用理由
+
+Rust は高性能なネイティブプログラミングのための強力な言語ですが、グラフィカルユーザーインターフェースを構築するためのエコシステムはまだ成熟していません。`iced`、`egui`、`gtk-rs`などのいくつかの GUI フレームワークはすでに存在しますが、これらは Flutter が提供する広範なサポートとスムーズな開発体験には及びません。それは唯一、Flutter が単一のコードベースからすべての 6 つの主要プラットフォームにコンパイルできるからです。
+
+Flutter は、見事なユーザーインターフェースを備えたクロスプラットフォームアプリケーションを構築するために非常に人気のある強力で多機能なフレームワークです。これは宣言的パターン、美しいウィジェット、ホットリロード、便利なデバッグツール、およびユーザーインターフェースに特化した専用のパッケージを提供します。
+
 ## Rust の利用理由
 
 Dart は GUI アプリケーション向けの素晴らしいオブジェクト指向のモダンな言語ですが、ネイティブのガベージコレクションにより、要件を満たすことができない場合があります。そこで、Rust が登場し、Dart よりも約[2~40 倍高速](https://programming-language-benchmarks.vercel.app/dart-vs-rust)であり、さらに複数スレッドを活用することができます。
 
 Rust は Stack Overflow で[最も愛されているプログラミング言語](https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages)として支持されています。そのネイティブなパフォーマンスは、ゼロキャストの抽象化哲学により高い生産性を実現します。多くの開発者は、将来的に Rust が C++の代替となる可能性を予測しています。Rust のシンプルさ、メモリの安全性、さまざまなシナリオでの優れたパフォーマンス、活気あるコミュニティ、堅牢なツールサポートが人気の向上に寄与しています。
-
-Rust の世界をさらに探求するには、公式の書籍をご覧ください：[https://doc.rust-lang.org/book/foreword.html](https://doc.rust-lang.org/book/foreword.html)。
 
 # 🛠️ コンポーネントのインストール
 
@@ -86,11 +90,12 @@ dart run rust_in_flutter template
     │   └── ...
     ├── linux/
 +   ├── messages/
-+   │   ├── entry.proto
++   │   ├── interaction.proto
 +   │   └── sample_schemas.proto
 +   ├── native/
 +   │   ├── hub/
 +   │   │   ├── src/
++   │   │   ├── build.rs
 +   │   │   └── Cargo.toml
 +   │   ├── sample_crate/
 +   │   │   ├── src/
@@ -170,8 +175,9 @@ child: Column(
 では、Protobuf を使用してメッセージスキーマを作成しましょう。
 
 ```proto
-// messages/entry.proto
+// messages/interaction.proto
 ...
+
 message SomeDataGetRequest {
   repeated int32 input_numbers = 1;
   string input_string = 2;
@@ -183,7 +189,7 @@ message SomeDataGetResponse {
 }
 ```
 
-次に、`.proto`ファイルから Dart と Rust のメッセージコードを生成します。このコマンドは`native/hub/build.rs`を呼び出します。
+次に、`.proto`ファイルから Dart と Rust のメッセージコードを生成します。このコマンドは`./native/hub/build.rs`を呼び出します。
 
 ```bash
 cargo check
@@ -194,7 +200,7 @@ cargo check
 ```dart
 // lib/main.dart
 ...
-import 'package:my_flutter_project/messages/entry.pbserver.dart';
+import 'package:my_flutter_project/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
 ElevatedButton(
@@ -204,7 +210,7 @@ ElevatedButton(
       inputString: 'Zero-cost abstraction',
     );
     final rustRequest = RustRequest(
-      address: 'basic-category/counter-number',
+      address: 'my-category/some-data',
       operation: RustOperation.Read,
       bytes: requestMessage.writeToBuffer(),
     );
@@ -227,7 +233,7 @@ ElevatedButton(
 use crate::bridge::api::RustResponse;
 use crate::sample_functions;
 ...
-let layered: Vec<&str> = rust_request.address.split('.').collect();
+let layered: Vec<&str> = rust_request.address.split('/').collect();
 let rust_response = if layered.is_empty() {
     RustResponse::default()
 } else if layered[0] == "basic-category" {
@@ -265,7 +271,7 @@ pub async fn some_data(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
         RustOperation::Read => {
-            use messages::entry::{SomeDataGetRequest, SomeDataGetResponse};
+            use crate::messages::interaction::{SomeDataGetRequest, SomeDataGetResponse};
 
             let request_message = SomeDataGetRequest::decode(&rust_request.bytes[..]).unwrap();
 
@@ -280,7 +286,6 @@ pub async fn some_data(rust_request: RustRequest) -> RustResponse {
                 output_numbers: new_numbers,
                 output_string: new_string,
             };
-
             RustResponse {
                 successful: true,
                 bytes: response_message.encode_to_vec(),
@@ -298,21 +303,9 @@ pub async fn some_data(rust_request: RustRequest) -> RustResponse {
 ```dart
 // lib/main.dart
 ...
-import 'package:my_flutter_project/messages/entry.pbserver.dart';
+import 'package:my_flutter_project/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
-ElevatedButton(
-  onPressed: () async {
-    final requestMessage = SomeDataGetRequest(
-      inputNumbers: [3, 4, 5],
-      inputString: 'Zero-cost abstraction',
-    );
-    final rustRequest = RustRequest(
-      address: 'basic-category/counter-number',
-      operation: RustOperation.Read,
-      // Convert Dart message object into raw bytes.
-      bytes: requestMessage.writeToBuffer(),
-    );
     final rustResponse = await requestToRust(rustRequest);
     final responseMessage = SomeDataGetResponse.fromBuffer(
       rustResponse.bytes,
@@ -348,7 +341,7 @@ Rust から Dart に毎秒増加する数値を送信したいとします。こ
 mod sample_functions;
 ...
 crate::spawn(sample_functions::keep_drawing_mandelbrot());
-crate::spawn(sample_functions::keep_sending_numbers());
+crate::spawn(sample_functions::keep_sending_numbers()); // ADD THIS LINE
 while let Some(request_unique) = request_receiver.recv().await {
 ...
 ```
@@ -356,7 +349,7 @@ while let Some(request_unique) = request_receiver.recv().await {
 メッセージスキーマを定義します。
 
 ```proto
-// messages/entry.proto
+// messages/interaction.proto
 ...
 message IncreasingNumbersSignal { int32 current_number = 1; }
 ...
@@ -379,17 +372,17 @@ use crate::bridge::send_rust_signal;
 pub async fn keep_sending_numbers() {
     let mut current_number: i32 = 1;
     loop {
-        use messages::entry::IncreasingNumbersSignal;
+        use crate::messages::interaction::IncreasingNumbersSignal;
 
         crate::time::sleep(std::time::Duration::from_secs(1)).await;
 
         let signal_message = IncreasingNumbersSignal { current_number };
-
         let rust_signal = RustSignal {
             address: String::from("my-category/increasing-numbers"),
             bytes: signal_message.encode_to_vec(),
         };
         send_rust_signal(rust_signal);
+
         current_number += 1;
     }
 }
@@ -401,7 +394,7 @@ pub async fn keep_sending_numbers() {
 ```dart
 // lib/main.dart
 ...
-import 'package:my_flutter_project/messages/entry.pbserver.dart';
+import 'package:my_flutter_project/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
 children: [

@@ -35,15 +35,17 @@ Flutter 支持的所有平台都经过了[测试](https://github.com/cunarist/ru
 - 在 Dart 的热重启上重新启动 Rust 逻辑
 - 发送本地数据时无需进行内存复制
 
-这是中文版本。
+## 为什么使用 Flutter？
+
+虽然 Rust 是用于高性能本地编程的强大语言，但其构建图形用户界面的生态系统尚不成熟。尽管它已经拥有一些 GUI 框架，如`iced`、`egui`、`gtk-rs`等，但它与 Flutter 提供的广泛支持和流畅的开发体验相比不具竞争力。唯有 Flutter 可以从单一代码库编译出适用于所有 6 个主要平台。
+
+Flutter 是一个功能强大且多用途的框架，以其构建具有惊人用户界面的跨平台应用程序而广受欢迎。它提供声明性模式、美观的小部件、热重载、方便的调试工具，以及专门用于用户界面的预置包。
 
 ## 为什么使用 Rust？
 
 虽然 Dart 是一种出色的、面向对象的、现代化的语言，但由于它具有垃圾回收等特性，性能并不是极致的。这就是 Rust 的用武之地。Rust 的性能被认为比 Dart 快大约[2~40 倍](https://programming-language-benchmarks.vercel.app/dart-vs-rust)(甚至无需使用多线程)。
 
 Rust 在 Stack Overflow 上被评为[最受喜爱的编程语言](https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages)，其原生性能得益于零转换抽象哲学，确保高生产力。许多开发者认为 Rust 有望在未来取代 C++。Rust 的简单性、内存安全性、在各种场景下的优异性能、充满活力的社区以及强大的工具支持共同促使其日益受欢迎。
-
-要深入了解 Rust 的世界，请查阅官方书籍：[https://doc.rust-lang.org/book/foreword.html](https://doc.rust-lang.org/book/foreword.html)。
 
 # 🛠️ 安装组件
 
@@ -88,11 +90,12 @@ dart run rust_in_flutter template
     │   └── ...
     ├── linux/
 +   ├── messages/
-+   │   ├── entry.proto
++   │   ├── interaction.proto
 +   │   └── sample_schemas.proto
 +   ├── native/
 +   │   ├── hub/
 +   │   │   ├── src/
++   │   │   ├── build.rs
 +   │   │   └── Cargo.toml
 +   │   ├── sample_crate/
 +   │   │   ├── src/
@@ -172,8 +175,9 @@ child: Column(
 然后使用 Protobuf 创建消息模式。
 
 ```proto
-// messages/entry.proto
+// messages/interaction.proto
 ...
+
 message SomeDataGetRequest {
   repeated int32 input_numbers = 1;
   string input_string = 2;
@@ -185,7 +189,7 @@ message SomeDataGetResponse {
 }
 ```
 
-接下来，从`.proto`文件生成 Dart 和 Rust 的消息代码。此命令会调用`native/hub/build.rs`文件。
+接下来，从`.proto`文件生成 Dart 和 Rust 的消息代码。此命令会调用`./native/hub/build.rs`文件。
 
 ```bash
 cargo check
@@ -196,7 +200,7 @@ cargo check
 ```dart
 // lib/main.dart
 ...
-import 'package:my_flutter_project/messages/entry.pbserver.dart';
+import 'package:my_flutter_project/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
 ElevatedButton(
@@ -206,7 +210,7 @@ ElevatedButton(
       inputString: 'Zero-cost abstraction',
     );
     final rustRequest = RustRequest(
-      address: 'basic-category/counter-number',
+      address: 'my-category/some-data',
       operation: RustOperation.Read,
       bytes: requestMessage.writeToBuffer(),
     );
@@ -229,7 +233,7 @@ ElevatedButton(
 use crate::bridge::api::RustResponse;
 use crate::sample_functions;
 ...
-let layered: Vec<&str> = rust_request.address.split('.').collect();
+let layered: Vec<&str> = rust_request.address.split('/').collect();
 let rust_response = if layered.is_empty() {
     RustResponse::default()
 } else if layered[0] == "basic-category" {
@@ -267,7 +271,7 @@ pub async fn some_data(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
         RustOperation::Read => {
-            use messages::entry::{SomeDataGetRequest, SomeDataGetResponse};
+            use crate::messages::interaction::{SomeDataGetRequest, SomeDataGetResponse};
 
             let request_message = SomeDataGetRequest::decode(&rust_request.bytes[..]).unwrap();
 
@@ -282,7 +286,6 @@ pub async fn some_data(rust_request: RustRequest) -> RustResponse {
                 output_numbers: new_numbers,
                 output_string: new_string,
             };
-
             RustResponse {
                 successful: true,
                 bytes: response_message.encode_to_vec(),
@@ -300,21 +303,9 @@ pub async fn some_data(rust_request: RustRequest) -> RustResponse {
 ```dart
 // lib/main.dart
 ...
-import 'package:my_flutter_project/messages/entry.pbserver.dart';
+import 'package:my_flutter_project/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
-ElevatedButton(
-  onPressed: () async {
-    final requestMessage = SomeDataGetRequest(
-      inputNumbers: [3, 4, 5],
-      inputString: 'Zero-cost abstraction',
-    );
-    final rustRequest = RustRequest(
-      address: 'basic-category/counter-number',
-      operation: RustOperation.Read,
-      // Convert Dart message object into raw bytes.
-      bytes: requestMessage.writeToBuffer(),
-    );
     final rustResponse = await requestToRust(rustRequest);
     final responseMessage = SomeDataGetResponse.fromBuffer(
       rustResponse.bytes,
@@ -350,7 +341,7 @@ flutter: ZERO-COST ABSTRACTION
 mod sample_functions;
 ...
 crate::spawn(sample_functions::keep_drawing_mandelbrot());
-crate::spawn(sample_functions::keep_sending_numbers());
+crate::spawn(sample_functions::keep_sending_numbers()); // ADD THIS LINE
 while let Some(request_unique) = request_receiver.recv().await {
 ...
 ```
@@ -358,7 +349,7 @@ while let Some(request_unique) = request_receiver.recv().await {
 定义消息模式。
 
 ```proto
-// messages/entry.proto
+// messages/interaction.proto
 ...
 message IncreasingNumbersSignal { int32 current_number = 1; }
 ...
@@ -381,17 +372,17 @@ use crate::bridge::send_rust_signal;
 pub async fn keep_sending_numbers() {
     let mut current_number: i32 = 1;
     loop {
-        use messages::entry::IncreasingNumbersSignal;
+        use crate::messages::interaction::IncreasingNumbersSignal;
 
         crate::time::sleep(std::time::Duration::from_secs(1)).await;
 
         let signal_message = IncreasingNumbersSignal { current_number };
-
         let rust_signal = RustSignal {
             address: String::from("my-category/increasing-numbers"),
             bytes: signal_message.encode_to_vec(),
         };
         send_rust_signal(rust_signal);
+
         current_number += 1;
     }
 }
@@ -403,7 +394,7 @@ pub async fn keep_sending_numbers() {
 ```dart
 // lib/main.dart
 ...
-import 'package:my_flutter_project/messages/entry.pbserver.dart';
+import 'package:my_flutter_project/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
 children: [

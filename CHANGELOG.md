@@ -1,3 +1,19 @@
+## 3.0.4
+
+- Polished template code.
+
+## 3.0.3
+
+- Polished template code.
+
+## 3.0.2
+
+- Polished guides, comments and template code.
+
+## 3.0.1
+
+- Fixed and organized tutorials and comments.
+
 ## 3.0.0
 
 - Adopted Protobuf for message serialization. Now communication between Dart and Rust is much more type-safe and faster than before. Because the template has now changed, you need to run `dart run rust_in_flutter template` again when migrating from version 2. (Thanks @wheregmis and @bookshiyi)
