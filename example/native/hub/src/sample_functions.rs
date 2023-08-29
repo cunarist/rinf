@@ -14,16 +14,16 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
         RustOperation::Read => {
             // We import message structs in this match condition
             // because schema will differ by the operation type.
-            use crate::messages::interaction::{CounterGetRequest, CounterGetResponse};
+            use crate::messages::interaction::{CounterReadRequest, CounterReadResponse};
 
             // Decode raw bytes into a Rust message object.
-            let request_message = CounterGetRequest::decode(&rust_request.bytes[..]).unwrap();
+            let request_message = CounterReadRequest::decode(&rust_request.bytes[..]).unwrap();
 
             // Perform a simple calculation.
             let after_value: i32 = sample_crate::add_seven(request_message.before_number);
 
             // Return the response that will be sent to Dart.
-            let response_message = CounterGetResponse {
+            let response_message = CounterReadResponse {
                 after_number: after_value,
                 dummy_one: request_message.dummy_one,
                 dummy_two: request_message.dummy_two,
