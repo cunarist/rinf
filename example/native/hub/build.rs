@@ -97,7 +97,6 @@ fn main() {
         }
     }
     let mut command = Command::new("protoc");
-    command.current_dir(flutter_project_path);
     command.args([
         &format!("--proto_path={}", proto_path.to_str().unwrap()),
         &format!("--dart_out={}", dart_output_path.to_str().unwrap()),
