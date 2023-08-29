@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 
 import 'logging.dart';
+import 'rustup.dart';
 
 final log = Logger("process");
 
@@ -78,30 +79,32 @@ class RustupNotFoundException implements Exception {
       'Maybe you need to install Rust? It only takes a minute:',
       ' ',
       if (Platform.isWindows) 'https://www.rust-lang.org/tools/install',
+      if (hasHomebrewRustInPath()) ...[
+        '\$ brew unlink rust # Unlink homebrew Rust from PATH',
+      ],
       if (!Platform.isWindows)
-        "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh",
+        "\$ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh",
       ' ',
     ].join('\n');
+  }
+
+  static bool hasHomebrewRustInPath() {
+    if (!Platform.isMacOS) {
+      return false;
+    }
+    final envPath = Platform.environment['PATH'] ?? '';
+    final paths = envPath.split(':');
+    return paths.any((p) {
+      return p.contains('homebrew') && File(path.join(p, 'rustc')).existsSync();
+    });
   }
 }
 
 String _resolveExecutable(String executable) {
   if (executable == 'rustup') {
-    final envPath = Platform.environment['PATH'];
-    final envPathSeparator = Platform.isWindows ? ';' : ':';
-    final home = Platform.isWindows
-        ? Platform.environment['USERPROFILE']
-        : Platform.environment['HOME'];
-    final paths = [
-      if (home != null) path.join(home, '.cargo', 'bin'),
-      if (envPath != null) ...envPath.split(envPathSeparator),
-    ];
-    for (final p in paths) {
-      final rustup = Platform.isWindows ? 'rustup.exe' : 'rustup';
-      final rustupPath = path.join(p, rustup);
-      if (File(rustupPath).existsSync()) {
-        return rustupPath;
-      }
+    final resolved = Rustup.executablePath();
+    if (resolved != null) {
+      return resolved;
     }
     throw RustupNotFoundException();
   } else {
