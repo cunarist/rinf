@@ -1,3 +1,7 @@
+## 3.0.3
+
+- Polished template code.
+
 ## 3.0.2
 
 - Polished guides, comments and template code.

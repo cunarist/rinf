@@ -1,6 +1,6 @@
 name: rust_in_flutter
 description: '"Rust as your Flutter backend, Flutter as your Rust frontend"'
-version: 3.0.2
+version: 3.0.3
 repository: https://github.com/cunarist/rust-in-flutter
 funding:
   - https://www.buymeacoffee.com/cunarist
