@@ -53,8 +53,7 @@ The action needs two secrets, private key for signing binaries and GitHub token 
 ```yaml
 on:
   push:
-    branches:
-      - prebuilt_binaries
+    branches: [ main ]
 
 name: Precompile Binaries
 
