@@ -187,7 +187,7 @@ message SomeDataGetResponse {
 }
 ```
 
-다음으로, `.proto` 파일로부터 Dart와 Rust 메시지 코드를 생성하세요. 이 명령은 `native/hub/build.rs` 스크립트를 호출합니다.
+다음으로, `.proto` 파일로부터 Dart와 Rust 메시지 코드를 생성하세요. 이 명령은 `./native/hub/build.rs` 스크립트를 호출합니다.
 
 ```bash
 cargo check

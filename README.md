@@ -185,7 +185,7 @@ message SomeDataGetResponse {
 }
 ```
 
-Next, generate Dart and Rust message code from `.proto` files. This command invokes `native/hub/build.rs`.
+Next, generate Dart and Rust message code from `.proto` files. This command invokes `./native/hub/build.rs`.
 
 ```bash
 cargo check

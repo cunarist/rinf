@@ -185,7 +185,7 @@ message SomeDataGetResponse {
 }
 ```
 
-次に、`.proto`ファイルから Dart と Rust のメッセージコードを生成します。このコマンドは`native/hub/build.rs`を呼び出します。
+次に、`.proto`ファイルから Dart と Rust のメッセージコードを生成します。このコマンドは`./native/hub/build.rs`を呼び出します。
 
 ```bash
 cargo check

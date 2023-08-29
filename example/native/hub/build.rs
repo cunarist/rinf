@@ -44,7 +44,7 @@ fn main() {
         .compile(&proto_filenames, &["../../messages"]);
     result.expect("Could not compile `.proto` files into Rust");
 
-    // Generate the `mod.rs` content for messages module in Rust.
+    // Generate `mod.rs` for `messages` module in Rust.
     let module_folder = Path::new("src/messages");
     #[allow(clippy::if_same_then_else)]
     let message_files = fs::read_dir(module_folder)

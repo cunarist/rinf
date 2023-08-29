@@ -187,7 +187,7 @@ message SomeDataGetResponse {
 }
 ```
 
-接下来，从`.proto`文件生成 Dart 和 Rust 的消息代码。此命令会调用`native/hub/build.rs`文件。
+接下来，从`.proto`文件生成 Dart 和 Rust 的消息代码。此命令会调用`./native/hub/build.rs`文件。
 
 ```bash
 cargo check
