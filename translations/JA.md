@@ -35,13 +35,17 @@ Flutter で利用可能なすべてのプラットフォームは[テスト](htt
 - Dart のホットリスタート時に Rust ロジックを再起動
 - ネイティブデータの送信時のメモリコピーなし
 
+## Flutter の利用理由
+
+Rust は高性能なネイティブプログラミングのための強力な言語ですが、グラフィカルユーザーインターフェースを構築するためのエコシステムはまだ成熟していません。`iced`、`egui`、`gtk-rs`などのいくつかの GUI フレームワークはすでに存在しますが、これらは Flutter が提供する広範なサポートとスムーズな開発体験には及びません。それは唯一、Flutter が単一のコードベースからすべての 6 つの主要プラットフォームにコンパイルできるからです。
+
+Flutter は、見事なユーザーインターフェースを備えたクロスプラットフォームアプリケーションを構築するために非常に人気のある強力で多機能なフレームワークです。これは宣言的パターン、美しいウィジェット、ホットリロード、便利なデバッグツール、およびユーザーインターフェースに特化した専用のパッケージを提供します。
+
 ## Rust の利用理由
 
 Dart は GUI アプリケーション向けの素晴らしいオブジェクト指向のモダンな言語ですが、ネイティブのガベージコレクションにより、要件を満たすことができない場合があります。そこで、Rust が登場し、Dart よりも約[2~40 倍高速](https://programming-language-benchmarks.vercel.app/dart-vs-rust)であり、さらに複数スレッドを活用することができます。
 
 Rust は Stack Overflow で[最も愛されているプログラミング言語](https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages)として支持されています。そのネイティブなパフォーマンスは、ゼロキャストの抽象化哲学により高い生産性を実現します。多くの開発者は、将来的に Rust が C++の代替となる可能性を予測しています。Rust のシンプルさ、メモリの安全性、さまざまなシナリオでの優れたパフォーマンス、活気あるコミュニティ、堅牢なツールサポートが人気の向上に寄与しています。
-
-Rust の世界をさらに探求するには、公式の書籍をご覧ください：[https://doc.rust-lang.org/book/foreword.html](https://doc.rust-lang.org/book/foreword.html)。
 
 # 🛠️ コンポーネントのインストール
 
@@ -174,12 +178,12 @@ child: Column(
 // messages/interaction.proto
 ...
 
-message SomeDataReadRequest {
+message SomeDataGetRequest {
   repeated int32 input_numbers = 1;
   string input_string = 2;
 }
 
-message SomeDataReadResponse {
+message SomeDataGetResponse {
   repeated int32 output_numbers = 1;
   string output_string = 2;
 }
@@ -201,7 +205,7 @@ import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
 ElevatedButton(
   onPressed: () async {
-    final requestMessage = SomeDataReadRequest(
+    final requestMessage = SomeDataGetRequest(
       inputNumbers: [3, 4, 5],
       inputString: 'Zero-cost abstraction',
     );
@@ -267,9 +271,9 @@ pub async fn some_data(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
         RustOperation::Read => {
-            use crate::messages::interaction::{SomeDataReadRequest, SomeDataReadResponse};
+            use crate::messages::interaction::{SomeDataGetRequest, SomeDataGetResponse};
 
-            let request_message = SomeDataReadRequest::decode(&rust_request.bytes[..]).unwrap();
+            let request_message = SomeDataGetRequest::decode(&rust_request.bytes[..]).unwrap();
 
             let new_numbers: Vec<i32> = request_message
                 .input_numbers
@@ -278,7 +282,7 @@ pub async fn some_data(rust_request: RustRequest) -> RustResponse {
                 .collect();
             let new_string = request_message.input_string.to_uppercase();
 
-            let response_message = SomeDataReadResponse {
+            let response_message = SomeDataGetResponse {
                 output_numbers: new_numbers,
                 output_string: new_string,
             };
@@ -303,7 +307,7 @@ import 'package:my_flutter_project/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
     final rustResponse = await requestToRust(rustRequest);
-    final responseMessage = SomeDataReadResponse.fromBuffer(
+    final responseMessage = SomeDataGetResponse.fromBuffer(
       rustResponse.bytes,
     );
     print(responseMessage.outputNumbers);
