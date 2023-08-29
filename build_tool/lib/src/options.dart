@@ -10,6 +10,7 @@ import 'package:yaml/yaml.dart';
 
 import 'builder.dart';
 import 'environment.dart';
+import 'rustup.dart';
 
 final _log = Logger('options');
 
@@ -226,16 +227,26 @@ class CargokitCrateOptions {
 }
 
 class CargokitUserOptions {
+  // When Rustup is installed always build locally unless user opts into
+  // using prebuilt binaries.
+  static bool defaultAllowPrebuiltBinaries() {
+    return Rustup.executablePath() == null;
+  }
+
   CargokitUserOptions({
-    this.allowPrebuiltBinaries = true,
-    this.verboseLogging = false,
+    required this.allowPrebuiltBinaries,
+    required this.verboseLogging,
   });
+
+  CargokitUserOptions._()
+      : allowPrebuiltBinaries = defaultAllowPrebuiltBinaries(),
+        verboseLogging = false;
 
   static CargokitUserOptions parse(YamlNode node) {
     if (node is! YamlMap) {
       throw SourceSpanException('Cargokit options must be a map', node.span);
     }
-    bool allowPrebuiltBinaries = true;
+    bool allowPrebuiltBinaries = defaultAllowPrebuiltBinaries();
     bool verboseLogging = false;
 
     for (final entry in node.nodes.entries) {
@@ -286,7 +297,7 @@ class CargokitUserOptions {
       }
       userProjectDir = userProjectDir.parent;
     }
-    return CargokitUserOptions();
+    return CargokitUserOptions._();
   }
 
   final bool allowPrebuiltBinaries;
