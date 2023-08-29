@@ -4,10 +4,16 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 fn main() {
+    // Prepare paths.
+    let working_directory = env::current_dir().unwrap();
+    let flutter_project_path = working_directory.parent().unwrap().parent().unwrap();
+    let proto_path = flutter_project_path.join("messages");
+    let dart_output_path = flutter_project_path.join("lib/messages");
+    let rust_output_path = flutter_project_path.join("native/hub/src/messages");
+
     // Get the list of `.proto` files.
-    let proto_folder = Path::new("../../messages");
     #[allow(clippy::if_same_then_else)]
-    let proto_filenames: Vec<String> = fs::read_dir(proto_folder)
+    let proto_filenames: Vec<String> = fs::read_dir(&proto_path)
         .expect("Failed to read directory")
         .filter_map(|entry| {
             let entry = entry.expect("Error reading directory entry");
@@ -23,15 +29,17 @@ fn main() {
         .collect();
 
     // Watch original `.proto` message files.
-    println!("cargo:rerun-if-changed=../../messages");
+    println!("cargo:rerun-if-changed={}", proto_path.to_str().unwrap());
     for proto_filename in &proto_filenames {
-        println!("cargo:rerun-if-changed=../../messages/{proto_filename}");
+        println!(
+            "cargo:rerun-if-changed={}",
+            proto_path.join(proto_filename).to_str().unwrap()
+        );
     }
 
     // Generate Rust message files.
-    let output_path = "src/messages";
-    let _ = fs::create_dir(output_path);
-    for result in fs::read_dir(output_path).unwrap() {
+    let _ = fs::create_dir(&rust_output_path);
+    for result in fs::read_dir(&rust_output_path).unwrap() {
         let entry_path = result.unwrap().path();
         if entry_path.is_dir() {
             fs::remove_dir_all(&entry_path).unwrap();
@@ -81,9 +89,8 @@ fn main() {
         .expect("Cannot globally install `protoc_plugin` Dart package");
 
     // Generate Dart message files.
-    let output_path = "../../lib/messages";
-    let _ = fs::create_dir(output_path);
-    for result in fs::read_dir(output_path).unwrap() {
+    let _ = fs::create_dir(&dart_output_path);
+    for result in fs::read_dir(&dart_output_path).unwrap() {
         let entry_path = result.unwrap().path();
         if entry_path.is_dir() {
             fs::remove_dir_all(&entry_path).unwrap();
@@ -91,8 +98,6 @@ fn main() {
             fs::remove_file(&entry_path).unwrap();
         }
     }
-    let working_directory = env::current_dir().unwrap();
-    let flutter_project_path = working_directory.parent().unwrap().parent().unwrap();
     let mut command = Command::new("protoc");
     command.current_dir(flutter_project_path);
     command.args([
