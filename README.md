@@ -174,12 +174,12 @@ Then create message schemas with Protobuf.
 // messages/interaction.proto
 ...
 
-message SomeDataGetRequest {
+message SomeDataReadRequest {
   repeated int32 input_numbers = 1;
   string input_string = 2;
 }
 
-message SomeDataGetResponse {
+message SomeDataReadResponse {
   repeated int32 output_numbers = 1;
   string output_string = 2;
 }
@@ -201,7 +201,7 @@ import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
 ElevatedButton(
   onPressed: () async {
-    final requestMessage = SomeDataGetRequest(
+    final requestMessage = SomeDataReadRequest(
       inputNumbers: [3, 4, 5],
       inputString: 'Zero-cost abstraction',
     );
@@ -267,9 +267,9 @@ pub async fn some_data(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
         RustOperation::Read => {
-            use crate::messages::interaction::{SomeDataGetRequest, SomeDataGetResponse};
+            use crate::messages::interaction::{SomeDataReadRequest, SomeDataReadResponse};
 
-            let request_message = SomeDataGetRequest::decode(&rust_request.bytes[..]).unwrap();
+            let request_message = SomeDataReadRequest::decode(&rust_request.bytes[..]).unwrap();
 
             let new_numbers: Vec<i32> = request_message
                 .input_numbers
@@ -278,7 +278,7 @@ pub async fn some_data(rust_request: RustRequest) -> RustResponse {
                 .collect();
             let new_string = request_message.input_string.to_uppercase();
 
-            let response_message = SomeDataGetResponse {
+            let response_message = SomeDataReadResponse {
                 output_numbers: new_numbers,
                 output_string: new_string,
             };
@@ -303,7 +303,7 @@ import 'package:my_flutter_project/messages/interaction.pbserver.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 ...
     final rustResponse = await requestToRust(rustRequest);
-    final responseMessage = SomeDataGetResponse.fromBuffer(
+    final responseMessage = SomeDataReadResponse.fromBuffer(
       rustResponse.bytes,
     );
     print(responseMessage.outputNumbers);
