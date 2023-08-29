@@ -13,13 +13,13 @@ This is how the process of using precompiled binaries looks during the build on 
 
 3. Cargokit computes a `crate-hash`. This is a SHA256 hash value computed from all Rust files inside crate, `Cargo.toml`, `Cargo.lock` and `cargokit_options.yaml`. This uniquely identifies the crate and it is used to find the correct prebuilt binaries.
 
-4. Cargokit will attempt to download the prebuilt binaries for target platform and `crate_hash` combination as well as signature file. If download succeeds, the binary content will be verified against the signature and public key included in `cargokit_options.yaml` (which is part of Rust crate and thus part of published Flutter package).
+4. Cargokit will attempt to download the prebuilt binaries for target platform and `crate_hash` combination and a signature file for each downloaded binary. If download succeeds, the binary content will be verified against the signature and public key included in `cargokit_options.yaml` (which is part of Rust crate and thus part of published Flutter package).
 
 5. If the verification succeeds, the prebuilt binaries will be used. Otherwise the binary will be discarded and Cargokit will insist on building from source.
 
 ## Providing precompiled binaries
 
-Note that this assumes that prebuilt binaries will be generated during githbu actions and deployed as github releases.
+Note that this assumes that prebuilt binaries will be generated during github actions and deployed as github releases.
 
 ### Use `build_tool` to generate a key-pair:
 
