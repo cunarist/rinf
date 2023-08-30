@@ -1,5 +1,6 @@
 name: build_tool
-description: A sample command-line application.
+description: Cargokit build_tool. Facilitates the build of Rust crate during Flutter application build.
+publish_to: none
 version: 1.0.0
 
 environment:
