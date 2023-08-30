@@ -61,7 +61,7 @@ class PrecompileBinaries {
     final hash = CrateHash.compute(manifestDir);
     _log.info('Computed crate hash: $hash');
 
-    final String tagName = 'precompled_$hash';
+    final String tagName = 'precompiled_$hash';
 
     final github = GitHub(auth: Authentication.withToken(githubToken));
     final repo = github.repositories;
