@@ -3,9 +3,9 @@
 Because Cargokit builds the Rust crate during Flutter build, it is inherently
 dependend on the Rust toolchain being installed on the developer's machine.
 
-To streamline plugin usage, it is possible for Cargokit to use precompiled binaries instead.
+To decrease the friction, it is possible for Cargokit to use precompiled binaries instead.
 
-This is how the process of using precompiled binaries looks during the build on developer machine:
+This is how the process of using precompiled binaries looks from the perspective of the build on developer machine:
 
 1. Cargokit checks if there is `cargokit_options.yaml` file in the root folder of target application. If there is one, it will be checked for `use_precompiled_binaries` options to see if user opted out of using precompiled binaries. In which case Cargokit will insist on building from source. Cargokit will also build from source if the configuration file is absent, but user has Rustup installed.
 
@@ -27,7 +27,7 @@ Note that this assumes that precompiled binaries will be generated during github
 dart run build_tool gen-key
 ```
 
-This will print the private key and public key. Store the private key securely, possibly. For example you can use it as a secret in GitHub Actions.
+This will print the private key and public key. Store the private key securely. It needs to be provided as a secret to github action.
 
 The public key should be included in `cargokit.yaml` file in the Rust crate.
 

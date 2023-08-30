@@ -6,9 +6,9 @@ In ideal conditions the end-developer using the plugin should not even be aware 
 
 ## Integration
 
-Cargokit is meant to be included in Flutter plugin (or application) that contains a Rust crate to be built during the Flutter build process.
+Cargokit is meant to be included in Flutter plugin (or application) that contains the Rust crate to be built during the Flutter build process.
 
-Cargokit can be either incuded as git submodule (for applications) or git subtree (for plugins - as pub does not support submodules for git dependencies).
+Cargokit can be either incuded as git submodule or git subtree (required for plugins - as pub does not support submodules for git dependencies).
 
 For a step by step tutorial on integrating Cargokit with a Flutter plugin see https://matejknopp.com/post/flutter_plugin_in_rust_with_no_prebuilt_binaries/.
 
@@ -28,13 +28,13 @@ The command takes no additional arguments, everything is controlled during envir
 
 This is invoked from `plugin.gradle` and it is used to build the Rust crate into a dynamic library on Android. The command takes no additional arguments, everything is controlled during environment variables set by `plugin.gradle`.
 
-The build_tool configures the Rust environment needed for cross compilation and then invokes `cargo build` with appropriate arguments and environment variables.
+The build_tool installs NDK if needed, configures the Rust environment for cross compilation and then invokes `cargo build` with appropriate arguments and environment variables.
 
 The build-tool also acts a linker driver.
 
 ### build-pod
 
-This is invoked from plugin's podspec `script_phase` through `build_pod.rs`. Bundle tool will build the Rust crate into a static library that gets linked into the plugin Framework. In this case must have `:execution_position` set to `:before_compile`.
+This is invoked from plugin's podspec `script_phase` through `build_pod.sh`. Bundle tool will build the Rust crate into a static library that gets linked into the plugin Framework. In this case must have `:execution_position` set to `:before_compile`.
 
 Cargokit will build binaries for all active architectures from XCode build and lipo them togherer.
 
@@ -99,6 +99,6 @@ Cargokit will attempt to detect Rustup in the default Rustup installation locati
 
 If `build_tool` doesn't find Rustup, it will about the build with a message showing instructions to install Rustup specific to current platform.
 
-On macOS it will also detect a homebrew Rust installation in PATH and will prompt user to call `brew unlink rust` first tu remove homebrew Rust installation from PATH, because it may interfere with Rustup.
+On macOS it will also detect a homebrew Rust installation in PATH and will prompt user to call `brew unlink rust` first to remove homebrew Rust installation from PATH, because it may interfere with Rustup.
 
 Homebrew Rust installation can not be used by Cargokit, because it can only build for host platform. Cargokit needs to be able to cross compile the Rust crate for iOS and Android and thus needs full Rustup installation.
