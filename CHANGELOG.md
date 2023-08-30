@@ -1,3 +1,9 @@
+## 3.0.5
+
+- Moved documentation to a dedicated website.
+- Now `build.rs` will automatically modify PATH for `protoc-gen-dart`.
+- Fixed an error appearing in Rust-analyzer's webassembly mode.
+
 ## 3.0.4
 
 - Polished template code.
