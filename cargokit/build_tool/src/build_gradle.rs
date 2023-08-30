@@ -82,6 +82,8 @@ const ARCH: &str = "darwin-x86_64";
 const ARCH: &str = "linux-x86_64";
 #[cfg(target_os = "windows")]
 const ARCH: &str = "windows-x86_64";
+#[cfg(target_os = "unknown")]
+const ARCH: &str = "";
 
 // Workaround for libgcc missing in NDK23, inspired by cargo-ndk
 fn libgcc_workaround(build_dir: &Path, ndk_version: &Version) -> Result<String> {
