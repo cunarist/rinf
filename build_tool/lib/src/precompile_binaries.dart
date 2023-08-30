@@ -7,6 +7,7 @@ import 'package:path/path.dart' as path;
 
 import 'artifacts_provider.dart';
 import 'builder.dart';
+import 'cargo.dart';
 import 'crate_hash.dart';
 import 'options.dart';
 import 'rustup.dart';
@@ -20,7 +21,6 @@ class PrecompileBinaries {
     required this.githubToken,
     required this.repositorySlug,
     required this.manifestDir,
-    required this.libName,
     required this.targets,
     this.androidSdkLocation,
     this.androidNdkVersion,
@@ -32,7 +32,6 @@ class PrecompileBinaries {
   final String githubToken;
   final RepositorySlug repositorySlug;
   final String manifestDir;
-  final String libName;
   final List<Target> targets;
   final String? androidSdkLocation;
   final String? androidNdkVersion;
@@ -48,6 +47,8 @@ class PrecompileBinaries {
   }
 
   Future<void> run() async {
+    final crateInfo = CrateInfo.load(manifestDir);
+
     final targets = List.of(this.targets);
     if (targets.isEmpty) {
       targets.addAll([
@@ -68,7 +69,7 @@ class PrecompileBinaries {
     final release = await _getOrCreateRelease(
       repo: repo,
       tagName: tagName,
-      libName: libName,
+      packageName: crateInfo.packageName,
       hash: hash,
     );
 
@@ -87,7 +88,7 @@ class PrecompileBinaries {
       crateOptions: crateOptions,
       targetTempDir: tempDir.path,
       manifestDir: manifestDir,
-      libName: libName,
+      crateInfo: crateInfo,
       isAndroid: androidSdkLocation != null,
       androidSdkPath: androidSdkLocation,
       androidNdkVersion: androidNdkVersion,
@@ -99,7 +100,7 @@ class PrecompileBinaries {
     for (final target in targets) {
       final artifactNames = getArtifactNames(
         target: target,
-        libraryName: libName,
+        libraryName: crateInfo.packageName,
         remote: true,
       );
 
@@ -172,7 +173,7 @@ class PrecompileBinaries {
   Future<Release> _getOrCreateRelease({
     required RepositoriesService repo,
     required String tagName,
-    required String libName,
+    required String packageName,
     required String hash,
   }) async {
     Release release;
@@ -189,7 +190,7 @@ class PrecompileBinaries {
             targetCommitish: null,
             isDraft: false,
             isPrerelease: false,
-            body: 'Precompiled binaries for crate $libName, '
+            body: 'Precompiled binaries for crate $packageName, '
                 'crate hash $hash.',
           ));
     }

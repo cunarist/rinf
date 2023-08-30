@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:path/path.dart' as path;
 
 import 'android_environment.dart';
+import 'cargo.dart';
 import 'environment.dart';
 import 'options.dart';
 import 'rustup.dart';
@@ -39,7 +40,7 @@ class BuildEnvironment {
   final CargokitCrateOptions crateOptions;
   final String targetTempDir;
   final String manifestDir;
-  final String libName;
+  final CrateInfo crateInfo;
 
   final bool isAndroid;
   final String? androidSdkPath;
@@ -52,7 +53,7 @@ class BuildEnvironment {
     required this.crateOptions,
     required this.targetTempDir,
     required this.manifestDir,
-    required this.libName,
+    required this.crateInfo,
     required this.isAndroid,
     this.androidSdkPath,
     this.androidNdkVersion,
@@ -75,12 +76,13 @@ class BuildEnvironment {
     final crateOptions = CargokitCrateOptions.load(
       manifestDir: manifestDir,
     );
+    final crateInfo = CrateInfo.load(manifestDir);
     return BuildEnvironment(
       configuration: buildConfiguration,
       crateOptions: crateOptions,
       targetTempDir: Environment.targetTempDir,
       manifestDir: manifestDir,
-      libName: Environment.libName,
+      crateInfo: crateInfo,
       isAndroid: isAndroid,
       androidSdkPath: isAndroid ? Environment.sdkPath : null,
       androidNdkVersion: isAndroid ? Environment.ndkVersion : null,
@@ -135,7 +137,7 @@ class RustBuilder {
         '--manifest-path',
         manifestPath,
         '-p',
-        environment.libName,
+        environment.crateInfo.packageName,
         if (!environment.configuration.isDebug) '--release',
         '--target',
         target.rust,

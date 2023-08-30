@@ -106,11 +106,6 @@ class PrecompileBinariesCommand extends Command {
         mandatory: true,
         help: 'Directory containing Cargo.toml',
       )
-      ..addOption(
-        'lib-name',
-        mandatory: true,
-        help: 'Name of the library to build.',
-      )
       ..addMultiOption('target',
           help: 'Rust target triple of artifact to build.\n'
               'Can be specified multiple times or omitted in which case\n'
@@ -192,7 +187,6 @@ class PrecompileBinariesCommand extends Command {
     final precompileBinaries = PrecompileBinaries(
       privateKey: PrivateKey(privateKey),
       githubToken: githubToken,
-      libName: argResults!['lib-name'] as String,
       manifestDir: manifestDir,
       repositorySlug: RepositorySlug.full(argResults!['repository'] as String),
       targets: targets,
@@ -208,17 +202,11 @@ class PrecompileBinariesCommand extends Command {
 
 class VerifyBinariesCommand extends Command {
   VerifyBinariesCommand() {
-    argParser
-      ..addOption(
-        'manifest-dir',
-        mandatory: true,
-        help: 'Directory containing Cargo.toml',
-      )
-      ..addOption(
-        'lib-name',
-        mandatory: true,
-        help: 'Name of the library to build.',
-      );
+    argParser.addOption(
+      'manifest-dir',
+      mandatory: true,
+      help: 'Directory containing Cargo.toml',
+    );
   }
 
   @override
@@ -232,10 +220,8 @@ class VerifyBinariesCommand extends Command {
   @override
   Future<void> run() async {
     final manifestDir = argResults!['manifest-dir'] as String;
-    final libName = argResults!['lib-name'] as String;
     final verifyBinaries = VerifyBinaries(
       manifestDir: manifestDir,
-      libraryName: libName,
     );
     await verifyBinaries.run();
   }

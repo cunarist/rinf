@@ -4,6 +4,7 @@ import 'package:ed25519_edwards/ed25519_edwards.dart';
 import 'package:http/http.dart';
 
 import 'artifacts_provider.dart';
+import 'cargo.dart';
 import 'crate_hash.dart';
 import 'options.dart';
 import 'precompile_binaries.dart';
@@ -12,13 +13,13 @@ import 'target.dart';
 class VerifyBinaries {
   VerifyBinaries({
     required this.manifestDir,
-    required this.libraryName,
   });
 
   final String manifestDir;
-  final String libraryName;
 
   Future<void> run() async {
+    final crateInfo = CrateInfo.load(manifestDir);
+
     final config = CargokitCrateOptions.load(manifestDir: manifestDir);
     final precompiledBinaries = config.precompiledBinaries;
     if (precompiledBinaries == null) {
@@ -34,7 +35,7 @@ class VerifyBinaries {
 
         final artifacts = getArtifactNames(
           target: target,
-          libraryName: libraryName,
+          libraryName: crateInfo.packageName,
           remote: true,
         );
 

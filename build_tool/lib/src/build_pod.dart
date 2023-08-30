@@ -52,16 +52,17 @@ class BuildPod {
         .where((element) => element.type == AritifactType.dylib)
         .toList();
 
+    final libName = environment.crateInfo.packageName;
+
     // If there is static lib, use it and link it with pod
     if (staticLibs.isNotEmpty) {
-      final finalTargetFile =
-          path.join(outputDir, "lib${environment.libName}.a");
+      final finalTargetFile = path.join(outputDir, "lib$libName.a");
       performLipo(finalTargetFile, staticLibs.map((e) => e.path));
     } else {
       // Otherwise try to replace bundle dylib with our dylib
       final bundlePaths = [
-        '${environment.libName}.framework/Versions/A/${environment.libName}',
-        '${environment.libName}.framework/${environment.libName}',
+        '$libName.framework/Versions/A/$libName',
+        '$libName.framework/$libName',
       ];
 
       for (final bundlePath in bundlePaths) {
