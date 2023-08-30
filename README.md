@@ -47,7 +47,7 @@ Rust has garnered a devoted following, being [the most loved programming languag
 
 # 📖 Documentation
 
-Check out the [documentation](https://docs.cunarist.com/rust-in-flutter/about/) for everything you need to know about how to use this thing.
+Check out the [documentation](https://docs.cunarist.com/rust-in-flutter/about) for everything you need to know about how to use this thing.
 
 # 🌟 Contributors
 
