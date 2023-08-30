@@ -9,11 +9,11 @@ This is how the process of using precompiled binaries looks during the build on 
 
 1. Cargokit checks if there is `cargokit_options.yaml` file in the root folder of target application. If there is one, it will be checked for `use_precompiled_binaries` options to see if user opted out of using precompiled binaries. In which case Cargokit will insist on building from source. Cargokit will also build from source if the configuration file is absent, but user has Rustup installed.
 
-2. Cargokit checks if there is `cargokit_options.yaml` file placed in the Rust crate. If there is one, it will be checked for `precompiled_binaries` section to see if crate supports precompiled binaries. The configuration section must contain a public key and URL prefix.
+2. Cargokit checks if there is `cargokit.yaml` file placed in the Rust crate. If there is one, it will be checked for `precompiled_binaries` section to see if crate supports precompiled binaries. The configuration section must contain a public key and URL prefix.
 
-3. Cargokit computes a `crate-hash`. This is a SHA256 hash value computed from all Rust files inside crate, `Cargo.toml`, `Cargo.lock` and `cargokit_options.yaml`. This uniquely identifies the crate and it is used to find the correct precompiled binaries.
+3. Cargokit computes a `crate-hash`. This is a SHA256 hash value computed from all Rust files inside crate, `Cargo.toml`, `Cargo.lock` and `cargokit.yaml`. This uniquely identifies the crate and it is used to find the correct precompiled binaries.
 
-4. Cargokit will attempt to download the precompiled binaries for target platform and `crate_hash` combination and a signature file for each downloaded binary. If download succeeds, the binary content will be verified against the signature and public key included in `cargokit_options.yaml` (which is part of Rust crate and thus part of published Flutter package).
+4. Cargokit will attempt to download the precompiled binaries for target platform and `crate_hash` combination and a signature file for each downloaded binary. If download succeeds, the binary content will be verified against the signature and public key included in `cargokit.yaml` (which is part of Rust crate and thus part of published Flutter package).
 
 5. If the verification succeeds, the precompiled binaries will be used. Otherwise the binary will be discarded and Cargokit will insist on building from source.
 
@@ -29,9 +29,9 @@ dart run build_tool gen-key
 
 This will print the private key and public key. Store the private key securely, possibly. For example you can use it as a secret in GitHub Actions.
 
-The public key should be included in `cargokit_options.yaml` file in the Rust crate.
+The public key should be included in `cargokit.yaml` file in the Rust crate.
 
-### Provide a `cargokit_options.yaml` file in the Rust crate
+### Provide a `cargokit.yaml` file in the Rust crate
 
 The file must be placed alongside Cargo.toml.
 

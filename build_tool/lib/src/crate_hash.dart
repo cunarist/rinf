@@ -10,7 +10,7 @@ import 'package:path/path.dart' as path;
 class CrateHash {
   /// Computes a hash uniquely identifying crate content. This takes into account
   /// content all all .rs files inside the src directory, as well as Cargo.toml,
-  /// Cargo.lock, build.rs and cargokit_options.yaml.
+  /// Cargo.lock, build.rs and cargokit.yaml.
   ///
   /// If [tempStorage] is provided, computed hash is stored in a file in that directory
   /// and reused on subsequent calls if the crate content hasn't changed.
@@ -112,7 +112,7 @@ class CrateHash {
     addFile('Cargo.toml');
     addFile('Cargo.lock');
     addFile('build.rs');
-    addFile('cargokit_options.yaml');
+    addFile('cargokit.yaml');
     return files;
   }
 

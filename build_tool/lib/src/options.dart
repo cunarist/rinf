@@ -216,7 +216,7 @@ class CargokitCrateOptions {
   static CargokitCrateOptions load({
     required String manifestDir,
   }) {
-    final uri = Uri.file(path.join(manifestDir, "cargokit_options.yaml"));
+    final uri = Uri.file(path.join(manifestDir, "cargokit.yaml"));
     final file = File.fromUri(uri);
     if (file.existsSync()) {
       final contents = loadYamlNode(file.readAsStringSync(), sourceUrl: uri);

@@ -54,9 +54,9 @@ Instead the `run_build_tool` script creates a minimal Dart command line package 
 
 ### Configuration for the Rust crate
 
-Cargokit can be configured through a `cargokit_options.yaml` file, which can be used to control the build of the Rust package and is placed into the Rust crate next to `Cargo.toml`.
+Cargokit can be configured through a `cargokit.yaml` file, which can be used to control the build of the Rust package and is placed into the Rust crate next to `Cargo.toml`.
 
-Here is an example `cargokit_options.yaml` with comments:
+Here is an example `cargokit.yaml` with comments:
 ```yaml
 cargo:
   debug: # Configuration of cargo execution during debug builds
