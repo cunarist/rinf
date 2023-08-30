@@ -86,6 +86,31 @@ fn main() {
         .output()
         .expect("Cannot globally install `protoc_plugin` Dart package");
 
+    // Modify the PATH environment variable for `protoc-gen-dart`.
+    let mut pub_cache_bin_path = std::path::PathBuf::new();
+    if let Some(home_dir) = std::env::var_os("HOME") {
+        // Unix-like OS
+        pub_cache_bin_path.push(home_dir);
+        pub_cache_bin_path.push(".pub-cache");
+        pub_cache_bin_path.push("bin");
+    } else if let Some(local_app_data) = std::env::var_os("LOCALAPPDATA") {
+        // Windows
+        pub_cache_bin_path.push(local_app_data);
+        pub_cache_bin_path.push("Pub");
+        pub_cache_bin_path.push("Cache");
+        pub_cache_bin_path.push("bin");
+    } else {
+        panic!("Failed to determine pub cache directory.");
+    }
+    if let Some(paths) = std::env::var_os("PATH") {
+        let mut paths = std::env::split_paths(&paths).collect::<Vec<_>>();
+        paths.push(pub_cache_bin_path);
+        let new_path = std::env::join_paths(paths).expect("Failed to join paths.");
+        std::env::set_var("PATH", &new_path);
+    } else {
+        std::env::set_var("PATH", pub_cache_bin_path);
+    }
+
     // Generate Dart message files.
     let _ = fs::create_dir(&dart_output_path);
     for result in fs::read_dir(&dart_output_path).unwrap() {
