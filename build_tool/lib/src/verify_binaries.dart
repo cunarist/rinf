@@ -20,9 +20,9 @@ class VerifyBinaries {
 
   Future<void> run() async {
     final config = CargokitCrateOptions.load(manifestDir: manifestDir);
-    final prebuiltBinaries = config.prebuiltBinaries;
-    if (prebuiltBinaries == null) {
-      stdout.writeln('Crate does not support prebuilt binaries.');
+    final precompiledBinaries = config.precompiledBinaries;
+    if (precompiledBinaries == null) {
+      stdout.writeln('Crate does not support precompiled binaries.');
     } else {
       final crateHash = CrateHash.compute(manifestDir);
       stdout.writeln('Crate hash: $crateHash');
@@ -38,7 +38,7 @@ class VerifyBinaries {
           remote: true,
         );
 
-        final prefix = prebuiltBinaries.uriPrefix;
+        final prefix = precompiledBinaries.uriPrefix;
 
         bool ok = true;
 
@@ -64,7 +64,7 @@ class VerifyBinaries {
             break;
           }
 
-          if (!verify(prebuiltBinaries.publicKey, asset.bodyBytes,
+          if (!verify(precompiledBinaries.publicKey, asset.bodyBytes,
               signature.bodyBytes)) {
             stdout.writeln('INVALID SIGNATURE');
             ok = false;

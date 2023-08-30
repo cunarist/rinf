@@ -81,7 +81,7 @@ class GenKeyCommand extends Command {
   final name = 'gen-key';
 
   @override
-  final description = 'Generate key pair for signing prebuilt binaries';
+  final description = 'Generate key pair for signing precompiled binaries';
 
   @override
   void run() {

@@ -61,7 +61,7 @@ class PrecompileBinaries {
     final hash = CrateHash.compute(manifestDir);
     _log.info('Computed crate hash: $hash');
 
-    final String tagName = 'prebuilt_$hash';
+    final String tagName = 'precompled_$hash';
 
     final github = GitHub(auth: Authentication.withToken(githubToken));
     final repo = github.repositories;
@@ -74,7 +74,7 @@ class PrecompileBinaries {
 
     final tempDir = this.tempDir != null
         ? Directory(this.tempDir!)
-        : Directory.systemTemp.createTempSync('prebuilt_');
+        : Directory.systemTemp.createTempSync('precompiled_');
 
     tempDir.createSync(recursive: true);
 
@@ -185,11 +185,11 @@ class PrecompileBinaries {
           repositorySlug,
           CreateRelease.from(
             tagName: tagName,
-            name: 'Prebuilt binaries ${hash.substring(0, 8)}',
+            name: 'Precompiled binaries ${hash.substring(0, 8)}',
             targetCommitish: null,
             isDraft: false,
             isPrerelease: false,
-            body: 'Prebuilt binaries for crate $libName, '
+            body: 'Precompiled binaries for crate $libName, '
                 'crate hash $hash.',
           ));
     }

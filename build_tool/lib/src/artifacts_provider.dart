@@ -51,7 +51,7 @@ class ArtifactProvider {
   final CargokitUserOptions userOptions;
 
   Future<Map<Target, List<Artifact>>> getArtifacts(List<Target> targets) async {
-    final result = await _getPrebuiltArtifacts(targets);
+    final result = await _getPrecompiledArtifacts(targets);
 
     final pendingTargets = List.of(targets);
     pendingTargets.removeWhere((element) => result.containsKey(element));
@@ -93,14 +93,14 @@ class ArtifactProvider {
     return result;
   }
 
-  Future<Map<Target, List<Artifact>>> _getPrebuiltArtifacts(
+  Future<Map<Target, List<Artifact>>> _getPrecompiledArtifacts(
       List<Target> targets) async {
-    if (userOptions.allowPrebuiltBinaries == false) {
-      _log.info('Prebuilt binaries are disabled');
+    if (userOptions.allowPrecompiledBinaries == false) {
+      _log.info('Precompiled binaries are disabled');
       return {};
     }
-    if (environment.crateOptions.prebuiltBinaries == null) {
-      _log.fine('Prebuilt binaries not enabled for this crate');
+    if (environment.crateOptions.precompiledBinaries == null) {
+      _log.fine('Precompiled binaries not enabled for this crate');
       return {};
     }
 
@@ -111,7 +111,7 @@ class ArtifactProvider {
         'Computed crate hash $crateHash in ${start.elapsedMilliseconds}ms');
 
     final downloadedArtifactsDir =
-        path.join(environment.targetTempDir, 'prebuilt', crateHash);
+        path.join(environment.targetTempDir, 'precompiled', crateHash);
     Directory(downloadedArtifactsDir).createSync(recursive: true);
 
     final res = <Target, List<Artifact>>{};
@@ -149,7 +149,7 @@ class ArtifactProvider {
 
       // Only provide complete set of artifacts.
       if (artifactsForTarget.length == requiredArtifacts.length) {
-        _log.fine('Found prebuilt artifacts for $target');
+        _log.fine('Found precompiled artifacts for $target');
         res[target] = artifactsForTarget;
       }
     }
@@ -163,14 +163,15 @@ class ArtifactProvider {
     required String signatureFileName,
     required String finalPath,
   }) async {
-    final prebuiltBinaries = environment.crateOptions.prebuiltBinaries!;
-    final prefix = prebuiltBinaries.uriPrefix;
+    final precompiledBinaries = environment.crateOptions.precompiledBinaries!;
+    final prefix = precompiledBinaries.uriPrefix;
     final url = Uri.parse('$prefix$crateHash/$fileName');
     final signatureUrl = Uri.parse('$prefix$crateHash/$signatureFileName');
     final signature = await get(signatureUrl);
     _log.fine('Downloading signature from $signatureUrl');
     if (signature.statusCode == 404) {
-      _log.warning('Prebuilt binaries for available for crate hash $crateHash');
+      _log.warning(
+          'Precompiled binaries for available for crate hash $crateHash');
       return;
     }
     if (signature.statusCode != 200) {
@@ -185,7 +186,7 @@ class ArtifactProvider {
       return;
     }
     if (verify(
-        prebuiltBinaries.publicKey, res.bodyBytes, signature.bodyBytes)) {
+        precompiledBinaries.publicKey, res.bodyBytes, signature.bodyBytes)) {
       File(finalPath).writeAsBytesSync(res.bodyBytes);
     } else {
       _log.shout('Signature verification failed! Ignoring binary.');

@@ -111,11 +111,11 @@ extension on YamlMap {
       nodes.map((key, value) => MapEntry(key.value, value));
 }
 
-class PrebuiltBinaries {
+class PrecompiledBinaries {
   final String uriPrefix;
   final PublicKey publicKey;
 
-  PrebuiltBinaries({
+  PrecompiledBinaries({
     required this.uriPrefix,
     required this.publicKey,
   });
@@ -129,7 +129,7 @@ class PrebuiltBinaries {
     return PublicKey(bytes);
   }
 
-  static PrebuiltBinaries parse(YamlNode node) {
+  static PrecompiledBinaries parse(YamlNode node) {
     if (node case YamlMap(valueMap: Map<dynamic, YamlNode> map)) {
       if (map
           case {
@@ -147,14 +147,15 @@ class PrebuiltBinaries {
           _ => throw SourceSpanException(
               'Invalid public key value.', publicKeyNode.span),
         };
-        return PrebuiltBinaries(
+        return PrecompiledBinaries(
           uriPrefix: urlPrefix,
           publicKey: publicKey,
         );
       }
     }
     throw SourceSpanException(
-        'Invalid prebuilt binaries value. Expected Map with "url_prefix" and "public_key".',
+        'Invalid precompiled binaries value. '
+        'Expected Map with "url_prefix" and "public_key".',
         node.span);
   }
 }
@@ -163,18 +164,18 @@ class PrebuiltBinaries {
 class CargokitCrateOptions {
   CargokitCrateOptions({
     this.cargo = const {},
-    this.prebuiltBinaries,
+    this.precompiledBinaries,
   });
 
   final Map<BuildConfiguration, CargoBuildOptions> cargo;
-  final PrebuiltBinaries? prebuiltBinaries;
+  final PrecompiledBinaries? precompiledBinaries;
 
   static CargokitCrateOptions parse(YamlNode node) {
     if (node is! YamlMap) {
       throw SourceSpanException('Cargokit options must be a map', node.span);
     }
     final options = <BuildConfiguration, CargoBuildOptions>{};
-    PrebuiltBinaries? prebuiltBinaries;
+    PrecompiledBinaries? precompiledBinaries;
 
     for (final entry in node.nodes.entries) {
       if (entry
@@ -198,17 +199,17 @@ class CargokitCrateOptions {
               'Unknown build configuration. Must be one of ${BuildConfiguration.values.map((e) => e.name)}.',
               key.span);
         }
-      } else if (entry.key case YamlScalar(value: 'prebuilt_binaries')) {
-        prebuiltBinaries = PrebuiltBinaries.parse(entry.value);
+      } else if (entry.key case YamlScalar(value: 'precompiled_binaries')) {
+        precompiledBinaries = PrecompiledBinaries.parse(entry.value);
       } else {
         throw SourceSpanException(
-            'Unknown cargokit option type. Must be "cargo" or "prebuilt_binaries".',
+            'Unknown cargokit option type. Must be "cargo" or "precompiled_binaries".',
             entry.key.span);
       }
     }
     return CargokitCrateOptions(
       cargo: options,
-      prebuiltBinaries: prebuiltBinaries,
+      precompiledBinaries: precompiledBinaries,
     );
   }
 
@@ -228,35 +229,35 @@ class CargokitCrateOptions {
 
 class CargokitUserOptions {
   // When Rustup is installed always build locally unless user opts into
-  // using prebuilt binaries.
-  static bool defaultAllowPrebuiltBinaries() {
+  // using precompiled binaries.
+  static bool defaultAllowPrecompiledBinaries() {
     return Rustup.executablePath() == null;
   }
 
   CargokitUserOptions({
-    required this.allowPrebuiltBinaries,
+    required this.allowPrecompiledBinaries,
     required this.verboseLogging,
   });
 
   CargokitUserOptions._()
-      : allowPrebuiltBinaries = defaultAllowPrebuiltBinaries(),
+      : allowPrecompiledBinaries = defaultAllowPrecompiledBinaries(),
         verboseLogging = false;
 
   static CargokitUserOptions parse(YamlNode node) {
     if (node is! YamlMap) {
       throw SourceSpanException('Cargokit options must be a map', node.span);
     }
-    bool allowPrebuiltBinaries = defaultAllowPrebuiltBinaries();
+    bool allowPrecompiledBinaries = defaultAllowPrecompiledBinaries();
     bool verboseLogging = false;
 
     for (final entry in node.nodes.entries) {
-      if (entry.key case YamlScalar(value: 'allow_prebuilt_binaries')) {
+      if (entry.key case YamlScalar(value: 'allow_precompiled_binaries')) {
         if (entry.value case YamlScalar(value: bool value)) {
-          allowPrebuiltBinaries = value;
+          allowPrecompiledBinaries = value;
           continue;
         }
         throw SourceSpanException(
-            'Invalid value for "allow_prebuilt_binaries". Must be a boolean.',
+            'Invalid value for "allow_precompiled_binaries". Must be a boolean.',
             entry.value.span);
       } else if (entry.key case YamlScalar(value: 'verbose_logging')) {
         if (entry.value case YamlScalar(value: bool value)) {
@@ -268,12 +269,12 @@ class CargokitUserOptions {
             entry.value.span);
       } else {
         throw SourceSpanException(
-            'Unknown cargokit option type. Must be "allow_prebuilt_binaries" or "verbose_logging".',
+            'Unknown cargokit option type. Must be "allow_precompiled_binaries" or "verbose_logging".',
             entry.key.span);
       }
     }
     return CargokitUserOptions(
-      allowPrebuiltBinaries: allowPrebuiltBinaries,
+      allowPrecompiledBinaries: allowPrecompiledBinaries,
       verboseLogging: verboseLogging,
     );
   }
@@ -300,6 +301,6 @@ class CargokitUserOptions {
     return CargokitUserOptions._();
   }
 
-  final bool allowPrebuiltBinaries;
+  final bool allowPrecompiledBinaries;
   final bool verboseLogging;
 }

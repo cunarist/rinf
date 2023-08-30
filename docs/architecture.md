@@ -67,12 +67,12 @@ cargo:
       - -Z
       - build-std=panic_abort,std
 
-# If crate ships with prebuilt binaries, they can be configured here.
-prebuilt_binaries:
-  # Uri prefix used when downloading prebuilt binaries.
-  url_prefix: https://github.com/superlistapp/super_native_extensions/releases/download/prebuilt_
+# If crate ships with precompiled binaries, they can be configured here.
+precompiled_binaries:
+  # Uri prefix used when downloading precompiled binaries.
+  url_prefix: https://github.com/superlistapp/super_native_extensions/releases/download/precompiled_
 
-  # Public key for verifying downloaded prebuilt binaries.
+  # Public key for verifying downloaded precompiled binaries.
   public_key: 3a257ef1c7d72d84225ac4658d24812ada50a7a7a8a2138c2a91353389fdc514
 ```
 
@@ -84,16 +84,16 @@ A `cargokit_options.yaml` file can also be placed by developer using plugin to t
 # Enables verbose logging of Cargokit during build
 verbose_logging: true
 
-# Opts out of using prebuilt binaries. If crate has configured
-# and deployed prebuilt binaries, these will be by default used whenever Rustup
-# is not installed. With `allow_prebuilt_binaries`  set to false, the build will
+# Opts out of using precompiled binaries. If crate has configured
+# and deployed precompiled binaries, these will be by default used whenever Rustup
+# is not installed. With `allow_precompiled_binaries`  set to false, the build will
 # instead be aborted prompting user to install Rustup.
-allow_prebuilt_binaries: false
+allow_precompiled_binaries: false
 ```
 
 ## Detecting Rustup
 
-When the plugin doesn't come with prebuilt libraries (or user opt-out), `build_tool` will need to invoke Rustup during build to ensure that required Rust targets and toolchain are installed for current build and to build the Rust crate.
+When the plugin doesn't come with precompiled libraries (or user opt-out), `build_tool` will need to invoke Rustup during build to ensure that required Rust targets and toolchain are installed for current build and to build the Rust crate.
 
 Cargokit will attempt to detect Rustup in the default Rustup installation location (`~/.cargo/rustup`) as well as in PATH. This is done so that if user install Rustup but doesn't properly configure PATH, Cargokit will still work.
 

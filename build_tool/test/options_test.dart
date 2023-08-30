@@ -19,16 +19,16 @@ extra_flags:
     expect(options.flags, ['-Z', 'build-std=panic_abort,std']);
   });
 
-  test('parsePrebuiltBinaries', () {
+  test('parsePrecompiledBinaries', () {
     final yaml = """
 url_prefix: https://url-prefix
 public_key: a4c3433798eb2c36edf2b94dbb4dd899d57496ca373a8982d8a792410b7f6445
 """;
-    final prebuiltBinaries = PrebuiltBinaries.parse(loadYamlNode(yaml));
+    final precompiledBinaries = PrecompiledBinaries.parse(loadYamlNode(yaml));
     final key = HEX.decode(
         'a4c3433798eb2c36edf2b94dbb4dd899d57496ca373a8982d8a792410b7f6445');
-    expect(prebuiltBinaries.uriPrefix, 'https://url-prefix');
-    expect(prebuiltBinaries.publicKey.bytes, key);
+    expect(precompiledBinaries.uriPrefix, 'https://url-prefix');
+    expect(precompiledBinaries.publicKey.bytes, key);
   });
 
   test('parseCargokitOptions', () {
@@ -44,15 +44,15 @@ cargo:
   release:
     toolchain: beta
 
-prebuilt_binaries:
+precompiled_binaries:
   url_prefix: https://url-prefix
   public_key: a4c3433798eb2c36edf2b94dbb4dd899d57496ca373a8982d8a792410b7f6445
 ''';
     final options = CargokitCrateOptions.parse(loadYamlNode(yaml));
-    expect(options.prebuiltBinaries?.uriPrefix, 'https://url-prefix');
+    expect(options.precompiledBinaries?.uriPrefix, 'https://url-prefix');
     final key = HEX.decode(
         'a4c3433798eb2c36edf2b94dbb4dd899d57496ca373a8982d8a792410b7f6445');
-    expect(options.prebuiltBinaries?.publicKey.bytes, key);
+    expect(options.precompiledBinaries?.publicKey.bytes, key);
 
     final debugOptions = options.cargo[BuildConfiguration.debug]!;
     expect(debugOptions.toolchain, Toolchain.nightly);
@@ -65,11 +65,11 @@ prebuilt_binaries:
 
   test('parseCargokitUserOptions', () {
     const yaml = '''
-allow_prebuilt_binaries: false
+allow_precompiled_binaries: false
 verbose_logging: true
 ''';
     final options = CargokitUserOptions.parse(loadYamlNode(yaml));
-    expect(options.allowPrebuiltBinaries, false);
+    expect(options.allowPrecompiledBinaries, false);
     expect(options.verboseLogging, true);
   });
 }

@@ -1,25 +1,25 @@
 # Precompiled Binaries
 
 Because Cargokit builds the Rust crate during Flutter build, it is inherently
-dependend on the Rust toolchain(s) being installed on the developer's machine.
+dependend on the Rust toolchain being installed on the developer's machine.
 
 To streamline plugin usage, it is possible for Cargokit to use precompiled binaries instead.
 
 This is how the process of using precompiled binaries looks during the build on developer machine:
 
-1. Cargokit checks if there is `cargokit_options.yaml` file in the root folder of target application. If there is one, it will be checked for `allow_prebuilt_binaries` options to see if user opted out of using prebuilt binaries. In which case Cargokit will insist on building from source. Cargokit will also build from source if the configuration file is absent, but user has Rustup installed.
+1. Cargokit checks if there is `cargokit_options.yaml` file in the root folder of target application. If there is one, it will be checked for `allow_precompiled_binaries` options to see if user opted out of using precompiled binaries. In which case Cargokit will insist on building from source. Cargokit will also build from source if the configuration file is absent, but user has Rustup installed.
 
-2. Cargokit checks if there is `cargokit_options.yaml` file placed in the Rust crate. If there is one, it will be checked for `prebuilt_binaries` section to see if crate supports prebuilt binaries. The configuration section must contain a public key and URL prefix.
+2. Cargokit checks if there is `cargokit_options.yaml` file placed in the Rust crate. If there is one, it will be checked for `precompiled_binaries` section to see if crate supports precompiled binaries. The configuration section must contain a public key and URL prefix.
 
-3. Cargokit computes a `crate-hash`. This is a SHA256 hash value computed from all Rust files inside crate, `Cargo.toml`, `Cargo.lock` and `cargokit_options.yaml`. This uniquely identifies the crate and it is used to find the correct prebuilt binaries.
+3. Cargokit computes a `crate-hash`. This is a SHA256 hash value computed from all Rust files inside crate, `Cargo.toml`, `Cargo.lock` and `cargokit_options.yaml`. This uniquely identifies the crate and it is used to find the correct precompiled binaries.
 
-4. Cargokit will attempt to download the prebuilt binaries for target platform and `crate_hash` combination and a signature file for each downloaded binary. If download succeeds, the binary content will be verified against the signature and public key included in `cargokit_options.yaml` (which is part of Rust crate and thus part of published Flutter package).
+4. Cargokit will attempt to download the precompiled binaries for target platform and `crate_hash` combination and a signature file for each downloaded binary. If download succeeds, the binary content will be verified against the signature and public key included in `cargokit_options.yaml` (which is part of Rust crate and thus part of published Flutter package).
 
-5. If the verification succeeds, the prebuilt binaries will be used. Otherwise the binary will be discarded and Cargokit will insist on building from source.
+5. If the verification succeeds, the precompiled binaries will be used. Otherwise the binary will be discarded and Cargokit will insist on building from source.
 
 ## Providing precompiled binaries
 
-Note that this assumes that prebuilt binaries will be generated during github actions and deployed as github releases.
+Note that this assumes that precompiled binaries will be generated during github actions and deployed as github releases.
 
 ### Use `build_tool` to generate a key-pair:
 
@@ -36,19 +36,19 @@ The public key should be included in `cargokit_options.yaml` file in the Rust cr
 The file must be placed alongside Cargo.toml.
 
 ```yaml
-prebuilt_binaries:
-  # Uri prefix used when downloading prebuilt binaries.
-  url_prefix: https://github.com/<repository-owner>/<repository-name>/releases/download/prebuilt_
+precompiled_binaries:
+  # Uri prefix used when downloading precompiled binaries.
+  url_prefix: https://github.com/<repository-owner>/<repository-name>/releases/download/precompiled_
 
-  # Public key for verifying downloaded prebuilt binaries.
+  # Public key for verifying downloaded precompiled binaries.
   public_key: <public key from previous step>
 ```
 
-### Configure a github action to build and upload prebuilt binaries.
+### Configure a github action to build and upload precompiled binaries.
 
 The github action should be run at every commit to main branch (and possibly other branches).
 
-The action needs two secrets, private key for signing binaries and GitHub token for uploading binaries as releases. Here is example action that prebuilds binaries for all supported targets.
+The action needs two secrets - private key for signing binaries and GitHub token for uploading binaries as releases. Here is example action that precompiles and uploads binaries for all supported targets.
 
 ```yaml
 on:
