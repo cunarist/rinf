@@ -75,14 +75,14 @@ jobs:
         run: sudo apt-get update && sudo apt-get install libgtk-3-dev
       - name: Precompile
         if: (matrix.os == 'macOS-latest') || (matrix.os == 'windows-latest')
-        run: dart run build_tool precompile-binaries -v --lib-name=super_native_extensions --manifest-dir=../../rust --repository=superlistapp/super_native_extensions
+        run: dart run build_tool precompile-binaries -v --manifest-dir=../../rust --repository=superlistapp/super_native_extensions
         working-directory: super_native_extensions/cargokit/build_tool
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
           PRIVATE_KEY: ${{ secrets.RELEASE_PRIVATE_KEY }}
       - name: Precompile (with Android)
         if: (matrix.os == 'ubuntu-latest')
-        run: dart run build_tool precompile-binaries -v --lib-name=super_native_extensions --manifest-dir=../../rust --repository=superlistapp/super_native_extensions --android-sdk-location=/usr/local/lib/android/sdk --android-ndk-version=24.0.8215888 --android-min-sdk-version=23
+        run: dart run build_tool precompile-binaries -v --manifest-dir=../../rust --repository=superlistapp/super_native_extensions --android-sdk-location=/usr/local/lib/android/sdk --android-ndk-version=24.0.8215888 --android-min-sdk-version=23
         working-directory: super_native_extensions/cargokit/build_tool
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
