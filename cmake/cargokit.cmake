@@ -11,10 +11,10 @@ function(apply_cargokit target manifest_dir lib_name any_symbol_name)
     set(CARGOKIT_LIB_NAME "${lib_name}")
     set(CARGOKIT_LIB_FULL_NAME "${CMAKE_SHARED_MODULE_PREFIX}${CARGOKIT_LIB_NAME}${CMAKE_SHARED_MODULE_SUFFIX}")
     if (CMAKE_CONFIGURATION_TYPES)
-        set(CARGOKIT_TARGET_DIR "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>")
+        set(CARGOKIT_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>")
         set(OUTPUT_LIB "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/${CARGOKIT_LIB_FULL_NAME}")
     else()
-        set(CARGOKIT_TARGET_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+        set(CARGOKIT_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}")
         set(OUTPUT_LIB "${CMAKE_CURRENT_BINARY_DIR}/${CARGOKIT_LIB_FULL_NAME}")
     endif()
     set(CARGOKIT_TEMP_DIR "${CMAKE_CURRENT_BINARY_DIR}/cargokit_build")
@@ -30,10 +30,11 @@ function(apply_cargokit target manifest_dir lib_name any_symbol_name)
         "CARGOKIT_CONFIGURATION=$<CONFIG>"
         "CARGOKIT_MANIFEST_DIR=${CMAKE_CURRENT_SOURCE_DIR}/${manifest_dir}"
         "CARGOKIT_LIB_NAME=${CARGOKIT_LIB_NAME}"
-        "CARGOKIT_BUILD_DIR=${CARGOKIT_TEMP_DIR}"
-        "CARGOKIT_TARGET_DIR=${CARGOKIT_TARGET_DIR}"
+        "CARGOKIT_TARGET_TEMP_DIR=${CARGOKIT_TEMP_DIR}"
+        "CARGOKIT_OUTPUT_DIR=${CARGOKIT_OUTPUT_DIR}"
         "CARGOKIT_TARGET_PLATFORM=${CARGOKIT_TARGET_PLATFORM}"
         "CARGOKIT_TOOL_TEMP_DIR=${CARGOKIT_TEMP_DIR}/tool"
+        "CARGOKIT_ROOT_PROJECT_DIR=${CMAKE_SOURCE_DIR}"
     )
 
     if (WIN32)
@@ -52,7 +53,7 @@ function(apply_cargokit target manifest_dir lib_name any_symbol_name)
                 "${CMAKE_CURRENT_BINARY_DIR}/${CONFIG}/${CARGOKIT_LIB_FULL_NAME}"
                 "${CMAKE_CURRENT_BINARY_DIR}/_phony_"
                 COMMAND ${CMAKE_COMMAND} -E env ${CARGOKIT_ENV}
-                "${cargokit_cmake_root}/run_rust_tool${SCRIPT_EXTENSION}" build_cmake
+                "${cargokit_cmake_root}/run_build_tool${SCRIPT_EXTENSION}" build-cmake
                 VERBATIM
             )
         endforeach()
@@ -62,7 +63,7 @@ function(apply_cargokit target manifest_dir lib_name any_symbol_name)
             ${OUTPUT_LIB}
             "${CMAKE_CURRENT_BINARY_DIR}/_phony_"
             COMMAND ${CMAKE_COMMAND} -E env ${CARGOKIT_ENV}
-            "${cargokit_cmake_root}/run_rust_tool${SCRIPT_EXTENSION}" build_cmake
+            "${cargokit_cmake_root}/run_build_tool${SCRIPT_EXTENSION}" build-cmake
             VERBATIM
         )
     endif()

@@ -8,16 +8,36 @@ NEW_PATH=`echo $PATH | tr ":" "\n" | grep -v "Contents/Developer/" | tr "\n" ":"
 
 export PATH=${NEW_PATH%?} # remove trailing :
 
-export CARGOKIT_PLATFORM_NAME=$PLATFORM_NAME
-export CARGOKIT_ARCHS=$ARCHS
-export CARGOKIT_CONFIGURATION=$CONFIGURATION
-export CARGOKIT_SRCROOT=$PODS_TARGET_SRCROOT
-export CARGOKIT_TEMP_DIR=$TARGET_TEMP_DIR
-export CARGOKIT_PRODUCT_NAME=$PRODUCT_NAME
-export CARGOKIT_TARGET_DIR=$PODS_CONFIGURATION_BUILD_DIR
-export CARGOKIT_TOOL_TEMP_DIR=$TARGET_TEMP_DIR/rust_tool
+env
 
-"$BASEDIR/run_rust_tool.sh" build_pod $@
+# Platform name (macosx, iphoneos, iphonesimulator)
+export CARGOKIT_DARWIN_PLATFORM_NAME=$PLATFORM_NAME
+
+# Arctive architectures (arm64, armv7, x86_64), space separated.
+export CARGOKIT_DARWIN_ARCHS=$ARCHS
+
+# Current build configuration (Debug, Release)
+export CARGOKIT_CONFIGURATION=$CONFIGURATION
+
+# Path to directory containing Cargo.toml.
+export CARGOKIT_MANIFEST_DIR=$PODS_TARGET_SRCROOT/$1
+
+# Name of Rust library being built.
+export CARGOKIT_LIB_NAME=$2
+
+# Temporary directory for build artifacts.
+export CARGOKIT_TARGET_TEMP_DIR=$TARGET_TEMP_DIR
+
+# Output directory for final artifacts.
+export CARGOKIT_OUTPUT_DIR=$PODS_CONFIGURATION_BUILD_DIR/$PRODUCT_NAME
+
+# Directory to store built tool artifacts.
+export CARGOKIT_TOOL_TEMP_DIR=$TARGET_TEMP_DIR/build_tool
+
+# Directory inside root project. Not necessarily the top level directory of root project.
+export CARGOKIT_ROOT_PROJECT_DIR=$SRCROOT
+
+"$BASEDIR/run_build_tool.sh" build-pod $@
 
 # Make a symlink from built framework to phony file, which will be used as input to
 # build script. This should force rebuild (podspec currently doesn't support alwaysOutOfDate
