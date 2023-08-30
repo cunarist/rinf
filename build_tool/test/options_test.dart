@@ -65,11 +65,11 @@ precompiled_binaries:
 
   test('parseCargokitUserOptions', () {
     const yaml = '''
-allow_precompiled_binaries: false
+use_precompiled_binaries: false
 verbose_logging: true
 ''';
     final options = CargokitUserOptions.parse(loadYamlNode(yaml));
-    expect(options.allowPrecompiledBinaries, false);
+    expect(options.usePrecompiledBinaries, false);
     expect(options.verboseLogging, true);
   });
 }

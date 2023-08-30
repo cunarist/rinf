@@ -7,7 +7,7 @@ To streamline plugin usage, it is possible for Cargokit to use precompiled binar
 
 This is how the process of using precompiled binaries looks during the build on developer machine:
 
-1. Cargokit checks if there is `cargokit_options.yaml` file in the root folder of target application. If there is one, it will be checked for `allow_precompiled_binaries` options to see if user opted out of using precompiled binaries. In which case Cargokit will insist on building from source. Cargokit will also build from source if the configuration file is absent, but user has Rustup installed.
+1. Cargokit checks if there is `cargokit_options.yaml` file in the root folder of target application. If there is one, it will be checked for `use_precompiled_binaries` options to see if user opted out of using precompiled binaries. In which case Cargokit will insist on building from source. Cargokit will also build from source if the configuration file is absent, but user has Rustup installed.
 
 2. Cargokit checks if there is `cargokit_options.yaml` file placed in the Rust crate. If there is one, it will be checked for `precompiled_binaries` section to see if crate supports precompiled binaries. The configuration section must contain a public key and URL prefix.
 

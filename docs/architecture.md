@@ -86,9 +86,9 @@ verbose_logging: true
 
 # Opts out of using precompiled binaries. If crate has configured
 # and deployed precompiled binaries, these will be by default used whenever Rustup
-# is not installed. With `allow_precompiled_binaries`  set to false, the build will
+# is not installed. With `use_precompiled_binaries` set to false, the build will
 # instead be aborted prompting user to install Rustup.
-allow_precompiled_binaries: false
+use_precompiled_binaries: false
 ```
 
 ## Detecting Rustup

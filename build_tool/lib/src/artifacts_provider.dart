@@ -95,7 +95,7 @@ class ArtifactProvider {
 
   Future<Map<Target, List<Artifact>>> _getPrecompiledArtifacts(
       List<Target> targets) async {
-    if (userOptions.allowPrecompiledBinaries == false) {
+    if (userOptions.usePrecompiledBinaries == false) {
       _log.info('Precompiled binaries are disabled');
       return {};
     }

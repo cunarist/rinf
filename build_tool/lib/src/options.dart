@@ -230,34 +230,34 @@ class CargokitCrateOptions {
 class CargokitUserOptions {
   // When Rustup is installed always build locally unless user opts into
   // using precompiled binaries.
-  static bool defaultAllowPrecompiledBinaries() {
+  static bool defaultUsePrecompiledBinaries() {
     return Rustup.executablePath() == null;
   }
 
   CargokitUserOptions({
-    required this.allowPrecompiledBinaries,
+    required this.usePrecompiledBinaries,
     required this.verboseLogging,
   });
 
   CargokitUserOptions._()
-      : allowPrecompiledBinaries = defaultAllowPrecompiledBinaries(),
+      : usePrecompiledBinaries = defaultUsePrecompiledBinaries(),
         verboseLogging = false;
 
   static CargokitUserOptions parse(YamlNode node) {
     if (node is! YamlMap) {
       throw SourceSpanException('Cargokit options must be a map', node.span);
     }
-    bool allowPrecompiledBinaries = defaultAllowPrecompiledBinaries();
+    bool usePrecompiledBinaries = defaultUsePrecompiledBinaries();
     bool verboseLogging = false;
 
     for (final entry in node.nodes.entries) {
-      if (entry.key case YamlScalar(value: 'allow_precompiled_binaries')) {
+      if (entry.key case YamlScalar(value: 'use_precompiled_binaries')) {
         if (entry.value case YamlScalar(value: bool value)) {
-          allowPrecompiledBinaries = value;
+          usePrecompiledBinaries = value;
           continue;
         }
         throw SourceSpanException(
-            'Invalid value for "allow_precompiled_binaries". Must be a boolean.',
+            'Invalid value for "use_precompiled_binaries". Must be a boolean.',
             entry.value.span);
       } else if (entry.key case YamlScalar(value: 'verbose_logging')) {
         if (entry.value case YamlScalar(value: bool value)) {
@@ -269,12 +269,12 @@ class CargokitUserOptions {
             entry.value.span);
       } else {
         throw SourceSpanException(
-            'Unknown cargokit option type. Must be "allow_precompiled_binaries" or "verbose_logging".',
+            'Unknown cargokit option type. Must be "use_precompiled_binaries" or "verbose_logging".',
             entry.key.span);
       }
     }
     return CargokitUserOptions(
-      allowPrecompiledBinaries: allowPrecompiledBinaries,
+      usePrecompiledBinaries: usePrecompiledBinaries,
       verboseLogging: verboseLogging,
     );
   }
@@ -301,6 +301,6 @@ class CargokitUserOptions {
     return CargokitUserOptions._();
   }
 
-  final bool allowPrecompiledBinaries;
+  final bool usePrecompiledBinaries;
   final bool verboseLogging;
 }
