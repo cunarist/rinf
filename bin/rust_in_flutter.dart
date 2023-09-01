@@ -300,7 +300,9 @@ Future<void> _generateMessageCode() async {
   final dartOutputPath =
       flutterProjectPath.uri.resolve('lib/messages').toFilePath();
   await Directory(rustOutputPath).create(recursive: true);
+  await _emptyDirectory(rustOutputPath);
   await Directory(dartOutputPath).create(recursive: true);
+  await _emptyDirectory(dartOutputPath);
 
   // Get the list of `.proto` files.
   final Stream<FileSystemEntity> protoEntityStream =
@@ -389,4 +391,18 @@ Future<void> _generateMessageCode() async {
 
   // Notify that it's done
   print("🎉 Message code in Dart and Rust is now ready! 🎉");
+}
+
+Future<void> _emptyDirectory(String directoryPath) async {
+  final directory = Directory(directoryPath);
+
+  if (await directory.exists()) {
+    await for (final entity in directory.list()) {
+      if (entity is File) {
+        await entity.delete();
+      } else if (entity is Directory) {
+        await entity.delete(recursive: true);
+      }
+    }
+  }
 }
