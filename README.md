@@ -13,7 +13,7 @@
 
 Designed for ease of use, future scalability, and unparalleled performance, this lightweight framework takes care of all the complexity behind the scenes. No messing with sensitive build files, no excessive code generation during development. Simply add this package to your app project, and you're all set to write Flutter and Rust together!
 
-## Platform Support
+## 🖥️ Platform Support
 
 All platforms available with Flutter are [tested](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml?query=branch%3Amain) and supported. Challenging build settings are automatically handled by this package.
 
@@ -24,39 +24,39 @@ All platforms available with Flutter are [tested](https://github.com/cunarist/ru
 - ✅ iOS: Tested and Supported
 - ✅ Web: Tested and Supported
 
-## Benefits
+## 🚀 Benefits
 
 - Rust integration with the ability to use an arbitrary number of library crates
 - Async interaction with no blocking
 - RESTful API with easy request from Dart and response from Rust
-- Type-safe and flexible messages powered by Protobuf
 - Streaming from Rust to Dart
+- Type-safe and flexible messages powered by Protobuf
 - Automatic restart of Rust logic on Dart's hot restart
 - No memory copy when sending native data
 
-## Why Use Flutter?
+## 🐦 Why Use Flutter?
 
 While Rust is a powerful language for high-performance native programming, its ecosystem for building graphical user interfaces is far from being mature. Though it already has some GUI frameworks like `iced`, `egui`, `gtk-rs`, and others, it doesn't compete with extensive support and smooth development experience that Flutter provides. It's only Flutter that compiles to all 6 major platforms from a single codebase.
 
 Flutter is a powerful and versatile framework that has gained immense popularity for building cross-platform applications with stunning user interfaces. It provides declarative pattern, beautiful widgets, hot reload, convenient debugging tools, and dedicated packages for user interfaces right out-of-the-box.
 
-## Why Use Rust?
+## 🦀 Why Use Rust?
 
 While Dart excels as an amazing object-oriented language for GUI apps, its non-native garbage collection may not always meet demanding performance requirements. This is where Rust steps in, offering an incredible speed advantage of roughly [2~40 times faster](https://programming-language-benchmarks.vercel.app/dart-vs-rust) than Dart, alongside the ability to leverage multiple threads.
 
 Rust has garnered a devoted following, being [the most loved programming language](https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages) on Stack Overflow. Its native performance, thanks to the zero-cost abstraction philosophy, ensures high productivity. Many developers foresee Rust potentially replacing C++ in the future. Rust's simplicity, memory safety, superior performance in various scenarios, vibrant community, and robust tooling support contribute to its growing popularity.
 
-# 📖 Documentation
+## 📖 Documentation
 
 Check out the [documentation](https://docs.cunarist.com/rust-in-flutter) for everything you need to know about how to use this thing.
 
-# 🌟 Contributors
+## 👥 Contributors
 
 We appreciate your contribution to the development of this project!
 
 [![GitHub contributors (via allcontributors.org)](https://contrib.rocks/image?repo=cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/graphs/contributors)
 
-# ☕ Support Us
+## ☕ Support Us
 
 If you are benefiting from the features of Rust-In-Flutter and find it helpful, why not consider supporting this project? Your generous donations contribute to the maintenance and development of Rust-In-Flutter, ensuring its continuous improvement and growth. 😉
 
