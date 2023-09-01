@@ -17,11 +17,12 @@ Designed for ease of use, future scalability, and unparalleled performance, this
 
 All platforms available with Flutter are [tested](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml?query=branch%3Amain) and supported. Challenging build settings are automatically handled by this package.
 
-| Dev OS  | Linux | Android | Windows | macOS | iOS | Web |
-| ------- | ----- | ------- | ------- | ----- | --- | --- |
-| Linux   | ✅    | ✅      | -       | -     | -   | ✅  |
-| Windows | -     | ✅      | ✅      | -     | -   | ✅  |
-| macOS   | -     | ✅      | -       | ✅    | ✅  | ✅  |
+- ✅ Linux: Tested and Supported
+- ✅ Android: Tested and Supported
+- ✅ Windows: Tested and Supported
+- ✅ macOS: Tested and Supported
+- ✅ iOS: Tested and Supported
+- ✅ Web: Tested and Supported
 
 ## Benefits
 
