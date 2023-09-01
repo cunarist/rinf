@@ -1,3 +1,7 @@
+## 3.1.0
+
+- Provide Dart command `message`. Developers can now generate Dart and Rust message code from `.proto` files with `dart run rust_in_flutter message`. `build.rs` file that used to do this is removed.
+
 ## 3.0.9
 
 - Fixed a problem with pub.dev score.
