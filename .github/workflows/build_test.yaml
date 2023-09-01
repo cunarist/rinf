@@ -119,7 +119,7 @@ jobs:
 
       - name: Generate message files
         working-directory: example/
-        run: cargo check
+        run: dart run rust_in_flutter message
 
       - name: Build example Flutter app
         if: matrix.target == 'linux'

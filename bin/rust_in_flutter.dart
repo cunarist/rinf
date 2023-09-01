@@ -9,6 +9,8 @@ Future<void> main(List<String> args) async {
     print("No operation is provided");
   } else if (args[0] == "template") {
     await _applyTemplate();
+  } else if (args[0] == "message") {
+    await _generateMessageCode();
   } else if (args[0] == "wasm") {
     if (args.contains("--release") || args.contains("-r")) {
       await _buildWebassembly(isReleaseMode: true);
@@ -23,7 +25,7 @@ Future<void> main(List<String> args) async {
 /// Creates new folders and files to an existing Flutter project folder.
 Future<void> _applyTemplate() async {
   // Get the path of the current project directory
-  final projectPath = Directory.current.path;
+  final flutterProjectPath = Directory.current.path;
 
   // Get the package directory path
   final packageConfig = await findPackageConfig(Directory.current);
@@ -37,7 +39,7 @@ Future<void> _applyTemplate() async {
   final packagePath = package.root.toFilePath();
 
   // Check if current folder is a Flutter project.
-  final mainFile = File('$projectPath/lib/main.dart');
+  final mainFile = File('$flutterProjectPath/lib/main.dart');
   final isFlutterProject = await mainFile.exists();
   if (!isFlutterProject) {
     print("\nThis folder doesn't look like a Flutter project. Aborting...\n");
@@ -46,19 +48,19 @@ Future<void> _applyTemplate() async {
 
   // Copy basic folders needed for Rust to work
   final templateSource = Directory('$packagePath/example/native');
-  final templateDestination = Directory('$projectPath/native');
+  final templateDestination = Directory('$flutterProjectPath/native');
   await _copyDirectory(templateSource, templateDestination);
   final messagesSource = Directory('$packagePath/example/messages');
-  final messagesDestination = Directory('$projectPath/messages');
+  final messagesDestination = Directory('$flutterProjectPath/messages');
   await _copyDirectory(messagesSource, messagesDestination);
 
   // Copy `Cargo.toml`
   final cargoSource = File('$packagePath/example/Cargo.toml');
-  final cargoDestination = File('$projectPath/Cargo.toml');
+  final cargoDestination = File('$flutterProjectPath/Cargo.toml');
   await cargoSource.copy(cargoDestination.path);
 
   // Create `.cargo/config.toml` file
-  final cargoConfigFile = File('$projectPath/.cargo/config.toml');
+  final cargoConfigFile = File('$flutterProjectPath/.cargo/config.toml');
   if (!(await cargoConfigFile.exists())) {
     await cargoConfigFile.create(recursive: true);
   }
@@ -74,7 +76,7 @@ Future<void> _applyTemplate() async {
   // Add some lines to `.gitignore`
   final rustSectionTitle = '# Rust related';
   final messageSectionTitle = '# Generated messages';
-  final gitignoreFile = File('$projectPath/.gitignore');
+  final gitignoreFile = File('$flutterProjectPath/.gitignore');
   if (!(await gitignoreFile.exists())) {
     await gitignoreFile.create(recursive: true);
   }
@@ -287,4 +289,104 @@ Future<void> _runAdvancedCommand(
     throw ProcessException(
         command, arguments, processOutput.join(''), exitCode);
   }
+}
+
+Future<void> _generateMessageCode() async {
+  // Prepare paths.
+  final flutterProjectPath = Directory.current;
+  final protoPath = flutterProjectPath.uri.resolve('messages').toFilePath();
+  final rustOutputPath =
+      flutterProjectPath.uri.resolve('native/hub/src/messages').toFilePath();
+  final dartOutputPath =
+      flutterProjectPath.uri.resolve('lib/messages').toFilePath();
+  Directory(rustOutputPath).create(recursive: true);
+  Directory(dartOutputPath).create(recursive: true);
+
+  // Get the list of `.proto` files.
+  final Stream<FileSystemEntity> protoEntityStream =
+      Directory(protoPath).list();
+  final List<String> protoFilenames = [];
+  await for (final entity in protoEntityStream) {
+    if (entity is File) {
+      final String filename = entity.uri.pathSegments.last;
+      if (filename.endsWith('.proto')) {
+        protoFilenames.add(filename);
+      }
+    }
+  }
+
+  // Generate Rust message files.
+  print("Installing `protoc-gen-prost` for Rust." +
+      " This might take a while if there are new updates to be installed.");
+  final cargoInstallCommand =
+      await Process.run('cargo', ['install', 'protoc-gen-prost']);
+  if (cargoInstallCommand.exitCode != 0) {
+    throw Exception('Cannot globally install `protoc-gen-prost` Rust crate');
+  }
+  final protocRustResult = await Process.run('protoc', [
+    '--proto_path=$protoPath',
+    '--prost_out=$rustOutputPath',
+    '--fatal_warnings',
+    ...protoFilenames,
+  ]);
+  if (protocRustResult.exitCode != 0) {
+    throw Exception('Could not compile `.proto` files into Rust');
+  }
+
+  // Generate `mod.rs` for `messages` module in Rust.
+  final Stream<FileSystemEntity> rustEntityStream =
+      Directory(rustOutputPath).list();
+  final List<FileSystemEntity> rustMessageFiles = [];
+  await for (final entity in rustEntityStream) {
+    if (entity is File) {
+      final String filename = entity.uri.pathSegments.last;
+      if (filename.endsWith('.rs') && filename != 'mod.rs') {
+        rustMessageFiles.add(entity);
+      }
+    }
+  }
+  final modRsLines = rustMessageFiles.map((file) async {
+    final fileName = file.uri.pathSegments.last;
+    final parts = fileName.split('.');
+    parts.removeLast(); // Remove the extension from the filename.
+    final fileNameWithoutExtension = parts.join('.');
+    return 'pub mod $fileNameWithoutExtension;';
+  });
+  final modRsContent = (await Future.wait(modRsLines)).join('\n');
+  await File('$rustOutputPath/mod.rs').writeAsString(modRsContent);
+
+  // Generate Dart message files.
+  print("Installing `protoc_plugin` for Dart." +
+      " This might take a while if there are new updates to be installed.");
+  final pubGlobalActivateCommand =
+      await Process.run('dart', ['pub', 'global', 'activate', 'protoc_plugin']);
+  if (pubGlobalActivateCommand.exitCode != 0) {
+    throw Exception('Cannot globally install `protoc_plugin` Dart package');
+  }
+  final newEnvironment = Map<String, String>.from(Platform.environment);
+  final currentPathVariable = newEnvironment['PATH'];
+  final pubCacheBinPath = Platform.isWindows
+      ? '${Platform.environment['LOCALAPPDATA']}\\Pub\\Cache\\bin'
+      : '${Platform.environment['HOME']}/.pub-cache/bin';
+  final pathSeparator = Platform.isWindows ? ';' : ':';
+  final newPathVariable = currentPathVariable != null
+      ? '$currentPathVariable$pathSeparator$pubCacheBinPath'
+      : pubCacheBinPath;
+  newEnvironment['PATH'] = newPathVariable;
+  final protocDartResult = await Process.run(
+    'protoc',
+    [
+      '--proto_path=$protoPath',
+      '--dart_out=$dartOutputPath',
+      '--fatal_warnings',
+      ...protoFilenames,
+    ],
+    environment: newEnvironment,
+  );
+  if (protocDartResult.exitCode != 0) {
+    throw Exception('Could not compile `.proto` files into Dart');
+  }
+
+  // Notify that it's done
+  print("🎉 Message code in Dart and Rust is now ready! 🎉");
 }
