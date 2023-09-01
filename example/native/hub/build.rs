@@ -82,9 +82,8 @@ fn main() {
     let dart_path = which::which("dart").unwrap(); // https://github.com/rust-lang/rust/issues/37519
     let mut command = Command::new(dart_path);
     command.args(["pub", "global", "activate", "protoc_plugin"]);
-    command
-        .output()
-        .expect("Cannot globally install `protoc_plugin` Dart package");
+    let result = command.output();
+    result.expect("Cannot globally install `protoc_plugin` Dart package");
 
     // Modify the PATH environment variable for `protoc-gen-dart`.
     let mut pub_cache_bin_path = std::path::PathBuf::new();
