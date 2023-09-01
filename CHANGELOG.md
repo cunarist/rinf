@@ -1,3 +1,7 @@
+## 3.2.3
+
+- Improved guides.
+
 ## 3.2.2
 
 - Organized guides.
