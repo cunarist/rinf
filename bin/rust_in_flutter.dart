@@ -8,7 +8,7 @@ Future<void> main(List<String> args) async {
   if (args.length == 0) {
     print("No operation is provided");
   } else if (args[0] == "template") {
-    await _applyTemplate();
+    await _applyRustTemplate();
   } else if (args[0] == "message") {
     await _generateMessageCode();
   } else if (args[0] == "wasm") {
@@ -23,7 +23,7 @@ Future<void> main(List<String> args) async {
 }
 
 /// Creates new folders and files to an existing Flutter project folder.
-Future<void> _applyTemplate() async {
+Future<void> _applyRustTemplate() async {
   // Get the path of the current project directory
   final flutterProjectPath = Directory.current.path;
 
@@ -81,20 +81,52 @@ Future<void> _applyTemplate() async {
     await gitignoreFile.create(recursive: true);
   }
   final gitignoreContent = await gitignoreFile.readAsString();
-  var splitted = gitignoreContent.split('\n\n');
-  splitted = splitted.map((s) => s.trim()).toList();
+  var gitignoreSplitted = gitignoreContent.split('\n\n');
+  gitignoreSplitted = gitignoreSplitted.map((s) => s.trim()).toList();
   if (!gitignoreContent.contains(rustSectionTitle)) {
     var text = rustSectionTitle;
     text += '\n' + '.cargo/';
     text += '\n' + 'target/';
-    splitted.add(text);
+    gitignoreSplitted.add(text);
   }
   if (!gitignoreContent.contains(messageSectionTitle)) {
     var text = messageSectionTitle;
     text += '\n' + '*/**/messages/';
-    splitted.add(text);
+    gitignoreSplitted.add(text);
   }
-  await gitignoreFile.writeAsString(splitted.join('\n\n'));
+  await gitignoreFile.writeAsString(gitignoreSplitted.join('\n\n'));
+
+  // Add some guides to `README.md`
+  final guideSectionTitle = '# Using Rust Inside Flutter';
+  final readmeFile = File('$flutterProjectPath/README.md');
+  if (!(await gitignoreFile.exists())) {
+    await gitignoreFile.create(recursive: true);
+  }
+  final readmeContent = await readmeFile.readAsString();
+  var readmeSplitted = readmeContent.split('\n\n');
+  readmeSplitted = readmeSplitted.map((s) => s.trim()).toList();
+  if (!readmeContent.contains(guideSectionTitle)) {
+    final text = '''
+$guideSectionTitle
+
+This project leverages Flutter for GUI and Rust for the backend logic,
+utilizing the capabilities of the
+[Rust-In-Flutter](https://pub.dev/packages/rust_in_flutter) framework.
+For detailed instructions on writing Rust and Flutter together,
+please refer to its [documentation](https://docs.cunarist.com/rust-in-flutter).
+
+Messages sent between Dart and Rust are implemented using Protobuf.
+If you have newly cloned the project repository
+or made changes to the `.proto` files in the `./messages` directory,
+run the following command:
+
+```bash
+dart run rust_in_flutter message
+```
+''';
+    readmeSplitted.add(text);
+  }
+  await readmeFile.writeAsString(readmeSplitted.join('\n\n'));
 
   // Add Dart dependencies
   await Process.run('dart', ['pub', 'add', 'protobuf']);
