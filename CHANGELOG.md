@@ -1,3 +1,7 @@
+## 3.2.2
+
+- Organized guides.
+
 ## 3.2.1
 
 - Matched first guides with the docs.
