@@ -113,13 +113,13 @@ jobs:
           java-version: "11"
           cache: "gradle"
 
-      - name: Fetch dependencies
+      - name: Fetch Flutter dependencies
         working-directory: example/
         run: flutter pub get
 
       - name: Generate message files
         working-directory: example/
-        run: cargo check
+        run: dart run rust_in_flutter message
 
       - name: Build example Flutter app
         if: matrix.target == 'linux'
