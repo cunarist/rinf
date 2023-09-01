@@ -318,7 +318,7 @@ Future<void> _generateMessageCode() async {
   }
 
   // Generate Rust message files.
-  print("Installing `protoc-gen-prost` for Rust." +
+  print("Verifying `protoc-gen-prost` for Rust." +
       " This might take a while if there are new updates to be installed.");
   final cargoInstallCommand =
       await Process.run('cargo', ['install', 'protoc-gen-prost']);
@@ -358,7 +358,7 @@ Future<void> _generateMessageCode() async {
   await File('$rustOutputPath/mod.rs').writeAsString(modRsContent);
 
   // Generate Dart message files.
-  print("Installing `protoc_plugin` for Dart." +
+  print("Verifying `protoc_plugin` for Dart." +
       " This might take a while if there are new updates to be installed.");
   final pubGlobalActivateCommand =
       await Process.run('dart', ['pub', 'global', 'activate', 'protoc_plugin']);
