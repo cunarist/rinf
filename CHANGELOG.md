@@ -1,3 +1,7 @@
+## 3.2.1
+
+- Matched first guides with the docs.
+
 ## 3.2.0
 
 - Now when applying the Rust template with `dart run rust_in_flutter template`, `README.md` file will get a new section explaining about this framework.
