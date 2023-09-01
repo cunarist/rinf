@@ -299,8 +299,8 @@ Future<void> _generateMessageCode() async {
       flutterProjectPath.uri.resolve('native/hub/src/messages').toFilePath();
   final dartOutputPath =
       flutterProjectPath.uri.resolve('lib/messages').toFilePath();
-  Directory(rustOutputPath).create(recursive: true);
-  Directory(dartOutputPath).create(recursive: true);
+  await Directory(rustOutputPath).create(recursive: true);
+  await Directory(dartOutputPath).create(recursive: true);
 
   // Get the list of `.proto` files.
   final Stream<FileSystemEntity> protoEntityStream =
