@@ -113,7 +113,7 @@ jobs:
           java-version: "11"
           cache: "gradle"
 
-      - name: Fetch dependencies
+      - name: Fetch Flutter dependencies
         working-directory: example/
         run: flutter pub get
 
