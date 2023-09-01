@@ -5,7 +5,7 @@
 [![Build Test](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml/badge.svg)](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml?query=branch%3Amain)
 [![GitHub License](https://img.shields.io/github/license/cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/blob/main/LICENSE)
 
-# 🆎 Rust-In-Flutter
+# Rust-In-Flutter
 
 **"Rust as your Flutter backend, Flutter as your Rust frontend"**
 
@@ -17,12 +17,12 @@ Designed for ease of use, future scalability, and unparalleled performance, this
 
 All platforms available with Flutter are [tested](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml?query=branch%3Amain) and supported. Challenging build settings are automatically handled by this package.
 
-- ✅ Linux: Tested and Supported
-- ✅ Android: Tested and Supported
-- ✅ Windows: Tested and Supported
-- ✅ macOS: Tested and Supported
-- ✅ iOS: Tested and Supported
-- ✅ Web: Tested and Supported
+- ✅ Linux: Tested and supported
+- ✅ Android: Tested and supported
+- ✅ Windows: Tested and supported
+- ✅ macOS: Tested and supported
+- ✅ iOS: Tested and supported
+- ✅ Web: Tested and supported
 
 ## 🚀 Benefits
 
