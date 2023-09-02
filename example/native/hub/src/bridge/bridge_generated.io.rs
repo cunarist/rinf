@@ -51,12 +51,6 @@ pub extern "C" fn new_uint_8_list_0(len: i32) -> *mut wire_uint_8_list {
 
 // Section: impl Wire2Api
 
-impl Wire2Api<String> for *mut wire_uint_8_list {
-    fn wire2api(self) -> String {
-        let vec: Vec<u8> = self.wire2api();
-        String::from_utf8_lossy(&vec).into_owned()
-    }
-}
 impl Wire2Api<RustRequestUnique> for *mut wire_RustRequestUnique {
     fn wire2api(self) -> RustRequestUnique {
         let wrap = unsafe { support::box_from_leak_ptr(self) };
@@ -67,7 +61,7 @@ impl Wire2Api<RustRequestUnique> for *mut wire_RustRequestUnique {
 impl Wire2Api<RustRequest> for wire_RustRequest {
     fn wire2api(self) -> RustRequest {
         RustRequest {
-            address: self.address.wire2api(),
+            resource: self.resource.wire2api(),
             operation: self.operation.wire2api(),
             bytes: self.bytes.wire2api(),
         }
@@ -95,7 +89,7 @@ impl Wire2Api<Vec<u8>> for *mut wire_uint_8_list {
 #[repr(C)]
 #[derive(Clone)]
 pub struct wire_RustRequest {
-    address: *mut wire_uint_8_list,
+    resource: i32,
     operation: i32,
     bytes: *mut wire_uint_8_list,
 }
@@ -129,7 +123,7 @@ impl<T> NewWithNullPtr for *mut T {
 impl NewWithNullPtr for wire_RustRequest {
     fn new_with_null_ptr() -> Self {
         Self {
-            address: core::ptr::null_mut(),
+            resource: Default::default(),
             operation: Default::default(),
             bytes: core::ptr::null_mut(),
         }

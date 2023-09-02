@@ -3,7 +3,12 @@ package interaction;
 
 import "sample_schemas.proto";
 
-message CounterReadRequest {
+enum RustResource {
+  COUNTER_NUMBER = 0;
+  MANDELBROT = 1;
+}
+
+message CounterNumberReadRequest {
   string letter = 1;
   int32 before_number = 2;
   uint32 dummy_one = 3;
@@ -11,7 +16,7 @@ message CounterReadRequest {
   repeated int32 dummy_three = 5;
 }
 
-message CounterReadResponse {
+message CounterNumberReadResponse {
   int32 after_number = 1;
   uint32 dummy_one = 2;
   sample_schemas.SampleSchema dummy_two = 3;

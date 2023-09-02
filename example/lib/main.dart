@@ -25,7 +25,7 @@ class Home extends StatelessWidget {
 
   // This method interacts with Rust.
   void _incrementCount() async {
-    final requestMessage = CounterReadRequest(
+    final requestMessage = CounterNumberReadRequest(
       letter: "Hello from Dart!",
       beforeNumber: _countNotifier.value,
       dummyOne: 1,
@@ -37,7 +37,7 @@ class Home extends StatelessWidget {
     );
 
     final rustRequest = RustRequest(
-      address: 'basic-category/counter-number',
+      resource: RustResource.COUNTER_NUMBER.value,
       operation: RustOperation.Read,
       // Convert Dart message object into raw bytes.
       bytes: requestMessage.writeToBuffer(),
@@ -50,7 +50,7 @@ class Home extends StatelessWidget {
     if (rustResponse.successful) {
       // Convert raw bytes into Dart message objects.
       final responseMessage =
-          CounterReadResponse.fromBuffer(rustResponse.bytes);
+          CounterNumberReadResponse.fromBuffer(rustResponse.bytes);
       _countNotifier.value = responseMessage.afterNumber;
     }
   }
@@ -73,7 +73,7 @@ class Home extends StatelessWidget {
               // only when there are signals
               // with the specific address it is interested in.
               stream: rustBroadcaster.stream.where((rustSignal) {
-                return rustSignal.address == 'sample-category/mandelbrot';
+                return rustSignal.resource == RustResource.MANDELBROT.value;
               }),
               builder: (context, snapshot) {
                 // If the app has just started and widget is built
