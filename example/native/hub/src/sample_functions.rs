@@ -1,10 +1,7 @@
 //! This module is only for demonstration purposes.
 //! You might want to remove this module in production.
 
-use crate::bridge::api::RustOperation;
-use crate::bridge::api::RustRequest;
-use crate::bridge::api::RustResponse;
-use crate::bridge::api::RustSignal;
+use crate::bridge::api::{RustOperation, RustRequest, RustResponse, RustSignal};
 use crate::bridge::send_rust_signal;
 use prost::Message;
 

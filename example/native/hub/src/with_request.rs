@@ -2,9 +2,7 @@
 //! when a `RustRequest` was received from Dart
 //! and returns `RustResponse`.
 
-use crate::bridge::api::RustRequestUnique;
-use crate::bridge::api::RustResponse;
-use crate::bridge::api::RustResponseUnique;
+use crate::bridge::api::{RustRequestUnique, RustResponse, RustResponseUnique};
 use crate::messages::interaction::RustResource;
 use crate::sample_functions;
 
