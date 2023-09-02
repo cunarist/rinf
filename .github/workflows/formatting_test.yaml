@@ -54,7 +54,7 @@ jobs:
         run: dart format .
 
       - name: Format Rust code
-        run: cargo clippy --fix
+        run: cargo clippy --fix --allow-dirty
 
       - name: Verify changed files
         id: verify-changed-files
