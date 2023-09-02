@@ -21,13 +21,13 @@ pub enum RustOperation {
 /// Holds the data that Rust streams to Dart.
 #[derive(Clone)]
 pub struct RustSignal {
-    pub address: String,
+    pub resource: i32,
     pub bytes: Vec<u8>,
 }
 
 /// Request object that is sent from Dart to Rust.
 pub struct RustRequest {
-    pub address: String,
+    pub resource: i32,
     pub operation: RustOperation,
     pub bytes: Vec<u8>,
 }
