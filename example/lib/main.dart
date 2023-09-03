@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
-import 'package:rust_in_flutter_example/messages/interaction.pbserver.dart';
-import 'package:rust_in_flutter_example/messages/sample_schemas.pbserver.dart';
+import 'package:rust_in_flutter_example/messages/counter_number.pbserver.dart'
+    as counterNumber;
+import 'package:rust_in_flutter_example/messages/mandelbrot.pbserver.dart'
+    as mandelbrot;
 
 void main() async {
   // Wait for initialization to be completed first.
@@ -25,11 +27,11 @@ class Home extends StatelessWidget {
 
   // This method interacts with Rust.
   void _incrementCount() async {
-    final requestMessage = CounterNumberReadRequest(
+    final requestMessage = counterNumber.ReadRequest(
       letter: "Hello from Dart!",
       beforeNumber: _countNotifier.value,
       dummyOne: 1,
-      dummyTwo: SampleSchema(
+      dummyTwo: counterNumber.SampleSchema(
         sampleFieldOne: true,
         sampleFieldTwo: false,
       ),
@@ -37,7 +39,7 @@ class Home extends StatelessWidget {
     );
 
     final rustRequest = RustRequest(
-      resource: RustResource.COUNTER_NUMBER.value,
+      resource: counterNumber.RUST_RESOURCE_ID,
       operation: RustOperation.Read,
       // Convert Dart message object into raw bytes.
       bytes: requestMessage.writeToBuffer(),
@@ -50,7 +52,7 @@ class Home extends StatelessWidget {
     if (rustResponse.successful) {
       // Convert raw bytes into Dart message objects.
       final responseMessage =
-          CounterNumberReadResponse.fromBuffer(rustResponse.bytes);
+          counterNumber.ReadResponse.fromBuffer(rustResponse.bytes);
       _countNotifier.value = responseMessage.afterNumber;
     }
   }
@@ -73,7 +75,7 @@ class Home extends StatelessWidget {
               // only when there are signals
               // with the specific address it is interested in.
               stream: rustBroadcaster.stream.where((rustSignal) {
-                return rustSignal.resource == RustResource.MANDELBROT.value;
+                return rustSignal.resource == mandelbrot.RUST_RESOURCE_ID;
               }),
               builder: (context, snapshot) {
                 // If the app has just started and widget is built

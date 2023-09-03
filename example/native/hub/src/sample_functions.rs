@@ -5,25 +5,23 @@ use crate::bridge::api::{RustOperation, RustRequest, RustResponse, RustSignal};
 use crate::bridge::send_rust_signal;
 use prost::Message;
 
-pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
+pub async fn handle_counter_number(rust_request: RustRequest) -> RustResponse {
+    use crate::messages::counter_number::{ReadRequest, ReadResponse};
+
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
         RustOperation::Read => {
             // We import message structs in this match condition
             // because schema will differ by the operation type.
-            use crate::messages::interaction::{
-                CounterNumberReadRequest, CounterNumberReadResponse,
-            };
 
             // Decode raw bytes into a Rust message object.
-            let request_message =
-                CounterNumberReadRequest::decode(&rust_request.bytes[..]).unwrap();
+            let request_message = ReadRequest::decode(&rust_request.bytes[..]).unwrap();
 
             // Perform a simple calculation.
             let after_value: i32 = sample_crate::add_seven(request_message.before_number);
 
             // Return the response that will be sent to Dart.
-            let response_message = CounterNumberReadResponse {
+            let response_message = ReadResponse {
                 after_number: after_value,
                 dummy_one: request_message.dummy_one,
                 dummy_two: request_message.dummy_two,
@@ -39,8 +37,8 @@ pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
     }
 }
 
-pub async fn keep_drawing_mandelbrot() {
-    use crate::messages::interaction::RustResource;
+pub async fn stream_mandelbrot() {
+    use crate::messages::mandelbrot::RUST_RESOURCE_ID;
 
     let mut scale: f64 = 1.0;
     let mut interval = crate::time::interval(std::time::Duration::from_millis(50));
@@ -69,7 +67,7 @@ pub async fn keep_drawing_mandelbrot() {
         if let Ok(mandelbrot) = calculated {
             // Stream the signal to Dart.
             let rust_signal = RustSignal {
-                resource: RustResource::Mandelbrot.into(),
+                resource: RUST_RESOURCE_ID,
                 bytes: mandelbrot,
             };
             send_rust_signal(rust_signal);

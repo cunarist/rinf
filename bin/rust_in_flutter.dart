@@ -348,12 +348,20 @@ Future<void> _generateMessageCode() async {
       }
     }
   }
+  final rustResourceNames = protoFilenames.map((fileName) {
+    final parts = fileName.split('.');
+    parts.removeLast(); // Remove the extension from the filename.
+    final fileNameWithoutExtension = parts.join('.');
+    return fileNameWithoutExtension;
+  }).toList();
 
   // Generate Rust message files.
   print("Verifying `protoc-gen-prost` for Rust." +
       " This might take a while if there are new updates to be installed.");
-  final cargoInstallCommand =
-      await Process.run('cargo', ['install', 'protoc-gen-prost']);
+  final cargoInstallCommand = await Process.run('cargo', [
+    'install',
+    'protoc-gen-prost',
+  ]);
   if (cargoInstallCommand.exitCode != 0) {
     throw Exception('Cannot globally install `protoc-gen-prost` Rust crate');
   }
@@ -366,25 +374,16 @@ Future<void> _generateMessageCode() async {
   if (protocRustResult.exitCode != 0) {
     throw Exception('Could not compile `.proto` files into Rust');
   }
+  rustResourceNames.asMap().forEach((index, rustResourceName) {
+    _appendLineToFile(
+      'native/hub/src/messages/$rustResourceName.rs',
+      'pub const RUST_RESOURCE_ID: i32 = $index;',
+    );
+  });
 
   // Generate `mod.rs` for `messages` module in Rust.
-  final Stream<FileSystemEntity> rustEntityStream =
-      Directory(rustOutputPath).list();
-  final List<FileSystemEntity> rustMessageFiles = [];
-  await for (final entity in rustEntityStream) {
-    if (entity is File) {
-      final String filename = entity.uri.pathSegments.last;
-      if (filename.endsWith('.rs') && filename != 'mod.rs') {
-        rustMessageFiles.add(entity);
-      }
-    }
-  }
-  final modRsLines = rustMessageFiles.map((file) async {
-    final fileName = file.uri.pathSegments.last;
-    final parts = fileName.split('.');
-    parts.removeLast(); // Remove the extension from the filename.
-    final fileNameWithoutExtension = parts.join('.');
-    return 'pub mod $fileNameWithoutExtension;';
+  final modRsLines = rustResourceNames.map((resourceName) async {
+    return 'pub mod $resourceName;';
   });
   final modRsContent = (await Future.wait(modRsLines)).join('\n');
   await File('$rustOutputPath/mod.rs').writeAsString(modRsContent);
@@ -392,8 +391,12 @@ Future<void> _generateMessageCode() async {
   // Generate Dart message files.
   print("Verifying `protoc_plugin` for Dart." +
       " This might take a while if there are new updates to be installed.");
-  final pubGlobalActivateCommand =
-      await Process.run('dart', ['pub', 'global', 'activate', 'protoc_plugin']);
+  final pubGlobalActivateCommand = await Process.run('dart', [
+    'pub',
+    'global',
+    'activate',
+    'protoc_plugin',
+  ]);
   if (pubGlobalActivateCommand.exitCode != 0) {
     throw Exception('Cannot globally install `protoc_plugin` Dart package');
   }
@@ -420,6 +423,12 @@ Future<void> _generateMessageCode() async {
   if (protocDartResult.exitCode != 0) {
     throw Exception('Could not compile `.proto` files into Dart');
   }
+  rustResourceNames.asMap().forEach((index, rustResourceName) {
+    _appendLineToFile(
+      'lib/messages/$rustResourceName.pbserver.dart',
+      'const RUST_RESOURCE_ID = $index;',
+    );
+  });
 
   // Notify that it's done
   print("🎉 Message code in Dart and Rust is now ready! 🎉");
@@ -437,4 +446,20 @@ Future<void> _emptyDirectory(String directoryPath) async {
       }
     }
   }
+}
+
+Future<void> _appendLineToFile(String filePath, String textToAppend) async {
+  // Read the existing content of the file
+  final file = File(filePath);
+  if (!(await file.exists())) {
+    await file.create(recursive: true);
+  }
+  String fileContent = await file.readAsString();
+
+  // Append the new text to the existing content
+  fileContent += '\n';
+  fileContent += textToAppend;
+
+  // Write the updated content back to the file
+  await file.writeAsString(fileContent);
 }
