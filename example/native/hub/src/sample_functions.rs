@@ -37,6 +37,15 @@ pub async fn handle_counter_number(rust_request: RustRequest) -> RustResponse {
     }
 }
 
+pub async fn handle_sample_resource(rust_request: RustRequest) -> RustResponse {
+    match rust_request.operation {
+        RustOperation::Create => RustResponse::default(),
+        RustOperation::Read => RustResponse::default(),
+        RustOperation::Update => RustResponse::default(),
+        RustOperation::Delete => RustResponse::default(),
+    }
+}
+
 pub async fn stream_mandelbrot() {
     use crate::messages::mandelbrot::RUST_RESOURCE_ID;
 
