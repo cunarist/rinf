@@ -355,6 +355,32 @@ Future<void> _generateMessageCode() async {
     return fileNameWithoutExtension;
   }).toList();
 
+  // Verify `package` statement in `.proto` files.
+  // Package name should be the same as the filename
+  // because Rust filenames are written with package name
+  // and Dart filenames are written with the `.proto` filename.
+  for (final resourceName in rustResourceNames) {
+    final protoFile = File('messages/$resourceName.proto');
+    final lines = await protoFile.readAsLines();
+    List<String> filteredLines = [];
+    final packagePattern = r'^package\s+[a-zA-Z_][a-zA-Z0-9_]*\s*[^=];$';
+    for (var line in lines) {
+      if (!RegExp(packagePattern).hasMatch(line.trim())) {
+        filteredLines.add(line);
+      }
+    }
+    final outputLines = [];
+    for (var line in filteredLines) {
+      if (line.trim().startsWith('syntax =')) {
+        outputLines.add(line);
+        outputLines.add('package $resourceName;');
+      } else {
+        outputLines.add(line);
+      }
+    }
+    await protoFile.writeAsString(outputLines.join('\n') + '\n');
+  }
+
   // Generate Rust message files.
   print("Verifying `protoc-gen-prost` for Rust." +
       " This might take a while if there are new updates to be installed.");

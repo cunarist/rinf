@@ -1,2 +1,2 @@
 syntax = "proto3";
-package dummy_resource;
+package sample_resource;
