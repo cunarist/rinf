@@ -3,7 +3,7 @@
 //! and returns `RustResponse`.
 
 use crate::bridge::api::{RustRequestUnique, RustResponse, RustResponseUnique};
-use crate::messages::interaction::RustResource;
+use crate::messages;
 use crate::sample_functions;
 
 pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUnique {
@@ -14,7 +14,7 @@ pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUn
     // Run the function that corresponds to the address.
     let rust_resource = rust_request.resource;
     let rust_response = {
-        if rust_resource == RustResource::CounterNumber.into() {
+        if rust_resource == messages::counter_number::RUST_RESOURCE_ID {
             sample_functions::calculate_something(rust_request).await
         } else {
             RustResponse::default()
