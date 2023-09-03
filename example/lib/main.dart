@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
-import 'package:rust_in_flutter_example/messages/counter_number.pb.dart'
-    as counterNumber;
-import 'package:rust_in_flutter_example/messages/mandelbrot.pb.dart'
-    as mandelbrot;
+import 'package:example_app/messages/counter_number.pb.dart' as counterNumber;
+import 'package:example_app/messages/mandelbrot.pb.dart' as mandelbrot;
 
 void main() async {
   // Wait for initialization to be completed first.
