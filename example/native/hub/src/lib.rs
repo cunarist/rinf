@@ -15,7 +15,7 @@ async fn main() {
     let mut request_receiver = bridge::get_request_receiver();
     // Repeat `crate::spawn` anywhere in your code
     // if more concurrent tasks are needed.
-    crate::spawn(sample_functions::keep_drawing_mandelbrot());
+    crate::spawn(sample_functions::keep_sending_mandelbrot());
     while let Some(request_unique) = request_receiver.recv().await {
         crate::spawn(async {
             let response_unique = handle_request(request_unique).await;
