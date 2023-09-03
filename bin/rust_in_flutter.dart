@@ -362,22 +362,19 @@ Future<void> _generateMessageCode() async {
   for (final resourceName in rustResourceNames) {
     final protoFile = File('messages/$resourceName.proto');
     final lines = await protoFile.readAsLines();
-    List<String> filteredLines = [];
-    final packagePattern = r'^package\s+[a-zA-Z_][a-zA-Z0-9_]*\s*[^=];$';
+    List<String> outputLines = [];
     for (var line in lines) {
-      if (!RegExp(packagePattern).hasMatch(line.trim())) {
-        filteredLines.add(line);
-      }
-    }
-    final outputLines = [];
-    for (var line in filteredLines) {
-      if (line.trim().startsWith('syntax =')) {
-        outputLines.add(line);
-        outputLines.add('package $resourceName;');
+      final packagePattern = r'^package\s+[a-zA-Z_][a-zA-Z0-9_]*\s*[^=];$';
+      if (RegExp(packagePattern).hasMatch(line.trim())) {
+        continue;
+      } else if (line.trim().startsWith("syntax")) {
+        continue;
       } else {
         outputLines.add(line);
       }
     }
+    outputLines.insert(0, 'package $resourceName;');
+    outputLines.insert(0, 'syntax = "proto3";');
     await protoFile.writeAsString(outputLines.join('\n') + '\n');
   }
 
