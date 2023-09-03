@@ -1,3 +1,7 @@
+## 3.4.2
+
+- Now running `dart run rust_in_flutter message` verifies `package` statement in `.proto` files and mistakes are fixed automatically.
+
 ## 3.4.1
 
 - Now match statement is used for handling requests. This improves code readability.
