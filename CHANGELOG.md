@@ -1,3 +1,7 @@
+## 3.4.5
+
+- Import statements became shorter in Dart.
+
 ## 3.4.4
 
 - Cleaned up outdated dependencies in `Cargo.toml`.
