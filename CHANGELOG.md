@@ -1,3 +1,7 @@
+## 3.4.1
+
+- Now match statement is used for handling requests. This improves code readability.
+
 ## 3.4.0
 
 - Now each `.proto` file is treated as a Rust resource, which essentially becomes an API endpoint.
