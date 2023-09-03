@@ -94,7 +94,7 @@ Future<void> _applyRustTemplate() async {
     text += '\n' + '*/**/messages/';
     gitignoreSplitted.add(text);
   }
-  await gitignoreFile.writeAsString(gitignoreSplitted.join('\n\n'));
+  await gitignoreFile.writeAsString(gitignoreSplitted.join('\n\n') + '\n');
 
   // Add some guides to `README.md`
   final guideSectionTitle = '# Using Rust Inside Flutter';
@@ -126,7 +126,7 @@ dart run rust_in_flutter message
 ''';
     readmeSplitted.add(text);
   }
-  await readmeFile.writeAsString(readmeSplitted.join('\n\n'));
+  await readmeFile.writeAsString(readmeSplitted.join('\n\n') + '\n');
 
   // Add Dart dependencies
   await Process.run('dart', ['pub', 'add', 'protobuf']);
