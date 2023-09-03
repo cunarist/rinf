@@ -1,3 +1,7 @@
+## 3.4.0
+
+- Now each `.proto` file is treated as a Rust resource, which essentially becomes an API endpoint.
+
 ## 3.3.0
 
 - `RustResource` enum has been added to `interaction.proto`. Now the list of available Rust resources are managed by Protobuf, which makes the project less error-prone. This new system also has less runtime overhead because interactions are distinguished by simple integers, not strings.
