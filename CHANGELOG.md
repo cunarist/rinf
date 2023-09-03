@@ -1,3 +1,7 @@
+## 3.4.3
+
+- Now `syntax` and `package` statements in `.proto` files should be handled automatically.
+
 ## 3.4.2
 
 - Now running `dart run rust_in_flutter message` verifies `package` statement in `.proto` files and mistakes are fixed automatically.
