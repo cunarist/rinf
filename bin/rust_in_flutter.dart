@@ -448,7 +448,7 @@ Future<void> _generateMessageCode() async {
   }
   rustResourceNames.asMap().forEach((index, rustResourceName) {
     _appendLineToFile(
-      'lib/messages/$rustResourceName.pbserver.dart',
+      'lib/messages/$rustResourceName.pb.dart',
       'const RUST_RESOURCE_ID = $index;',
     );
   });

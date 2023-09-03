@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
-import 'package:rust_in_flutter_example/messages/counter_number.pbserver.dart'
+import 'package:rust_in_flutter_example/messages/counter_number.pb.dart'
     as counterNumber;
-import 'package:rust_in_flutter_example/messages/mandelbrot.pbserver.dart'
+import 'package:rust_in_flutter_example/messages/mandelbrot.pb.dart'
     as mandelbrot;
 
 void main() async {
