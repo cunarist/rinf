@@ -400,7 +400,7 @@ Future<void> _generateMessageCode() async {
   rustResourceNames.asMap().forEach((index, rustResourceName) {
     _appendLineToFile(
       'native/hub/src/messages/$rustResourceName.rs',
-      'pub const RUST_RESOURCE_ID: i32 = $index;',
+      'pub const ID: i32 = $index;',
     );
   });
 
@@ -449,7 +449,7 @@ Future<void> _generateMessageCode() async {
   rustResourceNames.asMap().forEach((index, rustResourceName) {
     _appendLineToFile(
       'lib/messages/$rustResourceName.pb.dart',
-      'const RUST_RESOURCE_ID = $index;',
+      'const ID = $index;',
     );
   });
 

@@ -39,7 +39,7 @@ class Home extends StatelessWidget {
     );
 
     final rustRequest = RustRequest(
-      resource: counterNumber.RUST_RESOURCE_ID,
+      resource: counterNumber.ID,
       operation: RustOperation.Read,
       // Convert Dart message object into raw bytes.
       bytes: requestMessage.writeToBuffer(),
@@ -75,7 +75,7 @@ class Home extends StatelessWidget {
               // only when there are signals
               // with the specific address it is interested in.
               stream: rustBroadcaster.stream.where((rustSignal) {
-                return rustSignal.resource == mandelbrot.RUST_RESOURCE_ID;
+                return rustSignal.resource == mandelbrot.ID;
               }),
               builder: (context, snapshot) {
                 // If the app has just started and widget is built

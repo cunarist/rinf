@@ -47,7 +47,7 @@ pub async fn handle_sample_resource(rust_request: RustRequest) -> RustResponse {
 }
 
 pub async fn stream_mandelbrot() {
-    use crate::messages::mandelbrot::RUST_RESOURCE_ID;
+    use crate::messages::mandelbrot::ID;
 
     let mut scale: f64 = 1.0;
     let mut interval = crate::time::interval(std::time::Duration::from_millis(50));
@@ -76,7 +76,7 @@ pub async fn stream_mandelbrot() {
         if let Ok(mandelbrot) = calculated {
             // Stream the signal to Dart.
             let rust_signal = RustSignal {
-                resource: RUST_RESOURCE_ID,
+                resource: ID,
                 bytes: mandelbrot,
             };
             send_rust_signal(rust_signal);
