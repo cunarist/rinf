@@ -1,3 +1,7 @@
+## 3.4.4
+
+- Cleaned up outdated dependencies in `Cargo.toml`.
+
 ## 3.4.3
 
 - Now `syntax` and `package` statements in `.proto` files should be handled automatically.
