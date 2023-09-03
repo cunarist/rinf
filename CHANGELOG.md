@@ -1,3 +1,7 @@
+## 3.5.0
+
+- Shortend some names that were unnecessarily long.
+
 ## 3.4.5
 
 - Import statements became shorter in Dart.
