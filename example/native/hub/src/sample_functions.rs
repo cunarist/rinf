@@ -5,13 +5,14 @@ use crate::bridge::api::{RustOperation, RustRequest, RustResponse, RustSignal};
 use crate::bridge::send_rust_signal;
 use prost::Message;
 
-pub async fn calculate_something(rust_request: RustRequest) -> RustResponse {
+pub async fn handle_counter_number(rust_request: RustRequest) -> RustResponse {
+    use crate::messages::counter_number::{ReadRequest, ReadResponse};
+
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
         RustOperation::Read => {
             // We import message structs in this match condition
             // because schema will differ by the operation type.
-            use crate::messages::counter_number::{ReadRequest, ReadResponse};
 
             // Decode raw bytes into a Rust message object.
             let request_message = ReadRequest::decode(&rust_request.bytes[..]).unwrap();

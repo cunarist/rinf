@@ -15,7 +15,7 @@ pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUn
     let rust_resource = rust_request.resource;
     let rust_response = {
         if rust_resource == messages::counter_number::RUST_RESOURCE_ID {
-            sample_functions::calculate_something(rust_request).await
+            sample_functions::handle_counter_number(rust_request).await
         } else {
             RustResponse::default()
         }
