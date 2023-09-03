@@ -37,7 +37,7 @@ pub async fn handle_counter_number(rust_request: RustRequest) -> RustResponse {
     }
 }
 
-pub async fn keep_sending_mandelbrot() {
+pub async fn stream_mandelbrot() {
     use crate::messages::mandelbrot::RUST_RESOURCE_ID;
 
     let mut scale: f64 = 1.0;
