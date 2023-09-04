@@ -1,3 +1,7 @@
+## 3.5.1
+
+- Bumped `prost` version to avoid snake case related warnings.
+
 ## 3.5.0
 
 - Shortend some names that were unnecessarily long.
