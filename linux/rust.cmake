@@ -1,3 +1,4 @@
+cmake_policy(SET CMP0079 NEW)
 apply_standard_settings(${BINARY_NAME})
 
 set_target_properties(
