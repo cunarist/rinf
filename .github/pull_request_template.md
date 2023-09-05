@@ -1,10 +1,10 @@
 ## Changes
 
-_Please mention issues fixed by this PR here, using format "Fixes #the-issue-number"._
+_Please mention issues fixed by this PR here, using format "Fixes #(Issue number)"._
 
-## Before Commits
+## Before Committing
 
-Please make sure that you've formatted the files.
+_Please make sure that you've formatted the files._
 
 ```
 dart format .
