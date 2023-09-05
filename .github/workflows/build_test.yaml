@@ -88,34 +88,34 @@ jobs:
         working-directory: example/
         run: dart run rust_in_flutter message
 
-      - name: Build example Flutter app
+      - name: Build the example app
         if: matrix.target == 'linux'
         working-directory: example/
         run: flutter build linux
 
-      - name: Build example Flutter app
+      - name: Build the example app
         if: matrix.target == 'android'
         working-directory: example/
         run: |
           flutter build apk
           flutter build appbundle
 
-      - name: Build example Flutter app
+      - name: Build the example app
         if: matrix.target == 'windows'
         working-directory: example/
         run: flutter build windows
 
-      - name: Build example Flutter app
+      - name: Build the example app
         if: matrix.target == 'macos'
         working-directory: example/
         run: flutter build macos
 
-      - name: Build example Flutter app
+      - name: Build the example app
         if: matrix.target == 'ios'
         working-directory: example/
         run: flutter build ios --no-codesign
 
-      - name: Build example Flutter app
+      - name: Build the example app
         if: matrix.target == 'web'
         working-directory: example/
         run: |
