@@ -1,6 +1,6 @@
 # Example App
 
-Demonstrates how to use the Rust-In-Flutter plugin.
+Demonstrates how to use the Rust-In-Flutter framework.
 
 ## Using Rust Inside Flutter
 
