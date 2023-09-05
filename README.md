@@ -11,7 +11,7 @@
 
 ![preview](https://github.com/cunarist/rust-in-flutter/assets/66480156/be85cf04-2240-497f-8d0d-803c40536d8e)
 
-Designed for ease of use, future scalability, and unparalleled performance, this lightweight framework takes care of all the complexity behind the scenes. No messing with sensitive build files, no excessive code generation during development. Simply add this package to your app project, and you're all set to write Flutter and Rust together!
+Designed for ease of use, future scalability, and unparalleled performance, this lightweight framework takes care of all the complexity behind the scenes. No messing with sensitive build files, no excessive code generation during development. Simply add this framework to your app project, and you're all set to write Flutter and Rust together!
 
 ## 🖥️ Platform Support
 
