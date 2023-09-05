@@ -8,13 +8,11 @@ on:
       - "CHANGELOG.md"
       - "LICENSE"
       - "README.md"
-      - "translations/**"
   pull_request:
     paths-ignore:
       - "CHANGELOG.md"
       - "LICENSE"
       - "README.md"
-      - "translations/**"
   workflow_dispatch:
 
 concurrency:

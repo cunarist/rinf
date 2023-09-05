@@ -1,4 +1,4 @@
-## Changes
+## Report
 
 _Please mention the problem here. If it's not a problem, write it as a discussion._
 
