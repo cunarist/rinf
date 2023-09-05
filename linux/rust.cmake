@@ -16,6 +16,6 @@ apply_cargokit(${BINARY_NAME} ${CMAKE_SOURCE_DIR}/../native/hub hub "")
 
 set(
   rust_in_flutter_bundled_libraries
-  "${${PLUGIN_NAME}_cargokit_lib}"
+  "${${BINARY_NAME}_cargokit_lib}"
   PARENT_SCOPE
 )
