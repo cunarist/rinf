@@ -1,0 +1,4 @@
+[submodule "example"]
+	path = example
+	url = https://github.com/cunarist/rust_in_flutter_example
+	branch = local
