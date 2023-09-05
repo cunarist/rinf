@@ -391,7 +391,6 @@ Future<void> _generateMessageCode() async {
   final protocRustResult = await Process.run('protoc', [
     '--proto_path=$protoPath',
     '--prost_out=$rustOutputPath',
-    '--fatal_warnings',
     ...protoFilenames,
   ]);
   if (protocRustResult.exitCode != 0) {
@@ -438,7 +437,6 @@ Future<void> _generateMessageCode() async {
     [
       '--proto_path=$protoPath',
       '--dart_out=$dartOutputPath',
-      '--fatal_warnings',
       ...protoFilenames,
     ],
     environment: newEnvironment,
