@@ -54,6 +54,15 @@ jobs:
         with:
           submodules: true
 
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
       - name: Setup Protobuf compiler
         uses: arduino/setup-protoc@v2
         with:
