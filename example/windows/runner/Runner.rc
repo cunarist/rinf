@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.cunarist" "\0"
-            VALUE "FileDescription", "rust_in_flutter_example" "\0"
+            VALUE "FileDescription", "example_app" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "rust_in_flutter_example" "\0"
+            VALUE "InternalName", "example_app" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 com.cunarist. All rights reserved." "\0"
-            VALUE "OriginalFilename", "rust_in_flutter_example.exe" "\0"
-            VALUE "ProductName", "rust_in_flutter_example" "\0"
+            VALUE "OriginalFilename", "example_app.exe" "\0"
+            VALUE "ProductName", "example_app" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

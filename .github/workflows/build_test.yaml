@@ -54,45 +54,13 @@ jobs:
         with:
           submodules: true
 
-      # # Automaticallly setup cache (Doesn't work yet)
-      # - name: Setup Nix
-      #   if: matrix.runner == 'ubuntu-latest' || matrix.runner == 'macos-latest'
-      #   uses: DeterminateSystems/nix-installer-action@main
-
-      # - name: Setup Magic Nix Cache
-      #   if: matrix.runner == 'ubuntu-latest' ||  matrix.runner == 'macos-latest'
-      #   uses: DeterminateSystems/magic-nix-cache-action@main
-
-      # - name: Run Nix Flake Check
-      #   if: matrix.runner == 'ubuntu-latest' ||  matrix.runner == 'macos-latest'
-      #   run: nix flake check
-
-      # Manually setup cache
-      - name: Setup cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.pub-cache
-            ~/.cargo
-            ~/.gradle
-            ~/.android
-            /usr/local/lib/android/
-            ./example/build
-          key: manual-cache-${{ matrix.runner }}
-
       - name: Setup Flutter SDK
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          cache: true
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
-
-      - name: Setup Rust cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          prefix-key: "rust-cache"
 
       - name: Setup Protobuf compiler
         uses: arduino/setup-protoc@v2
@@ -111,7 +79,6 @@ jobs:
         with:
           distribution: "zulu"
           java-version: "11"
-          cache: "gradle"
 
       - name: Fetch Flutter dependencies
         working-directory: example/
@@ -121,34 +88,34 @@ jobs:
         working-directory: example/
         run: dart run rust_in_flutter message
 
-      - name: Build example Flutter app
+      - name: Build the example app
         if: matrix.target == 'linux'
         working-directory: example/
         run: flutter build linux
 
-      - name: Build example Flutter app
+      - name: Build the example app
         if: matrix.target == 'android'
         working-directory: example/
         run: |
           flutter build apk
           flutter build appbundle
 
-      - name: Build example Flutter app
+      - name: Build the example app
         if: matrix.target == 'windows'
         working-directory: example/
         run: flutter build windows
 
-      - name: Build example Flutter app
+      - name: Build the example app
         if: matrix.target == 'macos'
         working-directory: example/
         run: flutter build macos
 
-      - name: Build example Flutter app
+      - name: Build the example app
         if: matrix.target == 'ios'
         working-directory: example/
         run: flutter build ios --no-codesign
 
-      - name: Build example Flutter app
+      - name: Build the example app
         if: matrix.target == 'web'
         working-directory: example/
         run: |

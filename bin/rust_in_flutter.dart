@@ -97,7 +97,7 @@ Future<void> _applyRustTemplate() async {
   await gitignoreFile.writeAsString(gitignoreSplitted.join('\n\n') + '\n');
 
   // Add some guides to `README.md`
-  final guideSectionTitle = '# Using Rust Inside Flutter';
+  final guideSectionTitle = '## Using Rust Inside Flutter';
   final readmeFile = File('$flutterProjectPath/README.md');
   if (!(await gitignoreFile.exists())) {
     await gitignoreFile.create(recursive: true);
@@ -112,8 +112,23 @@ $guideSectionTitle
 This project leverages Flutter for GUI and Rust for the backend logic,
 utilizing the capabilities of the
 [Rust-In-Flutter](https://pub.dev/packages/rust_in_flutter) framework.
+
+To run and build this app, you need to have
+[Flutter SDK](https://docs.flutter.dev/get-started/install),
+[Rust toolchain](https://www.rust-lang.org/tools/install),
+and [Protobuf compiler](https://grpc.io/docs/protoc-installation)
+installed on your system.
+You can check that your system is ready with the commands below.
+Note that all the Flutter subcomponents should be installed.
+
+```bash
+rustc --version
+protoc --version
+flutter doctor
+```
+
 For detailed instructions on writing Rust and Flutter together,
-please refer to its [documentation](https://docs.cunarist.com/rust-in-flutter).
+please refer to Rust-In-Flutter's [documentation](https://docs.cunarist.com/rust-in-flutter).
 
 Messages sent between Dart and Rust are implemented using Protobuf.
 If you have newly cloned the project repository
@@ -391,7 +406,6 @@ Future<void> _generateMessageCode() async {
   final protocRustResult = await Process.run('protoc', [
     '--proto_path=$protoPath',
     '--prost_out=$rustOutputPath',
-    '--fatal_warnings',
     ...protoFilenames,
   ]);
   if (protocRustResult.exitCode != 0) {
@@ -438,7 +452,6 @@ Future<void> _generateMessageCode() async {
     [
       '--proto_path=$protoPath',
       '--dart_out=$dartOutputPath',
-      '--fatal_warnings',
       ...protoFilenames,
     ],
     environment: newEnvironment,
