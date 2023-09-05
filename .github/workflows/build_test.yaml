@@ -5,14 +5,12 @@ on:
     branches:
       - main
     paths-ignore:
-      - "CHANGELOG.md"
+      - "**.md"
       - "LICENSE"
-      - "README.md"
   pull_request:
     paths-ignore:
-      - "CHANGELOG.md"
+      - "**.md"
       - "LICENSE"
-      - "README.md"
   workflow_dispatch:
 
 concurrency:
