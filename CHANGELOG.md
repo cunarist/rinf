@@ -1,3 +1,8 @@
+## 3.6.0
+
+- Fixed a bug that prevents the app from running on Linux.
+- Improved various texts exposed to developers for clarity.
+
 ## 3.5.1
 
 - Bumped `prost` version to avoid snake case related warnings.
