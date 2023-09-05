@@ -1,4 +1,4 @@
-package com.cunarist.rust_in_flutter_example
+package com.cunarist.example_app
 
 import io.flutter.embedding.android.FlutterActivity
 
