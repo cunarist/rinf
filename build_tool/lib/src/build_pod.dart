@@ -77,6 +77,7 @@ class BuildPod {
             '@rpath/$bundlePath',
             targetFile,
           ]);
+          return;
         }
       }
       throw Exception('Unable to find bundle for dynamic library');
