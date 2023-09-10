@@ -234,11 +234,7 @@ Future<void> _buildWebassembly({bool isReleaseMode = false}) async {
     isReleaseMode: isReleaseMode,
   );
 
-  if (isReleaseMode) {
-    print("Webassembly module for release is now ready!");
-  } else {
-    print("Webassembly module is now ready!");
-  }
+  print("🎉 Webassembly module is now ready! 🎉");
 }
 
 Future<void> _verifyServerHeaders() async {
