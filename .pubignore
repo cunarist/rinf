@@ -4,6 +4,6 @@
 .cargo/
 .github/
 automate/
-translations/
+shorthand/
 target/
 **/*.lock

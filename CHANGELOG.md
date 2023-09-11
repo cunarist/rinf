@@ -1,3 +1,11 @@
+## 3.7.1
+
+- Organized descriptions and files.
+
+## 3.7.0
+
+- Now this framework provides a shorthand command `rifs ...` which is equivalent to `dart run rust_in_flutter ...`.
+
 ## 3.6.0
 
 - Fixed a bug that prevents the app from running on Linux.
