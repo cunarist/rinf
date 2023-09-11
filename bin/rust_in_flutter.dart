@@ -133,9 +133,6 @@ Also, please install the CLI tool for Rust-In-Flutter
 cargo install rifs
 ```
 
-For detailed instructions on writing Rust and Flutter together,
-please refer to Rust-In-Flutter's [documentation](https://docs.cunarist.com/rust-in-flutter).
-
 Messages sent between Dart and Rust are implemented using Protobuf.
 If you have newly cloned the project repository
 or made changes to the `.proto` files in the `./messages` directory,
@@ -144,6 +141,9 @@ run the following command:
 ```bash
 rifs message
 ```
+
+For detailed instructions on writing Rust and Flutter together,
+please refer to Rust-In-Flutter's [documentation](https://docs.cunarist.com/rust-in-flutter).
 ''';
     readmeSplitted.add(text);
   }
