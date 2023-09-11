@@ -25,7 +25,7 @@ class CommandFailedException implements Exception {
     final stdout = result.stdout.toString().trim();
     final stderr = result.stderr.toString().trim();
     return [
-      "External Command: $executable ${arguments.join(' ')}",
+      "External Command: $executable ${arguments.map((e) => '"$e"').join(' ')}",
       "Returned Exit Code: ${result.exitCode}",
       kSeparator,
       "STDOUT:",

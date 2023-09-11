@@ -72,4 +72,4 @@ if [ ! -f "$PACKAGE_HASH_FILE" ]; then
     echo "$PACKAGE_HASH" > "$PACKAGE_HASH_FILE"
 fi
 
-"$DART" bin/build_tool_runner.dill $@
+"$DART" bin/build_tool_runner.dill "$@"
