@@ -22,6 +22,12 @@ protoc --version
 flutter doctor
 ```
 
+To get started with Rust-In-Flutter, you'll need to install the CLI tool.
+
+```bash
+cargo install rifs
+```
+
 For detailed instructions on writing Rust and Flutter together,
 please refer to Rust-In-Flutter's [documentation](https://docs.cunarist.com/rust-in-flutter).
 
@@ -31,5 +37,5 @@ or made changes to the `.proto` files in the `./messages` directory,
 run the following command:
 
 ```bash
-dart run rust_in_flutter message
+rifs message
 ```

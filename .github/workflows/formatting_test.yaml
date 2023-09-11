@@ -43,9 +43,13 @@ jobs:
         working-directory: example/
         run: flutter pub get
 
+      - name: Install shorthand CLI tool
+        working-directory: shorthand/
+        run: cargo install --path ./
+
       - name: Generate message files
         working-directory: example/
-        run: dart run rust_in_flutter message
+        run: rifs message
 
       - name: Install Clippy
         run: rustup component add clippy
