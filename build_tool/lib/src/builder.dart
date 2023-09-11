@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 
 import 'android_environment.dart';
@@ -8,6 +9,8 @@ import 'options.dart';
 import 'rustup.dart';
 import 'target.dart';
 import 'util.dart';
+
+final _log = Logger('builder');
 
 enum BuildConfiguration {
   debug,
@@ -61,17 +64,24 @@ class BuildEnvironment {
     this.javaHome,
   });
 
+  static BuildConfiguration parseBuildConfiguration(String value) {
+    // XCode configuration adds the flavor to configuration name.
+    final firstSegment = value.split('-').first;
+    final buildConfiguration = BuildConfiguration.values.firstWhereOrNull(
+      (e) => e.name == firstSegment,
+    );
+    if (buildConfiguration == null) {
+      _log.warning('Unknown build configuraiton $value, will assume release');
+      return BuildConfiguration.release;
+    }
+    return buildConfiguration;
+  }
+
   static BuildEnvironment fromEnvironment({
     required bool isAndroid,
   }) {
-    final buildConfiguration = BuildConfiguration.values.firstWhereOrNull(
-      (e) => e.name == Environment.configuration,
-    );
-    if (buildConfiguration == null) {
-      throw BuildException(
-        'Unknown build configuration: ${Environment.configuration}',
-      );
-    }
+    final buildConfiguration =
+        parseBuildConfiguration(Environment.configuration);
     final manifestDir = Environment.manifestDir;
     final crateOptions = CargokitCrateOptions.load(
       manifestDir: manifestDir,
