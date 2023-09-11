@@ -6,4 +6,5 @@
 automate/
 shorthand/
 target/
+Cargo.toml
 **/*.lock

@@ -1,3 +1,7 @@
+## 3.7.2
+
+- Fixed a bug with cargo.
+
 ## 3.7.1
 
 - Organized descriptions and files.
