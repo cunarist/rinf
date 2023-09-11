@@ -1,5 +1,13 @@
 SET(cargokit_cmake_root "${CMAKE_CURRENT_LIST_DIR}/..")
 
+# Workaround for https://github.com/dart-lang/pub/issues/4010
+get_filename_component(cargokit_cmake_root "${cargokit_cmake_root}" REALPATH)
+
+if(WIN32)
+    # REALPATH does not properly resolve symlinks on windows :-/
+    execute_process(COMMAND powershell -File "${CMAKE_CURRENT_LIST_DIR}/resolve_symlinks.ps1" "${cargokit_cmake_root}" OUTPUT_VARIABLE cargokit_cmake_root OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif()
+
 # Arguments
 # - target: CMAKE target to which rust library is linked
 # - manifest_dir: relative path from current folder to directory containing cargo manifest

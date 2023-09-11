@@ -3,6 +3,9 @@ set -e
 
 BASEDIR=$(dirname "$0")
 
+# Workaround for https://github.com/dart-lang/pub/issues/4010
+BASEDIR=$(cd "$BASEDIR" ; pwd -P)
+
 # Remove XCode SDK from path. Otherwise this breaks tool compilation when building iOS project
 NEW_PATH=`echo $PATH | tr ":" "\n" | grep -v "Contents/Developer/" | tr "\n" ":"`
 
