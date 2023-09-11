@@ -1,0 +1,75 @@
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+name: Test Example Plugin
+
+jobs:
+  Build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macOS-latest
+          - windows-latest
+        build_mode:
+          - debug
+          - profile
+          - release
+    env:
+      EXAMPLE_DIR: "a b/hello_rust_ffi_plugin/example"
+    steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
+      - name: Setup Repository
+        shell: bash
+        run: |
+            mkdir "a b" # Space is intentional
+            cd "a b"
+            git config --global user.email "you@example.com"
+            git config --global user.name "Your Name"
+            git clone https://github.com/irondash/hello_rust_ffi_plugin
+            cd hello_rust_ffi_plugin
+            git subtree pull --prefix cargokit https://github.com/irondash/cargokit.git ${{ steps.extract_branch.outputs.branch }} --squash
+      - uses: subosito/flutter-action@v1
+        with:
+          channel: "stable"
+      - name: Install GTK
+        if: (matrix.os == 'ubuntu-latest')
+        run: sudo apt-get update && sudo apt-get install libgtk-3-dev
+      - name: Install ninja-build
+        if: (matrix.os == 'ubuntu-latest')
+        run: sudo apt-get update && sudo apt-get install ninja-build
+      - name: Build Linux (${{ matrix.build_mode }})
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        working-directory: ${{ env.EXAMPLE_DIR }}
+        run: flutter build linux --${{ matrix.build_mode }} -v
+      - name: Build macOS (${{ matrix.build_mode }})
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        working-directory: ${{ env.EXAMPLE_DIR }}
+        run: flutter build macos --${{ matrix.build_mode }} -v
+      - name: Build iOS (${{ matrix.build_mode }})
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        working-directory: ${{ env.EXAMPLE_DIR }}
+        run: flutter build ios --${{ matrix.build_mode }} --no-codesign -v
+      - name: Build Windows (${{ matrix.build_mode }})
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        working-directory: ${{ env.EXAMPLE_DIR }}
+        run: flutter build windows --${{ matrix.build_mode }} -v
+      - name: Build Android (${{ matrix.build_mode }})
+        shell: bash
+        working-directory: ${{ env.EXAMPLE_DIR }}
+        run: |
+          export JAVA_HOME=$JAVA_HOME_11_X64
+          flutter build apk --${{ matrix.build_mode }} -v
+
