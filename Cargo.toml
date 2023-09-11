@@ -1,3 +1,3 @@
 [workspace]
-members = ["./example/native/hub", "./cargokit/build_tool"]
+members = ["./example/native/hub", "./cargokit/build_tool", "./shorthand"]
 resolver = "2"

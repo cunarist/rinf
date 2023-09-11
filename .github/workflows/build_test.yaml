@@ -80,9 +80,13 @@ jobs:
         working-directory: example/
         run: flutter pub get
 
+      - name: Install shorthand CLI tool
+        working-directory: shorthand/
+        run: cargo install --path ./
+
       - name: Generate message files
         working-directory: example/
-        run: dart run rust_in_flutter message
+        run: rifs message
 
       - name: Build the example app
         if: matrix.target == 'linux'
@@ -115,5 +119,5 @@ jobs:
         if: matrix.target == 'web'
         working-directory: example/
         run: |
-          dart run rust_in_flutter wasm --release
+          rifs wasm --release
           flutter build web

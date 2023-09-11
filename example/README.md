@@ -22,8 +22,11 @@ protoc --version
 flutter doctor
 ```
 
-For detailed instructions on writing Rust and Flutter together,
-please refer to Rust-In-Flutter's [documentation](https://docs.cunarist.com/rust-in-flutter).
+To get started with Rust-In-Flutter, you'll need to install the CLI tool.
+
+```bash
+cargo install rifs
+```
 
 Messages sent between Dart and Rust are implemented using Protobuf.
 If you have newly cloned the project repository
@@ -31,5 +34,8 @@ or made changes to the `.proto` files in the `./messages` directory,
 run the following command:
 
 ```bash
-dart run rust_in_flutter message
+rifs message
 ```
+
+For detailed instructions on writing Rust and Flutter together,
+please refer to Rust-In-Flutter's [documentation](https://docs.cunarist.com/rust-in-flutter).

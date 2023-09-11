@@ -1,0 +1,10 @@
+[package]
+name = "rifs"
+version = "3.7.0"
+edition = "2021"
+license = "MIT"
+description = "Shorthand command for the Rust-In-Flutter framework"
+repository = "https://github.com/cunarist/rust-in-flutter"
+
+[dependencies]
+which = "4.4.2"
