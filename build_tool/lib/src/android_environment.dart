@@ -69,6 +69,7 @@ class AndroidEnvironment {
       'sdkmanager$sdkManagerExtension',
     );
 
+    log.info('Installing NDK $ndkVersion');
     runCommand(sdkManager, [
       '--install',
       'ndk;$ndkVersion',
@@ -95,6 +96,8 @@ class AndroidEnvironment {
     final minSdkVersion =
         math.max(target.androidMinSdkVersion!, this.minSdkVersion);
 
+    final exe = Platform.isWindows ? '.exe' : '';
+
     final arKey = 'AR_${target.rust}';
     final arValue = ['${target.rust}-ar', 'llvm-ar', 'llvm-ar.exe']
         .map((e) => path.join(toolchainPath, e))
@@ -106,12 +109,12 @@ class AndroidEnvironment {
     final targetArg = '--target=${target.rust}$minSdkVersion';
 
     final ccKey = 'CC_${target.rust}';
-    final ccValue = path.join(toolchainPath, 'clang');
+    final ccValue = path.join(toolchainPath, 'clang$exe');
     final cfFlagsKey = 'CFLAGS_${target.rust}';
     final cFlagsValue = targetArg;
 
     final cxxKey = 'CXX_${target.rust}';
-    final cxxValue = path.join(toolchainPath, 'clang++');
+    final cxxValue = path.join(toolchainPath, 'clang++$exe');
     final cxxfFlagsKey = 'CXXFLAGS_${target.rust}';
     final cxxFlagsValue = targetArg;
 
@@ -119,7 +122,7 @@ class AndroidEnvironment {
         'cargo_target_${target.rust.replaceAll('-', '_')}_linker'.toUpperCase();
 
     final ranlibKey = 'RANLIB_${target.rust}';
-    final ranlibValue = path.join(toolchainPath, 'llvm-ranlib');
+    final ranlibValue = path.join(toolchainPath, 'llvm-ranlib$exe');
 
     final ndkVersionParsed = Version.parse(ndkVersion);
     final rustFlagsKey = 'CARGO_ENCODED_RUSTFLAGS';
