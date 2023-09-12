@@ -26,7 +26,8 @@ abstract class BuildCommand extends Command {
   Future<void> run() async {
     final options = CargokitUserOptions.load();
 
-    if (options.verboseLogging) {
+    if (options.verboseLogging ||
+        Platform.environment['CARGOKIT_VERBOSE'] == '1') {
       enableVerboseLogging();
     }
 
