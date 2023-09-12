@@ -22,6 +22,7 @@ jobs:
           - release
     env:
       EXAMPLE_DIR: "a b/hello_rust_ffi_plugin/example"
+      CARGOKIT_VERBOSE: 1
     steps:
       - name: Extract branch name
         shell: bash
@@ -34,7 +35,8 @@ jobs:
             cd "a b"
             git config --global user.email "you@example.com"
             git config --global user.name "Your Name"
-            git clone https://github.com/irondash/hello_rust_ffi_plugin
+            # "advanced" branch has extra iOS flavor and uses rust nightly for release builds
+            git clone -b advanced https://github.com/irondash/hello_rust_ffi_plugin
             cd hello_rust_ffi_plugin
             git subtree pull --prefix cargokit https://github.com/irondash/cargokit.git ${{ steps.extract_branch.outputs.branch }} --squash
       - uses: subosito/flutter-action@v1
@@ -61,6 +63,11 @@ jobs:
         shell: bash
         working-directory: ${{ env.EXAMPLE_DIR }}
         run: flutter build ios --${{ matrix.build_mode }} --no-codesign -v
+      - name: Build iOS (${{ matrix.build_mode }}) - flavor1
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        working-directory: ${{ env.EXAMPLE_DIR }}
+        run: flutter build ios --flavor flavor1 --${{ matrix.build_mode }} --no-codesign -v
       - name: Build Windows (${{ matrix.build_mode }})
         if: matrix.os == 'windows-latest'
         shell: bash
