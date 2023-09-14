@@ -49,19 +49,21 @@ abstract class CargoKitBuildTask extends DefaultTask {
             throw new GradleException("Property 'libname' must be set on cargokit extension");
         }
 
-        def executableName = Os.isFamily(Os.FAMILY_WINDOWS) ? "run_rust_tool.cmd" : "run_rust_tool.sh"
+        def executableName = Os.isFamily(Os.FAMILY_WINDOWS) ? "run_build_tool.cmd" : "run_build_tool.sh"
         def path = Paths.get(new File(pluginFile).parent, "..", executableName);
 
         def manifestDir = Paths.get(project.buildscript.sourceFile.parent, project.cargokit.manifestDir)
 
+        def rootProjectDir = project.rootProject.projectDir
+
         project.exec {
             executable path
-            args "build_gradle"
-            environment "CARGOKIT_TOOL_TEMP_DIR", "${buildDir}/rust_tool"
+            args "build-gradle"
+            environment "CARGOKIT_ROOT_PROJECT_DIR", rootProjectDir
+            environment "CARGOKIT_TOOL_TEMP_DIR", "${buildDir}/build_tool"
             environment "CARGOKIT_MANIFEST_DIR", manifestDir
-            environment "CARGOKIT_LIB_NAME", project.cargokit.libname
-            environment "CARGOKIT_BUILD_MODE", buildMode
-            environment "CARGOKIT_BUILD_DIR", buildDir
+            environment "CARGOKIT_CONFIGURATION", buildMode
+            environment "CARGOKIT_TARGET_TEMP_DIR", buildDir
             environment "CARGOKIT_OUTPUT_DIR", outputDir
             environment "CARGOKIT_NDK_VERSION", ndkVersion
             environment "CARGOKIT_SDK_DIR", sdkDirectory
