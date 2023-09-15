@@ -4,7 +4,6 @@
 
 import 'dart:math';
 import 'dart:async';
-import 'dart:typed_data';
 import 'src/exports.dart';
 
 export 'src/exports.dart' show RustOperation;
@@ -62,7 +61,8 @@ Future<RustResponse> requestToRust(RustRequest rustRequest) async {
         id: id,
         response: RustResponse(
           successful: false,
-          bytes: Uint8List(0),
+          message: null,
+          blob: null,
         ),
       );
     },

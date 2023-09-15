@@ -1,5 +1,4 @@
 syntax = "proto3";
 package mandelbrot;
 
-// This API endpoint doesn't have any schema
-// because raw image data are being sent.
+message Signal { double current_scale = 2; }

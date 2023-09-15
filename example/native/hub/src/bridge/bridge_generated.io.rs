@@ -63,7 +63,8 @@ impl Wire2Api<RustRequest> for wire_RustRequest {
         RustRequest {
             resource: self.resource.wire2api(),
             operation: self.operation.wire2api(),
-            bytes: self.bytes.wire2api(),
+            message: self.message.wire2api(),
+            blob: self.blob.wire2api(),
         }
     }
 }
@@ -91,7 +92,8 @@ impl Wire2Api<Vec<u8>> for *mut wire_uint_8_list {
 pub struct wire_RustRequest {
     resource: i32,
     operation: i32,
-    bytes: *mut wire_uint_8_list,
+    message: *mut wire_uint_8_list,
+    blob: *mut wire_uint_8_list,
 }
 
 #[repr(C)]
@@ -125,7 +127,8 @@ impl NewWithNullPtr for wire_RustRequest {
         Self {
             resource: Default::default(),
             operation: Default::default(),
-            bytes: core::ptr::null_mut(),
+            message: core::ptr::null_mut(),
+            blob: core::ptr::null_mut(),
         }
     }
 }

@@ -40,7 +40,7 @@ class Home extends StatelessWidget {
       resource: counterNumber.ID,
       operation: RustOperation.Read,
       // Convert Dart message object into raw bytes.
-      bytes: requestMessage.writeToBuffer(),
+      message: requestMessage.writeToBuffer(),
     );
 
     // Use `requestToRust` from `rust_in_flutter.dart`
@@ -50,7 +50,7 @@ class Home extends StatelessWidget {
     if (rustResponse.successful) {
       // Convert raw bytes into Dart message objects.
       final responseMessage =
-          counterNumber.ReadResponse.fromBuffer(rustResponse.bytes);
+          counterNumber.ReadResponse.fromBuffer(rustResponse.message!);
       _countNotifier.value = responseMessage.afterNumber;
     }
   }
@@ -93,7 +93,7 @@ class Home extends StatelessWidget {
                   );
                 } else {
                   // Return an image container if some data is received.
-                  final imageData = received.bytes;
+                  final imageData = received.blob!;
                   return Container(
                     margin: const EdgeInsets.all(20),
                     width: 256,

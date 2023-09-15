@@ -133,13 +133,18 @@ class BridgeImpl implements Bridge {
     return raw as int;
   }
 
+  Uint8List? _wire2api_opt_uint_8_list(dynamic raw) {
+    return raw == null ? null : _wire2api_uint_8_list(raw);
+  }
+
   RustResponse _wire2api_rust_response(dynamic raw) {
     final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
     return RustResponse(
       successful: _wire2api_bool(arr[0]),
-      bytes: _wire2api_uint_8_list(arr[1]),
+      message: _wire2api_opt_uint_8_list(arr[1]),
+      blob: _wire2api_opt_uint_8_list(arr[2]),
     );
   }
 
@@ -155,11 +160,12 @@ class BridgeImpl implements Bridge {
 
   RustSignal _wire2api_rust_signal(dynamic raw) {
     final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
     return RustSignal(
       resource: _wire2api_i32(arr[0]),
-      bytes: _wire2api_uint_8_list(arr[1]),
+      message: _wire2api_opt_uint_8_list(arr[1]),
+      blob: _wire2api_opt_uint_8_list(arr[2]),
     );
   }
 

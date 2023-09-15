@@ -25,6 +25,11 @@ class BridgePlatform extends FlutterRustBridgeBase<BridgeWire> {
   }
 
   @protected
+  ffi.Pointer<wire_uint_8_list> api2wire_opt_uint_8_list(Uint8List? raw) {
+    return raw == null ? ffi.nullptr : api2wire_uint_8_list(raw);
+  }
+
+  @protected
   ffi.Pointer<wire_uint_8_list> api2wire_uint_8_list(Uint8List raw) {
     final ans = inner.new_uint_8_list_0(raw.length);
     ans.ref.ptr.asTypedList(raw.length).setAll(0, raw);
@@ -43,7 +48,8 @@ class BridgePlatform extends FlutterRustBridgeBase<BridgeWire> {
       RustRequest apiObj, wire_RustRequest wireObj) {
     wireObj.resource = api2wire_i32(apiObj.resource);
     wireObj.operation = api2wire_rust_operation(apiObj.operation);
-    wireObj.bytes = api2wire_uint_8_list(apiObj.bytes);
+    wireObj.message = api2wire_opt_uint_8_list(apiObj.message);
+    wireObj.blob = api2wire_opt_uint_8_list(apiObj.blob);
   }
 
   void _api_fill_to_wire_rust_request_unique(
@@ -309,7 +315,9 @@ final class wire_RustRequest extends ffi.Struct {
   @ffi.Int32()
   external int operation;
 
-  external ffi.Pointer<wire_uint_8_list> bytes;
+  external ffi.Pointer<wire_uint_8_list> message;
+
+  external ffi.Pointer<wire_uint_8_list> blob;
 }
 
 final class wire_RustRequestUnique extends ffi.Struct {

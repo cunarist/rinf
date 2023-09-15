@@ -37,19 +37,26 @@ pub fn wire_request_to_rust(port_: MessagePort, request_unique: JsValue) {
 
 // Section: impl Wire2Api
 
+impl Wire2Api<Option<Vec<u8>>> for Option<Box<[u8]>> {
+    fn wire2api(self) -> Option<Vec<u8>> {
+        self.map(Wire2Api::wire2api)
+    }
+}
+
 impl Wire2Api<RustRequest> for JsValue {
     fn wire2api(self) -> RustRequest {
         let self_ = self.dyn_into::<JsArray>().unwrap();
         assert_eq!(
             self_.length(),
-            3,
-            "Expected 3 elements, got {}",
+            4,
+            "Expected 4 elements, got {}",
             self_.length()
         );
         RustRequest {
             resource: self_.get(0).wire2api(),
             operation: self_.get(1).wire2api(),
-            bytes: self_.get(2).wire2api(),
+            message: self_.get(2).wire2api(),
+            blob: self_.get(3).wire2api(),
         }
     }
 }
@@ -79,6 +86,11 @@ impl Wire2Api<Vec<u8>> for Box<[u8]> {
 impl Wire2Api<i32> for JsValue {
     fn wire2api(self) -> i32 {
         self.unchecked_into_f64() as _
+    }
+}
+impl Wire2Api<Option<Vec<u8>>> for JsValue {
+    fn wire2api(self) -> Option<Vec<u8>> {
+        (!self.is_undefined() && !self.is_null()).then(|| self.wire2api())
     }
 }
 impl Wire2Api<RustOperation> for JsValue {
