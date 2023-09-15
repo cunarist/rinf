@@ -351,7 +351,7 @@ impl PortLike {
 /// Copied from https://github.com/chemicstry/wasm_thread/blob/main/src/script_path.js
 pub fn script_path() -> Option<String> {
     js_sys::eval(
-        r#"
+        r"
 (() => {
     try {
         throw new Error();
@@ -359,7 +359,7 @@ pub fn script_path() -> Option<String> {
         let parts = e.stack.match(/(?:\(|@)(\S+):\d+:\d+/);
         return parts[1];
     }
-})()"#,
+})()",
     )
     .ok()?
     .as_string()
