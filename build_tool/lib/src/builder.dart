@@ -116,14 +116,14 @@ class RustBuilder {
     Rustup rustup,
   ) {
     final toolchain = _toolchain;
-    if (!rustup.installedToolchains.any((i) => i.startsWith('$toolchain-'))) {
+    if (rustup.installedTargets(toolchain) == null) {
       rustup.installToolchain(toolchain);
     }
     if (toolchain == 'nightly') {
       rustup.installRustSrcForNightly();
     }
-    if (!rustup.installedTargets.contains(target.rust)) {
-      rustup.installTarget(target.rust);
+    if (!rustup.installedTargets(toolchain)!.contains(target.rust)) {
+      rustup.installTarget(target.rust, toolchain: toolchain);
     }
   }
 

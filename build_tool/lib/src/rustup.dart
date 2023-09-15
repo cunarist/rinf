@@ -1,41 +1,90 @@
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:path/path.dart' as path;
 
 import 'util.dart';
 
+class _Toolchain {
+  _Toolchain(
+    this.name,
+    this.targets,
+  );
+
+  final String name;
+  final List<String> targets;
+}
+
 class Rustup {
-  final List<String> installedTargets;
-  final List<String> installedToolchains;
-
-  Rustup()
-      : installedTargets = _getInstalledTargets(),
-        installedToolchains = _getInstalledToolchains();
-
-  void installTarget(String target) {
-    log.info("Installing Rust target: $target");
-    runCommand("rustup", ['target', 'add', target]);
-    installedTargets.add(target);
+  List<String>? installedTargets(String toolchain) {
+    final targets = _installedTargets(toolchain);
+    return targets != null ? List.unmodifiable(targets) : null;
   }
 
   void installToolchain(String toolchain) {
     log.info("Installing Rust toolchain: $toolchain");
     runCommand("rustup", ['toolchain', 'install', toolchain]);
-    installedToolchains.add(toolchain);
+    _installedToolchains
+        .add(_Toolchain(toolchain, _getInstalledTargets(toolchain)));
   }
 
-  static List<String> _getInstalledToolchains() {
+  void installTarget(
+    String target, {
+    required String toolchain,
+  }) {
+    log.info("Installing Rust target: $target");
+    runCommand("rustup", [
+      'target',
+      'add',
+      '--toolchain',
+      toolchain,
+      target,
+    ]);
+    _installedTargets(toolchain)?.add(target);
+  }
+
+  final List<_Toolchain> _installedToolchains;
+
+  Rustup() : _installedToolchains = _getInstalledToolchains();
+
+  List<String>? _installedTargets(String toolchain) => _installedToolchains
+      .firstWhereOrNull(
+          (e) => e.name == toolchain || e.name.startsWith('$toolchain-'))
+      ?.targets;
+
+  static List<_Toolchain> _getInstalledToolchains() {
+    String extractToolchainName(String line) {
+      // ignore (default) after toolchain name
+      final parts = line.split(' ');
+      return parts[0];
+    }
+
     final res = runCommand("rustup", ['toolchain', 'list']);
     final lines = res.stdout
         .toString()
         .split('\n')
         .where((e) => e.isNotEmpty)
+        .map(extractToolchainName)
         .toList(growable: true);
-    return lines;
+
+    return lines
+        .map(
+          (name) => _Toolchain(
+            name,
+            _getInstalledTargets(name),
+          ),
+        )
+        .toList(growable: true);
   }
 
-  static List<String> _getInstalledTargets() {
-    final res = runCommand("rustup", ['target', 'list', '--installed']);
+  static List<String> _getInstalledTargets(String toolchain) {
+    final res = runCommand("rustup", [
+      'target',
+      'list',
+      '--toolchain',
+      toolchain,
+      '--installed',
+    ]);
     final lines = res.stdout
         .toString()
         .split('\n')
