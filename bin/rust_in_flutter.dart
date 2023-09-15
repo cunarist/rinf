@@ -1,8 +1,6 @@
 import 'dart:io';
-import 'package:path/path.dart' as path;
 import 'package:package_config/package_config.dart';
 import 'dart:convert';
-import 'package:path/path.dart';
 
 Future<void> main(List<String> args) async {
   if (args.length == 0) {
@@ -99,8 +97,8 @@ Future<void> _applyRustTemplate() async {
   // Add some guides to `README.md`
   final guideSectionTitle = '## Using Rust Inside Flutter';
   final readmeFile = File('$flutterProjectPath/README.md');
-  if (!(await gitignoreFile.exists())) {
-    await gitignoreFile.create(recursive: true);
+  if (!(await readmeFile.exists())) {
+    await readmeFile.create(recursive: true);
   }
   final readmeContent = await readmeFile.readAsString();
   var readmeSplitted = readmeContent.split('\n\n');
@@ -191,13 +189,13 @@ Future<void> _copyDirectory(Directory source, Directory destination) async {
     (entity) async {
       if (entity is Directory) {
         final newDirectory = Directory(
-          path.join(destination.absolute.path, path.basename(entity.path)),
+          '${destination.uri.path}/${Uri.file(entity.path).pathSegments.last}',
         );
         await newDirectory.create();
         _copyDirectory(entity.absolute, newDirectory);
       } else if (entity is File) {
         await entity.copy(
-          path.join(destination.path, path.basename(entity.path)),
+          '${destination.uri.path}/${Uri.file(entity.path).pathSegments.last}',
         );
       }
     },
@@ -232,11 +230,15 @@ Future<void> _buildWebassembly({bool isReleaseMode = false}) async {
   // Verify Flutter SDK web server's response headers.
   await _verifyServerHeaders();
 
+  // Prepare the webassembly output path.
+  final flutterProjectPath = Directory.current;
+  final wasmOutputPath = flutterProjectPath.uri.resolve('web/pkg').toFilePath();
+
   // Build the webassembly module.
   print("Compiling Rust...");
   await _compile(
     crateDir: './native/hub',
-    wasmOutput: canonicalize('web/pkg'),
+    wasmOutput: wasmOutputPath,
     isReleaseMode: isReleaseMode,
   );
 
