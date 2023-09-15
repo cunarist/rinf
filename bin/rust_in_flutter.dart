@@ -358,27 +358,24 @@ Future<void> _generateMessageCode() async {
   // Get the list of `.proto` files.
   final Stream<FileSystemEntity> protoEntityStream =
       Directory(protoPath).list();
-  final List<String> protoFilenames = [];
+  final List<String> resourceNames = [];
   await for (final entity in protoEntityStream) {
     if (entity is File) {
       final String filename = entity.uri.pathSegments.last;
       if (filename.endsWith('.proto')) {
-        protoFilenames.add(filename);
+        final parts = filename.split('.');
+        parts.removeLast(); // Remove the extension from the filename.
+        final fileNameWithoutExtension = parts.join('.');
+        resourceNames.add(fileNameWithoutExtension);
       }
     }
   }
-  final rustResourceNames = protoFilenames.map((fileName) {
-    final parts = fileName.split('.');
-    parts.removeLast(); // Remove the extension from the filename.
-    final fileNameWithoutExtension = parts.join('.');
-    return fileNameWithoutExtension;
-  }).toList();
 
   // Verify `package` statement in `.proto` files.
   // Package name should be the same as the filename
   // because Rust filenames are written with package name
   // and Dart filenames are written with the `.proto` filename.
-  for (final resourceName in rustResourceNames) {
+  for (final resourceName in resourceNames) {
     final protoFile = File('messages/$resourceName.proto');
     final lines = await protoFile.readAsLines();
     List<String> outputLines = [];
@@ -410,12 +407,12 @@ Future<void> _generateMessageCode() async {
   final protocRustResult = await Process.run('protoc', [
     '--proto_path=$protoPath',
     '--prost_out=$rustOutputPath',
-    ...protoFilenames,
+    ...resourceNames.map((name) => '$name.proto'),
   ]);
   if (protocRustResult.exitCode != 0) {
     throw Exception('Could not compile `.proto` files into Rust');
   }
-  rustResourceNames.asMap().forEach((index, rustResourceName) {
+  resourceNames.asMap().forEach((index, rustResourceName) {
     _appendLineToFile(
       'native/hub/src/messages/$rustResourceName.rs',
       'pub const ID: i32 = $index;',
@@ -423,7 +420,7 @@ Future<void> _generateMessageCode() async {
   });
 
   // Generate `mod.rs` for `messages` module in Rust.
-  final modRsLines = rustResourceNames.map((resourceName) async {
+  final modRsLines = resourceNames.map((resourceName) async {
     return 'pub mod $resourceName;';
   });
   final modRsContent = (await Future.wait(modRsLines)).join('\n');
@@ -456,14 +453,14 @@ Future<void> _generateMessageCode() async {
     [
       '--proto_path=$protoPath',
       '--dart_out=$dartOutputPath',
-      ...protoFilenames,
+      ...resourceNames.map((name) => '$name.proto'),
     ],
     environment: newEnvironment,
   );
   if (protocDartResult.exitCode != 0) {
     throw Exception('Could not compile `.proto` files into Dart');
   }
-  rustResourceNames.asMap().forEach((index, rustResourceName) {
+  resourceNames.asMap().forEach((index, rustResourceName) {
     _appendLineToFile(
       'lib/messages/$rustResourceName.pb.dart',
       'const ID = $index;',
