@@ -1,4 +1,7 @@
 syntax = "proto3";
 package mandelbrot;
 
-message Signal { double current_scale = 2; }
+message Signal {
+  int32 id = 1;
+  double current_scale = 2;
+}

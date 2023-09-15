@@ -81,6 +81,7 @@ pub async fn stream_mandelbrot() {
                 resource: ID,
                 message: Some(
                     Signal {
+                        id: 0,
                         current_scale: scale,
                     }
                     .encode_to_vec(),
