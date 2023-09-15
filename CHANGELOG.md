@@ -1,3 +1,7 @@
+## 3.7.4
+
+- Updated `cargokit`, the build connector between Flutter and Rust.
+
 ## 3.7.3
 
 - Fixed a bug with cargo.
