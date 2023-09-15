@@ -33,6 +33,12 @@ if len(sys.argv) == 1:
     print("Automation option is not provided.")
 
 elif sys.argv[1] == "bridge-gen":
+    # Temporarily add `ffi` package
+    # because `flutter_rust_bridge_codegen` wants it,
+    # though the generated code doesn't use it.
+    command = "dart pub add ffi"
+    os.system(command)
+
     # Delete previous bridge files.
     remove_files_in_folder("./example/native/hub/src/bridge", "bridge")
     remove_files_in_folder("./lib/src", "bridge")
@@ -84,9 +90,13 @@ elif sys.argv[1] == "bridge-gen":
     replace_string_in_files(directory_path, search_string, replace_string)
 
     # Format code.
-    command = "cargo clippy --fix"
+    command = "cargo clippy --fix --allow-dirty"
     os.system(command)
     command = "dart format ."
+    os.system(command)
+
+    # Remove temporarily added `ffi` package.
+    command = "dart pub remove ffi"
     os.system(command)
 
 else:
