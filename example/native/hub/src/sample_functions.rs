@@ -25,8 +25,8 @@ pub async fn handle_deeper_resource(rust_request: RustRequest) -> RustResponse {
 
 pub async fn handle_counter_number(rust_request: RustRequest) -> RustResponse {
     use crate::messages::counter_number::{ReadRequest, ReadResponse};
-    // We import message structs in this match condition
-    // because schema will differ by the operation type.
+    // We import message structs in this handler function
+    // because schema will differ by Rust resource.
 
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
