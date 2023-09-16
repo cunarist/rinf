@@ -195,13 +195,13 @@ Future<void> _copyDirectory(Directory source, Directory destination) async {
     print(path.join(destination.uri.toFilePath(), entityName));
     if (entity is Directory) {
       final newDirectory = Directory(
-        path.join(destination.uri.toFilePath(), entityName),
+        path.join(destination.path, entityName),
       );
       await newDirectory.create();
       await _copyDirectory(entity.absolute, newDirectory);
     } else if (entity is File) {
       await entity.copy(
-        path.join(destination.uri.toFilePath(), entityName),
+        path.join(destination.path, entityName),
       );
     }
   }
