@@ -1,3 +1,7 @@
+## 4.0.2
+
+- Eliminated an unnecessary Dart dependency.
+
 ## 4.0.1
 
 - Eliminated an unnecessary Dart dependency.
