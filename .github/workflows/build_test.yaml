@@ -76,52 +76,54 @@ jobs:
           distribution: "zulu"
           java-version: "11"
 
+      - name: Create a Flutter app for testing
+        run: flutter create test
+
       - name: Fetch Flutter dependencies
-        working-directory: example/
+        working-directory: test/
         run: flutter pub get
 
       - name: Install shorthand CLI tool
-        working-directory: shorthand/
-        run: cargo install --path ./
+        run: cargo install --path shorthand/
 
-      - name: Check that Rust template command works
-        working-directory: example/
+      - name: Apply Rust template
+        working-directory: test/
         run: rifs template
 
       - name: Generate message files
-        working-directory: example/
+        working-directory: test/
         run: rifs message
 
       - name: Build the example app
         if: matrix.target == 'linux'
-        working-directory: example/
+        working-directory: test/
         run: flutter build linux
 
       - name: Build the example app
         if: matrix.target == 'android'
-        working-directory: example/
+        working-directory: test/
         run: |
           flutter build apk
           flutter build appbundle
 
       - name: Build the example app
         if: matrix.target == 'windows'
-        working-directory: example/
+        working-directory: test/
         run: flutter build windows
 
       - name: Build the example app
         if: matrix.target == 'macos'
-        working-directory: example/
+        working-directory: test/
         run: flutter build macos
 
       - name: Build the example app
         if: matrix.target == 'ios'
-        working-directory: example/
+        working-directory: test/
         run: flutter build ios --no-codesign
 
       - name: Build the example app
         if: matrix.target == 'web'
-        working-directory: example/
+        working-directory: test/
         run: |
           rifs wasm --release
           flutter build web
