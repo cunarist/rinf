@@ -423,8 +423,10 @@ Future<void> _generateMessageCode() async {
     }).toList();
     for (final otherSubPath in resourcesInFolders.keys) {
       if (otherSubPath != subPath && otherSubPath.contains(subPath)) {
-        final relation =
-            otherSubPath.replaceFirst(subPath, "").replaceFirst('/', '');
+        final relation = otherSubPath
+            .replaceFirst(subPath, "")
+            .replaceAll("\\", "/") // For Windows
+            .replaceFirst('/', '');
         if (!relation.contains('/')) {
           modRsLines.add('pub mod $relation;');
         }
