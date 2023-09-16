@@ -15,7 +15,7 @@ Designed for ease of use, future scalability, and unparalleled performance, this
 
 ## 🎮 Demo
 
-Check out the [demo](https://rif-example.cunarist.com/) running on the web to experience the exceptional speed and performance of this combination of Dart and Rust.
+Visit the [demo](https://rif-example.cunarist.com/) running on the web to experience the smoothness and delightfulness that comes from the combination of Flutter and Rust.
 
 ## 🖥️ Platform Support
 
