@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'basic.dart';
 import 'platform_independent.dart';
-import 'package:meta/meta.dart';
 export 'ffi.dart';
 
 /// borrowed from flutter foundation [kIsWeb](https://api.flutter.dev/flutter/foundation/kIsWeb-constant.html),
@@ -60,11 +59,11 @@ mixin FlutterRustBridgeSetupMixin<T extends FlutterRustBridgeWireBase>
   }
 
   /// Do your setup logic inside this function.
-  @protected
+
   Future<void> setup();
 
   /// Configure a logger for error handling.
-  @protected
+
   void log(String message) {}
 }
 
@@ -93,7 +92,7 @@ mixin FlutterRustBridgeTimeoutMixin<T extends FlutterRustBridgeWireBase>
   }
 
   /// The time limit for methods using [executeNormal]. Return null means *disable* this functionality.
-  @protected
+
   Duration? get timeLimitForExecuteNormal;
 }
 

@@ -6,7 +6,7 @@ import 'bridge_generated.io.dart'
     if (dart.library.html) 'bridge_generated.web.dart';
 import 'dart:convert';
 import 'dart:async';
-import 'package:meta/meta.dart';
+
 import 'bridge_engine/exports.dart';
 
 abstract class Bridge {

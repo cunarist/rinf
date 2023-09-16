@@ -5,7 +5,7 @@
 import "bridge_definitions.dart";
 import 'dart:convert';
 import 'dart:async';
-import 'package:meta/meta.dart';
+
 import 'bridge_engine/exports.dart';
 import 'bridge_generated.io.dart'
     if (dart.library.html) 'bridge_generated.web.dart';
@@ -184,17 +184,14 @@ class BridgeImpl implements Bridge {
 
 // Section: api2wire
 
-@protected
 int api2wire_i32(int raw) {
   return raw;
 }
 
-@protected
 int api2wire_rust_operation(RustOperation raw) {
   return api2wire_i32(raw.index);
 }
 
-@protected
 int api2wire_u8(int raw) {
   return raw;
 }

@@ -5,7 +5,7 @@
 import "bridge_definitions.dart";
 import 'dart:convert';
 import 'dart:async';
-import 'package:meta/meta.dart';
+
 import 'bridge_engine/exports.dart';
 import 'bridge_generated.dart';
 export 'bridge_generated.dart';
@@ -19,18 +19,15 @@ class BridgePlatform extends FlutterRustBridgeBase<BridgeWire>
 
 // Section: api2wire
 
-  @protected
   List<dynamic> api2wire_box_autoadd_rust_request_unique(
       RustRequestUnique raw) {
     return api2wire_rust_request_unique(raw);
   }
 
-  @protected
   Uint8List? api2wire_opt_uint_8_list(Uint8List? raw) {
     return raw == null ? null : api2wire_uint_8_list(raw);
   }
 
-  @protected
   List<dynamic> api2wire_rust_request(RustRequest raw) {
     return [
       api2wire_i32(raw.resource),
@@ -40,12 +37,10 @@ class BridgePlatform extends FlutterRustBridgeBase<BridgeWire>
     ];
   }
 
-  @protected
   List<dynamic> api2wire_rust_request_unique(RustRequestUnique raw) {
     return [api2wire_i32(raw.id), api2wire_rust_request(raw.request)];
   }
 
-  @protected
   Uint8List api2wire_uint_8_list(Uint8List raw) {
     return raw;
   }

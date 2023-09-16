@@ -1,4 +1,3 @@
-import 'package:meta/meta.dart';
 import 'ffi/io.dart' if (dart.library.html) 'ffi/web.dart';
 
 export 'ffi/stub.dart'
@@ -37,7 +36,7 @@ abstract class FrbOpaque extends FrbOpaqueBase {
   ShareFnType get shareFn;
 
   /// This constructor should never be called manually.
-  @internal
+
   FrbOpaque.unsafe(int ptr, int size) : _ptr = FrbOpaqueBase.initPtr(ptr) {
     if (ptr != 0) {
       FrbOpaqueBase.finalizerAttach(this, _ptr, size, staticFinalizer);
@@ -66,7 +65,7 @@ abstract class FrbOpaque extends FrbOpaqueBase {
   /// Rust object.
   ///
   /// Throws a [StateError] if called after [dispose].
-  @internal
+
   PlatformPointer shareOrMove() {
     if (!isStale()) {
       var ptr = shareFn(_ptr);

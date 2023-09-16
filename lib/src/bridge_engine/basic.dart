@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'platform_independent.dart';
 import 'utils.dart';
-import 'package:meta/meta.dart';
 import 'ffi.dart';
 export 'ffi.dart';
 import 'isolate.dart';
@@ -28,7 +27,6 @@ abstract class FlutterRustBridgeBase<T extends FlutterRustBridgeWireBase> {
     _setUpRustToDartComm();
   }
 
-  @protected
   final T inner;
 
   late final _dropPort = _initDropPort();
@@ -61,7 +59,7 @@ abstract class FlutterRustBridgeBase<T extends FlutterRustBridgeWireBase> {
   }
 
   /// Execute a normal ffi call. Usually called by generated code instead of manually called.
-  @protected
+
   Future<S> executeNormal<S>(FlutterRustBridgeTask<S> task) {
     final completer = Completer<dynamic>();
     final sendPort = singleCompletePort(completer);
@@ -71,7 +69,7 @@ abstract class FlutterRustBridgeBase<T extends FlutterRustBridgeWireBase> {
   }
 
   /// Similar to [executeNormal], except that this will return synchronously
-  @protected
+
   S executeSync<S>(FlutterRustBridgeSyncTask task) {
     final WireSyncReturn syncReturn;
     try {
@@ -98,7 +96,7 @@ abstract class FlutterRustBridgeBase<T extends FlutterRustBridgeWireBase> {
   }
 
   /// Similar to [executeNormal], except that this will return a [Stream] instead of a [Future].
-  @protected
+
   Stream<S> executeStream<S>(FlutterRustBridgeTask<S> task) async* {
     final func = task.constMeta.debugName;
     final nextIndex = _streamSinkNameIndex.update(func, (value) => value + 1,
@@ -146,7 +144,7 @@ abstract class FlutterRustBridgeBase<T extends FlutterRustBridgeWireBase> {
 }
 
 /// A task to call FFI function.
-@immutable
+
 class FlutterRustBridgeTask<S> extends FlutterRustBridgeBaseTask {
   /// The underlying function to call FFI function, usually the generated wire function
   final void Function(NativePortType port) callFfi;
@@ -168,7 +166,7 @@ class FlutterRustBridgeTask<S> extends FlutterRustBridgeBaseTask {
 }
 
 /// A task to call FFI function, but it is synchronous.
-@immutable
+
 class FlutterRustBridgeSyncTask<S> extends FlutterRustBridgeBaseTask {
   /// The underlying function to call FFI function, usually the generated wire function
   final WireSyncReturn Function() callFfi;

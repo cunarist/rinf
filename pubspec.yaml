@@ -13,7 +13,6 @@ dependencies:
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.0.2
-  meta: ^1.8.0
   package_config: ^2.1.0
   js: ^0.6.4
 
