@@ -1,3 +1,10 @@
+## 4.0.0
+
+- Added support for sending large binaries between Dart and Rust. This is now possible by using the `blob` field in `RustRequest`, `RustResponse`, and `RustSignal`. Please make sure you've run `rifs template` before using this new version because the template has changed a little.
+- Added support for nested message folders.
+- Added support for Rust nightly.
+- Eliminated unnecessary Dart dependencies.
+
 ## 3.7.4
 
 - Updated `cargokit`, the build connector between Flutter and Rust.
