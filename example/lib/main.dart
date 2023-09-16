@@ -23,7 +23,6 @@ class MyApp extends StatelessWidget {
 class Home extends StatelessWidget {
   final ValueNotifier<int> _countNotifier = ValueNotifier<int>(0);
 
-  // This method interacts with Rust.
   void _incrementCount() async {
     final requestMessage = counterNumber.ReadRequest(
       letter: "Hello from Dart!",
