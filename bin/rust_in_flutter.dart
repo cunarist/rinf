@@ -186,6 +186,9 @@ Future<void> _copyDirectory(Directory source, Directory destination) async {
   final newDirectory = Directory(destination.path);
   await newDirectory.create();
   await for (final entity in source.list(recursive: false)) {
+    print("");
+    print(destination.uri);
+    print(Uri.directory(entity.path).pathSegments.last);
     print(destination.uri
         .resolve(Uri.directory(entity.path).pathSegments.last)
         .toFilePath());
