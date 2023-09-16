@@ -1,3 +1,9 @@
+## 4.0.3
+
+- Fixed bugs with `rifs template` on Windows.
+- Fixed outdated comments.
+- Organized sample code.
+
 ## 4.0.2
 
 - Eliminated an unnecessary Dart dependency.
