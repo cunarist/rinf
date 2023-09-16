@@ -37,9 +37,6 @@ function(apply_cargokit target manifest_dir lib_name any_symbol_name)
         "CARGOKIT_CMAKE=${CMAKE_COMMAND}"
         "CARGOKIT_CONFIGURATION=$<CONFIG>"
         "CARGOKIT_MANIFEST_DIR=${manifest_dir}" # Different from upstream
-        "CARGOKIT_LIB_NAME=${CARGOKIT_LIB_NAME}"
-        "CARGOKIT_BUILD_DIR=${CARGOKIT_TEMP_DIR}"
-        "CARGOKIT_TARGET_DIR=${CARGOKIT_TARGET_DIR}"
         "CARGOKIT_TARGET_TEMP_DIR=${CARGOKIT_TEMP_DIR}"
         "CARGOKIT_OUTPUT_DIR=${CARGOKIT_OUTPUT_DIR}"
         "CARGOKIT_TARGET_PLATFORM=${CARGOKIT_TARGET_PLATFORM}"
