@@ -15,7 +15,6 @@ dependencies:
   plugin_platform_interface: ^2.0.2
   package_config: ^2.1.0
   js: ^0.6.4
-  path: ^1.8.3
 
 dev_dependencies:
   ffigen: ^8.0.0

@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:package_config/package_config.dart';
 import 'dart:convert';
-import 'package:path/path.dart' as path;
 
 Future<void> main(List<String> args) async {
   if (args.length == 0) {
@@ -187,21 +186,21 @@ Future<void> _copyDirectory(Directory source, Directory destination) async {
   final newDirectory = Directory(destination.path);
   await newDirectory.create();
   await for (final entity in source.list(recursive: false)) {
-    final entityName = path.basename(entity.path);
+    final entityName = entity.path.split(Platform.pathSeparator).last;
     print("");
     print(entity.path);
     print(destination.uri);
     print(entityName);
-    print(path.join(destination.uri.toFilePath(), entityName));
+    print(destination.uri.resolve(entityName));
     if (entity is Directory) {
       final newDirectory = Directory(
-        path.join(destination.path, entityName),
+        destination.uri.resolve(entityName).toFilePath(),
       );
       await newDirectory.create();
       await _copyDirectory(entity.absolute, newDirectory);
     } else if (entity is File) {
       await entity.copy(
-        path.join(destination.path, entityName),
+        destination.uri.resolve(entityName).toFilePath(),
       );
     }
   }
