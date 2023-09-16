@@ -84,7 +84,7 @@ jobs:
 
       - name: Fetch Flutter dependencies
         working-directory: test/
-        run: flutter pub get
+        run: dart pub get
 
       - name: Add this framework as a dependency
         working-directory: test/
