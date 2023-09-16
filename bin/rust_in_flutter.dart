@@ -57,20 +57,6 @@ Future<void> _applyRustTemplate() async {
   final cargoDestination = File('$flutterProjectPath/Cargo.toml');
   await cargoSource.copy(cargoDestination.path);
 
-  // Create `.cargo/config.toml` file
-  final cargoConfigFile = File('$flutterProjectPath/.cargo/config.toml');
-  if (!(await cargoConfigFile.exists())) {
-    await cargoConfigFile.create(recursive: true);
-  }
-  const cargoConfigContent = '''
-[build]
-# Uncomment the line below to switch Rust-analyzer to perform
-# type checking and linting in webassembly mode, for the web target.
-# You might have to restart Rust-analyzer for this change to take effect.
-# target = "wasm32-unknown-unknown"
-''';
-  await cargoConfigFile.writeAsString(cargoConfigContent);
-
   // Add some lines to `.gitignore`
   final rustSectionTitle = '# Rust related';
   final messageSectionTitle = '# Generated messages';
