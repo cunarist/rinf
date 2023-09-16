@@ -13,6 +13,10 @@
 
 Designed for ease of use, future scalability, and unparalleled performance, this lightweight framework takes care of all the complexity behind the scenes. No messing with sensitive build files, no excessive code generation during development. Simply add this framework to your app project, and you're all set to write Flutter and Rust together!
 
+## 🎮 Demo
+
+Check out the [demo](https://rif-example.cunarist.com/) running on the web to experience the exceptional speed and performance of this combination of Dart and Rust.
+
 ## 🖥️ Platform Support
 
 All platforms available with Flutter are [tested](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml?query=branch%3Amain) and supported. Challenging build settings are automatically handled by this framework.
