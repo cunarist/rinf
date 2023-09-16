@@ -26,11 +26,17 @@ class BridgePlatform extends FlutterRustBridgeBase<BridgeWire>
   }
 
   @protected
+  Uint8List? api2wire_opt_uint_8_list(Uint8List? raw) {
+    return raw == null ? null : api2wire_uint_8_list(raw);
+  }
+
+  @protected
   List<dynamic> api2wire_rust_request(RustRequest raw) {
     return [
       api2wire_i32(raw.resource),
       api2wire_rust_operation(raw.operation),
-      api2wire_uint_8_list(raw.bytes)
+      api2wire_opt_uint_8_list(raw.message),
+      api2wire_opt_uint_8_list(raw.blob)
     ];
   }
 

@@ -56,12 +56,14 @@ enum RustOperation {
 class RustRequest {
   final int resource;
   final RustOperation operation;
-  final Uint8List bytes;
+  final Uint8List? message;
+  final Uint8List? blob;
 
   const RustRequest({
     required this.resource,
     required this.operation,
-    required this.bytes,
+    this.message,
+    this.blob,
   });
 }
 
@@ -79,11 +81,13 @@ class RustRequestUnique {
 /// Response object that is sent from Rust to Dart.
 class RustResponse {
   final bool successful;
-  final Uint8List bytes;
+  final Uint8List? message;
+  final Uint8List? blob;
 
   const RustResponse({
     required this.successful,
-    required this.bytes,
+    this.message,
+    this.blob,
   });
 }
 
@@ -101,10 +105,12 @@ class RustResponseUnique {
 /// Holds the data that Rust streams to Dart.
 class RustSignal {
   final int resource;
-  final Uint8List bytes;
+  final Uint8List? message;
+  final Uint8List? blob;
 
   const RustSignal({
     required this.resource,
-    required this.bytes,
+    this.message,
+    this.blob,
   });
 }

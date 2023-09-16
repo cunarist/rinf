@@ -356,45 +356,38 @@ Future<void> _generateMessageCode() async {
   await _emptyDirectory(dartOutputPath);
 
   // Get the list of `.proto` files.
-  final Stream<FileSystemEntity> protoEntityStream =
-      Directory(protoPath).list();
-  final List<String> protoFilenames = [];
-  await for (final entity in protoEntityStream) {
-    if (entity is File) {
-      final String filename = entity.uri.pathSegments.last;
-      if (filename.endsWith('.proto')) {
-        protoFilenames.add(filename);
-      }
-    }
-  }
-  final rustResourceNames = protoFilenames.map((fileName) {
-    final parts = fileName.split('.');
-    parts.removeLast(); // Remove the extension from the filename.
-    final fileNameWithoutExtension = parts.join('.');
-    return fileNameWithoutExtension;
-  }).toList();
+  final resourcesInFolders = <String, List<String>>{};
+  await _collectProtoFiles(
+    Directory(protoPath),
+    Directory(protoPath),
+    resourcesInFolders,
+  );
 
   // Verify `package` statement in `.proto` files.
   // Package name should be the same as the filename
   // because Rust filenames are written with package name
   // and Dart filenames are written with the `.proto` filename.
-  for (final resourceName in rustResourceNames) {
-    final protoFile = File('messages/$resourceName.proto');
-    final lines = await protoFile.readAsLines();
-    List<String> outputLines = [];
-    for (var line in lines) {
-      final packagePattern = r'^package\s+[a-zA-Z_][a-zA-Z0-9_]*\s*[^=];$';
-      if (RegExp(packagePattern).hasMatch(line.trim())) {
-        continue;
-      } else if (line.trim().startsWith("syntax")) {
-        continue;
-      } else {
-        outputLines.add(line);
+  for (final entry in resourcesInFolders.entries) {
+    final subPath = entry.key;
+    final resourceNames = entry.value;
+    for (final resourceName in resourceNames) {
+      final protoFile = File('$protoPath$subPath/$resourceName.proto');
+      final lines = await protoFile.readAsLines();
+      List<String> outputLines = [];
+      for (var line in lines) {
+        final packagePattern = r'^package\s+[a-zA-Z_][a-zA-Z0-9_]*\s*[^=];$';
+        if (RegExp(packagePattern).hasMatch(line.trim())) {
+          continue;
+        } else if (line.trim().startsWith("syntax")) {
+          continue;
+        } else {
+          outputLines.add(line);
+        }
       }
+      outputLines.insert(0, 'package $resourceName;');
+      outputLines.insert(0, 'syntax = "proto3";');
+      await protoFile.writeAsString(outputLines.join('\n') + '\n');
     }
-    outputLines.insert(0, 'package $resourceName;');
-    outputLines.insert(0, 'syntax = "proto3";');
-    await protoFile.writeAsString(outputLines.join('\n') + '\n');
   }
 
   // Generate Rust message files.
@@ -407,27 +400,41 @@ Future<void> _generateMessageCode() async {
   if (cargoInstallCommand.exitCode != 0) {
     throw Exception('Cannot globally install `protoc-gen-prost` Rust crate');
   }
-  final protocRustResult = await Process.run('protoc', [
-    '--proto_path=$protoPath',
-    '--prost_out=$rustOutputPath',
-    ...protoFilenames,
-  ]);
-  if (protocRustResult.exitCode != 0) {
-    throw Exception('Could not compile `.proto` files into Rust');
+  for (final entry in resourcesInFolders.entries) {
+    final subPath = entry.key;
+    final resourceNames = entry.value;
+    Directory('$rustOutputPath$subPath').create(recursive: true);
+    final protocRustResult = await Process.run('protoc', [
+      '--proto_path=$protoPath$subPath',
+      '--prost_out=$rustOutputPath$subPath',
+      ...resourceNames.map((name) => '$name.proto'),
+    ]);
+    if (protocRustResult.exitCode != 0) {
+      throw Exception('Could not compile `.proto` files into Rust');
+    }
   }
-  rustResourceNames.asMap().forEach((index, rustResourceName) {
-    _appendLineToFile(
-      'native/hub/src/messages/$rustResourceName.rs',
-      'pub const ID: i32 = $index;',
-    );
-  });
 
   // Generate `mod.rs` for `messages` module in Rust.
-  final modRsLines = rustResourceNames.map((resourceName) async {
-    return 'pub mod $resourceName;';
-  });
-  final modRsContent = (await Future.wait(modRsLines)).join('\n');
-  await File('$rustOutputPath/mod.rs').writeAsString(modRsContent);
+  for (final entry in resourcesInFolders.entries) {
+    final subPath = entry.key;
+    final resourceNames = entry.value;
+    final modRsLines = resourceNames.map((resourceName) {
+      return 'pub mod $resourceName;';
+    }).toList();
+    for (final otherSubPath in resourcesInFolders.keys) {
+      if (otherSubPath != subPath && otherSubPath.contains(subPath)) {
+        final relation = otherSubPath
+            .replaceFirst(subPath, "")
+            .replaceAll("\\", "/") // For Windows
+            .replaceFirst('/', '');
+        if (!relation.contains('/')) {
+          modRsLines.add('pub mod $relation;');
+        }
+      }
+    }
+    final modRsContent = modRsLines.join('\n');
+    await File('$rustOutputPath$subPath/mod.rs').writeAsString(modRsContent);
+  }
 
   // Generate Dart message files.
   print("Verifying `protoc_plugin` for Dart." +
@@ -451,24 +458,41 @@ Future<void> _generateMessageCode() async {
       ? '$currentPathVariable$pathSeparator$pubCacheBinPath'
       : pubCacheBinPath;
   newEnvironment['PATH'] = newPathVariable;
-  final protocDartResult = await Process.run(
-    'protoc',
-    [
-      '--proto_path=$protoPath',
-      '--dart_out=$dartOutputPath',
-      ...protoFilenames,
-    ],
-    environment: newEnvironment,
-  );
-  if (protocDartResult.exitCode != 0) {
-    throw Exception('Could not compile `.proto` files into Dart');
-  }
-  rustResourceNames.asMap().forEach((index, rustResourceName) {
-    _appendLineToFile(
-      'lib/messages/$rustResourceName.pb.dart',
-      'const ID = $index;',
+  for (final entry in resourcesInFolders.entries) {
+    final subPath = entry.key;
+    final resourceNames = entry.value;
+    Directory('$dartOutputPath$subPath').create(recursive: true);
+    final protocDartResult = await Process.run(
+      'protoc',
+      [
+        '--proto_path=$protoPath$subPath',
+        '--dart_out=$dartOutputPath$subPath',
+        ...resourceNames.map((name) => '$name.proto'),
+      ],
+      environment: newEnvironment,
     );
-  });
+    if (protocDartResult.exitCode != 0) {
+      throw Exception('Could not compile `.proto` files into Dart');
+    }
+  }
+
+  // Assign Rust resource index to each message module.
+  var resourceIndex = 0;
+  for (final entry in resourcesInFolders.entries) {
+    final subPath = entry.key;
+    final resourceNames = entry.value;
+    for (final resourceName in resourceNames) {
+      _appendLineToFile(
+        '$rustOutputPath$subPath/$resourceName.rs',
+        'pub const ID: i32 = $resourceIndex;',
+      );
+      _appendLineToFile(
+        '$dartOutputPath$subPath/$resourceName.pb.dart',
+        'const ID = $resourceIndex;',
+      );
+      resourceIndex += 1;
+    }
+  }
 
   // Notify that it's done
   print("🎉 Message code in Dart and Rust is now ready! 🎉");
@@ -502,4 +526,33 @@ Future<void> _appendLineToFile(String filePath, String textToAppend) async {
 
   // Write the updated content back to the file
   await file.writeAsString(fileContent);
+}
+
+Future<void> _collectProtoFiles(
+  Directory rootDirectory,
+  Directory directory,
+  Map<String, List<String>> resourcesInFolders,
+) async {
+  final resources = <String>[];
+  await for (final entity in directory.list()) {
+    if (entity is File) {
+      final filename = entity.uri.pathSegments.last;
+      if (filename.endsWith('.proto')) {
+        final parts = filename.split('.');
+        parts.removeLast(); // Remove the extension from the filename.
+        final fileNameWithoutExtension = parts.join('.');
+        resources.add(fileNameWithoutExtension);
+      }
+    } else if (entity is Directory) {
+      await _collectProtoFiles(
+        rootDirectory,
+        entity,
+        resourcesInFolders,
+      ); // Recursive call for subdirectories
+    }
+  }
+  final folderPath = directory.path.replaceFirst(rootDirectory.path, '');
+  if (resources.length > 0) {
+    resourcesInFolders[folderPath] = resources;
+  }
 }

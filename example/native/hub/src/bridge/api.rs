@@ -22,14 +22,16 @@ pub enum RustOperation {
 #[derive(Clone)]
 pub struct RustSignal {
     pub resource: i32,
-    pub bytes: Vec<u8>,
+    pub message: Option<Vec<u8>>,
+    pub blob: Option<Vec<u8>>,
 }
 
 /// Request object that is sent from Dart to Rust.
 pub struct RustRequest {
     pub resource: i32,
     pub operation: RustOperation,
-    pub bytes: Vec<u8>,
+    pub message: Option<Vec<u8>>,
+    pub blob: Option<Vec<u8>>,
 }
 
 /// Wrapper for `RustRequest` with a unique ID.
@@ -42,7 +44,8 @@ pub struct RustRequestUnique {
 #[derive(Clone)]
 pub struct RustResponse {
     pub successful: bool,
-    pub bytes: Vec<u8>,
+    pub message: Option<Vec<u8>>,
+    pub blob: Option<Vec<u8>>,
 }
 
 impl Default for RustResponse {
@@ -50,7 +53,8 @@ impl Default for RustResponse {
     fn default() -> RustResponse {
         RustResponse {
             successful: false,
-            bytes: Vec::new(),
+            message: Some(Vec::new()),
+            blob: Some(Vec::new()),
         }
     }
 }

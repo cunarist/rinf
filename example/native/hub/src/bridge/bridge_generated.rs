@@ -128,6 +128,7 @@ impl Wire2Api<i32> for i32 {
         self
     }
 }
+
 impl Wire2Api<RustOperation> for i32 {
     fn wire2api(self) -> RustOperation {
         match self {
@@ -152,7 +153,8 @@ impl support::IntoDart for RustResponse {
     fn into_dart(self) -> support::DartAbi {
         vec![
             self.successful.into_into_dart().into_dart(),
-            self.bytes.into_into_dart().into_dart(),
+            self.message.into_dart(),
+            self.blob.into_dart(),
         ]
         .into_dart()
     }
@@ -184,7 +186,8 @@ impl support::IntoDart for RustSignal {
     fn into_dart(self) -> support::DartAbi {
         vec![
             self.resource.into_into_dart().into_dart(),
-            self.bytes.into_into_dart().into_dart(),
+            self.message.into_dart(),
+            self.blob.into_dart(),
         ]
         .into_dart()
     }

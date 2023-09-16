@@ -15,7 +15,8 @@ pub async fn handle_counter_number(rust_request: RustRequest) -> RustResponse {
             // because schema will differ by the operation type.
 
             // Decode raw bytes into a Rust message object.
-            let request_message = ReadRequest::decode(&rust_request.bytes[..]).unwrap();
+            let message_bytes = rust_request.message.unwrap();
+            let request_message = ReadRequest::decode(message_bytes.as_slice()).unwrap();
 
             // Perform a simple calculation.
             let after_value: i32 = sample_crate::add_seven(request_message.before_number);
@@ -29,7 +30,8 @@ pub async fn handle_counter_number(rust_request: RustRequest) -> RustResponse {
             };
             RustResponse {
                 successful: true,
-                bytes: response_message.encode_to_vec(),
+                message: Some(response_message.encode_to_vec()),
+                blob: None,
             }
         }
         RustOperation::Update => RustResponse::default(),
@@ -47,7 +49,7 @@ pub async fn handle_sample_resource(rust_request: RustRequest) -> RustResponse {
 }
 
 pub async fn stream_mandelbrot() {
-    use crate::messages::mandelbrot::ID;
+    use crate::messages::mandelbrot::{Signal, ID};
 
     let mut scale: f64 = 1.0;
     let mut interval = crate::time::interval(std::time::Duration::from_millis(50));
@@ -75,9 +77,14 @@ pub async fn stream_mandelbrot() {
 
         if let Ok(mandelbrot) = calculated {
             // Stream the signal to Dart.
+            let signal_message = Signal {
+                id: 0,
+                current_scale: scale,
+            };
             let rust_signal = RustSignal {
                 resource: ID,
-                bytes: mandelbrot,
+                message: Some(signal_message.encode_to_vec()),
+                blob: Some(mandelbrot),
             };
             send_rust_signal(rust_signal);
         }
