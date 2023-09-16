@@ -80,54 +80,54 @@ jobs:
         run: cargo install --path shorthand/
 
       - name: Create a Flutter app for testing
-        run: flutter create test
+        run: flutter create test_app
 
       - name: Fetch Flutter dependencies
-        working-directory: test/
+        working-directory: test_app/
         run: dart pub get
 
       - name: Add this framework as a dependency
-        working-directory: test/
+        working-directory: test_app/
         run: dart pub add 'rust_in_flutter:{"path":"../"}'
 
       - name: Apply Rust template
-        working-directory: test/
+        working-directory: test_app/
         run: rifs template
 
       - name: Generate message files
-        working-directory: test/
+        working-directory: test_app/
         run: rifs message
 
       - name: Build the example app
         if: matrix.target == 'linux'
-        working-directory: test/
+        working-directory: test_app/
         run: flutter build linux
 
       - name: Build the example app
         if: matrix.target == 'android'
-        working-directory: test/
+        working-directory: test_app/
         run: |
           flutter build apk
           flutter build appbundle
 
       - name: Build the example app
         if: matrix.target == 'windows'
-        working-directory: test/
+        working-directory: test_app/
         run: flutter build windows
 
       - name: Build the example app
         if: matrix.target == 'macos'
-        working-directory: test/
+        working-directory: test_app/
         run: flutter build macos
 
       - name: Build the example app
         if: matrix.target == 'ios'
-        working-directory: test/
+        working-directory: test_app/
         run: flutter build ios --no-codesign
 
       - name: Build the example app
         if: matrix.target == 'web'
-        working-directory: test/
+        working-directory: test_app/
         run: |
           rifs wasm --release
           flutter build web
