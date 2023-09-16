@@ -62,7 +62,7 @@ pub async fn stream_mandelbrot() {
     let mut scale: f64 = 1.0;
 
     loop {
-        crate::time::sleep(std::time::Duration::from_millis(50)).await;
+        crate::sleep(std::time::Duration::from_millis(50)).await;
 
         scale *= 0.95;
         if scale < 1e-7 {

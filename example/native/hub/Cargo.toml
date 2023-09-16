@@ -34,7 +34,7 @@ web-sys = { version = "0.3.64", features = [
     "BroadcastChannel",
     "console",
 ] }
-wasmtimer = "0.2.0"
+gloo-timers = { version = "0.3.0", features = ["futures"] }
 
 [dependencies]
 bytemuck = "1.11.0"

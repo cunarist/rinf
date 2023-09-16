@@ -23,23 +23,30 @@
 // Crate `wasm_bindgen_futures` has the ability
 // to convert Rust `Future`s into JavaScript `Promise`s.
 
+#[cfg(not(target_family = "wasm"))]
 pub(crate) fn spawn<T>(future: T)
 where
     T: std::future::Future<Output = ()> + Send + 'static,
 {
-    #[cfg(not(target_family = "wasm"))]
     tokio::task::spawn(future);
-    #[cfg(target_family = "wasm")]
+}
+#[cfg(target_family = "wasm")]
+pub(crate) fn spawn<T>(future: T)
+where
+    T: std::future::Future<Output = ()> + 'static,
+{
     wasm_bindgen_futures::spawn_local(future);
 }
 
 // On the web, `tokio` cannot access the system time.
-// Crate `wasmtimer` is the exact complement for `tokio::time` on the web.
+// Crate `gloo_timers` handles sleeping and intervals on the web.
 
-#[cfg(not(target_family = "wasm"))]
-pub(crate) use tokio::time;
-#[cfg(target_family = "wasm")]
-pub(crate) use wasmtimer::tokio as time;
+pub async fn sleep(duration: std::time::Duration) {
+    #[cfg(not(target_family = "wasm"))]
+    tokio::time::sleep(duration).await;
+    #[cfg(target_family = "wasm")]
+    gloo_timers::future::sleep(duration).await;
+}
 
 // On the web, the `println!` macro does not print to the browser console.
 // Crate `web_sys` does something exactly like `console.log()` in JavaScript.
