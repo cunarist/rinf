@@ -5,15 +5,32 @@ use crate::bridge::api::{RustOperation, RustRequest, RustResponse, RustSignal};
 use crate::bridge::send_rust_signal;
 use prost::Message;
 
+pub async fn handle_sample_resource(rust_request: RustRequest) -> RustResponse {
+    match rust_request.operation {
+        RustOperation::Create => RustResponse::default(),
+        RustOperation::Read => RustResponse::default(),
+        RustOperation::Update => RustResponse::default(),
+        RustOperation::Delete => RustResponse::default(),
+    }
+}
+
+pub async fn handle_deeper_resource(rust_request: RustRequest) -> RustResponse {
+    match rust_request.operation {
+        RustOperation::Create => RustResponse::default(),
+        RustOperation::Read => RustResponse::default(),
+        RustOperation::Update => RustResponse::default(),
+        RustOperation::Delete => RustResponse::default(),
+    }
+}
+
 pub async fn handle_counter_number(rust_request: RustRequest) -> RustResponse {
     use crate::messages::counter_number::{ReadRequest, ReadResponse};
+    // We import message structs in this match condition
+    // because schema will differ by the operation type.
 
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
         RustOperation::Read => {
-            // We import message structs in this match condition
-            // because schema will differ by the operation type.
-
             // Decode raw bytes into a Rust message object.
             let message_bytes = rust_request.message.unwrap();
             let request_message = ReadRequest::decode(message_bytes.as_slice()).unwrap();
@@ -34,15 +51,6 @@ pub async fn handle_counter_number(rust_request: RustRequest) -> RustResponse {
                 blob: None,
             }
         }
-        RustOperation::Update => RustResponse::default(),
-        RustOperation::Delete => RustResponse::default(),
-    }
-}
-
-pub async fn handle_sample_resource(rust_request: RustRequest) -> RustResponse {
-    match rust_request.operation {
-        RustOperation::Create => RustResponse::default(),
-        RustOperation::Read => RustResponse::default(),
         RustOperation::Update => RustResponse::default(),
         RustOperation::Delete => RustResponse::default(),
     }
