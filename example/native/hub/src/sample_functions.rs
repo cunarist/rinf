@@ -77,15 +77,13 @@ pub async fn stream_mandelbrot() {
 
         if let Ok(mandelbrot) = calculated {
             // Stream the signal to Dart.
+            let signal_message = Signal {
+                id: 0,
+                current_scale: scale,
+            };
             let rust_signal = RustSignal {
                 resource: ID,
-                message: Some(
-                    Signal {
-                        id: 0,
-                        current_scale: scale,
-                    }
-                    .encode_to_vec(),
-                ),
+                message: Some(signal_message.encode_to_vec()),
                 blob: Some(mandelbrot),
             };
             send_rust_signal(rust_signal);
