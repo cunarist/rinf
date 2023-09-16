@@ -84,6 +84,10 @@ jobs:
         working-directory: shorthand/
         run: cargo install --path ./
 
+      - name: Check that Rust template command works
+        working-directory: example/
+        run: rifs template
+
       - name: Generate message files
         working-directory: example/
         run: rifs message

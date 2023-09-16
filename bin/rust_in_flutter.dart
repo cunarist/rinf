@@ -185,21 +185,19 @@ please refer to Rust-In-Flutter's [documentation](https://docs.cunarist.com/rust
 Future<void> _copyDirectory(Directory source, Directory destination) async {
   final newDirectory = Directory(destination.path);
   await newDirectory.create();
-  await source.list(recursive: false).forEach(
-    (entity) async {
-      if (entity is Directory) {
-        final newDirectory = Directory(
-          '${destination.uri.path}/${Uri.file(entity.path).pathSegments.last}',
-        );
-        await newDirectory.create();
-        _copyDirectory(entity.absolute, newDirectory);
-      } else if (entity is File) {
-        await entity.copy(
-          '${destination.uri.path}/${Uri.file(entity.path).pathSegments.last}',
-        );
-      }
-    },
-  );
+  await for (final entity in source.list(recursive: false)) {
+    if (entity is Directory) {
+      final newDirectory = Directory(
+        '${destination.path}/${entity.uri.pathSegments.last}',
+      );
+      await newDirectory.create();
+      await _copyDirectory(entity.absolute, newDirectory);
+    } else if (entity is File) {
+      await entity.copy(
+        '${destination.path}/${entity.uri.pathSegments.last}',
+      );
+    }
+  }
 }
 
 Future<void> _buildWebassembly({bool isReleaseMode = false}) async {
