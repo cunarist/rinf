@@ -60,10 +60,9 @@ pub async fn stream_mandelbrot() {
     use crate::messages::mandelbrot::{Signal, ID};
 
     let mut scale: f64 = 1.0;
-    let mut interval = crate::time::interval(std::time::Duration::from_millis(50));
 
     loop {
-        interval.tick().await;
+        crate::time::sleep(std::time::Duration::from_millis(50)).await;
 
         scale *= 0.95;
         if scale < 1e-7 {
