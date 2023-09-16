@@ -428,9 +428,8 @@ Future<void> _generateMessageCode() async {
       if (otherSubPath != subPath && otherSubPath.contains(subPath)) {
         final relation = otherSubPath
             .replaceFirst(subPath, "")
-            .replaceAll("\\", "/") // For Windows
-            .replaceFirst('/', '');
-        if (!relation.contains('/')) {
+            .replaceFirst(Platform.pathSeparator, '');
+        if (!relation.contains(Platform.pathSeparator)) {
           modRsLines.add('pub mod $relation;');
         }
       }
@@ -456,9 +455,9 @@ Future<void> _generateMessageCode() async {
   final pubCacheBinPath = Platform.isWindows
       ? '${Platform.environment['LOCALAPPDATA']}\\Pub\\Cache\\bin'
       : '${Platform.environment['HOME']}/.pub-cache/bin';
-  final pathSeparator = Platform.isWindows ? ';' : ':';
+  final separator = Platform.isWindows ? ';' : ':';
   final newPathVariable = currentPathVariable != null
-      ? '$currentPathVariable$pathSeparator$pubCacheBinPath'
+      ? '$currentPathVariable$separator$pubCacheBinPath'
       : pubCacheBinPath;
   newEnvironment['PATH'] = newPathVariable;
   for (final entry in resourcesInFolders.entries) {
