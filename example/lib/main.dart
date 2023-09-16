@@ -68,7 +68,7 @@ class Home extends StatelessWidget {
               // Receive signals from Rust
               // with `rustBroadcaster` from `rust_in_flutter.dart`,
               // For better performance, filter signals
-              // by checking the `address` field with the `where` method.
+              // by checking the `resource` field with the `where` method.
               // This approach allows the builder to rebuild its widget
               // only when there are signals
               // with the specific address it is interested in.
@@ -116,7 +116,7 @@ class Home extends StatelessWidget {
             ),
             CurrentValueText(
               countNotifier: _countNotifier,
-            ), // Display current value
+            ), // Displays current value
           ],
         ),
       ),
