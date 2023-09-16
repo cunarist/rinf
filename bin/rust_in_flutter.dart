@@ -185,21 +185,20 @@ please refer to Rust-In-Flutter's [documentation](https://docs.cunarist.com/rust
 Future<void> _copyDirectory(Directory source, Directory destination) async {
   final newDirectory = Directory(destination.path);
   await newDirectory.create();
-  await source.list(recursive: false).forEach(
-    (entity) async {
-      if (entity is Directory) {
-        final newDirectory = Directory(
-          '${destination.uri.path}/${Uri.file(entity.path).pathSegments.last}',
-        );
-        await newDirectory.create();
-        _copyDirectory(entity.absolute, newDirectory);
-      } else if (entity is File) {
-        await entity.copy(
-          '${destination.uri.path}/${Uri.file(entity.path).pathSegments.last}',
-        );
-      }
-    },
-  );
+  await for (final entity in source.list(recursive: false)) {
+    final entityName = entity.path.split(Platform.pathSeparator).last;
+    if (entity is Directory) {
+      final newDirectory = Directory(
+        destination.uri.resolve(entityName).toFilePath(),
+      );
+      await newDirectory.create();
+      await _copyDirectory(entity.absolute, newDirectory);
+    } else if (entity is File) {
+      await entity.copy(
+        destination.uri.resolve(entityName).toFilePath(),
+      );
+    }
+  }
 }
 
 Future<void> _buildWebassembly({bool isReleaseMode = false}) async {
@@ -425,9 +424,8 @@ Future<void> _generateMessageCode() async {
       if (otherSubPath != subPath && otherSubPath.contains(subPath)) {
         final relation = otherSubPath
             .replaceFirst(subPath, "")
-            .replaceAll("\\", "/") // For Windows
-            .replaceFirst('/', '');
-        if (!relation.contains('/')) {
+            .replaceFirst(Platform.pathSeparator, '');
+        if (!relation.contains(Platform.pathSeparator)) {
           modRsLines.add('pub mod $relation;');
         }
       }
@@ -453,9 +451,9 @@ Future<void> _generateMessageCode() async {
   final pubCacheBinPath = Platform.isWindows
       ? '${Platform.environment['LOCALAPPDATA']}\\Pub\\Cache\\bin'
       : '${Platform.environment['HOME']}/.pub-cache/bin';
-  final pathSeparator = Platform.isWindows ? ';' : ':';
+  final separator = Platform.isWindows ? ';' : ':';
   final newPathVariable = currentPathVariable != null
-      ? '$currentPathVariable$pathSeparator$pubCacheBinPath'
+      ? '$currentPathVariable$separator$pubCacheBinPath'
       : pubCacheBinPath;
   newEnvironment['PATH'] = newPathVariable;
   for (final entry in resourcesInFolders.entries) {
