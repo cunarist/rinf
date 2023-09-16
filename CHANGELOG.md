@@ -1,3 +1,8 @@
+## 4.1.0
+
+- Fixed `sleep()` on the web.
+- Added demo link in the guides.
+
 ## 4.0.3
 
 - Fixed bugs with `rifs template` on Windows.
