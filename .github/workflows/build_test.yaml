@@ -86,6 +86,10 @@ jobs:
         working-directory: test/
         run: flutter pub get
 
+      - name: Add this framework as a dependency
+        working-directory: test/
+        run: dart pub add 'rust_in_flutter:{"path":"../"}'
+
       - name: Apply Rust template
         working-directory: test/
         run: rifs template
