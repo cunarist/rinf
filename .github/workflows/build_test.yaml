@@ -76,15 +76,15 @@ jobs:
           distribution: "zulu"
           java-version: "11"
 
+      - name: Install shorthand CLI tool
+        run: cargo install --path shorthand/
+
       - name: Create a Flutter app for testing
         run: flutter create test
 
       - name: Fetch Flutter dependencies
         working-directory: test/
         run: flutter pub get
-
-      - name: Install shorthand CLI tool
-        run: cargo install --path shorthand/
 
       - name: Apply Rust template
         working-directory: test/
