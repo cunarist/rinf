@@ -115,7 +115,7 @@ class Home extends StatelessWidget {
             ),
             CurrentValueText(
               countNotifier: _countNotifier,
-            ), // Displays current value
+            ),
           ],
         ),
       ),
