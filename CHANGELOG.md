@@ -1,3 +1,7 @@
+## 4.1.3
+
+- Make `rifs message` command read `PUB_CACHE` enviornment variable if present.
+
 ## 4.1.2
 
 - Fixed `rifs template` command.
