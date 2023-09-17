@@ -1,3 +1,7 @@
+## 4.1.2
+
+- Fixed `rifs template` command.
+
 ## 4.1.1
 
 - Added some guides to the shorthand crate.
