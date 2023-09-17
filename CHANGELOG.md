@@ -1,3 +1,7 @@
+## 4.1.4
+
+- Fixed a sentence in the guides.
+
 ## 4.1.3
 
 - Made `rifs message` command read `PUB_CACHE` enviornment variable if present. (Thanks @rabbitson87)
