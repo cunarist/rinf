@@ -1,3 +1,8 @@
+## 4.1.1
+
+- Added some guides to the shorthand crate.
+- Remove an unneeded dependency from the shorthand crate.
+
 ## 4.1.0
 
 - Fixed `sleep()` on the web.
