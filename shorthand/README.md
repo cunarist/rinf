@@ -5,3 +5,5 @@
 ![preview](https://github.com/cunarist/rust-in-flutter/assets/66480156/be85cf04-2240-497f-8d0d-803c40536d8e)
 
 RIFS is a command-line tool for simplifying the use of the Rust-In-Flutter framework. For detailed information on how to use this framework, please refer to the [documentation](https://docs.cunarist.com/rust-in-flutter/).
+
+Explore the web-based [demo](https://rif-example.cunarist.com/) to enjoy the seamless and enjoyable experience created by the fusion of Flutter and Rust.
