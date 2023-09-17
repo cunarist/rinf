@@ -1,10 +1,9 @@
 # Remove unnecessary content
 # when publishing the package to pub.dev
 
-.cargo/
-.github/
-automate/
-target/
-shorthand/
-Cargo.toml
-**/*.lock
+/automate/
+/target/
+/shorthand/
+/Cargo.toml
+
+*.lock
