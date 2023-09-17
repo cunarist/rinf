@@ -1,4 +1,3 @@
 [workspace]
-members = ["./example/native/hub"]
-exclude = ["./shorthand"]
+members = ["./example/native/hub", "./shorthand"]
 resolver = "2"

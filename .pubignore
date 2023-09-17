@@ -5,4 +5,6 @@
 .github/
 automate/
 target/
+shorthand/
+Cargo.toml
 **/*.lock
