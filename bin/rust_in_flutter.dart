@@ -3,36 +3,31 @@ import 'package:package_config/package_config.dart';
 import 'dart:convert';
 
 Future<void> main(List<String> args) async {
-  if (args.length == 0) {
-    print("No operation is provided");
-  } else
-    switch (args[0]) {
-      case "template":
-        await _applyRustTemplate();
-        break;
-      case "message":
-        await _generateMessageCode();
-        break;
-      case "wasm":
-        if (args.contains("--release") || args.contains("-r")) {
-          await _buildWebassembly(isReleaseMode: true);
-        } else {
-          await _buildWebassembly(isReleaseMode: false);
-        }
-        break;
-      case "--help":
-      case "-h":
-        print("Usage: rifs [arguments]");
-        print("");
-        print("Arguments:");
-        print("  -h, --help    Print this usage information.");
-        print("  template      Apply a template to current project.");
-        print("  message       Generate message code from messages/*.proto.");
-        print("  wasm          Build webassembly.");
-        break;
-      default:
-        print("No available operation is provided");
-    }
+  switch (args[0]) {
+    case "template":
+      await _applyRustTemplate();
+      break;
+    case "message":
+      await _generateMessageCode();
+      break;
+    case "wasm":
+      if (args.contains("--release") || args.contains("-r")) {
+        await _buildWebassembly(isReleaseMode: true);
+      } else {
+        await _buildWebassembly(isReleaseMode: false);
+      }
+      break;
+    case "--help":
+    case "-h":
+    default:
+      print("Usage: rifs [arguments]");
+      print("");
+      print("Arguments:");
+      print("  -h, --help    Print this usage information.");
+      print("  template      Apply a template to current project.");
+      print("  message       Generate message code from messages/*.proto.");
+      print("  wasm          Build webassembly.");
+  }
 }
 
 /// Creates new folders and files to an existing Flutter project folder.
