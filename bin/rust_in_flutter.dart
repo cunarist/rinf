@@ -4,19 +4,33 @@ import 'dart:convert';
 
 Future<void> main(List<String> args) async {
   if (args.length == 0) {
-    print("No operation is provided");
-  } else if (args[0] == "template") {
-    await _applyRustTemplate();
-  } else if (args[0] == "message") {
-    await _generateMessageCode();
-  } else if (args[0] == "wasm") {
-    if (args.contains("--release") || args.contains("-r")) {
-      await _buildWebassembly(isReleaseMode: true);
-    } else {
-      await _buildWebassembly(isReleaseMode: false);
-    }
-  } else {
-    print("No available operation is provided");
+    print("No operation is provided.");
+    print("Use `rifs --help` to see all available operations.");
+    return;
+  }
+  switch (args[0]) {
+    case "template":
+      await _applyRustTemplate();
+      break;
+    case "message":
+      await _generateMessageCode();
+      break;
+    case "wasm":
+      if (args.contains("--release") || args.contains("-r")) {
+        await _buildWebassembly(isReleaseMode: true);
+      } else {
+        await _buildWebassembly(isReleaseMode: false);
+      }
+      break;
+    case "--help":
+    case "-h":
+    default:
+      print("Usage: rifs [arguments]");
+      print("Arguments:");
+      print("  -h, --help    Shows this usage information.");
+      print("  template      Applies Rust template to the current project.");
+      print("  message       Generates message code from `.proto` files.");
+      print("  wasm          Builds webassembly.");
   }
 }
 
