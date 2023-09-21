@@ -3,6 +3,11 @@ import 'package:package_config/package_config.dart';
 import 'dart:convert';
 
 Future<void> main(List<String> args) async {
+  if (args.length == 0) {
+    print("No operation is provided.");
+    print("Use `rifs --help` to see all available operations.");
+    return;
+  }
   switch (args[0]) {
     case "template":
       await _applyRustTemplate();
@@ -21,12 +26,11 @@ Future<void> main(List<String> args) async {
     case "-h":
     default:
       print("Usage: rifs [arguments]");
-      print("");
       print("Arguments:");
-      print("  -h, --help    Print this usage information.");
-      print("  template      Apply a template to current project.");
-      print("  message       Generate message code from messages/*.proto.");
-      print("  wasm          Build webassembly.");
+      print("  -h, --help    Shows this usage information.");
+      print("  template      Applies Rust template to the current project.");
+      print("  message       Generates message code from `.proto` files.");
+      print("  wasm          Builds webassembly.");
   }
 }
 
