@@ -37,10 +37,16 @@ export CARGOKIT_TOOL_TEMP_DIR=$TARGET_TEMP_DIR/build_tool
 # Directory inside root project. Not necessarily the top level directory of root project.
 export CARGOKIT_ROOT_PROJECT_DIR=$SRCROOT
 
+FLUTTER_EXPORT_ENVIRONMENT="$PODS_ROOT/../Flutter/ephemeral/flutter_export_environment.sh"
+
+if [[ -f "$FLUTTER_EXPORT_ENVIRONMENT" ]]; then
+  source "$FLUTTER_EXPORT_ENVIRONMENT"
+fi
+
 "$BASEDIR/run_build_tool.sh" build-pod "$@"
 
 # Make a symlink from built framework to phony file, which will be used as input to
 # build script. This should force rebuild (podspec currently doesn't support alwaysOutOfDate
 # attribute on custom build phase)
-ln -Fs "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}" "${BUILT_PRODUCTS_DIR}/cargokit_phony"
+ln -Fs "$OBJROOT/XCBuildData/build.db" "${BUILT_PRODUCTS_DIR}/cargokit_phony"
 ln -Fs "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}" "${BUILT_PRODUCTS_DIR}/cargokit_phony_out"
