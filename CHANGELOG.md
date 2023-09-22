@@ -1,3 +1,7 @@
+## 4.3.0
+
+- Now `flutter run` will use `require-corp` value for `cross-origin-embedder-policy` HTTP header that works on all web browsers.
+
 ## 4.2.1
 
 - Fixed a bug with `RustResponse::default()`.
