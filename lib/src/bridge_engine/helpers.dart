@@ -105,9 +105,7 @@ class MissingHeaderException implements Exception {
 Buffers cannot be shared due to missing cross-origin headers.
 Make sure your web server responds with the following headers:
 - cross-origin-opener-policy: same-origin
-- cross-origin-embedder-policy: credentialless OR require-corp
-
-If running from Flutter, consider `flutter build web` and running a custom static-file server.''';
+- cross-origin-embedder-policy: require-corp''';
 
   @override
   String toString() => _message;

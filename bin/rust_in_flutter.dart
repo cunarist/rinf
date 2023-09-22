@@ -282,7 +282,7 @@ httpServer.defaultResponseHeaders.add(
 );
 httpServer.defaultResponseHeaders.add(
   'cross-origin-embedder-policy',
-  'credentialless',
+  'require-corp',
 );""");
   serverFileContent = lines.join("\n");
   await serverFile.writeAsString(serverFileContent);
