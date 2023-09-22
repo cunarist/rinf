@@ -53,8 +53,8 @@ impl Default for RustResponse {
     fn default() -> RustResponse {
         RustResponse {
             successful: false,
-            message: Some(Vec::new()),
-            blob: Some(Vec::new()),
+            message: None,
+            blob: None,
         }
     }
 }
