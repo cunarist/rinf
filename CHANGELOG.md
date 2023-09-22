@@ -1,3 +1,7 @@
+## 4.2.1
+
+- Fixed a bug with `RustResponse::default()`.
+
 ## 4.2.0
 
 - New command `rifs --help`. Thanks `@bookshiyi`!
