@@ -105,6 +105,15 @@ elif sys.argv[1] == "bridge-gen":
     command = "dart pub remove ffi"
     os.system(command)
 
+elif sys.argv[1] == "cargokit-update":
+    print("Updating CargoKit...")
+    command = "git subtree pull"
+    command += " --prefix cargokit"
+    command += " https://github.com/irondash/cargokit.git"
+    command += " main"
+    command += " --squash"
+    os.system(command)
+
 else:
     print("No such option for automation is available.")
 
