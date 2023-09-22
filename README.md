@@ -40,7 +40,7 @@ All platforms available with Flutter are [tested](https://github.com/cunarist/ru
 
 ## 🐦 Why Use Flutter?
 
-While Rust is a powerful language for high-performance native programming, its ecosystem for building graphical user interfaces is far from being mature. Though it already has some GUI frameworks like `iced`, `egui`, `gtk-rs`, and others, it doesn't compete with extensive support and smooth development experience that Flutter provides. It's only Flutter that compiles to all 6 major platforms from a single codebase.
+While Rust is a powerful language for high-performance native programming, its ecosystem for building graphical user interfaces is far from being mature. Though Rust already has some GUI frameworks, they don't compete with extensive support and smooth development experience that Flutter provides. It's only Flutter that compiles to all 6 major platforms from a single codebase.
 
 Flutter is a powerful and versatile framework that has gained immense popularity for building cross-platform applications with stunning user interfaces. It provides declarative pattern, beautiful widgets, hot reload, convenient debugging tools, and dedicated packages for user interfaces right out-of-the-box.
 
