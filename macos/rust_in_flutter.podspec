@@ -22,11 +22,19 @@ Pod::Spec.new do |s|
   s.platform = :osx, '10.11'
   s.swift_version = '5.0'
 
+  script = <<-SCRIPT
+      echo "Generate protobuf message" 
+      cd $PROJECT_DIR/../../
+      dart run rust_in_flutter message
+      echo "Build Rust library"
+      sh "$PODS_TARGET_SRCROOT/../cargokit/build_pod.sh" "$PROJECT_DIR/../../native/hub" hub
+    SCRIPT
+
   # Include Rust crates in the build process.
   s.script_phase = {
-    :name => 'Build a Rust library',
-    :script => 'sh ${PODS_TARGET_SRCROOT}/../cargokit/build_pod.sh ${PROJECT_DIR}/../../native/hub hub',
-    :execution_position=> :before_compile,
+    :name => 'Generate protobuf message and build Rust library',
+    :script => script,
+    :execution_position => :before_compile,
     :input_files => ['${BUILT_PRODUCTS_DIR}/cargokit_phony'],
     :output_files => ['${BUILT_PRODUCTS_DIR}/cargokit_phony_out', '${BUILT_PRODUCTS_DIR}/output.txt'],
   }

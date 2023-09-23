@@ -92,9 +92,9 @@ jobs:
         working-directory: test_app/
         run: rifs template
 
-      - name: Generate message files
-        working-directory: test_app/
-        run: rifs message
+      # - name: Generate message files
+      #   working-directory: test_app/
+      #   run: rifs message
 
       - name: Build the example app
         if: matrix.target == 'linux'
