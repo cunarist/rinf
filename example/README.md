@@ -22,7 +22,7 @@ protoc --version
 flutter doctor
 ```
 
-To get started with Rust-In-Flutter, you'll need to install the CLI tool.
+You also need to have the CLI tool for Rust-In-Flutter ready.
 
 ```bash
 cargo install rifs

@@ -125,7 +125,7 @@ protoc --version
 flutter doctor
 ```
 
-Also, please install the CLI tool for Rust-In-Flutter
+You also need to have the CLI tool for Rust-In-Flutter ready.
 
 ```bash
 cargo install rifs
