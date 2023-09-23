@@ -78,8 +78,8 @@ class Home extends StatelessWidget {
                 // If the app has just started and widget is built
                 // without receiving a Rust signal,
                 // the snapshot's data will be null.
-                final received = snapshot.data;
-                if (received == null) {
+                final rustSignal = snapshot.data;
+                if (rustSignal == null) {
                   // Return a black container if the received data is null.
                   return Container(
                     margin: const EdgeInsets.all(20),
@@ -92,7 +92,7 @@ class Home extends StatelessWidget {
                   );
                 } else {
                   // Return an image container if some data is received.
-                  final imageData = received.blob!;
+                  final imageData = rustSignal.blob!;
                   return Container(
                     margin: const EdgeInsets.all(20),
                     width: 256,

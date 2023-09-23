@@ -57,7 +57,7 @@ pub async fn handle_counter_number(rust_request: RustRequest) -> RustResponse {
 }
 
 pub async fn stream_mandelbrot() {
-    use crate::messages::mandelbrot::{Signal, ID};
+    use crate::messages::mandelbrot::{StateSignal, ID};
 
     let mut scale: f64 = 1.0;
 
@@ -84,7 +84,7 @@ pub async fn stream_mandelbrot() {
 
         if let Ok(mandelbrot) = calculated {
             // Stream the signal to Dart.
-            let signal_message = Signal {
+            let signal_message = StateSignal {
                 id: 0,
                 current_scale: scale,
             };
