@@ -39,20 +39,20 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Fetch Flutter dependencies
-        working-directory: example/
-        run: flutter pub get
-
       - name: Install shorthand CLI tool
         working-directory: shorthand/
         run: cargo install --path ./
 
+      - name: Install Clippy
+        run: rustup component add clippy
+
+      - name: Fetch Flutter dependencies
+        working-directory: example/
+        run: flutter pub get
+
       - name: Generate message files
         working-directory: example/
         run: rifs message
-
-      - name: Install Clippy
-        run: rustup component add clippy
 
       - name: Format Dart code
         run: dart format .
