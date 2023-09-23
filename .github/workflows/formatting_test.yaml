@@ -63,8 +63,7 @@ jobs:
           cargo clippy --fix --allow-dirty
 
       - name: Check if the code has changed
-        run: |
-          git diff --exit-code
+        run: git diff --exit-code
 
   config:
     name: configuration-files
