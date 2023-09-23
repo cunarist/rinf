@@ -97,9 +97,11 @@ elif sys.argv[1] == "bridge-gen":
     replace_string_in_files(directory_path, search_string, replace_string)
 
     # Format code.
-    command = "cargo clippy --fix --allow-dirty"
-    os.system(command)
     command = "dart format ."
+    os.system(command)
+    command = "cargo fmt"
+    os.system(command)
+    command = "cargo clippy --fix --allow-dirty"
     os.system(command)
 
     # Remove temporarily added `ffi` package.
