@@ -31,6 +31,7 @@ print("")
 
 if len(sys.argv) == 1:
     print("Automation option is not provided.")
+    print("Use `python automate --help` to see all available operations.")
 
 elif sys.argv[1] == "bridge-gen":
     # Temporarily add `ffi` package
@@ -105,7 +106,24 @@ elif sys.argv[1] == "bridge-gen":
     command = "dart pub remove ffi"
     os.system(command)
 
+elif sys.argv[1] == "cargokit-update":
+    print("Updating CargoKit...")
+    command = "git subtree pull"
+    command += " --prefix cargokit"
+    command += " https://github.com/irondash/cargokit.git"
+    command += " main"
+    command += " --squash"
+    os.system(command)
+
+elif sys.argv[1] == "--help" or sys.argv[1] == "-h":
+    print("Usage: python automate [arguments]")
+    print("Arguments:")
+    print("  -h, --help         Shows this usage information.")
+    print("  bridge-gen         Generates bridge files.")
+    print("  cargokit-update    Updates CargoKit.")
+
 else:
     print("No such option for automation is available.")
+    print("Use `python automate --help` to see all available operations.")
 
 exit()
