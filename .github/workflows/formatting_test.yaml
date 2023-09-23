@@ -61,7 +61,7 @@ jobs:
         run: cargo clippy --fix --allow-dirty
 
       - name: Verify changed files
-        run: git diff-index --exit-code
+        run: git diff --exit-code
 
   config:
     name: configuration-files
