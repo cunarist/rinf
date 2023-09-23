@@ -1,3 +1,9 @@
+## 4.4.0
+
+- Improved various guides and comments.
+- Fixed a bug that made the app crash when passing in an empty `Vec<u8>`.
+- Fixed the formatting of Rust files.
+
 ## 4.3.0
 
 - Now `flutter run` will use `require-corp` value for `cross-origin-embedder-policy` HTTP header that works on all web browsers.

@@ -15,7 +15,7 @@ crate-type = ["lib", "cdylib", "staticlib"]
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 libc = "0.2"
 dart-sys = { version = "4.0.2" }
-allo-isolate = { version = "0.1.18", features = ["zero-copy"] }
+allo-isolate = { version = "0.1.20", features = ["zero-copy"] }
 tokio = { version = "1.28.2", features = ["rt-multi-thread", "time"] }
 os-thread-local = "0.1.3"
 

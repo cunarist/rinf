@@ -61,6 +61,12 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Install shorthand CLI tool
+        run: cargo install --path shorthand/
+
+      - name: Create a Flutter app for testing
+        run: flutter create test_app
+
       - name: Setup Ninja and GTK3 toolchain (Only Linux target)
         if: matrix.target == 'linux'
         run: |
@@ -73,12 +79,6 @@ jobs:
         with:
           distribution: "zulu"
           java-version: "11"
-
-      - name: Install shorthand CLI tool
-        run: cargo install --path shorthand/
-
-      - name: Create a Flutter app for testing
-        run: flutter create test_app
 
       - name: Fetch Flutter dependencies
         working-directory: test_app/
