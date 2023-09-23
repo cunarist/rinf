@@ -54,14 +54,13 @@ jobs:
       - name: Install Clippy
         run: rustup component add clippy
 
-      - name: Format Dart code
-        run: dart format .
+      - name: Check Dart code
+        run: dart format --set-exit-if-changed .
 
-      - name: Format Rust code
-        run: cargo clippy --fix --allow-dirty
-
-      - name: Verify changed files
-        run: git diff --exit-code
+      - name: Check Rust code
+        run: |
+          cargo fmt --check
+          cargo clippy -- -D warnings
 
   config:
     name: configuration-files

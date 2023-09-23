@@ -8,5 +8,6 @@ _Please make sure that you've formatted the files._
 
 ```
 dart format .
-cargo clippy --fix
+cargo fmt
+cargo clippy --fix --allow-dirty
 ```

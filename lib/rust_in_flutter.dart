@@ -19,7 +19,7 @@ final _responseBroadcaster = StreamController<RustResponseUnique>.broadcast();
 final _requestIdGenerator = _IdGenerator();
 
 /// Contains basic functionalities of this framework.
-class RustInFlutter {
+class RustInFlutter            {
   /// Makes sure that the Rust side is ready.
   /// Don't forget to call this function in the `main` function of Dart.
   static Future<void> ensureInitialized() async {
