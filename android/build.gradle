@@ -56,6 +56,25 @@ android {
     defaultConfig {
         minSdkVersion 16
     }
+
+    task generateProtobufMessages(type: Exec) {
+        commandLine 'dart', 'run', 'rust_in_flutter', 'message'
+        standardOutput = new ByteArrayOutputStream()
+        errorOutput = new ByteArrayOutputStream()
+        workingDir = rootProject.projectDir.parent
+        doFirst {
+            println "Generating protobuf messages"
+        }
+        doLast {
+            if (execResult.exitValue != 0) {
+                throw new GradleException("Generation of protobuf messages failed:\n\n${standardOutput.toString()}\n\n${errorOutput.toString()}")
+            } else {
+                println "Standard Output:\n${standardOutput.toString()}"
+                println "Standard Error:\n${errorOutput.toString()}"
+            }
+        }
+    }
+    preBuild.dependsOn generateProtobufMessages
 }
 
 // Include Rust crates in the build process
