@@ -33,7 +33,6 @@ Pod::Spec.new do |s|
   # Include Rust crates in the build process.
   s.script_phase = {
     :name => 'Generate protobuf message and build Rust library',
-    :execution_position => :before_compile,
     :script => script,
     :execution_position => :before_compile,
     :input_files => ['${BUILT_PRODUCTS_DIR}/cargokit_phony'],
