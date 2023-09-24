@@ -22,5 +22,7 @@ set(rust_in_flutter_bundled_libraries
   PARENT_SCOPE
 )
 
+include(./gen_msg.cmake)
+
 # Include the CMake build file of the Rust code.
 include(./rust.cmake)
