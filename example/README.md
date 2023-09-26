@@ -38,4 +38,4 @@ rifs message
 ```
 
 For detailed instructions on writing Rust and Flutter together,
-please refer to Rust-In-Flutter's [documentation](https://docs.cunarist.com/rust-in-flutter).
+please refer to Rust-In-Flutter's [documentation](https://rif-docs.cunarist.com).

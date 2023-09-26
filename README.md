@@ -15,7 +15,7 @@ Designed for ease of use, future scalability, and unparalleled performance, this
 
 ## 🎮 Demo
 
-Visit the [demo](https://rif-example.cunarist.com/) running on the web to experience the smoothness and delightfulness that comes from the combination of Flutter and Rust. You can also dive into the [example code](https://github.com/cunarist/rust-in-flutter/tree/main/example).
+Visit the [demo](https://rif-demo.cunarist.com/) running on the web to experience the smoothness and delightfulness that comes from the combination of Flutter and Rust. You can also dive into the [example code](https://github.com/cunarist/rust-in-flutter/tree/main/example).
 
 ## 🖥️ Platform Support
 
@@ -52,7 +52,7 @@ Rust has garnered a devoted following, being [the most loved programming languag
 
 ## 📖 Documentation
 
-Check out the [documentation](https://docs.cunarist.com/rust-in-flutter) for everything you need to know about how to use this thing.
+Check out the [documentation](https://rif-docs.cunarist.com) for everything you need to know about how to use this thing.
 
 ## 👥 Contributors
 
