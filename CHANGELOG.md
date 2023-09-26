@@ -1,3 +1,11 @@
+## 4.4.2
+
+- Updated docs and demo links.
+
+## 4.4.1
+
+- Updated docs and demo links.
+
 ## 4.4.0
 
 - Improved various guides and comments.
