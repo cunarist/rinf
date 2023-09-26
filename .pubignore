@@ -2,8 +2,9 @@
 # when publishing the package to pub.dev
 
 /automate/
-/target/
+/documentation/
 /shorthand/
+/target/
 /Cargo.toml
 
 *.lock

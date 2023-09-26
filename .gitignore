@@ -33,3 +33,4 @@ target/
 
 # Others
 **/*.lock
+/documentation/site/
