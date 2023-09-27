@@ -208,5 +208,6 @@ pub fn mandelbrot(
 
 #[allow(unused_imports)]
 mod crates_for_compile_test {
+    use machineid_rs;
     use slint;
 }
