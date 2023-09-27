@@ -205,3 +205,8 @@ pub fn mandelbrot(
 
     write_image(&colorize(&pixels), bounds)
 }
+
+#[allow(unused_imports)]
+mod crates_for_compile_test {
+    use slint;
+}
