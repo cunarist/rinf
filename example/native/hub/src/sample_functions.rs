@@ -100,5 +100,10 @@ pub async fn stream_mandelbrot() {
 }
 
 pub async fn do_compilation_test() {
-    sample_crate::compilation_test::perform();
+    let option = sample_crate::compilation_test::get_hardward_id();
+    if let Some(hwid) = option {
+        crate::debug_print!("Hardware ID: {}", hwid);
+    } else {
+        crate::debug_print!("Hardware ID not available on this platform");
+    }
 }

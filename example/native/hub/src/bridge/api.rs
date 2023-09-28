@@ -149,6 +149,13 @@ pub fn check_rust_streams() -> bool {
     if cell.borrow().is_none() {
         are_all_ready = false;
     };
+    #[cfg(debug_assertions)]
+    {
+        let cell = PRINT_STREAM_SHARED.lock().unwrap();
+        if cell.borrow().is_none() {
+            are_all_ready = false;
+        };
+    }
     are_all_ready
 }
 

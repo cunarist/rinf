@@ -213,18 +213,18 @@ pub fn mandelbrot(
 #[cfg(any(target_os = "windows", target_os = "macos", target_os = "linux"))]
 pub mod compilation_test {
     use machineid_rs::{Encryption, HWIDComponent, IdBuilder};
-    pub fn perform() {
+    pub fn get_hardward_id() -> Option<String> {
         let mut builder = IdBuilder::new(Encryption::MD5);
         builder
             .add_component(HWIDComponent::SystemID)
             .add_component(HWIDComponent::CPUCores);
         let hwid = builder.build("mykey").unwrap();
-        println!("Machine ID: {}", hwid);
+        Some(hwid)
     }
 }
 #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
 pub mod compilation_test {
-    pub fn perform() {
-        println!("Skipping RIF compilation test...");
+    pub fn get_hardward_id() -> Option<String> {
+        None
     }
 }

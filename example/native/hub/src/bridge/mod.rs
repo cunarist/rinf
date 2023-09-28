@@ -67,22 +67,31 @@ pub fn respond_to_dart(response_unique: RustResponseUnique) {
 macro_rules! debug_print {
     ( $( $t:tt )* ) => {
         let print_content = format!( $( $t )* ).into();
-        $crate::bridge::api::PRINT_STREAM.with(|inner| {
-            let mut borrowed = inner.borrow_mut();
-            let option = borrowed.as_ref();
-            if let Some(stream) = option {
-                stream.add(print_content);
-            } else {
-                let cell = $crate::bridge::api::PRINT_STREAM_SHARED.lock().unwrap();
-                let stream = cell.borrow().as_ref().unwrap().clone();
-                stream.add(print_content);
-                borrowed.replace(stream);
-            }
-        });
+        $crate::bridge::send_rust_print(print_content);
     }
 }
 #[macro_export]
 #[cfg(not(debug_assertions))]
 macro_rules! debug_print {
-    ( $( $t:tt )* ) => {};
+    ( $( $t:tt )* ) => {
+        let _ = format!( $( $t )* );
+    };
+}
+
+/// Sends a string to Dart that should be printed.
+/// Not intended to be directly accessed.
+/// Use `debug_print!` macro whenever possible.
+pub fn send_rust_print(print_content: String) {
+    api::PRINT_STREAM.with(|inner| {
+        let mut borrowed = inner.borrow_mut();
+        let option = borrowed.as_ref();
+        if let Some(stream) = option {
+            stream.add(print_content);
+        } else {
+            let cell = api::PRINT_STREAM_SHARED.lock().unwrap();
+            let stream = cell.borrow().as_ref().unwrap().clone();
+            stream.add(print_content);
+            borrowed.replace(stream);
+        }
+    });
 }
