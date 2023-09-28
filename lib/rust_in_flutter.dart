@@ -33,7 +33,7 @@ class RustInFlutter {
     rustResponseStream.listen((responseUnique) {
       _responseBroadcaster.add(responseUnique);
     });
-    if (!kReleaseMode) {
+    if (kDebugMode) {
       final rustPrintStream = api.prepareRustPrintStream();
       rustPrintStream.listen((printContent) {
         debugPrint(printContent);
