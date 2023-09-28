@@ -111,3 +111,18 @@ After running the `protoc` command, you'll find the generated Dart files in the 
 // In your Dart code, you can import and use the well-known type:
 import 'package:my_app/messages/google/protobuf/timestamp.pb.dart';
 ```
+
+### Can I use this in pure Dart projects?
+
+No, this framework only supports GUI Flutter apps because it's basically a 'Flutter FFI plugin'. This framework does NOT support other types of projects:
+
+- Flutter GUI app: **Mainly supported ☀️**
+- Flutter plugin: Not supported, but this package can be an inspiration
+- Dart CLI app: Might not work, this framework has to hook onto the Flutter SDK
+- Dart package: Not supported, unable to hook onto Dart SDK builds
+
+However, we also promise to deliver the best development experience as it is mainly focused on this **one** category.
+
+### What happens when a panic occurs in Rust?
+
+A Rust panic does not crash the app. It just terminates the local async task that it has been occurred in. You don't need to worry about the app stability because of Rust panics. When a panic occurs, the information will kindly be shown in the CLI if it's debug mode.
