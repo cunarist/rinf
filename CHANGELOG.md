@@ -1,3 +1,9 @@
+## 4.6.0
+
+- New `debug_print!` macro that works on all environments, including web and mobile emulators, with the power of Flutter debuggers. To use this, you need to run `rifs template` again.
+- Now panic information in Rust will be properly printed to the CLI. Note that Rust panics don't crash the app and do not hinder stability.
+- Improved docs. There are also more guides about well-known types in Protobuf. Thanks `@LucaCoduriV`!
+
 ## 4.5.0
 
 - Added support for external symbols on iOS and macOS. This is needed for some Rust crates that depend on Apple's system frameworks.
