@@ -23,8 +23,8 @@ You need to manually build webassembly module from Rust before running or buildi
 To serve the web application:
 
 ```bash
-rifs wasm
-flutter run --profile  # Choose a browser
+rifs wasm --release
+flutter run --release  # Choose a browser
 ```
 
 To build the optimized release version of the web application:
@@ -34,4 +34,4 @@ rifs wasm --release
 flutter build web
 ```
 
-> Note that Flutter apps in debug mode are known to be quite slow on the web. We recommend using profile mode when debugging on a web browser.
+> Note that Flutter apps in debug mode are known to be quite slow on the web. We recommend using release mode when testing on a web browser. You can use debug mode if you need to analyze the code deeper, without the `--release` argument.
