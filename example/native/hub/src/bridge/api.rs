@@ -154,6 +154,10 @@ pub fn check_rust_streams() -> bool {
 
 /// Start the main function of Rust.
 pub fn start_rust_logic() {
+    #[cfg(debug_assertions)]
+    std::panic::set_hook(Box::new(|panic_info| {
+        crate::debug_print!("A panic occurred in Rust.\n{}", panic_info);
+    }));
     #[cfg(not(target_family = "wasm"))]
     {
         TOKIO_RUNTIME.with(move |inner| {
