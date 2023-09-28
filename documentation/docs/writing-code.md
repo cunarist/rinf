@@ -297,7 +297,7 @@ You might be used to `println!` macro in Rust. However, using that macro isn't a
 
 The `debug_print!` macro is better than `println!` in that it only works in debug mode, resulting in a smaller and cleaner release binary.
 
-When writing Rust code in the `hub` crate, you can simply print your debug message like below. Once you use this macro, Flutter will handle the rest.
+When writing Rust code in the `hub` crate, you can simply print your debug message like below. Once you use this macro, Flutter will take care of the rest.
 
 ```rust
 crate::debug_print!("My object is {:?}", my_object);
