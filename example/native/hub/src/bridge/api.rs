@@ -71,6 +71,7 @@ type SharedCell<T> = Arc<Mutex<Cell<T>>>;
 
 type RustSignalStream = StreamSink<RustSignal>;
 type RustResponseStream = StreamSink<RustResponseUnique>;
+type RustPrintStream = StreamSink<String>;
 type RustRequestSender = Sender<RustRequestUnique>;
 type RustRequestReceiver = Receiver<RustRequestUnique>;
 
@@ -85,6 +86,7 @@ thread_local! {
 thread_local! {
     pub static SIGNAL_STREAM: Cell<RustSignalStream> = RefCell::new(None);
     pub static RESPONSE_STREAM: Cell<RustResponseStream> = RefCell::new(None);
+    pub static PRINT_STREAM: Cell<RustPrintStream> = RefCell::new(None);
     pub static RESPONSE_SENDER: Cell<RustResponseUnique> = RefCell::new(None);
 }
 
@@ -94,6 +96,8 @@ lazy_static! {
     pub static ref SIGNAL_STREAM_SHARED: SharedCell<RustSignalStream> =
         Arc::new(Mutex::new(RefCell::new(None)));
     pub static ref RESPONSE_STREAM_SHARED: SharedCell<RustResponseStream> =
+        Arc::new(Mutex::new(RefCell::new(None)));
+    pub static ref PRINT_STREAM_SHARED: SharedCell<RustPrintStream> =
         Arc::new(Mutex::new(RefCell::new(None)));
     pub static ref REQUST_RECEIVER_SHARED: SharedCell<RustRequestReceiver> =
         Arc::new(Mutex::new(RefCell::new(None)));
@@ -111,10 +115,16 @@ pub fn prepare_rust_signal_stream(signal_stream: StreamSink<RustSignal>) {
     cell.replace(Some(signal_stream));
 }
 
-/// Returns a stream object in Dart that returns responses from Rust.
+/// Returns a stream object in Dart that gives responses from Rust.
 pub fn prepare_rust_response_stream(response_stream: StreamSink<RustResponseUnique>) {
     let cell = RESPONSE_STREAM_SHARED.lock().unwrap();
     cell.replace(Some(response_stream));
+}
+
+/// Returns a stream object in Dart that gives strings to print from Rust.
+pub fn prepare_rust_print_stream(print_stream: StreamSink<String>) {
+    let cell = PRINT_STREAM_SHARED.lock().unwrap();
+    cell.replace(Some(print_stream));
 }
 
 /// Prepare channels that are used in the Rust world.
@@ -144,6 +154,10 @@ pub fn check_rust_streams() -> bool {
 
 /// Start the main function of Rust.
 pub fn start_rust_logic() {
+    #[cfg(debug_assertions)]
+    std::panic::set_hook(Box::new(|panic_info| {
+        crate::debug_print!("A panic occurred in Rust.\n{}", panic_info);
+    }));
     #[cfg(not(target_family = "wasm"))]
     {
         TOKIO_RUNTIME.with(move |inner| {

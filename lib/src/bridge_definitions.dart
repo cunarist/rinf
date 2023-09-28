@@ -15,10 +15,15 @@ abstract class Bridge {
 
   FlutterRustBridgeTaskConstMeta get kPrepareRustSignalStreamConstMeta;
 
-  /// Returns a stream object in Dart that returns responses from Rust.
+  /// Returns a stream object in Dart that gives responses from Rust.
   Stream<RustResponseUnique> prepareRustResponseStream({dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kPrepareRustResponseStreamConstMeta;
+
+  /// Returns a stream object in Dart that gives strings to print from Rust.
+  Stream<String> prepareRustPrintStream({dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kPrepareRustPrintStreamConstMeta;
 
   /// Prepare channels that are used in the Rust world.
   Future<void> prepareChannels({dynamic hint});

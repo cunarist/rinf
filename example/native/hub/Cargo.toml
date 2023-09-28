@@ -7,8 +7,8 @@ edition = "2021"
 [lib]
 # `lib` is required for non-library targets,
 # such as tests and benchmarks.
+# `cdylib` is for Linux, Android, Windows, and web.
 # `staticlib` is for iOS and macOS.
-# `cdylib` is for all other platforms.
 crate-type = ["lib", "cdylib", "staticlib"]
 
 # These are dependencies for non-web platforms.
@@ -32,7 +32,6 @@ web-sys = { version = "0.3.64", features = [
     "Worker",
     "Url",
     "BroadcastChannel",
-    "console",
 ] }
 gloo-timers = { version = "0.3.0", features = ["futures"] }
 

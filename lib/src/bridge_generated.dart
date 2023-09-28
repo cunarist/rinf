@@ -53,6 +53,22 @@ class BridgeImpl implements Bridge {
         argNames: [],
       );
 
+  Stream<String> prepareRustPrintStream({dynamic hint}) {
+    return _platform.executeStream(FlutterRustBridgeTask(
+      callFfi: (port_) => _platform.inner.wire_prepare_rust_print_stream(port_),
+      parseSuccessData: _wire2api_String,
+      constMeta: kPrepareRustPrintStreamConstMeta,
+      argValues: [],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kPrepareRustPrintStreamConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "prepare_rust_print_stream",
+        argNames: [],
+      );
+
   Future<void> prepareChannels({dynamic hint}) {
     return _platform.executeNormal(FlutterRustBridgeTask(
       callFfi: (port_) => _platform.inner.wire_prepare_channels(port_),
@@ -124,6 +140,10 @@ class BridgeImpl implements Bridge {
     _platform.dispose();
   }
 // Section: wire2api
+
+  String _wire2api_String(dynamic raw) {
+    return raw as String;
+  }
 
   bool _wire2api_bool(dynamic raw) {
     return raw as bool;

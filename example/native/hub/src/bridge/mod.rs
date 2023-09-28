@@ -38,7 +38,7 @@ pub fn send_rust_signal(rust_signal: RustSignal) {
     });
 }
 
-/// Send a response to Dart with a unique interaction ID
+/// Sends a response to Dart with a unique interaction ID
 /// to remember which request that response corresponds to.
 /// No memory copy is involved as the bytes are moved directly to Dart.
 pub fn respond_to_dart(response_unique: RustResponseUnique) {
@@ -54,4 +54,35 @@ pub fn respond_to_dart(response_unique: RustResponseUnique) {
             borrowed.replace(stream);
         }
     });
+}
+
+/// Delegates the printing operation to Flutter,
+/// which excels at handling various platforms
+/// including web and mobile emulators.
+/// When debugging, using this macro is recommended over `println!()`,
+/// as it seamlessly adapts to different environments.
+/// Note that this macro produces nothing in release mode.
+#[macro_export]
+#[cfg(debug_assertions)]
+macro_rules! debug_print {
+    ( $( $t:tt )* ) => {
+        let print_content = format!( $( $t )* ).into();
+        $crate::bridge::api::PRINT_STREAM.with(|inner| {
+            let mut borrowed = inner.borrow_mut();
+            let option = borrowed.as_ref();
+            if let Some(stream) = option {
+                stream.add(print_content);
+            } else {
+                let cell = $crate::bridge::api::PRINT_STREAM_SHARED.lock().unwrap();
+                let stream = cell.borrow().as_ref().unwrap().clone();
+                stream.add(print_content);
+                borrowed.replace(stream);
+            }
+        });
+    }
+}
+#[macro_export]
+#[cfg(not(debug_assertions))]
+macro_rules! debug_print {
+    ( $( $t:tt )* ) => {};
 }
