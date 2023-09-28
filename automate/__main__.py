@@ -81,6 +81,9 @@ elif sys.argv[1] == "bridge-gen":
     search_string = "@protected"
     replace_string = ""
     replace_string_in_files(directory_path, search_string, replace_string)
+    search_string = "@internal"
+    replace_string = ""
+    replace_string_in_files(directory_path, search_string, replace_string)
 
     directory_path = "./example/native/hub/src/bridge"
     search_string = "flutter_rust_bridge::"

@@ -34,6 +34,7 @@ pub async fn handle_counter_number(rust_request: RustRequest) -> RustResponse {
             // Decode raw bytes into a Rust message object.
             let message_bytes = rust_request.message.unwrap();
             let request_message = ReadRequest::decode(message_bytes.as_slice()).unwrap();
+            crate::debug_print!("{}", request_message.letter);
 
             // Perform a simple calculation.
             let after_value: i32 = sample_crate::add_seven(request_message.before_number);

@@ -55,16 +55,3 @@ pub async fn sleep(duration: std::time::Duration) {
     #[cfg(target_family = "wasm")]
     gloo_timers::future::sleep(duration).await;
 }
-
-// On the web, the `println!` macro does not print to the browser console.
-// Crate `web_sys` does something exactly like `console.log()` in JavaScript.
-
-#[macro_export]
-#[cfg(target_family = "wasm")]
-macro_rules! print {
-    ( $( $t:tt )* ) => {
-        web_sys::console::log_1(&format!( $( $t )* ).into());
-    }
-}
-#[cfg(not(target_family = "wasm"))]
-pub(crate) use println as print;

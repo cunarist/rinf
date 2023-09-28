@@ -12,6 +12,11 @@ pub fn wire_prepare_rust_response_stream(port_: MessagePort) {
 }
 
 #[wasm_bindgen]
+pub fn wire_prepare_rust_print_stream(port_: MessagePort) {
+    wire_prepare_rust_print_stream_impl(port_)
+}
+
+#[wasm_bindgen]
 pub fn wire_prepare_channels(port_: MessagePort) {
     wire_prepare_channels_impl(port_)
 }

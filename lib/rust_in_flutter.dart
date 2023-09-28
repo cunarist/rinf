@@ -5,6 +5,7 @@
 import 'dart:math';
 import 'dart:async';
 import 'src/exports.dart';
+import 'package:flutter/foundation.dart';
 
 export 'src/exports.dart' show RustOperation;
 export 'src/exports.dart' show RustRequest;
@@ -32,6 +33,12 @@ class RustInFlutter {
     rustResponseStream.listen((responseUnique) {
       _responseBroadcaster.add(responseUnique);
     });
+    if (kDebugMode) {
+      final rustPrintStream = api.prepareRustPrintStream();
+      rustPrintStream.listen((printContent) {
+        debugPrint(printContent);
+      });
+    }
     while (!(await api.checkRustStreams())) {}
     api.startRustLogic();
   }
