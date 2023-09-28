@@ -1,3 +1,7 @@
+## 4.6.1
+
+- Stabilized `debug_print!` logic.
+
 ## 4.6.0
 
 - New `debug_print!` macro that works on all environments, including web and mobile emulators, with the power of Flutter debuggers. To use this, you need to run `rifs template` again.
