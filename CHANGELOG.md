@@ -1,3 +1,7 @@
+## 4.5.0
+
+- Added support for external symbols on iOS and macOS. This is needed for some Rust crates that depend on Apple's system frameworks.
+
 ## 4.4.2
 
 - Updated docs and demo links.
