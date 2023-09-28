@@ -213,7 +213,6 @@ pub fn mandelbrot(
 #[cfg(any(target_os = "windows", target_os = "macos", target_os = "linux"))]
 pub mod compilation_test {
     use machineid_rs::{Encryption, HWIDComponent, IdBuilder};
-    use slint;
     pub fn perform() {
         let mut builder = IdBuilder::new(Encryption::MD5);
         builder

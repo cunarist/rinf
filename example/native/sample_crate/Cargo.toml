@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [target.'cfg(any(target_os = "windows", target_os = "macos", target_os = "linux"))'.dependencies]
-slint = "1.2.1"
 machineid-rs = "1.2.4"
 
 [dependencies]
