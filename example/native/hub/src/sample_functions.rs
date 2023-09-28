@@ -97,3 +97,7 @@ pub async fn stream_mandelbrot() {
         }
     }
 }
+
+pub async fn do_compilation_test() {
+    sample_crate::compilation_test::perform();
+}
