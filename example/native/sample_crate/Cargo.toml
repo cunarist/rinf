@@ -7,7 +7,6 @@ edition = "2021"
 slint = "1.2.1"
 machineid-rs = "1.2.4"
 
-
 [dependencies]
 anyhow = "1.0.69"
 num = "0.4"
