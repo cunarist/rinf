@@ -290,3 +290,15 @@ This is a bytes array created by Protobuf serialization. Note that it is not rec
 ### Field `blob`
 
 This is also a bytes array intended to contain large data up to a few gigabytes. You can send any kind of binary as you wish such as a high-resolution image or some kind of file data. Sending a blob is a zero-copy operation, which means no memory copy is involved. This field is optional and can be `null` or `None`.
+
+## 🖨️ The `debug_print!` Macro
+
+You might be used to `println!` macro in Rust. However, using that macro isn't a very good idea in our apps made with Flutter and Rust because `println!` outputs cannot be seen on the web and mobile emulators.
+
+The `debug_print!` macro is better than `println!` in that it only works in debug mode, resulting in a smaller and cleaner release binary.
+
+When writing Rust code in the `hub` crate, you can simply print your debug message like below. Once you use this macro, Flutter will handle the rest.
+
+```rust
+crate::debug_print!("My object is {:?}", my_object);
+```
