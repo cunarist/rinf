@@ -206,8 +206,26 @@ pub fn mandelbrot(
     write_image(&colorize(&pixels), bounds)
 }
 
+// Some crates only support desktop platforms.
+// That's why we are doing the compilation test
+// only on desktop platforms.
 #[allow(unused_imports)]
-mod crates_for_compile_test {
-    use machineid_rs;
+#[cfg(any(target_os = "windows", target_os = "macos", target_os = "linux"))]
+pub mod compilation_test {
+    use machineid_rs::{Encryption, HWIDComponent, IdBuilder};
     use slint;
+    pub fn perform() {
+        let mut builder = IdBuilder::new(Encryption::MD5);
+        builder
+            .add_component(HWIDComponent::SystemID)
+            .add_component(HWIDComponent::CPUCores);
+        let hwid = builder.build("mykey").unwrap();
+        println!("Machine ID: {}", hwid);
+    }
+}
+#[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
+pub mod compilation_test {
+    pub fn perform() {
+        println!("Skipping RIF compilation test...");
+    }
 }

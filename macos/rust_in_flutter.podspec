@@ -28,16 +28,15 @@ Pod::Spec.new do |s|
     :script => 'sh ${PODS_TARGET_SRCROOT}/../cargokit/build_pod.sh ${PROJECT_DIR}/../../native/hub hub',
     :execution_position=> :before_compile,
     :input_files => ['${BUILT_PRODUCTS_DIR}/cargokit_phony'],
-    :output_files => ['${BUILT_PRODUCTS_DIR}/cargokit_phony_out', '${BUILT_PRODUCTS_DIR}/output.txt'],
+    # Let XCode know that the static library referenced in -force_load below is
+    # created by this build step.
+    :output_files => ["${BUILT_PRODUCTS_DIR}/libhub.a"],
   }
   s.pod_target_xcconfig = {
-    # From default Flutter template.
     'DEFINES_MODULE' => 'YES',
+    # Flutter.framework does not contain a i386 slice.
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
     # We use `-force_load` instead of `-l` since Xcode strips out unused symbols from static libraries.
-    'OTHER_LDFLAGS' => '-force_load ${BUILT_PRODUCTS_DIR}/libhub.a',
-    'DEAD_CODE_STRIPPING' => 'YES',
-    'STRIP_INSTALLED_PRODUCT[config=*][sdk=*][arch=*]' => "YES",
-    'STRIP_STYLE[config=*][sdk=*][arch=*]' => "non-global",
-    'DEPLOYMENT_POSTPROCESSING[config=*][sdk=*][arch=*]' => "YES",
+    'OTHER_LDFLAGS' => '-force_load ${BUILT_PRODUCTS_DIR}/libhub.a -Wl -undefined dynamic_lookup',
   }
 end
