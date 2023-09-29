@@ -1,3 +1,7 @@
+## 4.6.2
+
+- Polished various aspects.
+
 ## 4.6.1
 
 - Stabilized `debug_print!` logic.
