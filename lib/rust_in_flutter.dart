@@ -30,13 +30,13 @@ class RustInFlutter {
       rustBroadcaster.add(rustSignal);
     });
     final rustResponseStream = api.prepareRustResponseStream();
-    rustResponseStream.listen((responseUnique) {
-      _responseBroadcaster.add(responseUnique);
+    rustResponseStream.listen((rustResponseUnique) {
+      _responseBroadcaster.add(rustResponseUnique);
     });
     if (kDebugMode) {
-      final rustPrintStream = api.prepareRustPrintStream();
-      rustPrintStream.listen((printContent) {
-        debugPrint(printContent);
+      final rustReportStream = api.prepareRustReportStream();
+      rustReportStream.listen((rustReport) {
+        debugPrint(rustReport);
       });
     }
     while (!(await api.checkRustStreams())) {}

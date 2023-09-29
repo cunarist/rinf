@@ -2,6 +2,7 @@
 //! More specifically, sending responses and
 //! stream signals to Dart are supported.
 //! DO NOT EDIT.
+
 #![allow(dead_code)]
 
 use api::RustResponseUnique;
@@ -61,36 +62,31 @@ pub fn respond_to_dart(response_unique: RustResponseUnique) {
 /// including web and mobile emulators.
 /// When debugging, using this macro is recommended over `println!()`,
 /// as it seamlessly adapts to different environments.
-/// Note that this macro produces nothing in release mode.
+/// Note that this macro does nothing in release mode.
 #[macro_export]
-#[cfg(debug_assertions)]
 macro_rules! debug_print {
     ( $( $t:tt )* ) => {
-        let print_content = format!( $( $t )* ).into();
-        $crate::bridge::send_rust_print(print_content);
+        let rust_report = format!( $( $t )* );
+        #[cfg(debug_assertions)]
+        $crate::bridge::send_rust_report(rust_report.into());
+        #[cfg(not(debug_assertions))]
+        let _ = rust_report;
     }
 }
-#[macro_export]
-#[cfg(not(debug_assertions))]
-macro_rules! debug_print {
-    ( $( $t:tt )* ) => {
-        let _ = format!( $( $t )* );
-    };
-}
-
-/// Sends a string to Dart that should be printed.
-/// Not intended to be directly accessed.
-/// Use `debug_print!` macro whenever possible.
-pub fn send_rust_print(print_content: String) {
-    api::PRINT_STREAM.with(|inner| {
+/// Sends a string to Dart that should be printed in the CLI.
+/// Do NOT use this function directly in the code.
+/// Use `debug_print!` macro instead.
+#[cfg(debug_assertions)]
+pub fn send_rust_report(rust_report: String) {
+    api::REPORT_STREAM.with(|inner| {
         let mut borrowed = inner.borrow_mut();
         let option = borrowed.as_ref();
         if let Some(stream) = option {
-            stream.add(print_content);
+            stream.add(rust_report);
         } else {
-            let cell = api::PRINT_STREAM_SHARED.lock().unwrap();
+            let cell = api::REPORT_STREAM_SHARED.lock().unwrap();
             let stream = cell.borrow().as_ref().unwrap().clone();
-            stream.add(print_content);
+            stream.add(rust_report);
             borrowed.replace(stream);
         }
     });

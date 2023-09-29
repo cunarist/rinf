@@ -193,19 +193,19 @@ class BridgeWire implements FlutterRustBridgeWireBase {
   late final _wire_prepare_rust_response_stream =
       _wire_prepare_rust_response_streamPtr.asFunction<void Function(int)>();
 
-  void wire_prepare_rust_print_stream(
+  void wire_prepare_rust_report_stream(
     int port_,
   ) {
-    return _wire_prepare_rust_print_stream(
+    return _wire_prepare_rust_report_stream(
       port_,
     );
   }
 
-  late final _wire_prepare_rust_print_streamPtr =
+  late final _wire_prepare_rust_report_streamPtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
-          'wire_prepare_rust_print_stream');
-  late final _wire_prepare_rust_print_stream =
-      _wire_prepare_rust_print_streamPtr.asFunction<void Function(int)>();
+          'wire_prepare_rust_report_stream');
+  late final _wire_prepare_rust_report_stream =
+      _wire_prepare_rust_report_streamPtr.asFunction<void Function(int)>();
 
   void wire_prepare_channels(
     int port_,

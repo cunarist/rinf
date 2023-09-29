@@ -53,19 +53,20 @@ class BridgeImpl implements Bridge {
         argNames: [],
       );
 
-  Stream<String> prepareRustPrintStream({dynamic hint}) {
+  Stream<String> prepareRustReportStream({dynamic hint}) {
     return _platform.executeStream(FlutterRustBridgeTask(
-      callFfi: (port_) => _platform.inner.wire_prepare_rust_print_stream(port_),
+      callFfi: (port_) =>
+          _platform.inner.wire_prepare_rust_report_stream(port_),
       parseSuccessData: _wire2api_String,
-      constMeta: kPrepareRustPrintStreamConstMeta,
+      constMeta: kPrepareRustReportStreamConstMeta,
       argValues: [],
       hint: hint,
     ));
   }
 
-  FlutterRustBridgeTaskConstMeta get kPrepareRustPrintStreamConstMeta =>
+  FlutterRustBridgeTaskConstMeta get kPrepareRustReportStreamConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
-        debugName: "prepare_rust_print_stream",
+        debugName: "prepare_rust_report_stream",
         argNames: [],
       );
 

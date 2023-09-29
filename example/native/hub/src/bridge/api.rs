@@ -71,7 +71,7 @@ type SharedCell<T> = Arc<Mutex<Cell<T>>>;
 
 type RustSignalStream = StreamSink<RustSignal>;
 type RustResponseStream = StreamSink<RustResponseUnique>;
-type RustPrintStream = StreamSink<String>;
+type RustReportStream = StreamSink<String>;
 type RustRequestSender = Sender<RustRequestUnique>;
 type RustRequestReceiver = Receiver<RustRequestUnique>;
 
@@ -86,7 +86,7 @@ thread_local! {
 thread_local! {
     pub static SIGNAL_STREAM: Cell<RustSignalStream> = RefCell::new(None);
     pub static RESPONSE_STREAM: Cell<RustResponseStream> = RefCell::new(None);
-    pub static PRINT_STREAM: Cell<RustPrintStream> = RefCell::new(None);
+    pub static REPORT_STREAM: Cell<RustReportStream> = RefCell::new(None);
     pub static RESPONSE_SENDER: Cell<RustResponseUnique> = RefCell::new(None);
 }
 
@@ -97,7 +97,7 @@ lazy_static! {
         Arc::new(Mutex::new(RefCell::new(None)));
     pub static ref RESPONSE_STREAM_SHARED: SharedCell<RustResponseStream> =
         Arc::new(Mutex::new(RefCell::new(None)));
-    pub static ref PRINT_STREAM_SHARED: SharedCell<RustPrintStream> =
+    pub static ref REPORT_STREAM_SHARED: SharedCell<RustReportStream> =
         Arc::new(Mutex::new(RefCell::new(None)));
     pub static ref REQUST_RECEIVER_SHARED: SharedCell<RustRequestReceiver> =
         Arc::new(Mutex::new(RefCell::new(None)));
@@ -122,8 +122,8 @@ pub fn prepare_rust_response_stream(response_stream: StreamSink<RustResponseUniq
 }
 
 /// Returns a stream object in Dart that gives strings to print from Rust.
-pub fn prepare_rust_print_stream(print_stream: StreamSink<String>) {
-    let cell = PRINT_STREAM_SHARED.lock().unwrap();
+pub fn prepare_rust_report_stream(print_stream: StreamSink<String>) {
+    let cell = REPORT_STREAM_SHARED.lock().unwrap();
     cell.replace(Some(print_stream));
 }
 
@@ -151,7 +151,7 @@ pub fn check_rust_streams() -> bool {
     };
     #[cfg(debug_assertions)]
     {
-        let cell = PRINT_STREAM_SHARED.lock().unwrap();
+        let cell = REPORT_STREAM_SHARED.lock().unwrap();
         if cell.borrow().is_none() {
             are_all_ready = false;
         };

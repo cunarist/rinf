@@ -37,6 +37,7 @@ All platforms available with Flutter are [tested](https://github.com/cunarist/ru
 - Type-safe and flexible messages powered by Protobuf
 - Automatic restart of Rust logic on Dart's hot restart
 - No memory copy when sending native data
+- Convenient debugging capabilities
 
 ## 🐦 Why Use Flutter?
 

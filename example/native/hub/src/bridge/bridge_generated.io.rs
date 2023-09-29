@@ -12,8 +12,8 @@ pub extern "C" fn wire_prepare_rust_response_stream(port_: i64) {
 }
 
 #[no_mangle]
-pub extern "C" fn wire_prepare_rust_print_stream(port_: i64) {
-    wire_prepare_rust_print_stream_impl(port_)
+pub extern "C" fn wire_prepare_rust_report_stream(port_: i64) {
+    wire_prepare_rust_report_stream_impl(port_)
 }
 
 #[no_mangle]

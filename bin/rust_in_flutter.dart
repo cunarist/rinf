@@ -140,6 +140,12 @@ run the following command:
 rifs message
 ```
 
+Now you can run and build this app just like any other Flutter projects.
+
+```bash
+flutter run
+```
+
 For detailed instructions on writing Rust and Flutter together,
 please refer to Rust-In-Flutter's [documentation](https://rif-docs.cunarist.com).
 ''';

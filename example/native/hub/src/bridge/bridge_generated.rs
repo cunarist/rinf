@@ -54,16 +54,16 @@ fn wire_prepare_rust_response_stream_impl(port_: MessagePort) {
         },
     )
 }
-fn wire_prepare_rust_print_stream_impl(port_: MessagePort) {
+fn wire_prepare_rust_report_stream_impl(port_: MessagePort) {
     BRIDGE_HANDLER.wrap::<_, _, _, ()>(
         WrapInfo {
-            debug_name: "prepare_rust_print_stream",
+            debug_name: "prepare_rust_report_stream",
             port: Some(port_),
             mode: FfiCallMode::Stream,
         },
         move || {
             move |task_callback| {
-                Ok(prepare_rust_print_stream(
+                Ok(prepare_rust_report_stream(
                     task_callback.stream_sink::<_, String>(),
                 ))
             }
