@@ -24,13 +24,15 @@ Future<void> main(List<String> args) async {
       break;
     case "--help":
     case "-h":
-    default:
       print("Usage: rifs [arguments]");
       print("Arguments:");
       print("  -h, --help    Shows this usage information.");
       print("  template      Applies Rust template to the current project.");
       print("  message       Generates message code from `.proto` files.");
       print("  wasm          Builds webassembly.");
+    default:
+      print("No such operation is available.");
+      print("Use `rifs --help` to see all available operations.");
   }
 }
 
