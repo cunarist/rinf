@@ -2,8 +2,8 @@
 /// More specifically, sending requests to Rust and
 /// receiving stream signals from Rust are possible.
 
-import 'dart:math';
 import 'dart:async';
+import 'dart:math';
 import 'src/exports.dart';
 import 'package:flutter/foundation.dart';
 
@@ -36,7 +36,7 @@ class RustInFlutter {
     if (kDebugMode) {
       final rustReportStream = api.prepareRustReportStream();
       rustReportStream.listen((rustReport) {
-        debugPrint(rustReport);
+        print(rustReport);
       });
     }
     while (!(await api.checkRustStreams())) {}
@@ -79,12 +79,13 @@ Future<RustResponse> requestToRust(RustRequest rustRequest) async {
 }
 
 class _IdGenerator {
-  int _counter = -pow(2, 31).toInt();
   final _maxLimit = pow(2, 31).toInt() - 1;
+  final _minLimit = -pow(2, 31).toInt();
+  int _counter = 0;
   int generateId() {
     final id = _counter;
     final increased = _counter + 1;
-    _counter = increased <= _maxLimit ? increased : -pow(2, 31).toInt();
+    _counter = increased <= _maxLimit ? increased : _minLimit;
     return id;
   }
 }
