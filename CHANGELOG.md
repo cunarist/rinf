@@ -1,3 +1,7 @@
+## 4.7.0
+
+- Now Rust stacktrace will be printed to the CLI when a panic occurs. The changes are mostly included in the template, so make sure you've run `rifs template` on this new version.
+
 ## 4.6.2
 
 - Polished various aspects.
