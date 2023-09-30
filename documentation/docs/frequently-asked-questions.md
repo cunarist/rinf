@@ -125,4 +125,4 @@ However, we also promise to deliver the best development experience as it is mai
 
 ### What happens when a panic occurs in Rust?
 
-A Rust panic does not crash the app. It just terminates the local async task that it has been occurred in. You don't need to worry about the app stability because of Rust panics. When a panic occurs, the information will kindly be shown in the CLI if it's debug mode.
+A Rust panic doesn't crash the app; it simply cancels the spawned async task. You don't need to worry about app stability due to Rust panics. When a panic occurs, the information will be displayed in the CLI if the app is running in debug mode.
