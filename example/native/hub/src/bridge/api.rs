@@ -168,15 +168,17 @@ pub fn start_rust_logic() {
             let mut frames_filtered = Vec::new();
             backtrace::trace(|frame| {
                 // Filter some backtrace frames
-                // as those from infrastructure crates are not needed.
+                // as those from infrastructure functions are not needed.
                 let mut should_keep_tracing = true;
                 backtrace::resolve_frame(frame, |symbol| {
                     if let Some(symbol_name) = symbol.name() {
                         let name = symbol_name.to_string();
-                        if name.starts_with("backtrace::") {
+                        let name_trimmed = name.trim_start_matches('_');
+                        if name_trimmed.starts_with("rust_begin_unwind") {
+                            frames_filtered.clear();
                             return;
                         }
-                        if name.starts_with("tokio::") {
+                        if name_trimmed.starts_with("rust_try") {
                             should_keep_tracing = false;
                             return;
                         }
