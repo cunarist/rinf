@@ -2,6 +2,7 @@
 
 use crate::bridge::bridge_engine::StreamSink;
 use lazy_static::lazy_static;
+use os_thread_local::ThreadLocal;
 use std::cell::RefCell;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -105,8 +106,8 @@ lazy_static! {
 
 #[cfg(not(target_family = "wasm"))]
 lazy_static! {
-    pub static ref TOKIO_RUNTIME: os_thread_local::ThreadLocal<RefCell<Option<tokio::runtime::Runtime>>> =
-        os_thread_local::ThreadLocal::new(|| RefCell::new(None));
+    pub static ref TOKIO_RUNTIME: ThreadLocal<Cell<tokio::runtime::Runtime>> =
+        ThreadLocal::new(|| RefCell::new(None));
 }
 
 /// Returns a stream object in Dart that listens to Rust.
