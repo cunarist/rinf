@@ -1,3 +1,8 @@
+## 4.8.0
+
+- Now by running `rifs template --bridge`, you can apply and update only the `bridge` module inside the `hub` crate. This is useful when you've upgraded RIF but do not need to apply the whole template again.
+- Improved `rifs --help` output.
+
 ## 4.7.0
 
 - Now Rust stacktrace will be printed to the CLI when a panic occurs. The changes are mostly included in the template, so make sure you've run `rifs template` on this new version.
