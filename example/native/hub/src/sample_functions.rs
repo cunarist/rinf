@@ -102,8 +102,15 @@ pub async fn stream_mandelbrot() {
 pub async fn do_compilation_test() {
     let option = sample_crate::compilation_test::get_hardward_id();
     if let Some(hwid) = option {
-        crate::debug_print!("Hardware ID: {}", hwid);
+        crate::debug_print!(
+            "Checking if Rust integration is properly done. \
+            Hardware ID is {}.",
+            hwid
+        );
     } else {
-        crate::debug_print!("Hardware ID not available on this platform");
+        crate::debug_print!(
+            "Checking if Rust integration is properly done. \
+            Hardware ID is not available on this platform."
+        );
     }
 }

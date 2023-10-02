@@ -4,29 +4,39 @@ import 'package:example_app/messages/counter_number.pb.dart' as counterNumber;
 import 'package:example_app/messages/mandelbrot.pb.dart' as mandelbrot;
 
 void main() async {
-  // Wait for initialization to be completed first.
+  // Wait for Rust initialization to be completed first.
   await RustInFlutter.ensureInitialized();
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Home(),
+      title: 'RIF Example',
+      theme: ThemeData(
+        useMaterial3: true,
+        brightness: MediaQuery.platformBrightnessOf(context),
+      ),
+      home: MyHomePage(),
     );
   }
 }
 
-class Home extends StatelessWidget {
-  final ValueNotifier<int> _countNotifier = ValueNotifier<int>(0);
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
 
-  void _incrementCount() async {
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
+
+  void _incrementCounter() async {
     final requestMessage = counterNumber.ReadRequest(
       letter: "Hello from Dart!",
-      beforeNumber: _countNotifier.value,
+      beforeNumber: _counter,
       dummyOne: 1,
       dummyTwo: counterNumber.SampleSchema(
         sampleFieldOne: true,
@@ -34,23 +44,21 @@ class Home extends StatelessWidget {
       ),
       dummyThree: [3, 4, 5],
     );
-
     final rustRequest = RustRequest(
       resource: counterNumber.ID,
       operation: RustOperation.Read,
-      // Convert Dart message object into raw bytes.
       message: requestMessage.writeToBuffer(),
     );
-
     // Use `requestToRust` from `rust_in_flutter.dart`
     // to send the request to Rust and get the response.
     final rustResponse = await requestToRust(rustRequest);
-
     if (rustResponse.successful) {
-      // Convert raw bytes into Dart message objects.
-      final responseMessage =
-          counterNumber.ReadResponse.fromBuffer(rustResponse.message!);
-      _countNotifier.value = responseMessage.afterNumber;
+      final responseMessage = counterNumber.ReadResponse.fromBuffer(
+        rustResponse.message!,
+      );
+      setState(() {
+        _counter = responseMessage.afterNumber;
+      });
     }
   }
 
@@ -113,58 +121,18 @@ class Home extends StatelessWidget {
                 }
               },
             ),
-            CurrentValueText(
-              countNotifier: _countNotifier,
+            Text(
+              "Current value is $_counter",
             ),
           ],
         ),
       ),
       // This is a button that calls the increment method.
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCount,
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
     );
-  }
-}
-
-class CurrentValueText extends StatefulWidget {
-  final ValueNotifier<int> countNotifier;
-  const CurrentValueText({required this.countNotifier});
-  @override
-  _CurrentValueTextState createState() => _CurrentValueTextState();
-}
-
-class _CurrentValueTextState extends State<CurrentValueText> {
-  late int _currentCount;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentCount = widget.countNotifier.value;
-    widget.countNotifier.addListener(_updateCurrentCount);
-  }
-
-  void _updateCurrentCount() {
-    setState(() {
-      _currentCount = widget.countNotifier.value;
-    });
-  }
-
-  @override
-  void dispose() {
-    widget.countNotifier.removeListener(_updateCurrentCount);
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_currentCount == 0) {
-      return const Text("Not calculated yet");
-    } else {
-      return Text(
-        "Current value is $_currentCount",
-      );
-    }
   }
 }
