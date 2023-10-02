@@ -10,7 +10,11 @@ Future<void> main(List<String> args) async {
   }
   switch (args[0]) {
     case "template":
-      await _applyRustTemplate();
+      if (args.contains("--bridge") || args.contains("-b")) {
+        await _applyRustTemplate(onlyBridge: true);
+      } else {
+        await _applyRustTemplate();
+      }
       break;
     case "message":
       await _generateMessageCode();
@@ -19,17 +23,19 @@ Future<void> main(List<String> args) async {
       if (args.contains("--release") || args.contains("-r")) {
         await _buildWebassembly(isReleaseMode: true);
       } else {
-        await _buildWebassembly(isReleaseMode: false);
+        await _buildWebassembly();
       }
       break;
     case "--help":
     case "-h":
       print("Usage: rifs [arguments]");
       print("Arguments:");
-      print("  -h, --help    Shows this usage information.");
-      print("  template      Applies Rust template to the current project.");
-      print("  message       Generates message code from `.proto` files.");
-      print("  wasm          Builds webassembly.");
+      print("  -h, --help        Shows this usage information.");
+      print("  template          Applies Rust template to current project.");
+      print("    -b, --bridge    Only applies `bridge` Rust module.");
+      print("  message           Generates message code from `.proto` files.");
+      print("  wasm              Builds webassembly module.");
+      print("    -r, --release   Builds in release mode.");
     default:
       print("No such operation is available.");
       print("Use `rifs --help` to see all available operations.");
@@ -37,7 +43,7 @@ Future<void> main(List<String> args) async {
 }
 
 /// Creates new folders and files to an existing Flutter project folder.
-Future<void> _applyRustTemplate() async {
+Future<void> _applyRustTemplate({bool onlyBridge = false}) async {
   // Get the path of the current project directory
   final flutterProjectPath = Directory.current.path;
 
@@ -57,6 +63,14 @@ Future<void> _applyRustTemplate() async {
   final isFlutterProject = await mainFile.exists();
   if (!isFlutterProject) {
     print("\nThis folder doesn't look like a Flutter project. Aborting...\n");
+    return;
+  }
+
+  // Only copy the bridge module inside the `hub crate if wanted.
+  if (onlyBridge) {
+    final source = Directory('$packagePath/example/native/hub/src/bridge');
+    final destination = Directory('$flutterProjectPath/native/hub/src/bridge');
+    await _copyDirectory(source, destination);
     return;
   }
 
@@ -192,7 +206,7 @@ please refer to Rust-In-Flutter's [documentation](https://rif-docs.cunarist.com)
 
 Future<void> _copyDirectory(Directory source, Directory destination) async {
   final newDirectory = Directory(destination.path);
-  await newDirectory.create();
+  await newDirectory.create(recursive: true);
   await for (final entity in source.list(recursive: false)) {
     final entityName = entity.path.split(Platform.pathSeparator).last;
     if (entity is Directory) {

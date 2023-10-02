@@ -123,9 +123,9 @@ elif sys.argv[1] == "cargokit-update":
 elif sys.argv[1] == "--help" or sys.argv[1] == "-h":
     print("Usage: python automate [arguments]")
     print("Arguments:")
-    print("  -h, --help         Shows this usage information.")
-    print("  bridge-gen         Generates bridge files.")
-    print("  cargokit-update    Updates CargoKit.")
+    print("  -h, --help        Shows this usage information.")
+    print("  bridge-gen        Generates bridge files.")
+    print("  cargokit-update   Updates CargoKit.")
 
 else:
     print("No such option for automation is available.")
