@@ -73,6 +73,7 @@ macro_rules! debug_print {
         let _ = rust_report;
     }
 }
+
 /// Sends a string to Dart that should be printed in the CLI.
 /// Do NOT use this function directly in the code.
 /// Use `debug_print!` macro instead.
