@@ -88,7 +88,6 @@ thread_local! {
     pub static SIGNAL_STREAM: Cell<RustSignalStream> = RefCell::new(None);
     pub static RESPONSE_STREAM: Cell<RustResponseStream> = RefCell::new(None);
     pub static REPORT_STREAM: Cell<RustReportStream> = RefCell::new(None);
-    pub static RESPONSE_SENDER: Cell<RustResponseUnique> = RefCell::new(None);
 }
 
 // Native: All threads
