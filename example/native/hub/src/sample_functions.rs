@@ -130,7 +130,7 @@ pub async fn run_debug_tests() {
     let start_time = sample_crate::get_current_time();
     let mut last_time = sample_crate::get_current_time();
     let mut count = 0u64;
-    while count < 100000000 {
+    loop {
         count += 1;
         if count % 10000 == 0 {
             crate::yield_now().await;
