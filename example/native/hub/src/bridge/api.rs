@@ -160,10 +160,10 @@ pub fn check_rust_streams() -> bool {
 
 /// Start the main function of Rust.
 pub fn start_rust_logic() {
-    #[cfg(debug_assertions)]
-    std::panic::set_hook(Box::new(|panic_info| {
-        #[cfg(not(target_family = "wasm"))]
-        {
+    #[cfg(not(target_family = "wasm"))]
+    {
+        #[cfg(debug_assertions)]
+        std::panic::set_hook(Box::new(|panic_info| {
             let mut frames_filtered = Vec::new();
             backtrace::trace(|frame| {
                 // Filter some backtrace frames
@@ -194,14 +194,7 @@ pub fn start_rust_logic() {
                 panic_info,
                 backtrace_filtered
             );
-        }
-        #[cfg(target_family = "wasm")]
-        {
-            crate::debug_print!("A panic occurred in Rust.\n{}", panic_info);
-        }
-    }));
-    #[cfg(not(target_family = "wasm"))]
-    {
+        }));
         TOKIO_RUNTIME.with(move |inner| {
             let tokio_runtime = tokio::runtime::Builder::new_multi_thread()
                 .enable_all()
@@ -213,6 +206,10 @@ pub fn start_rust_logic() {
     }
     #[cfg(target_family = "wasm")]
     {
+        #[cfg(debug_assertions)]
+        std::panic::set_hook(Box::new(|panic_info| {
+            crate::debug_print!("A panic occurred in Rust.\n{}", panic_info);
+        }));
         #[cfg(debug_assertions)]
         crate::bridge::bridge_engine::wasm_bindgen_src::worker::replace_worker();
         wasm_bindgen_futures::spawn_local(crate::main());
