@@ -1,11 +1,11 @@
 //! This crate is only for demonstration purposes.
 //! You might want to remove this crate in production.
 
-use chrono::{offset, DateTime};
-
 pub use mandelbrot::{mandelbrot, Point, Size};
 
 mod mandelbrot;
+
+// This is just a simple Rust function.
 
 pub fn add_seven(before: i32) -> i32 {
     before + 7
@@ -29,6 +29,7 @@ pub fn get_hardward_id() -> Option<String> {
 
 // `chrono` supports all platforms when `wasmbind` feature is enabled.
 
+use chrono::{offset, DateTime};
 pub fn get_current_time() -> DateTime<offset::Local> {
     offset::Local::now()
 }

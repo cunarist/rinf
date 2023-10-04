@@ -2,11 +2,9 @@
 //! https://github.com/ProgrammingRust/mandelbrot/blob/task-queue/src/main.rs and
 //! https://github.com/Ducolnd/rust-mandelbrot/blob/master/src/main.rs
 
-use anyhow::*;
 use image::codecs::png::PngEncoder;
 use image::*;
 use num::Complex;
-use std::sync::Mutex;
 
 #[derive(Debug, Clone)]
 pub struct Size {
@@ -139,14 +137,17 @@ pub fn colorize_pixel(it: u8) -> (u8, u8, u8) {
 
 /// Write the buffer `pixels`, whose dimensions are given by `bounds`, to the
 /// file named `filename`.
-fn write_image(pixels: &[u8], bounds: (usize, usize)) -> Result<Vec<u8>> {
+fn write_image(pixels: &[u8], bounds: (usize, usize)) -> Option<Vec<u8>> {
     let mut buf = Vec::new();
 
     let encoder = PngEncoder::new(&mut buf);
     #[allow(deprecated)]
-    encoder.encode(pixels, bounds.0 as u32, bounds.1 as u32, ColorType::Rgb8)?;
+    let result = encoder.encode(pixels, bounds.0 as u32, bounds.1 as u32, ColorType::Rgb8);
 
-    Ok(buf)
+    match result {
+        Ok(_) => Some(buf),
+        Err(_) => None,
+    }
 }
 
 pub fn mandelbrot(
@@ -154,47 +155,27 @@ pub fn mandelbrot(
     zoom_point: Point,
     scale: f64,
     num_threads: i32,
-) -> Result<Vec<u8>> {
+) -> Option<Vec<u8>> {
     let bounds = (image_size.width as usize, image_size.height as usize);
     let upper_left = Complex::new(zoom_point.x - scale, zoom_point.y - scale);
     let lower_right = Complex::new(zoom_point.x + scale, zoom_point.y + scale);
 
     let mut pixels = vec![0; bounds.0 * bounds.1];
-
     let band_rows = bounds.1 / (num_threads as usize) + 1;
+    let mut bands = pixels.chunks_mut(band_rows * bounds.0).enumerate();
 
-    {
-        let bands = Mutex::new(pixels.chunks_mut(band_rows * bounds.0).enumerate());
-        let worker = || loop {
-            match {
-                let mut guard = bands.lock().unwrap();
-                guard.next()
-            } {
-                None => {
-                    return;
-                }
-                Some((i, band)) => {
-                    let top = band_rows * i;
-                    let height = band.len() / bounds.0;
-                    let band_bounds = (bounds.0, height);
-                    let band_upper_left = pixel_to_point(bounds, (0, top), upper_left, lower_right);
-                    let band_lower_right =
-                        pixel_to_point(bounds, (bounds.0, top + height), upper_left, lower_right);
-                    render(band, band_bounds, band_upper_left, band_lower_right);
-                }
-            }
-        };
-
-        #[cfg(not(target_family = "wasm"))]
-        crossbeam::scope(|scope| {
-            for _ in 0..num_threads {
-                scope.spawn(|_| worker());
-            }
-        })
-        .unwrap();
-
-        #[cfg(target_family = "wasm")]
-        worker();
+    loop {
+        if let Some((i, band)) = bands.next() {
+            let top = band_rows * i;
+            let height = band.len() / bounds.0;
+            let band_bounds = (bounds.0, height);
+            let band_upper_left = pixel_to_point(bounds, (0, top), upper_left, lower_right);
+            let band_lower_right =
+                pixel_to_point(bounds, (bounds.0, top + height), upper_left, lower_right);
+            render(band, band_bounds, band_upper_left, band_lower_right);
+        } else {
+            break;
+        }
     }
 
     write_image(&colorize(&pixels), bounds)

@@ -72,8 +72,8 @@ pub async fn stream_mandelbrot() {
 
         let calculated = sample_crate::mandelbrot(
             sample_crate::Size {
-                width: 128,
-                height: 128,
+                width: 256,
+                height: 256,
             },
             sample_crate::Point {
                 x: 0.360,
@@ -83,7 +83,7 @@ pub async fn stream_mandelbrot() {
             4,
         );
 
-        if let Ok(mandelbrot) = calculated {
+        if let Some(mandelbrot) = calculated {
             // Stream the signal to Dart.
             let signal_message = StateSignal {
                 id: 0,
@@ -103,9 +103,11 @@ pub async fn run_debug_tests() {
     crate::sleep(std::time::Duration::from_secs(1)).await;
     crate::debug_print!("Starting debug tests.");
 
+    // Get the current time.
     let current_time = sample_crate::get_current_time();
     crate::debug_print!("System time: {}", current_time);
 
+    // Use a crate that accesses operating system APIs.
     let option = sample_crate::get_hardward_id();
     if let Some(hwid) = option {
         crate::debug_print!("Hardware ID: {}", hwid);
@@ -113,6 +115,7 @@ pub async fn run_debug_tests() {
         crate::debug_print!("Hardware ID is not available on this platform.");
     }
 
+    // Test `tokio::join!` for futures.
     let join_first = async {
         crate::sleep(std::time::Duration::from_secs(1)).await;
         crate::debug_print!("First future finished.");
@@ -127,6 +130,7 @@ pub async fn run_debug_tests() {
     };
     tokio::join!(join_first, join_second, join_third);
 
+    // Avoid blocking the async event loop.
     let start_time = sample_crate::get_current_time();
     let mut last_time = sample_crate::get_current_time();
     let mut count = 0u64;
@@ -137,10 +141,10 @@ pub async fn run_debug_tests() {
             let time_passed = sample_crate::get_current_time() - last_time;
             let total_time_passed = sample_crate::get_current_time() - start_time;
             if total_time_passed.num_milliseconds() > 10000 {
-                crate::debug_print!("Counting done with {}", count);
+                crate::debug_print!("Counting done with {count}");
                 break;
             } else if time_passed.num_milliseconds() > 1000 {
-                crate::debug_print!("Counted to {}, yielding regularly.", count);
+                crate::debug_print!("Counted to {count}, yielding regularly.");
                 last_time = sample_crate::get_current_time();
             }
         }
