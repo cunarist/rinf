@@ -11,9 +11,7 @@
 
 ![preview](assets/presentation.gif)
 
-This is a production-ready framework for creating beautiful and performant cross-platform apps with Flutter and Rust. Batteries are fully included.
-
-Designed for ease of use, future scalability, and unparalleled performance, this lightweight framework takes care of all the complexity behind the scenes. No messing with sensitive build files, no excessive code generation during development. Simply add this framework to your app project, and you're all set to write Flutter and Rust together!
+This is a production-ready framework for creating beautiful and performant cross-platform apps with Flutter and Rust. Batteries are fully included. Simply add this framework to your app project, and you're all set to write Flutter and Rust together!
 
 ## 🎮 Demo
 
@@ -34,7 +32,7 @@ All platforms available with Flutter are [tested](https://github.com/cunarist/ru
 
 - **Truly easy**: It only takes about about a minute or two to fully setup your app. No other solution provides this level of convenience.
 - **Minimal**: This is not a bulky framework that requires you to install so many dependencies and use complicated CLI commands. Just focus on your code using your preferred Flutter and Rust libraries.
-- **High-level interface**: You dont't have to worry about memory safety or build configuration using this system. Stay with Dart and Rust that you're familiar with.
+- **High-level interface**: No messing with sensitive build files, no concerns about memory safety. Stay with Dart and Rust that you're familiar with.
 - **Low-level control**: Though the hard things are hidden beneath the surface, you are free to modify the underlying logic such as concurrency or debugging features. There is no hidden mechanism that keeps you from gaining full control.
 - **Well maintained**: Our [automated workflows](https://github.com/cunarist/rust-in-flutter/actions) including build tests are always kept passing, thanks to the main branch protection rule. Also, the number of external dependencies is kept as low as possible and documentations are thoughtfully organized.
 - **Efficient**: No memory copy when sending native data, no hidden threads and web workers with memory overhead. This is a really thin wrapper around Dart and Rust.
