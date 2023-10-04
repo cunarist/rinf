@@ -33,7 +33,7 @@ All platforms available with Flutter are [tested](https://github.com/cunarist/ru
 - **Truly easy**: It only takes about about a minute or two to fully setup your app. No other solution provides this level of convenience.
 - **Minimal**: This is not a bulky framework that requires you to install so many dependencies and use complicated CLI commands. Just focus on your code using your preferred Flutter and Rust libraries.
 - **High-level interface**: No messing with sensitive build files, no concerns about memory safety. Stay with Dart and Rust that you're familiar with.
-- **Low-level control**: Though the hard things are hidden beneath the surface, you are free to modify the underlying logic such as concurrency or debugging features. There is no hidden mechanism that keeps you from gaining full control.
+- **Low-level control**: Though the hard things are kept beneath the surface, you are free to modify the underlying logic such as concurrency or debugging features. There is no hidden mechanism that keeps you from gaining full control.
 - **Well maintained**: Our [automated workflows](https://github.com/cunarist/rust-in-flutter/actions) including build tests are always kept passing, thanks to the main branch protection rule. Also, the number of external dependencies is kept as low as possible and documentations are thoughtfully organized.
 - **Efficient**: No memory copy when sending native data, no hidden threads and web workers with memory overhead. This is a really thin wrapper around Dart and Rust.
 - **Scalable**: You are able to use an arbitrary number of Rust library crates as you want, perhaps including ones that you've already been working with.
