@@ -11,28 +11,23 @@ pub fn add_seven(before: i32) -> i32 {
     before + 7
 }
 
-// Some crates only support desktop platforms.
-// That's why we are doing the compilation test
-// only on desktop platforms.
-#[allow(unused_imports)]
+// `machineid_rs` only supports desktop platforms.
+
 #[cfg(any(target_os = "windows", target_os = "macos", target_os = "linux"))]
-pub mod compilation_test {
-    use machineid_rs::{Encryption, HWIDComponent, IdBuilder};
-    pub fn get_hardward_id() -> Option<String> {
-        let mut builder = IdBuilder::new(Encryption::MD5);
-        builder
-            .add_component(HWIDComponent::SystemID)
-            .add_component(HWIDComponent::CPUCores);
-        let hwid = builder.build("mykey").unwrap();
-        Some(hwid)
-    }
+pub fn get_hardward_id() -> Option<String> {
+    let mut builder = machineid_rs::IdBuilder::new(machineid_rs::Encryption::MD5);
+    builder
+        .add_component(machineid_rs::HWIDComponent::SystemID)
+        .add_component(machineid_rs::HWIDComponent::CPUCores);
+    let hwid = builder.build("mykey").unwrap();
+    Some(hwid)
 }
 #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
-pub mod compilation_test {
-    pub fn get_hardward_id() -> Option<String> {
-        None
-    }
+pub fn get_hardward_id() -> Option<String> {
+    None
 }
+
+// `chrono` supports all platforms when `wasmbind` feature is enabled.
 
 pub fn get_current_time() -> DateTime<offset::Local> {
     offset::Local::now()

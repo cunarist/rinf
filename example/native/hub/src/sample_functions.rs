@@ -106,7 +106,7 @@ pub async fn run_debug_tests() {
     let current_time = sample_crate::get_current_time();
     crate::debug_print!("System time: {}", current_time);
 
-    let option = sample_crate::compilation_test::get_hardward_id();
+    let option = sample_crate::get_hardward_id();
     if let Some(hwid) = option {
         crate::debug_print!("Hardware ID: {}", hwid);
     } else {
