@@ -43,7 +43,7 @@ All platforms available with Flutter are [tested](https://github.com/cunarist/ru
 - **File-based messages**: No more headaches from extremely big API code files that hinders readability. Even defining hundereds and thousands of API endpoints between Dart and Rust is easy and clean.
 - **Async interaction**: You can seamlessly integrate Rust code with Flutter, ensuring that Rust operations won't block Flutter's main thread.
 - **Convenient debugging**: All the debugging functionalities are provided by default, without dealing with browsers or mobile emulators. Also, the whole Rust logic is automatically restarted on Dart's hot restart.
-- **Reliable**: This framework simply provides a connection between Dart and Rust without complex code generation mechanism that is fundamentally unstable. No need to create a PR only to send a specific kind of data that you were the first to try. This system is backed by big communities, which is especially important for ensuring safety.
+- **Reliable**: This framework simply provides a connection between Dart and Rust without complex code generation mechanism. This system is backed by big communities, which is especially important for ensuring safety.
 
 ## 🐦 Why Use Flutter?
 
