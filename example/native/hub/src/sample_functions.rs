@@ -104,11 +104,11 @@ pub async fn run_debug_tests() {
     crate::debug_print!("Starting debug tests.");
 
     let current_time = sample_crate::get_current_time();
-    crate::debug_print!("System time is {}", current_time);
+    crate::debug_print!("System time: {}", current_time);
 
     let option = sample_crate::compilation_test::get_hardward_id();
     if let Some(hwid) = option {
-        crate::debug_print!("Hardware ID is {}.", hwid);
+        crate::debug_print!("Hardware ID: {}", hwid);
     } else {
         crate::debug_print!("Hardware ID is not available on this platform.");
     }
