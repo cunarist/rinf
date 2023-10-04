@@ -99,7 +99,11 @@ pub async fn stream_mandelbrot() {
     }
 }
 
+#[allow(unreachable_code)]
 pub async fn run_debug_tests() {
+    #[cfg(not(debug_assertions))]
+    return;
+
     crate::sleep(std::time::Duration::from_secs(1)).await;
     crate::debug_print!("Starting debug tests.");
 
