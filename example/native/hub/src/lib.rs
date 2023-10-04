@@ -17,6 +17,7 @@ async fn main() {
     // if more concurrent tasks are needed.
     crate::spawn(sample_functions::stream_mandelbrot());
     crate::spawn(sample_functions::do_compilation_test());
+    crate::spawn(sample_functions::do_yield_test());
     while let Some(request_unique) = request_receiver.recv().await {
         crate::spawn(async {
             let response_unique = handle_request(request_unique).await;

@@ -114,3 +114,12 @@ pub async fn do_compilation_test() {
         );
     }
 }
+
+pub async fn do_yield_test() {
+    let mut count = 0u64;
+    while count < 1000 {
+        crate::yield_now().await;
+        count += 1;
+    }
+    crate::debug_print!("Counted to {} without blocking.", count);
+}

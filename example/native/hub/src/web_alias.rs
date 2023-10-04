@@ -46,12 +46,42 @@ where
     wasm_bindgen_futures::spawn_local(future);
 }
 
-// On the web, `tokio` cannot access the system time.
-// Crate `gloo_timers` handles sleeping and intervals on the web.
+// On the web, `tokio` cannot access the system to check the passed time.
+// The JavaScript function `setTimeout()`
+// performs this task.
 
+#[cfg(not(target_family = "wasm"))]
 pub async fn sleep(duration: std::time::Duration) {
-    #[cfg(not(target_family = "wasm"))]
     tokio::time::sleep(duration).await;
-    #[cfg(target_family = "wasm")]
-    gloo_timers::future::sleep(duration).await;
+}
+#[cfg(target_family = "wasm")]
+pub async fn sleep(duration: std::time::Duration) {
+    let milliseconds = duration.as_millis() as i32;
+    use wasm_bindgen::JsCast;
+    let promise = js_sys::Promise::new(&mut |resolve, _reject| {
+        let global = js_sys::global();
+        let scope = global.dyn_into::<web_sys::WorkerGlobalScope>().unwrap();
+        let _ = scope.set_timeout_with_callback_and_timeout_and_arguments_0(&resolve, milliseconds);
+    });
+    let _ = wasm_bindgen_futures::JsFuture::from(promise).await;
+}
+
+// To avoid blocking inside a long-running function,
+// you have to yield to the async event loop regularly.
+// The JavaScript function `setTimeout()`
+// can handle this.
+
+#[cfg(not(target_family = "wasm"))]
+pub async fn yield_now() {
+    tokio::task::yield_now().await;
+}
+#[cfg(target_family = "wasm")]
+pub async fn yield_now() {
+    use wasm_bindgen::JsCast;
+    let promise = js_sys::Promise::new(&mut |resolve, _reject| {
+        let global = js_sys::global();
+        let scope = global.dyn_into::<web_sys::WorkerGlobalScope>().unwrap();
+        let _ = scope.set_timeout_with_callback_and_timeout_and_arguments_0(&resolve, 0);
+    });
+    let _ = wasm_bindgen_futures::JsFuture::from(promise).await;
 }
