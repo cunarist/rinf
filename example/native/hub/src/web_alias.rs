@@ -68,7 +68,7 @@ pub async fn sleep(duration: std::time::Duration) {
     use wasm_bindgen::prelude::*;
     #[wasm_bindgen]
     extern "C" {
-        #[wasm_bindgen(js_name = "setTimeout")]
+        #[wasm_bindgen(js_name = setTimeout)]
         fn set_timeout(callback: &js_sys::Function, milliseconds: i32);
     }
     let milliseconds = duration.as_millis() as i32;
@@ -91,7 +91,7 @@ pub async fn yield_now() {
     use wasm_bindgen::prelude::*;
     #[wasm_bindgen]
     extern "C" {
-        #[wasm_bindgen(js_name = "queueMicrotask")]
+        #[wasm_bindgen(js_name = queueMicrotask)]
         fn queue_microtask(callback: &js_sys::Function);
     }
     let promise = js_sys::Promise::new(&mut |resolve, _reject| {
