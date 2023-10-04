@@ -102,14 +102,31 @@ pub async fn stream_mandelbrot() {
 pub async fn run_debug_tests() {
     crate::sleep(std::time::Duration::from_secs(1)).await;
     crate::debug_print!("Starting debug tests.");
+
     let timestamp = sample_crate::get_current_time();
     crate::debug_print!("System time is {}", timestamp);
+
     let option = sample_crate::compilation_test::get_hardward_id();
     if let Some(hwid) = option {
         crate::debug_print!("Hardware ID is {}.", hwid);
     } else {
         crate::debug_print!("Hardware ID is not available on this platform.");
     }
+
+    let join_first = async {
+        crate::sleep(std::time::Duration::from_secs(1)).await;
+        crate::debug_print!("First future finished.");
+    };
+    let join_second = async {
+        crate::sleep(std::time::Duration::from_secs(2)).await;
+        crate::debug_print!("Second future finished.");
+    };
+    let join_third = async {
+        crate::sleep(std::time::Duration::from_secs(3)).await;
+        crate::debug_print!("Third future finished.");
+    };
+    tokio::join!(join_first, join_second, join_third);
+
     let mut count = 0u64;
     while count < 100000000 {
         count += 1;
@@ -120,5 +137,6 @@ pub async fn run_debug_tests() {
             crate::debug_print!("Counted to {}, yielding regularly.", count);
         }
     }
+
     crate::debug_print!("Debug tests completed!");
 }
