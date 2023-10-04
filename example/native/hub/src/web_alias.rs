@@ -31,13 +31,9 @@
 
 #![allow(dead_code, unused_imports, unused_macros)]
 
-// On native platforms,`tokio`'s async runtime
-// allows millions of concurrent tasks to run the same time
-// utilizing only the number of threads
-// equivalent to the number of cores on the computer.
-// This is much more efficient and scalable than switching threads.
-//
-// On the web, async tasks are executed in the JavaScript event loop.
+// On native platforms,`tokio`'s multicore async runtime
+// allows millions of concurrent tasks to run at the same time.
+// On the web, concurrent tasks are executed in the JavaScript event loop.
 // Crate `wasm_bindgen_futures` has the ability
 // to convert Rust `Future`s into JavaScript `Promise`s.
 
@@ -57,8 +53,9 @@ where
 }
 
 // To avoid blocking inside a long-running function,
-// you have to yield to the JavaScript's async event loop regularly.
-// The JavaScript function `queueMicrotask()` performs this task.
+// you have to yield to the async event loop regularly.
+// The JavaScript function `queueMicrotask()`
+// performs this task on the web.
 
 #[cfg(not(target_family = "wasm"))]
 pub async fn yield_now() {
