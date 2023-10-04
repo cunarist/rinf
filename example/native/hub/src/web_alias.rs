@@ -56,28 +56,6 @@ where
     wasm_bindgen_futures::spawn_local(future);
 }
 
-// On the web, `tokio` cannot access the system to check the passed time.
-// The JavaScript function `setTimeout()` performs this task.
-
-#[cfg(not(target_family = "wasm"))]
-pub async fn sleep(duration: std::time::Duration) {
-    tokio::time::sleep(duration).await;
-}
-#[cfg(target_family = "wasm")]
-pub async fn sleep(duration: std::time::Duration) {
-    use wasm_bindgen::prelude::*;
-    #[wasm_bindgen]
-    extern "C" {
-        #[wasm_bindgen(js_name = setTimeout)]
-        fn set_timeout(callback: &js_sys::Function, milliseconds: i32);
-    }
-    let milliseconds = duration.as_millis() as i32;
-    let promise = js_sys::Promise::new(&mut |resolve, _reject| {
-        set_timeout(&resolve, milliseconds);
-    });
-    let _ = wasm_bindgen_futures::JsFuture::from(promise).await;
-}
-
 // To avoid blocking inside a long-running function,
 // you have to yield to the JavaScript's async event loop regularly.
 // The JavaScript function `queueMicrotask()` performs this task.
@@ -96,6 +74,28 @@ pub async fn yield_now() {
     }
     let promise = js_sys::Promise::new(&mut |resolve, _reject| {
         queue_microtask(&resolve);
+    });
+    let _ = wasm_bindgen_futures::JsFuture::from(promise).await;
+}
+
+// On the web, `tokio` cannot access the system to check the passed time.
+// The JavaScript function `setTimeout()` performs this task.
+
+#[cfg(not(target_family = "wasm"))]
+pub async fn sleep(duration: std::time::Duration) {
+    tokio::time::sleep(duration).await;
+}
+#[cfg(target_family = "wasm")]
+pub async fn sleep(duration: std::time::Duration) {
+    use wasm_bindgen::prelude::*;
+    #[wasm_bindgen]
+    extern "C" {
+        #[wasm_bindgen(js_name = setTimeout)]
+        fn set_timeout(callback: &js_sys::Function, milliseconds: i32);
+    }
+    let milliseconds = duration.as_millis() as i32;
+    let promise = js_sys::Promise::new(&mut |resolve, _reject| {
+        set_timeout(&resolve, milliseconds);
     });
     let _ = wasm_bindgen_futures::JsFuture::from(promise).await;
 }
