@@ -78,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
               // by checking the `resource` field with the `where` method.
               // This approach allows the builder to rebuild its widget
               // only when there are signals
-              // with the specific address it is interested in.
+              // related to a specific Rust resource it is interested in.
               stream: rustBroadcaster.stream.where((rustSignal) {
                 return rustSignal.resource == mandelbrot.ID;
               }),
