@@ -1,3 +1,8 @@
+## 4.8.1
+
+- Improved the readability of the example code.
+- Organized and clarified first guides.
+
 ## 4.8.0
 
 - Now by running `rifs template --bridge`, you can apply and update only the `bridge` module inside the `hub` crate. This is useful when you've upgraded RIF but do not need to apply the whole template again.
