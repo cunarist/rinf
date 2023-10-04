@@ -1,6 +1,6 @@
 # Applying Rust Template
 
-> This section assumes that you've already created a Flutter project. If you haven't, go ahead and make one following [this awesome official tutorial](https://docs.flutter.dev/get-started/codelab).
+> This section assumes that you've already created a Flutter project with `flutter create [my_app_name]`. You can get further guidance from [this awesome Flutter tutorial](https://docs.flutter.dev/get-started/codelab).
 
 First of all, add this framework to your Flutter project.
 
