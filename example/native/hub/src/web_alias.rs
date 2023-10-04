@@ -12,10 +12,20 @@
 //! You might encounter situations
 //! where you cannot use native Rust code directly on the web.
 //! Add more custom web aliases here if needed.
-//! There are many crates at `crates.io`
-//! that mimic native functionalities on the web
-//! by interacting with JavaScript,
-//! so use them if necessary.
+//! Refer to the links below to understand how to interact with JavaScript.
+//! - https://rustwasm.github.io/wasm-bindgen/reference/attributes/on-js-imports/js_name.html
+//! - https://rustwasm.github.io/wasm-bindgen/reference/attributes/on-js-imports/js_namespace.html
+//!
+//! Rust code is executed in a **web worker**.
+//! Therefore, you cannot access the global `window` JavaScript object
+//! just like when you work in the main thread of JavaScript.
+//! Refer to the link below to check which web APIs are available in a web worker.
+//! You'll be surprised by various capabilities that modern JavaScript has.
+//! - https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Functions_and_classes_available_to_workers
+//!
+//! Also, there are many crates at `crates.io`
+//! that mimic native functionalities on the web.
+//! Use them if you do not want to write code that interacts with JavaScript yourself.
 //!
 //! If your app is not targeting web, you can simply remove this module.
 
