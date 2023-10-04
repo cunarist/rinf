@@ -1,3 +1,7 @@
+## 4.8.2
+
+- Improved guide sentences.
+
 ## 4.8.1
 
 - Improved the readability of the example code.
