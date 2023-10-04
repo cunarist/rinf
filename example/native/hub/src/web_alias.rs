@@ -47,8 +47,7 @@ where
 }
 
 // On the web, `tokio` cannot access the system to check the passed time.
-// The JavaScript function `setTimeout()`
-// performs this task.
+// The JavaScript function `setTimeout()` performs this task.
 
 #[cfg(not(target_family = "wasm"))]
 pub async fn sleep(duration: std::time::Duration) {
@@ -56,20 +55,22 @@ pub async fn sleep(duration: std::time::Duration) {
 }
 #[cfg(target_family = "wasm")]
 pub async fn sleep(duration: std::time::Duration) {
+    use wasm_bindgen::prelude::*;
+    #[wasm_bindgen]
+    extern "C" {
+        #[wasm_bindgen(js_name = "setTimeout")]
+        fn set_timeout(callback: &js_sys::Function, milliseconds: i32);
+    }
     let milliseconds = duration.as_millis() as i32;
-    use wasm_bindgen::JsCast;
     let promise = js_sys::Promise::new(&mut |resolve, _reject| {
-        let global = js_sys::global();
-        let scope = global.dyn_into::<web_sys::WorkerGlobalScope>().unwrap();
-        let _ = scope.set_timeout_with_callback_and_timeout_and_arguments_0(&resolve, milliseconds);
+        set_timeout(&resolve, milliseconds);
     });
     let _ = wasm_bindgen_futures::JsFuture::from(promise).await;
 }
 
 // To avoid blocking inside a long-running function,
-// you have to yield to the async event loop regularly.
-// The JavaScript function `setTimeout()`
-// can handle this.
+// you have to yield to the JavaScript's async event loop regularly.
+// The JavaScript function `queueMicrotask()` performs this task.
 
 #[cfg(not(target_family = "wasm"))]
 pub async fn yield_now() {
@@ -77,11 +78,14 @@ pub async fn yield_now() {
 }
 #[cfg(target_family = "wasm")]
 pub async fn yield_now() {
-    use wasm_bindgen::JsCast;
+    use wasm_bindgen::prelude::*;
+    #[wasm_bindgen]
+    extern "C" {
+        #[wasm_bindgen(js_name = "queueMicrotask")]
+        fn queue_microtask(callback: &js_sys::Function);
+    }
     let promise = js_sys::Promise::new(&mut |resolve, _reject| {
-        let global = js_sys::global();
-        let scope = global.dyn_into::<web_sys::WorkerGlobalScope>().unwrap();
-        let _ = scope.set_timeout_with_callback_and_timeout_and_arguments_0(&resolve, 0);
+        queue_microtask(&resolve);
     });
     let _ = wasm_bindgen_futures::JsFuture::from(promise).await;
 }

@@ -99,27 +99,24 @@ pub async fn stream_mandelbrot() {
     }
 }
 
-pub async fn do_compilation_test() {
+pub async fn run_debug_tests() {
+    crate::sleep(std::time::Duration::from_secs(1)).await;
+    crate::debug_print!("\nStarting debug tests.");
     let option = sample_crate::compilation_test::get_hardward_id();
     if let Some(hwid) = option {
-        crate::debug_print!(
-            "Checking if Rust integration is properly done. \
-            Hardware ID is {}.",
-            hwid
-        );
+        crate::debug_print!("Hardware ID is {}.", hwid);
     } else {
-        crate::debug_print!(
-            "Checking if Rust integration is properly done. \
-            Hardware ID is not available on this platform."
-        );
+        crate::debug_print!("Hardware ID is not available on this platform.");
     }
-}
-
-pub async fn do_yield_test() {
     let mut count = 0u64;
-    while count < 1000 {
-        crate::yield_now().await;
+    while count < 100000000 {
         count += 1;
+        if count % 10000 == 0 {
+            crate::yield_now().await;
+        }
+        if count % 10000000 == 0 {
+            crate::debug_print!("Counted to {}, yielding regularly.", count);
+        }
     }
-    crate::debug_print!("Counted to {} without blocking.", count);
+    crate::debug_print!("Debug tests completed!\n");
 }
