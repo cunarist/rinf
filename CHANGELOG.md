@@ -1,3 +1,10 @@
+## 4.9.0
+
+- New default web alias `yield_now()`. Inside a long-running code, calling this will help you avoid blocking the whole async event loop, by giving the flow back to other async tasks.
+- Vastly improved comments inside the `web_alias` Rust module.
+- Now Rust panics on the web will be printed to the CLI too.
+- Improved the example app's performance and debug tests.
+
 ## 4.8.2
 
 - Improved guide sentences.
