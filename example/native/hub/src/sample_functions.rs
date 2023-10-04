@@ -103,8 +103,8 @@ pub async fn run_debug_tests() {
     crate::sleep(std::time::Duration::from_secs(1)).await;
     crate::debug_print!("Starting debug tests.");
 
-    let timestamp = sample_crate::get_current_time();
-    crate::debug_print!("System time is {}", timestamp);
+    let current_time = sample_crate::get_current_time();
+    crate::debug_print!("System time is {}", current_time);
 
     let option = sample_crate::compilation_test::get_hardward_id();
     if let Some(hwid) = option {
@@ -127,16 +127,25 @@ pub async fn run_debug_tests() {
     };
     tokio::join!(join_first, join_second, join_third);
 
+    let start_time = sample_crate::get_current_time();
+    let mut last_time = sample_crate::get_current_time();
     let mut count = 0u64;
     while count < 100000000 {
         count += 1;
         if count % 10000 == 0 {
             crate::yield_now().await;
-        }
-        if count % 10000000 == 0 {
-            crate::debug_print!("Counted to {}, yielding regularly.", count);
+            let time_passed = sample_crate::get_current_time() - last_time;
+            let total_time_passed = sample_crate::get_current_time() - start_time;
+            if total_time_passed.num_milliseconds() > 10000 {
+                crate::debug_print!("Counting done with {}", count);
+                break;
+            } else if time_passed.num_milliseconds() > 1000 {
+                crate::debug_print!("Counted to {}, yielding regularly.", count);
+                last_time = sample_crate::get_current_time();
+            }
         }
     }
 
     crate::debug_print!("Debug tests completed!");
+    panic!("This is an intentional panic that comes after debug tests.");
 }

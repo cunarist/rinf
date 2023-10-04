@@ -160,10 +160,10 @@ pub fn check_rust_streams() -> bool {
 
 /// Start the main function of Rust.
 pub fn start_rust_logic() {
-    #[cfg(not(target_family = "wasm"))]
-    {
-        #[cfg(debug_assertions)]
-        std::panic::set_hook(Box::new(|panic_info| {
+    #[cfg(debug_assertions)]
+    std::panic::set_hook(Box::new(|panic_info| {
+        #[cfg(not(target_family = "wasm"))]
+        {
             let mut frames_filtered = Vec::new();
             backtrace::trace(|frame| {
                 // Filter some backtrace frames
@@ -194,7 +194,14 @@ pub fn start_rust_logic() {
                 panic_info,
                 backtrace_filtered
             );
-        }));
+        }
+        #[cfg(target_family = "wasm")]
+        {
+            crate::debug_print!("A panic occurred in Rust.\n{}", panic_info);
+        }
+    }));
+    #[cfg(not(target_family = "wasm"))]
+    {
         TOKIO_RUNTIME.with(move |inner| {
             let tokio_runtime = tokio::runtime::Builder::new_multi_thread()
                 .enable_all()
