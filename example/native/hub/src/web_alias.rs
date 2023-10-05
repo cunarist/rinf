@@ -88,7 +88,7 @@ pub async fn sleep(duration: std::time::Duration) {
     #[wasm_bindgen]
     extern "C" {
         #[wasm_bindgen(js_name = setTimeout)]
-        fn set_timeoutt(callback: &js_sys::Function, milliseconds: i32);
+        fn set_timeout(callback: &js_sys::Function, milliseconds: i32);
     }
     let milliseconds = duration.as_millis() as i32;
     let promise = js_sys::Promise::new(&mut |resolve, _reject| {
