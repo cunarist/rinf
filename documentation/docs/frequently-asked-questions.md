@@ -126,3 +126,30 @@ However, we also promise to deliver the best development experience as it is mai
 ### What happens when a panic occurs in Rust?
 
 A Rust panic doesn't crash the app; it simply cancels the spawned async task. You don't need to worry about app stability due to Rust panics. When a panic occurs, the information will be displayed in the CLI if the app is running in debug mode.
+
+### How do I make Rust-analyzer lint in webassembly mode?
+
+There might be various Rust codes with these attribute above:
+
+```rust
+#[cfg(target_family = "wasm")]
+...
+#[cfg(not(target_family = "wasm"))]
+...
+```
+
+Since the environments of the web and native platforms are so different, there are times when you need to use these attributes to include and exclude parts of the code depending on whether they are targeting web or not.
+
+By default, Rust-analyzer runs in native mode. To make it run in webassembly mode, create that `.cargo/config.toml` file:
+
+```toml
+[build]
+# Uncomment the line below to switch Rust-analyzer to perform
+# type checking and linting in webassembly mode, for the web target.
+# You might have to restart Rust-analyzer for this change to take effect.
+target = "wasm32-unknown-unknown"
+rustflags = ["-C", "target-feature=+atomics,+bulk-memory,+mutable-globals"]
+
+[unstable]
+build-std = ['std', 'panic_abort']
+```
