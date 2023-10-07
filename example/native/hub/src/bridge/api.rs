@@ -108,6 +108,11 @@ lazy_static! {
         os_thread_local::ThreadLocal::new(|| RefCell::new(None));
 }
 
+#[cfg(target_family = "wasm")]
+thread_local! {
+    pub static IS_MAIN_STARTED: RefCell<bool> = RefCell::new(false);
+}
+
 /// Returns a stream object in Dart that listens to Rust.
 pub fn prepare_rust_signal_stream(signal_stream: StreamSink<RustSignal>) {
     let cell = SIGNAL_STREAM_SHARED.lock().unwrap();
@@ -210,7 +215,13 @@ pub fn start_rust_logic() {
         std::panic::set_hook(Box::new(|panic_info| {
             crate::debug_print!("A panic occurred in Rust.\n{}", panic_info);
         }));
-        wasm_bindgen_futures::spawn_local(crate::main());
+        IS_MAIN_STARTED.with(move |ref_cell| {
+            let is_started = *ref_cell.borrow();
+            if !is_started {
+                wasm_bindgen_futures::spawn_local(crate::main());
+                ref_cell.replace(true);
+            }
+        });
     }
 }
 
