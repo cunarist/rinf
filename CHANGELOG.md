@@ -1,3 +1,8 @@
+## 4.10.0
+
+- New default web alias `spawn_blocking()`. CPU-intensive blocking tasks are better to be executed on a separate thread pool.
+- Improved the example app's performance and debug tests.
+
 ## 4.9.0
 
 - New default web alias `yield_now()`. Inside a long-running code, calling this will help you avoid blocking the whole async event loop, by giving the flow back to other async tasks.
