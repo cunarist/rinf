@@ -58,7 +58,7 @@ where
 // Sometimes, running CPU-intensive blocking tasks is necessary.
 // It is better to spawn them
 // in a totally separate thread pool for parallelization.
-// On the web, `async_wasm` crate does this job
+// On the web, `async_wasm_task` crate does this job
 // by interacting with JavaScript and web workers.
 
 #[cfg(not(target_family = "wasm"))]
@@ -80,7 +80,7 @@ where
 
 // To avoid blocking inside a long-running function,
 // you have to yield to the async event loop regularly.
-// On the web, `async_wasm` crate does this job
+// On the web, `async_wasm_task` crate does this job
 // by interacting with JavaScript.
 
 #[cfg(not(target_family = "wasm"))]
