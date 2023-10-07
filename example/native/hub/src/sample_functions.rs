@@ -70,19 +70,23 @@ pub async fn stream_mandelbrot() {
             scale = 1.0
         };
 
-        let calculated = sample_crate::mandelbrot(
-            sample_crate::Size {
-                width: 256,
-                height: 256,
-            },
-            sample_crate::Point {
-                x: 0.360,
-                y: -0.641,
-            },
-            scale,
-            4,
-        );
-
+        // Calculate the mandelbrot image
+        // parallelly in a separate thread pool.
+        let join_handle = crate::spawn_blocking(move || {
+            sample_crate::mandelbrot(
+                sample_crate::Size {
+                    width: 256,
+                    height: 256,
+                },
+                sample_crate::Point {
+                    x: 0.360,
+                    y: -0.641,
+                },
+                scale,
+                4,
+            )
+        });
+        let calculated = join_handle.await.unwrap();
         if let Some(mandelbrot) = calculated {
             // Stream the signal to Dart.
             let signal_message = StateSignal {

@@ -162,20 +162,16 @@ pub fn mandelbrot(
 
     let mut pixels = vec![0; bounds.0 * bounds.1];
     let band_rows = bounds.1 / (num_threads as usize) + 1;
-    let mut bands = pixels.chunks_mut(band_rows * bounds.0).enumerate();
+    let bands = pixels.chunks_mut(band_rows * bounds.0).enumerate();
 
-    loop {
-        if let Some((i, band)) = bands.next() {
-            let top = band_rows * i;
-            let height = band.len() / bounds.0;
-            let band_bounds = (bounds.0, height);
-            let band_upper_left = pixel_to_point(bounds, (0, top), upper_left, lower_right);
-            let band_lower_right =
-                pixel_to_point(bounds, (bounds.0, top + height), upper_left, lower_right);
-            render(band, band_bounds, band_upper_left, band_lower_right);
-        } else {
-            break;
-        }
+    for (i, band) in bands {
+        let top = band_rows * i;
+        let height = band.len() / bounds.0;
+        let band_bounds = (bounds.0, height);
+        let band_upper_left = pixel_to_point(bounds, (0, top), upper_left, lower_right);
+        let band_lower_right =
+            pixel_to_point(bounds, (bounds.0, top + height), upper_left, lower_right);
+        render(band, band_bounds, band_upper_left, band_lower_right);
     }
 
     write_image(&colorize(&pixels), bounds)

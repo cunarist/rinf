@@ -44,8 +44,7 @@ where
     F: std::future::Future<Output = T> + Send + 'static,
     T: Send + 'static,
 {
-    let join_handle = tokio::task::spawn(future);
-    join_handle
+    tokio::task::spawn(future)
 }
 #[cfg(target_family = "wasm")]
 pub(crate) fn spawn<F, T>(future: F) -> async_wasm_task::JoinHandle<T>
@@ -53,8 +52,7 @@ where
     F: std::future::Future<Output = T> + 'static,
     T: 'static,
 {
-    let join_handle = async_wasm_task::spawn(future);
-    join_handle
+    async_wasm_task::spawn(future)
 }
 
 // Sometimes, running CPU-intensive blocking tasks is necessary.
@@ -69,8 +67,7 @@ where
     C: FnOnce() -> T + Send + 'static,
     T: Send + 'static,
 {
-    let join_handle = tokio::task::spawn_blocking(callable);
-    join_handle
+    tokio::task::spawn_blocking(callable)
 }
 #[cfg(target_family = "wasm")]
 pub(crate) fn spawn_blocking<C, T>(callable: C) -> async_wasm_task::JoinHandle<T>
@@ -78,8 +75,7 @@ where
     C: FnOnce() -> T + Send + 'static,
     T: Send + 'static,
 {
-    let join_handle = async_wasm_task::spawn_blocking(callable);
-    join_handle
+    async_wasm_task::spawn_blocking(callable)
 }
 
 // To avoid blocking inside a long-running function,
