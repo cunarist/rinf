@@ -33,29 +33,59 @@
 
 // On native platforms,`tokio`'s multicore async runtime
 // allows millions of concurrent tasks to run at the same time.
-// On the web, concurrent tasks are executed in the JavaScript event loop.
+// On the web, concurrent tasks are executed
+// in JavaScript's single-threaded event loop.
 // Crate `wasm_bindgen_futures` has the ability
 // to convert Rust `Future`s into JavaScript `Promise`s.
 
 #[cfg(not(target_family = "wasm"))]
-pub(crate) fn spawn<T>(future: T)
+pub(crate) fn spawn<F, T>(future: F) -> tokio::task::JoinHandle<T>
 where
-    T: std::future::Future<Output = ()> + Send + 'static,
+    F: std::future::Future<Output = T> + Send + 'static,
+    T: Send + 'static,
 {
-    tokio::task::spawn(future);
+    let join_handle = tokio::task::spawn(future);
+    join_handle
 }
 #[cfg(target_family = "wasm")]
-pub(crate) fn spawn<T>(future: T)
+pub(crate) fn spawn<F, T>(future: F) -> async_wasm_task::JoinHandle<T>
 where
-    T: std::future::Future<Output = ()> + 'static,
+    F: std::future::Future<Output = T> + 'static,
+    T: 'static,
 {
-    wasm_bindgen_futures::spawn_local(future);
+    let join_handle = async_wasm_task::spawn(future);
+    join_handle
+}
+
+// Sometimes, running CPU-intensive blocking tasks is necessary.
+// It is better to spawn them
+// in a totally separate thread pool for parallelization.
+// On the web, `async_wasm` crate does this job
+// by interacting with JavaScript and web workers.
+
+#[cfg(not(target_family = "wasm"))]
+pub(crate) fn spawn_blocking<C, T>(callable: C) -> tokio::task::JoinHandle<T>
+where
+    C: FnOnce() -> T + Send + 'static,
+    T: Send + 'static,
+{
+    let join_handle = tokio::task::spawn_blocking(callable);
+    join_handle
+}
+#[cfg(target_family = "wasm")]
+pub(crate) fn spawn_blocking<C, T>(callable: C) -> async_wasm_task::JoinHandle<T>
+where
+    C: FnOnce() -> T + Send + 'static,
+    T: Send + 'static,
+{
+    let join_handle = async_wasm_task::spawn_blocking(callable);
+    join_handle
 }
 
 // To avoid blocking inside a long-running function,
 // you have to yield to the async event loop regularly.
-// The JavaScript function `queueMicrotask()`
-// performs this task on the web.
+// On the web, `async_wasm` crate does this job
+// by interacting with JavaScript.
 
 #[cfg(not(target_family = "wasm"))]
 pub async fn yield_now() {
@@ -63,16 +93,7 @@ pub async fn yield_now() {
 }
 #[cfg(target_family = "wasm")]
 pub async fn yield_now() {
-    use wasm_bindgen::prelude::*;
-    #[wasm_bindgen]
-    extern "C" {
-        #[wasm_bindgen(js_name = queueMicrotask)]
-        fn queue_microtask(callback: &js_sys::Function);
-    }
-    let promise = js_sys::Promise::new(&mut |resolve, _reject| {
-        queue_microtask(&resolve);
-    });
-    let _ = wasm_bindgen_futures::JsFuture::from(promise).await;
+    async_wasm_task::yield_now().await;
 }
 
 // On the web, `tokio` cannot access the system to check the passed time.
@@ -88,9 +109,9 @@ pub async fn sleep(duration: std::time::Duration) {
     #[wasm_bindgen]
     extern "C" {
         #[wasm_bindgen(js_name = setTimeout)]
-        fn set_timeout(callback: &js_sys::Function, milliseconds: i32);
+        fn set_timeout(callback: &js_sys::Function, milliseconds: f64);
     }
-    let milliseconds = duration.as_millis() as i32;
+    let milliseconds = duration.as_millis() as f64;
     let promise = js_sys::Promise::new(&mut |resolve, _reject| {
         set_timeout(&resolve, milliseconds);
     });
