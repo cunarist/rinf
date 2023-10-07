@@ -210,8 +210,6 @@ pub fn start_rust_logic() {
         std::panic::set_hook(Box::new(|panic_info| {
             crate::debug_print!("A panic occurred in Rust.\n{}", panic_info);
         }));
-        #[cfg(debug_assertions)]
-        crate::bridge::bridge_engine::wasm_bindgen_src::worker::replace_worker();
         wasm_bindgen_futures::spawn_local(crate::main());
     }
 }
