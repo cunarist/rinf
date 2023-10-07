@@ -21,27 +21,29 @@ pub fn replace_worker() {
 
 fn create_worker() -> Worker {
     let script = format!(
-        "importScripts('{}');
-            onmessage = event => {{
-                let init = wasm_bindgen(...event.data).catch(err => {{
-                    setTimeout(() => {{ throw err }})
-                    throw err
-                }})
-                onmessage = async event => {{
-                    await init
-                    let [payload, ...transfer] = event.data
-                    try {{
-                        wasm_bindgen.receive_transfer_closure(payload, transfer)
-                    }} catch (err) {{
-                        if (transfer[0] && typeof transfer[0].postMessage === 'function') {{
-                            transfer[0].postMessage([1, 'ABORT', err.toString(), err.stack])
-                        }}
-                        setTimeout(() => {{ throw err }})
-                        postMessage(null)
-                        throw err
+        "
+        importScripts('{}');
+        onmessage = event => {{
+            let init = wasm_bindgen(...event.data).catch(err => {{
+                setTimeout(() => {{ throw err }})
+                throw err
+            }})
+            onmessage = async event => {{
+                await init
+                let [payload, ...transfer] = event.data
+                try {{
+                    wasm_bindgen.receive_transfer_closure(payload, transfer)
+                }} catch (err) {{
+                    if (transfer[0] && typeof transfer[0].postMessage === 'function') {{
+                        transfer[0].postMessage([1, 'ABORT', err.toString(), err.stack])
                     }}
+                    setTimeout(() => {{ throw err }})
+                    postMessage(null)
+                    throw err
                 }}
-            }}",
+            }}
+        }}
+        ",
         script_path().unwrap()
     );
     let blob = Blob::new_with_blob_sequence_and_options(
