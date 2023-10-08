@@ -8,10 +8,8 @@ macro_rules! spawn_bridge_task {
         }
         #[cfg(target_family = "wasm")]
         {
-            $crate::bridge::bridge_engine::wasm_bindgen_src::worker::WEB_WORKER.with(|inner:&std::cell::RefCell<Option<web_sys::Worker>>| {
-                let borrowed = inner.borrow();
-                let web_worker = borrowed.as_ref().unwrap();
-                let _ = bridge_task.apply(web_worker);
+            $crate::bridge::bridge_engine::wasm_bindgen_src::worker::WEB_WORKER.with(|worker| {
+                let _ = bridge_task.apply(worker);
             });
         }
     }};

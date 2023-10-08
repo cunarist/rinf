@@ -81,12 +81,12 @@ impl<E: Executor, H: ErrorHandler> SimpleHandler<E, H> {
 
 /// The default handler used by the generated code.
 pub type DefaultHandler =
-    SimpleHandler<ThreadPoolExecutor<ReportDartErrorHandler>, ReportDartErrorHandler>;
+    SimpleHandler<BridgeTaskExecutor<ReportDartErrorHandler>, ReportDartErrorHandler>;
 
 impl Default for DefaultHandler {
     fn default() -> Self {
         Self::new(
-            ThreadPoolExecutor::new(ReportDartErrorHandler),
+            BridgeTaskExecutor::new(ReportDartErrorHandler),
             ReportDartErrorHandler,
         )
     }
@@ -174,20 +174,17 @@ pub trait Executor: RefUnwindSafe {
 }
 
 /// The default executor used.
-/// It creates an internal thread pool, and each call to a Rust function is
-/// handled by a different thread.
-pub struct ThreadPoolExecutor<EH: ErrorHandler> {
+pub struct BridgeTaskExecutor<EH: ErrorHandler> {
     error_handler: EH,
 }
 
-impl<EH: ErrorHandler> ThreadPoolExecutor<EH> {
-    /// Create a new executor backed by a thread pool.
+impl<EH: ErrorHandler> BridgeTaskExecutor<EH> {
     pub fn new(error_handler: EH) -> Self {
-        ThreadPoolExecutor { error_handler }
+        BridgeTaskExecutor { error_handler }
     }
 }
 
-impl<EH: ErrorHandler> Executor for ThreadPoolExecutor<EH> {
+impl<EH: ErrorHandler> Executor for BridgeTaskExecutor<EH> {
     fn execute<TaskFn, TaskRet, D>(&self, wrap_info: WrapInfo, task: TaskFn)
     where
         TaskFn: FnOnce(TaskCallback) -> Result<TaskRet, BridgeError> + Send + UnwindSafe + 'static,

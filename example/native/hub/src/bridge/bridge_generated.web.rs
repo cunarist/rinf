@@ -32,6 +32,11 @@ pub fn wire_start_rust_logic(port_: MessagePort) {
 }
 
 #[wasm_bindgen]
+pub fn wire_stop_rust_logic(port_: MessagePort) {
+    wire_stop_rust_logic_impl(port_)
+}
+
+#[wasm_bindgen]
 pub fn wire_request_to_rust(port_: MessagePort, request_unique: JsValue) {
     wire_request_to_rust_impl(port_, request_unique)
 }

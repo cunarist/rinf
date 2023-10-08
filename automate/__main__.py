@@ -34,6 +34,9 @@ if len(sys.argv) == 1:
     print("Use `python automate --help` to see all available operations.")
 
 elif sys.argv[1] == "bridge-gen":
+    # You must install `flutter_rust_bridge_codegen` version 1.80
+    # with `cargo install flutter_rust_bridge_codegen --version ~1.80`
+
     # Temporarily add `ffi` package
     # because `flutter_rust_bridge_codegen` wants it,
     # though the generated code doesn't use it.

@@ -42,6 +42,16 @@ class RustInFlutter {
     while (!(await api.checkRustStreams())) {}
     api.startRustLogic();
   }
+
+  /// Ensure that all Rust tasks are terminated
+  /// by calling this function before closing the Flutter app.
+  /// Doing so can prevent potential memory errors that may occur
+  /// when Rust attempts to send data after the Dart VM has been turned off.
+  /// Please note that on the web, this function does not have any effect,
+  /// as tasks are managed by the JavaScript runtime, not Rust.
+  static Future<void> ensureFinalized() async {
+    await api.stopRustLogic();
+  }
 }
 
 /// Sends bytes data to Rust wrapped in `RustRequest` object

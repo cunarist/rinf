@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 import 'package:example_app/messages/counter_number.pb.dart' as counterNumber;
@@ -9,8 +10,28 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _appLifecycleListener = AppLifecycleListener(
+    onExitRequested: () async {
+      // Stop Rust tasks before closing the Flutter app.
+      await RustInFlutter.ensureFinalized();
+      return AppExitResponse.exit;
+    },
+  );
+
+  @override
+  void dispose() {
+    _appLifecycleListener.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -26,6 +47,7 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }

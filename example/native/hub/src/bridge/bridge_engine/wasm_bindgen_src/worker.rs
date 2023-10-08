@@ -1,22 +1,10 @@
 use crate::bridge::bridge_engine::script_path;
 use js_sys::Array;
-use std::cell::RefCell;
 use wasm_bindgen::prelude::*;
 use web_sys::{Blob, BlobPropertyBag, Url, Worker};
 
 thread_local! {
-    pub static WEB_WORKER: RefCell<Option<Worker>> = RefCell::new(Some(create_worker()));
-}
-
-pub fn replace_worker() {
-    WEB_WORKER.with(|inner| {
-        let popped = inner.replace(None);
-        if let Some(previous_worker) = popped {
-            previous_worker.terminate();
-        }
-        let new_worker = create_worker();
-        inner.replace(Some(new_worker));
-    })
+    pub static WEB_WORKER: Worker = create_worker();
 }
 
 fn create_worker() -> Worker {
