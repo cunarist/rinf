@@ -113,8 +113,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   // Return a black container if the received data is null.
                   return Container(
                     margin: const EdgeInsets.all(20),
-                    width: 360,
-                    height: 360,
+                    width: 256,
+                    height: 256,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(24.0),
                       color: Colors.black,

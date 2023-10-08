@@ -80,8 +80,8 @@ pub async fn stream_mandelbrot() {
             let join_handle = crate::spawn_blocking(move || {
                 sample_crate::mandelbrot(
                     sample_crate::Size {
-                        width: 540,
-                        height: 540,
+                        width: 384,
+                        height: 384,
                     },
                     sample_crate::Point {
                         x: 0.360,
