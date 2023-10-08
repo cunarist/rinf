@@ -20,7 +20,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final _appLifecycleListener = AppLifecycleListener(
     onExitRequested: () async {
-      // Stop Rust tasks before closing the Flutter app.
+      // Terminate Rust tasks before closing the Flutter app.
       await RustInFlutter.ensureFinalized();
       return AppExitResponse.exit;
     },
