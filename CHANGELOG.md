@@ -1,3 +1,7 @@
+## 4.11.3
+
+- Improved the example app's code.
+
 ## 4.11.2
 
 - Fixed a problem with compilation on macOS.
