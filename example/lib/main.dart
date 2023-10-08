@@ -125,8 +125,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   final imageData = rustSignal.blob!;
                   return Container(
                     margin: const EdgeInsets.all(20),
-                    width: 320,
-                    height: 320,
+                    width: 256,
+                    height: 256,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(24.0),
                       child: FittedBox(
