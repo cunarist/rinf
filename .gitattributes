@@ -4,7 +4,8 @@
 
 # Unix-like systems use LF ('\n') for new lines, while Windows uses CRLF ('\r\n').
 # Without this file, text files will be written with CRLF EOL characters on Windows,
-# which can lead to compatibility issues when publishing with 'dart pub publish'.
+# which leads to compatibility issues when the code is published
+# with 'dart pub publish'.
 
 # You can check current end-of-line characters being used in the cloned repository
 # with `git ls-files --eol`.
