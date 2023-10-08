@@ -1,0 +1,12 @@
+# Important Note:
+# This setting ensures consistent end-of-line (EOL) characters
+# across all platforms when performing 'git pull' and 'git fetch'.
+
+# Unix-like systems use LF ('\n') for new lines, while Windows uses CRLF ('\r\n').
+# Without this file, text files will be written with CRLF EOL characters on Windows,
+# which can lead to compatibility issues when publishing with 'dart pub publish'.
+
+# You can check current end-of-line characters being used in the cloned repository
+# with `git ls-files --eol`.
+
+* text=auto eol=lf
