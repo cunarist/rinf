@@ -62,13 +62,16 @@ pub async fn stream_mandelbrot() {
 
     let mut scale: f64 = 1.0;
 
-    let (frame_sender, mut frame_receiver) = tokio::sync::mpsc::channel(1024);
+    let (frame_sender, mut frame_receiver) = tokio::sync::mpsc::channel(25);
 
     // Send frames in order.
     crate::spawn(async move {
         loop {
             // Wait for 40 milliseconds on each frame
             crate::sleep(std::time::Duration::from_millis(40)).await;
+            if frame_sender.capacity() == 0 {
+                continue;
+            }
 
             scale *= 0.98;
             if scale < 1e-7 {
