@@ -14,10 +14,10 @@ class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyAppState();
+  State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyHomePage> {
+class _MyAppState extends State<MyApp> {
   final _appLifecycleListener = AppLifecycleListener(
     onExitRequested: () async {
       await RustInFlutter.ensureFinalized();
