@@ -1,3 +1,7 @@
+## 4.11.1
+
+- Fixed a problem with compilation on macOS.
+
 ## 4.11.0
 
 - New Dart function `ensureFinalized()`. This function ensures that all Rust tasks are terminated. Take a look at the example code to understand how to run this function before closing the Flutter app. Note that you have to run `rifs template --bridge` again to use this function.
