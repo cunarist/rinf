@@ -1,3 +1,7 @@
+## 4.11.2
+
+- Fixed a problem with compilation on macOS.
+
 ## 4.11.1
 
 - Fixed a problem with compilation on macOS.
