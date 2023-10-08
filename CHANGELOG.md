@@ -1,3 +1,7 @@
+## 4.11.0
+
+- New Dart function `ensureFinalized()`. This function ensures that all Rust tasks are terminated. Take a look at the example code to understand how to run this function before closing the Flutter app. Note that you have to run `rifs template --bridge` again to use this function.
+
 ## 4.10.0
 
 - New default web alias `spawn_blocking()`. CPU-intensive blocking tasks are better to be executed on a separate thread pool.
