@@ -133,8 +133,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         fit: BoxFit.contain,
                         child: Image.memory(
                           imageData,
-                          width: 360,
-                          height: 360,
+                          width: 256,
+                          height: 256,
                           gaplessPlayback: true,
                         ),
                       ),
