@@ -9,7 +9,7 @@
 
 **"Rust as your Flutter backend, Flutter as your Rust frontend"**
 
-![preview](assets/presentation.gif)
+![Preview](assets/preview.gif)
 
 This is a production-ready framework for creating beautiful and performant cross-platform apps with Flutter and Rust. Batteries are fully included. Simply add this framework to your app project, and you're all set to write Flutter and Rust together!
 
