@@ -64,7 +64,7 @@ pub async fn stream_mandelbrot() {
 
     let (frame_sender, mut frame_receiver) = tokio::sync::mpsc::channel(1024);
 
-    // Send frames in order
+    // Send frames in order.
     crate::spawn(async move {
         loop {
             // Wait for 40 milliseconds on each frame
@@ -95,7 +95,7 @@ pub async fn stream_mandelbrot() {
         }
     });
 
-    // Receive frames in order
+    // Receive frames in order.
     crate::spawn(async move {
         loop {
             let join_handle = frame_receiver.recv().await.unwrap();
