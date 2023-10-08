@@ -113,8 +113,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   // Return a black container if the received data is null.
                   return Container(
                     margin: const EdgeInsets.all(20),
-                    width: 256,
-                    height: 256,
+                    width: 360,
+                    height: 360,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(24.0),
                       color: Colors.black,
@@ -125,16 +125,16 @@ class _MyHomePageState extends State<MyHomePage> {
                   final imageData = rustSignal.blob!;
                   return Container(
                     margin: const EdgeInsets.all(20),
-                    width: 256,
-                    height: 256,
+                    width: 320,
+                    height: 320,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(24.0),
                       child: FittedBox(
                         fit: BoxFit.contain,
                         child: Image.memory(
                           imageData,
-                          width: 64,
-                          height: 64,
+                          width: 360,
+                          height: 360,
                           gaplessPlayback: true,
                         ),
                       ),
