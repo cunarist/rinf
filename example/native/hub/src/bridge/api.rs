@@ -225,6 +225,18 @@ pub fn start_rust_logic() {
     }
 }
 
+/// Stop and terminate all Rust tasks.
+pub fn stop_rust_logic() {
+    #[cfg(not(target_family = "wasm"))]
+    {
+        TOKIO_RUNTIME.with(move |ref_cell| {
+            ref_cell.replace(None);
+        });
+    }
+    #[cfg(target_family = "wasm")]
+    {}
+}
+
 /// Send a request to Rust and receive a response in Dart.
 pub fn request_to_rust(request_unique: RustRequestUnique) {
     REQUEST_SENDER.with(move |inner| {

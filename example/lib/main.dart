@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:rust_in_flutter/rust_in_flutter.dart';
 import 'package:example_app/messages/counter_number.pb.dart' as counterNumber;
@@ -31,7 +32,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final _appLifecycleListener = AppLifecycleListener(
+    onExitRequested: () async {
+      await RustInFlutter.ensureFinalized();
+      return AppExitResponse.exit;
+    },
+  );
   int _counter = 0;
+
+  @override
+  void dispose() {
+    _appLifecycleListener.dispose();
+    super.dispose();
+  }
 
   void _incrementCounter() async {
     final requestMessage = counterNumber.ReadRequest(

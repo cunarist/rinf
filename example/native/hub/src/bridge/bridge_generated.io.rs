@@ -32,6 +32,11 @@ pub extern "C" fn wire_start_rust_logic(port_: i64) {
 }
 
 #[no_mangle]
+pub extern "C" fn wire_stop_rust_logic(port_: i64) {
+    wire_stop_rust_logic_impl(port_)
+}
+
+#[no_mangle]
 pub extern "C" fn wire_request_to_rust(port_: i64, request_unique: *mut wire_RustRequestUnique) {
     wire_request_to_rust_impl(port_, request_unique)
 }
