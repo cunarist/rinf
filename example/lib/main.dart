@@ -10,8 +10,26 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyHomePage> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyHomePage> {
+  final _appLifecycleListener = AppLifecycleListener(
+    onExitRequested: () async {
+      await RustInFlutter.ensureFinalized();
+      return AppExitResponse.exit;
+    },
+  );
+
+  @override
+  void dispose() {
+    _appLifecycleListener.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,19 +52,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final _appLifecycleListener = AppLifecycleListener(
-    onExitRequested: () async {
-      await RustInFlutter.ensureFinalized();
-      return AppExitResponse.exit;
-    },
-  );
-
-  @override
-  void dispose() {
-    _appLifecycleListener.dispose();
-    super.dispose();
-  }
-
   int _counter = 0;
 
   void _incrementCounter() async {
