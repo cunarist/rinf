@@ -12,6 +12,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -38,13 +40,14 @@ class _MyHomePageState extends State<MyHomePage> {
       return AppExitResponse.exit;
     },
   );
-  int _counter = 0;
 
   @override
   void dispose() {
     _appLifecycleListener.dispose();
     super.dispose();
   }
+
+  int _counter = 0;
 
   void _incrementCounter() async {
     final requestMessage = counterNumber.ReadRequest(
