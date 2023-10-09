@@ -2,7 +2,7 @@
 
 **"Rust as your Flutter backend, Flutter as your Rust frontend"**
 
-![Preview](https://github.com/cunarist/rust-in-flutter/assets/66480156/0c014887-ec40-4307-ab49-84c1a954fc2f)
+![Preview](https://github.com/cunarist/rust-in-flutter/assets/66480156/ae82aad9-02f9-4a1e-93f9-69907511baf8)
 
 Rust-In-Flutter is a framework fully prepared for production use, and it comes with all the essential components for developing visually appealing and fast cross-platform applications. For detailed information on how to use this framework, please refer to the [documentation](https://rif-docs.cunarist.com).
 
