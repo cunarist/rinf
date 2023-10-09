@@ -1,3 +1,7 @@
+## 4.11.4
+
+- Improved the first preview image and some comments.
+
 ## 4.11.3
 
 - Improved the example app's code.
