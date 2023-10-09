@@ -1,6 +1,6 @@
 [package]
 name = "rifs"
-version = "4.11.5"
+version = "4.11.6"
 edition = "2021"
 license = "MIT"
 description = "Rust as your Flutter backend, Flutter as your Rust frontend"
