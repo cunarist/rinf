@@ -1,3 +1,7 @@
+## 4.11.5
+
+- Improved the shorthand command crate.
+
 ## 4.11.4
 
 - Improved the first preview image and some comments.
