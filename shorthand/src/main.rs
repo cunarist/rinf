@@ -10,6 +10,8 @@ fn main() {
     let mut command = Command::new("dart.bat");
     #[cfg(target_family = "unix")]
     let mut command = Command::new("dart");
+    #[cfg(target_family = "wasm")]
+    let mut command = Command::new("exit");
     command.args(["run", "rust_in_flutter"]);
     command.args(&dart_command_args);
 
