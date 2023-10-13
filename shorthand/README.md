@@ -1,6 +1,6 @@
 # Rust-In-Flutter Shorthand
 
-**"Rust as your Flutter backend, Flutter as your Rust frontend"**
+**Rust as your Flutter backend, Flutter as your Rust frontend**
 
 ![Preview](https://github.com/cunarist/rust-in-flutter/assets/66480156/ae82aad9-02f9-4a1e-93f9-69907511baf8)
 
