@@ -62,9 +62,9 @@ pub async fn stream_mandelbrot() {
 
     let mut scale: f64 = 1.0;
 
-    let (frame_sender, mut frame_receiver) = tokio::sync::mpsc::channel(25);
+    let (frame_sender, mut frame_receiver) = tokio::sync::mpsc::channel(5);
 
-    // Send frames in order.
+    // Send frame join handles in order.
     crate::spawn(async move {
         loop {
             // Wait for 40 milliseconds on each frame
@@ -91,14 +91,13 @@ pub async fn stream_mandelbrot() {
                         y: -0.641,
                     },
                     scale,
-                    4,
                 )
             });
             let _ = frame_sender.send(join_handle).await;
         }
     });
 
-    // Receive frames in order.
+    // Receive frame join handles in order.
     crate::spawn(async move {
         loop {
             let join_handle = frame_receiver.recv().await.unwrap();

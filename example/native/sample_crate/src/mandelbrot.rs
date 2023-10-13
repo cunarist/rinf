@@ -150,22 +150,16 @@ fn write_image(pixels: &[u8], bounds: (usize, usize)) -> Option<Vec<u8>> {
     }
 }
 
-pub fn mandelbrot(
-    image_size: Size,
-    zoom_point: Point,
-    scale: f64,
-    num_threads: i32,
-) -> Option<Vec<u8>> {
+pub fn mandelbrot(image_size: Size, zoom_point: Point, scale: f64) -> Option<Vec<u8>> {
     let bounds = (image_size.width as usize, image_size.height as usize);
     let upper_left = Complex::new(zoom_point.x - scale, zoom_point.y - scale);
     let lower_right = Complex::new(zoom_point.x + scale, zoom_point.y + scale);
 
     let mut pixels = vec![0; bounds.0 * bounds.1];
-    let band_rows = bounds.1 / (num_threads as usize) + 1;
-    let bands = pixels.chunks_mut(band_rows * bounds.0).enumerate();
+    let bands = pixels.chunks_mut(bounds.0 * bounds.1).enumerate();
 
     for (i, band) in bands {
-        let top = band_rows * i;
+        let top = bounds.1 * i;
         let height = band.len() / bounds.0;
         let band_bounds = (bounds.0, height);
         let band_upper_left = pixel_to_point(bounds, (0, top), upper_left, lower_right);
