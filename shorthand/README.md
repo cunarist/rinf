@@ -7,7 +7,7 @@
 [![Build Test](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml/badge.svg)](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml?query=branch%3Amain)
 [![GitHub License](https://img.shields.io/github/license/cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/blob/main/LICENSE)
 
-**A command-line tool for simplifying the use of the Rust-In-Flutter**
+**A command-line tool for simplifying the use of Rust-In-Flutter**
 
 ![Preview](https://github.com/cunarist/rust-in-flutter/assets/66480156/ae82aad9-02f9-4a1e-93f9-69907511baf8)
 
