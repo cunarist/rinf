@@ -1,3 +1,7 @@
+## 4.11.8
+
+- Improved first guides.
+
 ## 4.11.7
 
 - Improved the example app's code and guides.
