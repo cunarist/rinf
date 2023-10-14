@@ -1,3 +1,7 @@
+## 4.11.7
+
+- Improved the example app's code and guides.
+
 ## 4.11.6
 
 - Improved the shorthand command crate.
