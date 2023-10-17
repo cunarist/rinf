@@ -38,7 +38,7 @@ This is invoked from plugin's podspec `script_phase` through `build_pod.sh`. Bun
 
 Cargokit will build binaries for all active architectures from XCode build and lipo them togherer.
 
-When using Cargokit to integrate Rust code with an application (not a plugin) you can also configure the `Cargo.toml` to just build a dynamic library. When Cargokit finds that the crate only built a dylib and no static lib, it will attempt to replace the Cocoapod framework binary with the dylib. In this case the script `:execution_position` must be set to `:after_compile`. This is *not* recommended for plugins and it's quite experimental.
+When using Cargokit to integrate Rust code with an application (not a plugin) you can also configure the `Cargo.toml` to just build a dynamic library. When Cargokit finds that the crate only built a dylib and no static lib, it will attempt to replace the Cocoapod framework binary with the dylib. In this case the script `:execution_position` must be set to `:after_compile`. This is _not_ recommended for plugins and it's quite experimental.
 
 ### gen-key, precompile-binaries, verify-binaries
 
@@ -57,6 +57,7 @@ Instead the `run_build_tool` script creates a minimal Dart command line package 
 Cargokit can be configured through a `cargokit.yaml` file, which can be used to control the build of the Rust package and is placed into the Rust crate next to `Cargo.toml`.
 
 Here is an example `cargokit.yaml` with comments:
+
 ```yaml
 cargo:
   debug: # Configuration of cargo execution during debug builds

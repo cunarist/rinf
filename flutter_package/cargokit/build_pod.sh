@@ -23,7 +23,7 @@ export CARGOKIT_DARWIN_ARCHS=$ARCHS
 export CARGOKIT_CONFIGURATION=$CONFIGURATION
 
 # Path to directory containing Cargo.toml.
-export CARGOKIT_MANIFEST_DIR=$PODS_TARGET_SRCROOT/$1
+export CARGOKIT_MANIFEST_DIR=$1 #Different from upstream
 
 # Temporary directory for build artifacts.
 export CARGOKIT_TARGET_TEMP_DIR=$TARGET_TEMP_DIR

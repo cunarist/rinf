@@ -53,7 +53,7 @@ The action needs two secrets - private key for signing binaries and GitHub token
 ```yaml
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 name: Precompile Binaries
 
@@ -92,4 +92,3 @@ jobs:
 By default the `built_tool precompile-binaries` commands build and uploads the binaries for all targets buildable from current host. This can be overriden using the `--target <rust-triple>` argument.
 
 Android binaries will be built when `--android-sdk-location` and `--android-ndk-version` arguments are provided.
-

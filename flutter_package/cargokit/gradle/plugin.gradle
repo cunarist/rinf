@@ -52,7 +52,7 @@ abstract class CargoKitBuildTask extends DefaultTask {
         def executableName = Os.isFamily(Os.FAMILY_WINDOWS) ? "run_build_tool.cmd" : "run_build_tool.sh"
         def path = Paths.get(new File(pluginFile).parent, "..", executableName);
 
-        def manifestDir = Paths.get(project.buildscript.sourceFile.parent, project.cargokit.manifestDir)
+        def manifestDir = project.cargokit.manifestDir  // Different from upstream
 
         def rootProjectDir = project.rootProject.projectDir
 
