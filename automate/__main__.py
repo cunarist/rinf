@@ -1,6 +1,5 @@
 import os
 import sys
-import re
 
 
 def exit():
@@ -40,25 +39,27 @@ elif sys.argv[1] == "bridge-gen":
     # Temporarily add `ffi` package
     # because `flutter_rust_bridge_codegen` wants it,
     # though the generated code doesn't use it.
+    os.chdir("./flutter_package")
     command = "dart pub add ffi"
     os.system(command)
+    os.chdir("../")
 
     # Delete previous bridge files.
-    remove_files_in_folder("./flutter_package/examplenative/hub/src/bridge", "bridge")
-    remove_files_in_folder("./lib/src", "bridge")
+    remove_files_in_folder("./flutter_package/example/native/hub/src/bridge", "bridge")
+    remove_files_in_folder("./flutter_package/lib/src", "bridge")
 
     # Generate bridge files.
     command = "flutter_rust_bridge_codegen"
-    command += " --rust-input ./flutter_package/examplenative/hub/src/bridge/api.rs"
-    command += " --rust-output ./flutter_package/examplenative/hub/src/bridge/bridge_generated.rs"
-    command += " --dart-output ./lib/src/bridge_generated.dart"
-    command += " --dart-decl-output ./lib/src/bridge_definitions.dart"
+    command += " --rust-input ./flutter_package/example/native/hub/src/bridge/api.rs"
+    command += " --rust-output ./flutter_package/example/native/hub/src/bridge/bridge_generated.rs"
+    command += " --dart-output ./flutter_package/lib/src/bridge_generated.dart"
+    command += " --dart-decl-output ./flutter_package/lib/src/bridge_definitions.dart"
     command += " --class-name Bridge"
     command += " --wasm"
     os.system(command)
 
     # Remove an unnecessary root import.
-    filepath = "./flutter_package/examplenative/hub/src/lib.rs"
+    filepath = "./flutter_package/example/native/hub/src/lib.rs"
     with open(filepath, mode="r", encoding="utf8") as file:
         lines = file.readlines()
     for turn, line in enumerate(lines):
@@ -68,7 +69,7 @@ elif sys.argv[1] == "bridge-gen":
         file.write("".join(lines))
 
     # Modify some code.
-    directory_path = "./lib/src/"
+    directory_path = "./flutter_package/lib/src/"
     search_string = "package:flutter_rust_bridge/flutter_rust_bridge.dart"
     replace_string = "bridge_engine/exports.dart"
     replace_string_in_files(directory_path, search_string, replace_string)
@@ -88,7 +89,7 @@ elif sys.argv[1] == "bridge-gen":
     replace_string = ""
     replace_string_in_files(directory_path, search_string, replace_string)
 
-    directory_path = "./flutter_package/examplenative/hub/src/bridge"
+    directory_path = "./flutter_package/example/native/hub/src/bridge"
     search_string = "flutter_rust_bridge::"
     replace_string = "crate::bridge::bridge_engine::"
     replace_string_in_files(directory_path, search_string, replace_string)
@@ -111,13 +112,15 @@ elif sys.argv[1] == "bridge-gen":
     os.system(command)
 
     # Remove temporarily added `ffi` package.
+    os.chdir("./flutter_package")
     command = "dart pub remove ffi"
     os.system(command)
+    os.chdir("../")
 
 elif sys.argv[1] == "cargokit-update":
     print("Updating CargoKit...")
     command = "git subtree pull"
-    command += " --prefix cargokit"
+    command += " --prefix flutter_package/cargokit"
     command += " https://github.com/irondash/cargokit.git"
     command += " main"
     command += " --squash"
