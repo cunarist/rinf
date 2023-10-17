@@ -1,5 +1,0 @@
-# Remove unnecessary content
-# when publishing the package to pub.dev
-
-/target/
-*.lock
