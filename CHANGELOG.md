@@ -1,3 +1,7 @@
+## 4.12.0
+
+- Renamed the framework to Rinf.
+
 ## 4.11.8
 
 - Improved first guides.
