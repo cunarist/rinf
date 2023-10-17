@@ -79,55 +79,55 @@ jobs:
         run: cargo install --path ./
 
       - name: Create a Flutter app for testing
-        working-directory: flutter_package/
+        working-directory: flutter_ffi_plugin/
         run: flutter create test_app
 
       - name: Fetch Flutter dependencies
-        working-directory: flutter_package/test_app/
+        working-directory: flutter_ffi_plugin/test_app/
         run: flutter pub get
 
       - name: Add this framework as a dependency
-        working-directory: flutter_package/test_app/
+        working-directory: flutter_ffi_plugin/test_app/
         run: dart pub add "rinf:{'path':'../'}"
 
       - name: Apply Rust template
-        working-directory: flutter_package/test_app/
+        working-directory: flutter_ffi_plugin/test_app/
         run: rinf template
 
       - name: Generate message files
-        working-directory: flutter_package/test_app/
+        working-directory: flutter_ffi_plugin/test_app/
         run: rinf message
 
       - name: Build the example app
         if: matrix.target == 'linux'
-        working-directory: flutter_package/test_app/
+        working-directory: flutter_ffi_plugin/test_app/
         run: flutter build linux
 
       - name: Build the example app
         if: matrix.target == 'android'
-        working-directory: flutter_package/test_app/
+        working-directory: flutter_ffi_plugin/test_app/
         run: |
           flutter build apk
           flutter build appbundle
 
       - name: Build the example app
         if: matrix.target == 'windows'
-        working-directory: flutter_package/test_app/
+        working-directory: flutter_ffi_plugin/test_app/
         run: flutter build windows
 
       - name: Build the example app
         if: matrix.target == 'macos'
-        working-directory: flutter_package/test_app/
+        working-directory: flutter_ffi_plugin/test_app/
         run: flutter build macos
 
       - name: Build the example app
         if: matrix.target == 'ios'
-        working-directory: flutter_package/test_app/
+        working-directory: flutter_ffi_plugin/test_app/
         run: flutter build ios --no-codesign
 
       - name: Build the example app
         if: matrix.target == 'web'
-        working-directory: flutter_package/test_app/
+        working-directory: flutter_ffi_plugin/test_app/
         run: |
           rinf wasm --release
           flutter build web

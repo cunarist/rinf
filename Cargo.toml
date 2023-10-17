@@ -1,3 +1,3 @@
 [workspace]
-members = ["./flutter_package/example/native/*", "./rust_crate"]
+members = ["./flutter_ffi_plugin/example/native/*", "./rust_crate"]
 resolver = "2"

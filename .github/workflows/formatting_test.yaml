@@ -47,11 +47,11 @@ jobs:
         run: cargo install --path ./
 
       - name: Fetch Flutter dependencies
-        working-directory: flutter_package/example/
+        working-directory: flutter_ffi_plugin/example/
         run: flutter pub get
 
       - name: Generate message files
-        working-directory: flutter_package/example/
+        working-directory: flutter_ffi_plugin/example/
         run: rinf message
 
       - name: Check for any errors
