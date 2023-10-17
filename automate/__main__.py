@@ -39,13 +39,15 @@ elif sys.argv[1] == "bridge-gen":
     # Temporarily add `ffi` package
     # because `flutter_rust_bridge_codegen` wants it,
     # though the generated code doesn't use it.
-    os.chdir("./flutter_package")
+    os.chdir("./flutter_ffi_plugin/")
     command = "dart pub add ffi"
     os.system(command)
     os.chdir("../")
 
     # Delete previous bridge files.
-    remove_files_in_folder("./flutter_ffi_plugin/example/native/hub/src/bridge", "bridge")
+    remove_files_in_folder(
+        "./flutter_ffi_plugin/example/native/hub/src/bridge", "bridge"
+    )
     remove_files_in_folder("./flutter_ffi_plugin/lib/src", "bridge")
 
     # Generate bridge files.
@@ -53,7 +55,9 @@ elif sys.argv[1] == "bridge-gen":
     command += " --rust-input ./flutter_ffi_plugin/example/native/hub/src/bridge/api.rs"
     command += " --rust-output ./flutter_ffi_plugin/example/native/hub/src/bridge/bridge_generated.rs"
     command += " --dart-output ./flutter_ffi_plugin/lib/src/bridge_generated.dart"
-    command += " --dart-decl-output ./flutter_ffi_plugin/lib/src/bridge_definitions.dart"
+    command += (
+        " --dart-decl-output ./flutter_ffi_plugin/lib/src/bridge_definitions.dart"
+    )
     command += " --class-name Bridge"
     command += " --wasm"
     os.system(command)
@@ -112,7 +116,7 @@ elif sys.argv[1] == "bridge-gen":
     os.system(command)
 
     # Remove temporarily added `ffi` package.
-    os.chdir("./flutter_package")
+    os.chdir("./flutter_ffi_plugin/")
     command = "dart pub remove ffi"
     os.system(command)
     os.chdir("../")
