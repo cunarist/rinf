@@ -5,7 +5,7 @@ import 'dart:convert';
 Future<void> main(List<String> args) async {
   if (args.length == 0) {
     print("No operation is provided.");
-    print("Use `rifs --help` to see all available operations.");
+    print("Use `rinf --help` to see all available operations.");
     return;
   }
   switch (args[0]) {
@@ -28,7 +28,7 @@ Future<void> main(List<String> args) async {
       break;
     case "--help":
     case "-h":
-      print("Usage: rifs [arguments]");
+      print("Usage: rinf [arguments]");
       print("Arguments:");
       print("  -h, --help        Shows this usage information.");
       print("  template          Applies Rust template to current project.");
@@ -38,7 +38,7 @@ Future<void> main(List<String> args) async {
       print("    -r, --release   Builds in release mode.");
     default:
       print("No such operation is available.");
-      print("Use `rifs --help` to see all available operations.");
+      print("Use `rinf --help` to see all available operations.");
   }
 }
 
@@ -144,7 +144,7 @@ flutter doctor
 You also need to have the CLI tool for Rinf ready.
 
 ```bash
-cargo install rifs
+cargo install rinf
 ```
 
 Messages sent between Dart and Rust are implemented using Protobuf.
@@ -153,7 +153,7 @@ or made changes to the `.proto` files in the `./messages` directory,
 run the following command:
 
 ```bash
-rifs message
+rinf message
 ```
 
 Now you can run and build this app just like any other Flutter projects.

@@ -32,7 +32,7 @@
 
 ## 4.11.0
 
-- New Dart function `ensureFinalized()`. This function ensures that all Rust tasks are terminated. Take a look at the example code to understand how to run this function before closing the Flutter app. Note that you have to run `rifs template --bridge` again to use this function.
+- New Dart function `ensureFinalized()`. This function ensures that all Rust tasks are terminated. Take a look at the example code to understand how to run this function before closing the Flutter app. Note that you have to run `rinf template --bridge` again to use this function.
 
 ## 4.10.0
 
@@ -57,12 +57,12 @@
 
 ## 4.8.0
 
-- Now by running `rifs template --bridge`, you can apply and update only the `bridge` module inside the `hub` crate. This is useful when you've upgraded RIF but do not need to apply the whole template again.
-- Improved `rifs --help` output.
+- Now by running `rinf template --bridge`, you can apply and update only the `bridge` module inside the `hub` crate. This is useful when you've upgraded RIF but do not need to apply the whole template again.
+- Improved `rinf --help` output.
 
 ## 4.7.0
 
-- Now Rust stacktrace will be printed to the CLI when a panic occurs. The changes are mostly included in the template, so make sure you've run `rifs template` on this new version.
+- Now Rust stacktrace will be printed to the CLI when a panic occurs. The changes are mostly included in the template, so make sure you've run `rinf template` on this new version.
 
 ## 4.6.2
 
@@ -74,7 +74,7 @@
 
 ## 4.6.0
 
-- New `debug_print!` macro that works on all environments, including web and mobile emulators, with the power of Flutter debuggers. To use this, you need to run `rifs template` again.
+- New `debug_print!` macro that works on all environments, including web and mobile emulators, with the power of Flutter debuggers. To use this, you need to run `rinf template` again.
 - Now panic information in Rust will be properly printed to the CLI. Note that Rust panics don't crash the app and do not hinder stability.
 - Improved docs. There are also more guides about well-known types in Protobuf. Thanks `@LucaCoduriV`!
 
@@ -106,7 +106,7 @@
 
 ## 4.2.0
 
-- New command `rifs --help`. Thanks `@bookshiyi`!
+- New command `rinf --help`. Thanks `@bookshiyi`!
 
 ## 4.1.4
 
@@ -114,11 +114,11 @@
 
 ## 4.1.3
 
-- Made `rifs message` command read `PUB_CACHE` enviornment variable if present. Thanks `@rabbitson87`!
+- Made `rinf message` command read `PUB_CACHE` enviornment variable if present. Thanks `@rabbitson87`!
 
 ## 4.1.2
 
-- Fixed `rifs template` command.
+- Fixed `rinf template` command.
 
 ## 4.1.1
 
@@ -132,7 +132,7 @@
 
 ## 4.0.3
 
-- Fixed bugs with `rifs template` on Windows.
+- Fixed bugs with `rinf template` on Windows.
 - Fixed outdated comments.
 - Organized sample code.
 
@@ -146,7 +146,7 @@
 
 ## 4.0.0
 
-- Added support for sending large binaries between Dart and Rust. This is now possible by using the `blob` field in `RustRequest`, `RustResponse`, and `RustSignal`. Please make sure you've run `rifs template` before using this new version because the template has changed a little.
+- Added support for sending large binaries between Dart and Rust. This is now possible by using the `blob` field in `RustRequest`, `RustResponse`, and `RustSignal`. Please make sure you've run `rinf template` before using this new version because the template has changed a little.
 - Added support for nested message folders.
 - Added support for Rust nightly.
 - Eliminated unnecessary Dart dependencies.
@@ -169,7 +169,7 @@
 
 ## 3.7.0
 
-- Now this framework provides a shorthand command `rifs ...` which is equivalent to `dart run rust_in_flutter ...`.
+- Now this framework provides a shorthand command `rinf ...` which is equivalent to `dart run rust_in_flutter ...`.
 
 ## 3.6.0
 

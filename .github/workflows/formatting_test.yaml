@@ -52,7 +52,7 @@ jobs:
 
       - name: Generate message files
         working-directory: example/
-        run: rifs message
+        run: rinf message
 
       - name: Check for any errors
         run: |

@@ -90,11 +90,11 @@ jobs:
 
       - name: Apply Rust template
         working-directory: test_app/
-        run: rifs template
+        run: rinf template
 
       - name: Generate message files
         working-directory: test_app/
-        run: rifs message
+        run: rinf message
 
       - name: Build the example app
         if: matrix.target == 'linux'
@@ -127,5 +127,5 @@ jobs:
         if: matrix.target == 'web'
         working-directory: test_app/
         run: |
-          rifs wasm --release
+          rinf wasm --release
           flutter build web

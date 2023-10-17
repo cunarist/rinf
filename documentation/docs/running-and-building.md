@@ -23,14 +23,14 @@ You need to manually build webassembly module from Rust before running or buildi
 To serve the web application:
 
 ```bash
-rifs wasm --release
+rinf wasm --release
 flutter run --release  # Choose a browser
 ```
 
 To build the optimized release version of the web application:
 
 ```bash
-rifs wasm --release
+rinf wasm --release
 flutter build web
 ```
 

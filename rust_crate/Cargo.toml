@@ -1,5 +1,5 @@
 [package]
-name = "rifs"
+name = "rinf"
 version = "4.11.8"
 edition = "2021"
 license = "MIT"
