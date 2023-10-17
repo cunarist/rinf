@@ -1,3 +1,7 @@
+## 4.12.1
+
+- Fixed publishing issues.
+
 ## 4.12.0
 
 - Renamed the framework to Rinf.
