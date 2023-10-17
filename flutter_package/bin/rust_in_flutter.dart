@@ -125,7 +125,7 @@ $guideSectionTitle
 
 This project leverages Flutter for GUI and Rust for the backend logic,
 utilizing the capabilities of the
-[Rust-In-Flutter](https://pub.dev/packages/rust_in_flutter) framework.
+[Rinf](https://pub.dev/packages/rust_in_flutter) framework.
 
 To run and build this app, you need to have
 [Flutter SDK](https://docs.flutter.dev/get-started/install),
@@ -141,7 +141,7 @@ protoc --version
 flutter doctor
 ```
 
-You also need to have the CLI tool for Rust-In-Flutter ready.
+You also need to have the CLI tool for Rinf ready.
 
 ```bash
 cargo install rifs
@@ -163,7 +163,7 @@ flutter run
 ```
 
 For detailed instructions on writing Rust and Flutter together,
-please refer to Rust-In-Flutter's [documentation](https://rif-docs.cunarist.com).
+please refer to Rinf's [documentation](https://rif-docs.cunarist.com).
 ''';
     readmeSplitted.add(text);
   }

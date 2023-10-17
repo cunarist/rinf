@@ -14,7 +14,7 @@ Data being sent between Dart and Rust are basically bytes arrays, represented as
 
 ### Where are the library files generated from Rust crates?
 
-All build settings of Rust-In-Flutter ensures that all library files compiled from Rust crates are properly included in the final build, ready to be distributed. Therefore you do not need to worry about bundling library files.
+All build settings of Rinf ensures that all library files compiled from Rust crates are properly included in the final build, ready to be distributed. Therefore you do not need to worry about bundling library files.
 
 ### Android app build has failed. What should I do?
 
@@ -72,7 +72,7 @@ cargo:
 
 ### Is it safe enough to pass secret parameters between Dart and Rust?
 
-It is completely safe to pass secret parameters between Dart and Rust. Some other Rust GUI frameworks use HTTP or websockets to communicate between GUI and Rust, which is quite insecure. However, that's not the case for Rust-In-Flutter because messages are passed within the Flutter app's process. This is not only secure but also performant because message passing is a zero-copy operation on the memory. Please note that while it is hard to reverse-engineer compiled native binaries to search for secret keys or params, it is generally not recommended to hardcode sensitive information in the application itself. This caution applies to this framework as well as any other distributed binaries.
+It is completely safe to pass secret parameters between Dart and Rust. Some other Rust GUI frameworks use HTTP or websockets to communicate between GUI and Rust, which is quite insecure. However, that's not the case for Rinf because messages are passed within the Flutter app's process. This is not only secure but also performant because message passing is a zero-copy operation on the memory. Please note that while it is hard to reverse-engineer compiled native binaries to search for secret keys or params, it is generally not recommended to hardcode sensitive information in the application itself. This caution applies to this framework as well as any other distributed binaries.
 
 ### How do I use well-known types in Protobuf?
 

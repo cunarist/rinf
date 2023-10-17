@@ -1,4 +1,4 @@
-# RIFS
+# Rinf
 
 [![Pub Version](https://img.shields.io/pub/v/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
 [![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
@@ -7,7 +7,7 @@
 [![Build Test](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml/badge.svg)](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml?query=branch%3Amain)
 [![GitHub License](https://img.shields.io/github/license/cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/blob/main/LICENSE)
 
-**A command-line tool for simplifying the use of Rust-In-Flutter**
+**Rust as your Flutter backend, Flutter as your Rust frontend**
 
 ![Preview](https://github.com/cunarist/rust-in-flutter/assets/66480156/ae82aad9-02f9-4a1e-93f9-69907511baf8)
 

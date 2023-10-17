@@ -1,12 +1,12 @@
 # Shorthand Command
 
-Now install the shorthand command tool to easily execute Rust-In-Flutter commands in the CLI.
+Now install the shorthand command tool to easily execute Rinf commands in the CLI.
 
 ```bash
 cargo install rifs
 ```
 
-After you've installed `rifs`, which stands for 'Rust-In-Flutter Shorthand', you can use this tool to execute any command provided by this framework. Actual commands will be introduced in the upcoming sections.
+After you've installed `rifs`, which stands for 'Rinf Shorthand', you can use this tool to execute any command provided by this framework. Actual commands will be introduced in the upcoming sections.
 
 ```bash
 rifs ...
