@@ -61,12 +61,6 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install shorthand CLI tool
-        run: cargo install --path shorthand/
-
-      - name: Create a Flutter app for testing
-        run: flutter create test_app
-
       - name: Setup Ninja and GTK3 toolchain (Only Linux target)
         if: matrix.target == 'linux'
         run: |
@@ -80,52 +74,60 @@ jobs:
           distribution: "zulu"
           java-version: "11"
 
+      - name: Install the CLI tool
+        working-directory: rust_crate/
+        run: cargo install --path ./
+
+      - name: Create a Flutter app for testing
+        working-directory: flutter_ffi_plugin/
+        run: flutter create test_app
+
       - name: Fetch Flutter dependencies
-        working-directory: test_app/
+        working-directory: flutter_ffi_plugin/test_app/
         run: flutter pub get
 
       - name: Add this framework as a dependency
-        working-directory: test_app/
-        run: dart pub add "rust_in_flutter:{'path':'../'}"
+        working-directory: flutter_ffi_plugin/test_app/
+        run: dart pub add "rinf:{'path':'../'}"
 
       - name: Apply Rust template
-        working-directory: test_app/
-        run: rifs template
+        working-directory: flutter_ffi_plugin/test_app/
+        run: rinf template
 
       - name: Generate message files
-        working-directory: test_app/
-        run: rifs message
+        working-directory: flutter_ffi_plugin/test_app/
+        run: rinf message
 
       - name: Build the example app
         if: matrix.target == 'linux'
-        working-directory: test_app/
+        working-directory: flutter_ffi_plugin/test_app/
         run: flutter build linux
 
       - name: Build the example app
         if: matrix.target == 'android'
-        working-directory: test_app/
+        working-directory: flutter_ffi_plugin/test_app/
         run: |
           flutter build apk
           flutter build appbundle
 
       - name: Build the example app
         if: matrix.target == 'windows'
-        working-directory: test_app/
+        working-directory: flutter_ffi_plugin/test_app/
         run: flutter build windows
 
       - name: Build the example app
         if: matrix.target == 'macos'
-        working-directory: test_app/
+        working-directory: flutter_ffi_plugin/test_app/
         run: flutter build macos
 
       - name: Build the example app
         if: matrix.target == 'ios'
-        working-directory: test_app/
+        working-directory: flutter_ffi_plugin/test_app/
         run: flutter build ios --no-codesign
 
       - name: Build the example app
         if: matrix.target == 'web'
-        working-directory: test_app/
+        working-directory: flutter_ffi_plugin/test_app/
         run: |
-          rifs wasm --release
+          rinf wasm --release
           flutter build web

@@ -39,20 +39,20 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install shorthand CLI tool
-        working-directory: shorthand/
-        run: cargo install --path ./
-
       - name: Install Clippy
         run: rustup component add clippy
 
+      - name: Install the CLI tool
+        working-directory: rust_crate/
+        run: cargo install --path ./
+
       - name: Fetch Flutter dependencies
-        working-directory: example/
+        working-directory: flutter_ffi_plugin/example/
         run: flutter pub get
 
       - name: Generate message files
-        working-directory: example/
-        run: rifs message
+        working-directory: flutter_ffi_plugin/example/
+        run: rinf message
 
       - name: Check for any errors
         run: |

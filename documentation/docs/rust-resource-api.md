@@ -6,7 +6,7 @@ Each `.proto` file located in `./messages` and its subfolders is treated as a Ru
 
 Each Rust resource will be assigned a unique `ID` on code generation, which is inserted into the `resource` field of `RustRequest` and `RustSignal` to distinguish which Rust resource that the message is trying to talk about.
 
-When you generate message code using the `rifs message` command, the resulting Dart and Rust modules' names and subpaths will precisely correspond to those of the `.proto` files.
+When you generate message code using the `rinf message` command, the resulting Dart and Rust modules' names and subpaths will precisely correspond to those of the `.proto` files.
 
 - `./messages`: `.proto` input files
 - `./lib/messages`: `.dart` output files

@@ -1,0 +1,7 @@
+[package]
+name = "rinf"
+version = "4.11.8"
+edition = "2021"
+license = "MIT"
+description = "Rust as your Flutter backend, Flutter as your Rust frontend"
+repository = "https://github.com/cunarist/rinf"
