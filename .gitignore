@@ -32,5 +32,5 @@ build/
 target/
 
 # Others
-**/*.lock
+*.lock
 /documentation/site/
