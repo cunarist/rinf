@@ -2,7 +2,7 @@
 
 ### Where should I ask for help?
 
-If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/rust-in-flutter/discussions) and open a Q&A thread for assistance.
+If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/rinf/discussions) and open a Q&A thread for assistance.
 
 ### Where should I use Rust?
 
@@ -27,7 +27,7 @@ Add that line to `./android/app/build.gradle` file:
 ```gradle
 ..
 android {
-    namespace "com.cunarist.rust_in_flutter_example"
+    namespace "com.cunarist.rinf_example"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion // <------ THIS LINE
 

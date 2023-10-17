@@ -1,4 +1,4 @@
-#include "rust_in_flutter.h"
+#include "rinf.h"
 
 // A very short-lived native function.
 //

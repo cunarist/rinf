@@ -1,6 +1,6 @@
 // The Android Gradle Plugin builds the native code with the Android NDK.
 
-group 'com.cunarist.rust_in_flutter'
+group 'com.cunarist.rinf'
 version '1.0'
 
 buildscript {

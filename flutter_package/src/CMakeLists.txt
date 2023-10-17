@@ -3,15 +3,15 @@
 # the plugin to fail to compile for some customers of the plugin.
 cmake_minimum_required(VERSION 3.10)
 
-project(rust_in_flutter_library VERSION 0.0.1 LANGUAGES C)
+project(rinf_library VERSION 0.0.1 LANGUAGES C)
 
-add_library(rust_in_flutter SHARED
-  "rust_in_flutter.c"
+add_library(rinf SHARED
+  "rinf.c"
 )
 
-set_target_properties(rust_in_flutter PROPERTIES
-  PUBLIC_HEADER rust_in_flutter.h
-  OUTPUT_NAME "rust_in_flutter"
+set_target_properties(rinf PROPERTIES
+  PUBLIC_HEADER rinf.h
+  OUTPUT_NAME "rinf"
 )
 
-target_compile_definitions(rust_in_flutter PUBLIC DART_SHARED_LIB)
+target_compile_definitions(rinf PUBLIC DART_SHARED_LIB)

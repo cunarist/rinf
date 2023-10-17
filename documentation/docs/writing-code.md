@@ -4,7 +4,7 @@
 
 Let's say that you want to make a new button that sends an array of numbers and a string from Dart to Rust to perform some calculation on it. You can follow these steps to understand how to send a request and wait for the response.
 
-Let's start from our [default example](https://github.com/cunarist/rust-in-flutter/tree/main/example).
+Let's start from our [default example](https://github.com/cunarist/rinf/tree/main/example).
 
 Create a new `.proto` file in `./messages` that represents the new Rust resource.
 
@@ -51,7 +51,7 @@ child: Column(
 ```dart
 // lib/main.dart
 ...
-import 'package:rust_in_flutter/rust_in_flutter.dart';
+import 'package:rinf/rinf.dart';
 import 'package:example_app/messages/tutorial_resource.pb.dart'
     as tutorialResource;
 ...
@@ -146,7 +146,7 @@ Finally, when you receive a response from Rust in Dart, you can do anything with
 ```dart
 // lib/main.dart
 ...
-import 'package:rust_in_flutter/rust_in_flutter.dart';
+import 'package:rinf/rinf.dart';
 import 'package:example_app/messages/tutorial_resource.pb.dart'
     as tutorialResource;
 ...
@@ -178,7 +178,7 @@ You can extend this RESTful API pattern and create hundreds and thousands of end
 
 Let's say that you want to send increasing numbers every second from Rust to Dart. In this case, it would be inefficient for Dart to send requests repeatedly. This is where streaming is needed.
 
-Let's start from our [default example](https://github.com/cunarist/rust-in-flutter/tree/main/example).
+Let's start from our [default example](https://github.com/cunarist/rinf/tree/main/example).
 
 Define the Rust resource and message schema.
 
@@ -244,7 +244,7 @@ Finally, receive the signals in Dart with `StreamBuilder`, filter them by resour
 ```dart
 // lib/main.dart
 ...
-import 'package:rust_in_flutter/rust_in_flutter.dart';
+import 'package:rinf/rinf.dart';
 import 'package:example_app/messages/increasing_number.pb.dart'
     as increasingNumbers;
 ...

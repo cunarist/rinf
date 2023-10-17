@@ -1,12 +1,12 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:rust_in_flutter/rust_in_flutter.dart';
+import 'package:rinf/rinf.dart';
 import 'package:example_app/messages/counter_number.pb.dart' as counterNumber;
 import 'package:example_app/messages/mandelbrot.pb.dart' as mandelbrot;
 
 void main() async {
   // Wait for Rust initialization to be completed first.
-  await RustInFlutter.ensureInitialized();
+  await Rinf.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -21,7 +21,7 @@ class _MyAppState extends State<MyApp> {
   final _appLifecycleListener = AppLifecycleListener(
     onExitRequested: () async {
       // Terminate Rust tasks before closing the Flutter app.
-      await RustInFlutter.ensureFinalized();
+      await Rinf.ensureFinalized();
       return AppExitResponse.exit;
     },
   );
@@ -35,7 +35,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'RIF Example',
+      title: 'Rinf Example',
       theme: ThemeData(
         useMaterial3: true,
         brightness: MediaQuery.platformBrightnessOf(context),
@@ -71,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
       operation: RustOperation.Read,
       message: requestMessage.writeToBuffer(),
     );
-    // Use `requestToRust` from `rust_in_flutter.dart`
+    // Use `requestToRust` from `rinf.dart`
     // to send the request to Rust and get the response.
     final rustResponse = await requestToRust(rustRequest);
     if (rustResponse.successful) {
@@ -95,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
             // and rebuilds the widget accordingly.
             StreamBuilder<RustSignal>(
               // Receive signals from Rust
-              // with `rustBroadcaster` from `rust_in_flutter.dart`,
+              // with `rustBroadcaster` from `rinf.dart`,
               // For better performance, filter signals
               // by checking the `resource` field with the `where` method.
               // This approach allows the builder to rebuild its widget

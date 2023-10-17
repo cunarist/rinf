@@ -1,9 +1,9 @@
 #
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
-# Run `pod lib lint rust_in_flutter.podspec` to validate before publishing.
+# Run `pod lib lint rinf.podspec` to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'rust_in_flutter'
+  s.name             = 'rinf'
   s.version          = '0.1.0'
   s.summary          = 'Summary'
   s.description      = 'Description'
@@ -17,9 +17,9 @@ Pod::Spec.new do |s|
   # `../src/*` so that the C sources can be shared among all target platforms.
   s.source           = { :path => '.' }
   s.source_files     = 'Classes/**/*'
-  s.dependency 'FlutterMacOS'
-
-  s.platform = :osx, '10.11'
+  s.dependency 'Flutter'
+  
+  s.platform = :ios, '11.0'
   s.swift_version = '5.0'
 
   # Include Rust crates in the build process.
@@ -34,7 +34,7 @@ Pod::Spec.new do |s|
   }
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
-    # Flutter.framework does not contain a i386 slice.
+    # Flutter framework does not contain a i386 slice. From default Flutter template.
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
     # We use `-force_load` instead of `-l` since Xcode strips out unused symbols from static libraries.
     'OTHER_LDFLAGS' => '-force_load ${BUILT_PRODUCTS_DIR}/libhub.a -Wl -undefined dynamic_lookup',

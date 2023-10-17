@@ -1,11 +1,11 @@
 # About
 
-[![Pub Version](https://img.shields.io/pub/v/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
-[![Pub Popularity](https://img.shields.io/pub/popularity/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
-[![Pub Points](https://img.shields.io/pub/points/rust_in_flutter)](https://pub.dev/packages/rust_in_flutter)
-[![GitHub Stars](https://img.shields.io/github/stars/cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/stargazers)
-[![Build Test](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml/badge.svg)](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml?query=branch%3Amain)
-[![GitHub License](https://img.shields.io/github/license/cunarist/rust-in-flutter)](https://github.com/cunarist/rust-in-flutter/blob/main/LICENSE)
+[![Pub Version](https://img.shields.io/pub/v/rinf)](https://pub.dev/packages/rinf)
+[![Pub Popularity](https://img.shields.io/pub/popularity/rinf)](https://pub.dev/packages/rinf)
+[![Pub Points](https://img.shields.io/pub/points/rinf)](https://pub.dev/packages/rinf)
+[![GitHub Stars](https://img.shields.io/github/stars/cunarist/rinf)](https://github.com/cunarist/rinf/stargazers)
+[![Build Test](https://github.com/cunarist/rinf/actions/workflows/build_test.yaml/badge.svg)](https://github.com/cunarist/rinf/actions/workflows/build_test.yaml?query=branch%3Amain)
+[![GitHub License](https://img.shields.io/github/license/cunarist/rinf)](https://github.com/cunarist/rinf/blob/main/LICENSE)
 
 **Rust as your Flutter backend, Flutter as your Rust frontend**
 
@@ -15,11 +15,11 @@ This is a production-ready framework for creating beautiful and performant cross
 
 ## 🎮 Demo
 
-Visit the [demo](https://rif-demo.cunarist.com/) running on the web to experience the smoothness and delightfulness that comes from the combination of Flutter and Rust. You can also dive into the [example code](https://github.com/cunarist/rust-in-flutter/tree/main/example).
+Visit the [demo](https://rif-demo.cunarist.com/) running on the web to experience the smoothness and delightfulness that comes from the combination of Flutter and Rust. You can also dive into the [example code](https://github.com/cunarist/rinf/tree/main/example).
 
 ## 🖥️ Platform Support
 
-All platforms available with Flutter are [tested](https://github.com/cunarist/rust-in-flutter/actions/workflows/build_test.yaml?query=branch%3Amain) and supported. Challenging build settings are automatically handled by this framework.
+All platforms available with Flutter are [tested](https://github.com/cunarist/rinf/actions/workflows/build_test.yaml?query=branch%3Amain) and supported. Challenging build settings are automatically handled by this framework.
 
 - ✅ Linux: Tested and supported
 - ✅ Android: Tested and supported
@@ -34,7 +34,7 @@ All platforms available with Flutter are [tested](https://github.com/cunarist/ru
 - **Minimal**: This is not a bulky framework that requires you to install so many dependencies and use complicated CLI commands. Just focus on your code using your preferred Flutter and Rust libraries.
 - **High-level interface**: No messing with sensitive build files, no concerns about memory safety. Stay with Dart and Rust that you're familiar with.
 - **Low-level control**: Though the hard things are kept beneath the surface, you are free to modify the underlying logic such as concurrency or debugging features. There is no hidden mechanism that prevents your understanding.
-- **Well maintained**: Our [automated workflows](https://github.com/cunarist/rust-in-flutter/actions) including build tests are always kept passing, thanks to the main branch protection rule. Also, the number of external dependencies is kept as low as possible and documentations are thoughtfully organized.
+- **Well maintained**: Our [automated workflows](https://github.com/cunarist/rinf/actions) including build tests are always kept passing, thanks to the main branch protection rule. Also, the number of external dependencies is kept as low as possible and documentations are thoughtfully organized.
 - **Efficient**: No memory copy when sending native data, no hidden threads and web workers with memory overhead. This is a really thin wrapper around Dart and Rust.
 - **Scalable**: You are able to use an arbitrary number of Rust library crates as you want, perhaps including ones that you've already been working on.
 - **Logical API**: You declare RESTful messages, not functions for APIs, which provides greater stability. Requesting from Dart and responsing from Rust, as well as streaming from Rust to Dart is possible. Messages are type-safe and flexible because it's powered by the well-known [Protobuf](https://protobuf.dev/) serialization. You also have the ability to send large binary data from Rust to Dart without any memory copy.

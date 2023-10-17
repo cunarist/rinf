@@ -3,7 +3,7 @@
 import 'dart:async';
 import 'dart:html';
 
-import 'package:rust_in_flutter/src/bridge_engine/exports.dart';
+import 'package:rinf/src/bridge_engine/exports.dart';
 export 'package:js/js.dart';
 import 'package:js/js_util.dart';
 export 'package:js/js_util.dart' show promiseToFuture, getProperty;

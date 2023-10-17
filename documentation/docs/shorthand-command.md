@@ -12,4 +12,4 @@ After you've installed `rinf`, which stands for 'Rinf Shorthand', you can use th
 rinf ...
 ```
 
-> All the commands of this framework can originally be executed with `dart run rust_in_flutter ...`. However, this is quite long and cumbersome to write over and over again. That's why this framework provides a shorthand command tool.
+> All the commands of this framework can originally be executed with `dart run rinf ...`. However, this is quite long and cumbersome to write over and over again. That's why this framework provides a shorthand command tool.

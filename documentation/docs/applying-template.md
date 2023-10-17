@@ -5,7 +5,7 @@
 First of all, add this framework to your Flutter project.
 
 ```bash
-flutter pub add rust_in_flutter
+flutter pub add rinf
 ```
 
 Then, simply run this in the command-line from your Flutter project's directory.

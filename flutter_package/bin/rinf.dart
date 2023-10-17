@@ -52,7 +52,7 @@ Future<void> _applyRustTemplate({bool onlyBridge = false}) async {
   if (packageConfig == null) {
     return;
   }
-  final packageName = 'rust_in_flutter';
+  final packageName = 'rinf';
   final package = packageConfig.packages.firstWhere(
     (p) => p.name == packageName,
   );
@@ -125,7 +125,7 @@ $guideSectionTitle
 
 This project leverages Flutter for GUI and Rust for the backend logic,
 utilizing the capabilities of the
-[Rinf](https://pub.dev/packages/rust_in_flutter) framework.
+[Rinf](https://pub.dev/packages/rinf) framework.
 
 To run and build this app, you need to have
 [Flutter SDK](https://docs.flutter.dev/get-started/install),
@@ -175,14 +175,14 @@ please refer to Rinf's [documentation](https://rif-docs.cunarist.com).
   // Modify `./lib/main.dart`
   await Process.run('dart', ['format', './lib/main.dart']);
   var mainText = await mainFile.readAsString();
-  if (!mainText.contains('package:rust_in_flutter/rust_in_flutter.dart')) {
+  if (!mainText.contains('package:rinf/rinf.dart')) {
     final lines = mainText.split("\n");
     final lastImportIndex = lines.lastIndexWhere(
       (line) => line.startsWith('import '),
     );
     lines.insert(
       lastImportIndex + 1,
-      "import 'package:rust_in_flutter/rust_in_flutter.dart';",
+      "import 'package:rinf/rinf.dart';",
     );
     mainText = lines.join("\n");
   }
@@ -192,10 +192,10 @@ please refer to Rinf's [documentation](https://rif-docs.cunarist.com).
       'main() async {',
     );
   }
-  if (!mainText.contains('RustInFlutter.ensureInitialized()')) {
+  if (!mainText.contains('Rinf.ensureInitialized()')) {
     mainText = mainText.replaceFirst(
       'main() async {',
-      'main() async { await RustInFlutter.ensureInitialized();',
+      'main() async { await Rinf.ensureInitialized();',
     );
   }
   await mainFile.writeAsString(mainText);

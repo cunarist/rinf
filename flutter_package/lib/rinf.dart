@@ -14,13 +14,13 @@ export 'src/exports.dart' show RustSignal;
 
 /// Listens to a stream from Rust and broadcasts the data in Dart.
 /// You can see the usage example at
-/// https://pub.dev/packages/rust_in_flutter/example.
+/// https://pub.dev/packages/rinf/example.
 final rustBroadcaster = StreamController<RustSignal>.broadcast();
 final _responseBroadcaster = StreamController<RustResponseUnique>.broadcast();
 final _requestIdGenerator = _IdGenerator();
 
 /// Contains basic functionalities of this framework.
-class RustInFlutter {
+class Rinf {
   /// Makes sure that the Rust side is ready.
   /// Don't forget to call this function in the `main` function of Dart.
   static Future<void> ensureInitialized() async {
@@ -63,7 +63,7 @@ class RustInFlutter {
 /// If the Rust doesn't respond for 60 seconds,
 /// this function will return a failed `RustResponse` object.
 /// You can see the usage example at
-/// https://pub.dev/packages/rust_in_flutter/example.
+/// https://pub.dev/packages/rinf/example.
 Future<RustResponse> requestToRust(RustRequest rustRequest) async {
   final id = _requestIdGenerator.generateId();
   final requestUnique = RustRequestUnique(id: id, request: rustRequest);
