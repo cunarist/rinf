@@ -4,7 +4,7 @@
 
 Let's say that you want to make a new button that sends an array of numbers and a string from Dart to Rust to perform some calculation on it. You can follow these steps to understand how to send a request and wait for the response.
 
-Let's start from our [default example](https://github.com/cunarist/rinf/tree/main/example).
+Let's start from our [default example](https://github.com/cunarist/rinf/tree/main/flutter_package/example).
 
 Create a new `.proto` file in `./messages` that represents the new Rust resource.
 
@@ -178,7 +178,7 @@ You can extend this RESTful API pattern and create hundreds and thousands of end
 
 Let's say that you want to send increasing numbers every second from Rust to Dart. In this case, it would be inefficient for Dart to send requests repeatedly. This is where streaming is needed.
 
-Let's start from our [default example](https://github.com/cunarist/rinf/tree/main/example).
+Let's start from our [default example](https://github.com/cunarist/rinf/tree/main/flutter_package/example).
 
 Define the Rust resource and message schema.
 

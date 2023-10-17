@@ -44,13 +44,13 @@ elif sys.argv[1] == "bridge-gen":
     os.system(command)
 
     # Delete previous bridge files.
-    remove_files_in_folder("./example/native/hub/src/bridge", "bridge")
+    remove_files_in_folder("./flutter_package/examplenative/hub/src/bridge", "bridge")
     remove_files_in_folder("./lib/src", "bridge")
 
     # Generate bridge files.
     command = "flutter_rust_bridge_codegen"
-    command += " --rust-input ./example/native/hub/src/bridge/api.rs"
-    command += " --rust-output ./example/native/hub/src/bridge/bridge_generated.rs"
+    command += " --rust-input ./flutter_package/examplenative/hub/src/bridge/api.rs"
+    command += " --rust-output ./flutter_package/examplenative/hub/src/bridge/bridge_generated.rs"
     command += " --dart-output ./lib/src/bridge_generated.dart"
     command += " --dart-decl-output ./lib/src/bridge_definitions.dart"
     command += " --class-name Bridge"
@@ -58,7 +58,7 @@ elif sys.argv[1] == "bridge-gen":
     os.system(command)
 
     # Remove an unnecessary root import.
-    filepath = "./example/native/hub/src/lib.rs"
+    filepath = "./flutter_package/examplenative/hub/src/lib.rs"
     with open(filepath, mode="r", encoding="utf8") as file:
         lines = file.readlines()
     for turn, line in enumerate(lines):
@@ -88,7 +88,7 @@ elif sys.argv[1] == "bridge-gen":
     replace_string = ""
     replace_string_in_files(directory_path, search_string, replace_string)
 
-    directory_path = "./example/native/hub/src/bridge"
+    directory_path = "./flutter_package/examplenative/hub/src/bridge"
     search_string = "flutter_rust_bridge::"
     replace_string = "crate::bridge::bridge_engine::"
     replace_string_in_files(directory_path, search_string, replace_string)

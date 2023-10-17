@@ -15,7 +15,7 @@ This is a production-ready framework for creating beautiful and performant cross
 
 ## 🎮 Demo
 
-Visit the [demo](https://rif-demo.cunarist.com/) running on the web to experience the smoothness and delightfulness that comes from the combination of Flutter and Rust. You can also dive into the [example code](https://github.com/cunarist/rinf/tree/main/example).
+Visit the [demo](https://rif-demo.cunarist.com/) running on the web to experience the smoothness and delightfulness that comes from the combination of Flutter and Rust. You can also dive into the [example code](https://github.com/cunarist/rinf/tree/main/flutter_package/example).
 
 ## 🖥️ Platform Support
 
