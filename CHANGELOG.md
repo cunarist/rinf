@@ -1,3 +1,7 @@
+## 4.12.2
+
+- Fixed guide badges.
+
 ## 4.12.1
 
 - Fixed publishing issues.
