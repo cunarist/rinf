@@ -11,7 +11,7 @@
 
 ![Preview](assets/preview.gif)
 
-This is a production-ready framework for creating beautiful and performant cross-platform apps using Flutter and Rust with batteries fully included. Simply add this framework to your app project, and you're all set to write Flutter and Rust together!
+Rinf is a production-ready framework for creating beautiful and performant cross-platform apps using Flutter and Rust with batteries fully included. Simply add this framework to your app project, and you're all set to write Flutter and Rust together!
 
 ## 🎮 Demo
 
