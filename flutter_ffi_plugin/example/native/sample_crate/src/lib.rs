@@ -27,7 +27,7 @@ pub fn get_hardward_id() -> Option<String> {
     None
 }
 
-// `chrono` supports all platforms when `wasmbind` feature is enabled.
+// `chrono` supports all platforms, including web.
 
 use chrono::{offset, DateTime};
 pub fn get_current_time() -> DateTime<offset::Local> {
