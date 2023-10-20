@@ -1,3 +1,7 @@
+## 4.12.4
+
+- Fixed permission related problems with build script files.
+
 ## 4.12.3
 
 - Fixed permission related problems with build script files.
