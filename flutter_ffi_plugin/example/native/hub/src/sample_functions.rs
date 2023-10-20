@@ -5,6 +5,11 @@ use crate::bridge::api::{RustOperation, RustRequest, RustResponse, RustSignal};
 use crate::bridge::send_rust_signal;
 use prost::Message;
 
+#[cfg(debug_assertions)]
+static SHOULD_DEMONSTRATE: bool = true;
+#[cfg(not(debug_assertions))]
+static SHOULD_DEMONSTRATE: bool = false;
+
 pub async fn handle_sample_resource(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
         RustOperation::Create => RustResponse::default(),
@@ -59,6 +64,10 @@ pub async fn handle_counter_number(rust_request: RustRequest) -> RustResponse {
 
 pub async fn stream_mandelbrot() {
     use crate::messages::mandelbrot::{StateSignal, ID};
+
+    if !SHOULD_DEMONSTRATE {
+        return;
+    }
 
     let mut scale: f64 = 1.0;
 
@@ -119,10 +128,10 @@ pub async fn stream_mandelbrot() {
     });
 }
 
-#[allow(unreachable_code)]
 pub async fn run_debug_tests() {
-    #[cfg(not(debug_assertions))]
-    return;
+    if !SHOULD_DEMONSTRATE {
+        return;
+    }
 
     crate::sleep(std::time::Duration::from_secs(1)).await;
     crate::debug_print!("Starting debug tests.");

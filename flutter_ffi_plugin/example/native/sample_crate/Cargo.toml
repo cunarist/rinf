@@ -9,4 +9,4 @@ machineid-rs = "1.2.4"
 [dependencies]
 num = "0.4"
 image = "0.24.3"
-chrono = { version = "0.4.31", features = ["wasmbind"] }
+chrono = "0.4.31"
