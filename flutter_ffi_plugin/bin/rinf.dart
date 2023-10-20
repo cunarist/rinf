@@ -87,6 +87,16 @@ Future<void> _applyRustTemplate({bool onlyBridge = false}) async {
   final cargoDestination = File('$flutterProjectPath/Cargo.toml');
   await cargoSource.copy(cargoDestination.path);
 
+  // Disable demonstrations in sample functions
+  final sampleFunctionsFile =
+      File('$flutterProjectPath/native/hub/src/sample_functions.rs');
+  var sampleFunctionsContent = await sampleFunctionsFile.readAsString();
+  sampleFunctionsContent = sampleFunctionsContent.replaceAll(
+    'static SHOULD_DEMONSTRATE: bool = true;',
+    'static SHOULD_DEMONSTRATE: bool = false;',
+  );
+  await sampleFunctionsFile.writeAsString(sampleFunctionsContent);
+
   // Add some lines to `.gitignore`
   final rustSectionTitle = '# Rust related';
   final messageSectionTitle = '# Generated messages';
