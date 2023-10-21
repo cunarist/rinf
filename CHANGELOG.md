@@ -1,3 +1,9 @@
+## 4.13.0
+
+- Improved the template code by disabling CPU-intensive tasks and removing unneeded dependency features.
+- Improved CLI outputs from `rinf wasm`.
+- Improved various guides and template comments.
+
 ## 4.12.5
 
 - Automated publication.
