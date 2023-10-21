@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'basic.dart';
+import 'ffi/stub.dart';
 import 'platform_independent.dart';
-export 'ffi.dart';
 
 /// borrowed from flutter foundation [kIsWeb](https://api.flutter.dev/flutter/foundation/kIsWeb-constant.html),
 /// but allows for using it in a Dart context alike

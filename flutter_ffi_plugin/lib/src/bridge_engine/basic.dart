@@ -2,9 +2,8 @@ import 'dart:async';
 
 import 'platform_independent.dart';
 import 'utils.dart';
-import 'ffi.dart';
-export 'ffi.dart';
 import 'isolate.dart';
+import 'ffi/stub.dart';
 export 'isolate.dart';
 
 final _instances = <Type>{};
@@ -68,33 +67,6 @@ abstract class FlutterRustBridgeBase<T extends FlutterRustBridgeWireBase> {
         _transformRust2DartMessage(raw, task.parseSuccessData));
   }
 
-  /// Similar to [executeNormal], except that this will return synchronously
-
-  S executeSync<S>(FlutterRustBridgeSyncTask task) {
-    final WireSyncReturn syncReturn;
-    try {
-      syncReturn = task.callFfi();
-    } catch (err, st) {
-      throw FfiException('EXECUTE_SYNC_ABORT', '$err', st);
-    }
-    try {
-      final syncReturnAsDartObject = wireSyncReturnIntoDart(syncReturn);
-      assert(syncReturnAsDartObject.length == 2);
-      final rawReturn = syncReturnAsDartObject[0];
-      final isSuccess = syncReturnAsDartObject[1];
-      if (isSuccess) {
-        return task.parseSuccessData(rawReturn);
-      } else {
-        throw FfiException('EXECUTE_SYNC', rawReturn as String, null);
-      }
-    } catch (err, st) {
-      if (err is FfiException) rethrow;
-      throw FfiException('EXECUTE_SYNC_ABORT', '$err', st);
-    } finally {
-      inner.free_WireSyncReturn(syncReturn);
-    }
-  }
-
   /// Similar to [executeNormal], except that this will return a [Stream] instead of a [Future].
 
   Stream<S> executeStream<S>(FlutterRustBridgeTask<S> task) async* {
@@ -153,28 +125,6 @@ class FlutterRustBridgeTask<S> extends FlutterRustBridgeBaseTask {
   final S Function(dynamic) parseSuccessData;
 
   const FlutterRustBridgeTask({
-    required this.callFfi,
-    required this.parseSuccessData,
-    required FlutterRustBridgeTaskConstMeta constMeta,
-    required List<dynamic> argValues,
-    required dynamic hint,
-  }) : super(
-          constMeta: constMeta,
-          argValues: argValues,
-          hint: hint,
-        );
-}
-
-/// A task to call FFI function, but it is synchronous.
-
-class FlutterRustBridgeSyncTask<S> extends FlutterRustBridgeBaseTask {
-  /// The underlying function to call FFI function, usually the generated wire function
-  final WireSyncReturn Function() callFfi;
-
-  /// Parse the returned data from the underlying function
-  final S Function(dynamic) parseSuccessData;
-
-  const FlutterRustBridgeSyncTask({
     required this.callFfi,
     required this.parseSuccessData,
     required FlutterRustBridgeTaskConstMeta constMeta,

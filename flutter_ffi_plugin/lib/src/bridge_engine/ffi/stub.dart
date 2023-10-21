@@ -1,16 +1,9 @@
 import 'dart:async';
 
 import 'io.dart' if (dart.library.html) 'web.dart'
-    show DartPostCObject, NativePortType, WireSyncReturn;
+    show DartPostCObject, NativePortType;
 export 'io.dart' if (dart.library.html) 'web.dart'
-    show
-        ExternalLibrary,
-        WireSyncReturn,
-        FrbOpaqueBase,
-        DartApiDl,
-        NativePortType,
-        PlatformPointer,
-        OpaqueTypeFinalizer;
+    show ExternalLibrary, DartApiDl, NativePortType;
 import 'package:rinf/src/bridge_engine/isolate.dart' show SendPort;
 
 /// This class, together with its subclasses, are only for internal usage.
@@ -36,12 +29,6 @@ abstract class FlutterRustBridgeWireBase {
   int new_dart_opaque(Object obj) {
     throw UnimplementedError();
   }
-
-  /// Not to be used by normal users, but has to be public for generated code
-  // ignore: non_constant_identifier_names
-  void free_WireSyncReturn(WireSyncReturn val) {
-    throw UnimplementedError();
-  }
 }
 
 extension NativeType on SendPort {
@@ -51,10 +38,6 @@ extension NativeType on SendPort {
 extension StoreDartPostCObjectExt on FlutterRustBridgeWireBase {
   void storeDartPostCObject() => throw UnimplementedError();
 }
-
-/// Generates the dynamic Dart object from either an FFI struct or a JS value
-List<dynamic> wireSyncReturnIntoDart(WireSyncReturn syncReturn) =>
-    throw UnimplementedError();
 
 /// Whether the web platform has been isolated by COOP and COEP headers,
 /// and is capable of sharing buffers between workers.
