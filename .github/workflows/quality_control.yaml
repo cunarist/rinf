@@ -47,8 +47,9 @@ jobs:
         run: cargo install --path ./
 
       - name: Fetch Flutter dependencies
-        working-directory: flutter_ffi_plugin/
-        run: flutter pub get
+        run: |
+          flutter pub get --directory flutter_ffi_plugin/
+          flutter pub get --directory flutter_ffi_plugin/cargokit/build_tool
 
       - name: Generate message files
         working-directory: flutter_ffi_plugin/example/

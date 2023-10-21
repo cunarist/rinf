@@ -81,10 +81,6 @@ jobs:
         working-directory: flutter_ffi_plugin/
         run: flutter create test_app
 
-      - name: Fetch Flutter dependencies
-        working-directory: flutter_ffi_plugin/test_app/
-        run: flutter pub get
-
       - name: Add this framework as a dependency
         working-directory: flutter_ffi_plugin/test_app/
         run: dart pub add "rinf:{'path':'../'}"
