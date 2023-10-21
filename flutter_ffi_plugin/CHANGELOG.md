@@ -1,3 +1,7 @@
+## 4.13.1
+
+- Fixed formatting issues in Dart code.
+
 ## 4.13.0
 
 - Improved the template code by disabling CPU-intensive tasks and removing unneeded dependency features.
