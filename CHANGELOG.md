@@ -1,3 +1,7 @@
+## 4.12.5
+
+- Automated publication.
+
 ## 4.12.4
 
 - Fixed permission related problems with build script files.
