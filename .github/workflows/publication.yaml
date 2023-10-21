@@ -8,7 +8,7 @@ name: publication
 # If you publish the packages on Windows with `dart pub publish`
 # script files are very likely to produce error on unix-like OS.
 # This issue has already been observed with `.sh` files.
-# That's why we use this manually-triggered Ubuntu workflow to publish packages.
+# That's why we must use this automated Ubuntu workflow to publish packages.
 
 on:
   push:
