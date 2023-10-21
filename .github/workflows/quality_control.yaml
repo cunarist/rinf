@@ -1,4 +1,4 @@
-name: formatting-test
+name: quality-control
 
 on:
   push:
