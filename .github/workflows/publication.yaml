@@ -29,8 +29,6 @@ jobs:
 
       - name: Setup Dart SDK
         uses: dart-lang/setup-dart@v1 # Required for configuring OIDC token
-        with:
-          channel: "stable"
 
       - name: Setup Flutter SDK
         uses: subosito/flutter-action@v2 # Required for the Flutter FFI plugin
