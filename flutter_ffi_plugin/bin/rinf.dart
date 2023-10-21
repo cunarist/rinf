@@ -274,7 +274,7 @@ Future<void> _buildWebassembly({bool isReleaseMode = false}) async {
     wasmOutput: wasmOutputPath,
     isReleaseMode: isReleaseMode,
   );
-  print("Saved `.wasm` and `.js` files to `${wasmOutputSubfolder}`.");
+  print("Saved `.wasm` and `.js` files to `$wasmOutputSubfolder`.");
 
   print("🎉 Webassembly module is now ready! 🎉");
 }

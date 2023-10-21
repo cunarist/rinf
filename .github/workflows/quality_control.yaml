@@ -63,11 +63,13 @@ jobs:
           cargo check --target wasm32-unknown-unknown
           cargo check --target wasm32-unknown-unknown --release
 
-      - name: Format Dart code
-        run: dart format .
-
-      - name: Format Rust code
+      - name: Analyze code
         run: |
+          dart analyze flutter_ffi_plugin --fatal-infos
+
+      - name: Format code
+        run: |
+          dart format .
           cargo fmt
           cargo clippy --fix --allow-dirty
 
