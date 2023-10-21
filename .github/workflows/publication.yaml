@@ -1,0 +1,47 @@
+name: publication
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upload:
+    name: upload
+    runs-on: ubuntu-latest
+
+    # With default Git settings, Unix-like systems use LF (`\n`) for new lines,
+    # while Windows uses CRLF (`\r\n`) in local repositories.
+    # This default Git behavior is not ideal for a cross-platform project like Rinf.
+    # Also, the file permission system on Windows is not compatible with unix-like OS.
+
+    # If you publish the packages on Windows with `dart pub publish`
+    # script files are very likely to produce error on unix-like OS.
+    # This issue has already been observed with `.sh` files.
+    # That's why we use this manually-triggered Ubuntu workflow to publish packages.
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Check the Flutter FFI plugin
+        working-directory: flutter_ffi_plugin/
+        run: dart pub publish --dry-run
+
+      - name: Publish the Flutter FFI plugin
+        working-directory: flutter_ffi_plugin/
+        run: dart pub publish --force
+
+      - name: Check the Rust crate
+        working-directory: rust_crate/
+        run: cargo publish --dry-run
+
+      - name: Publish the Rust crate
+        working-directory: rust_crate/
+        run: cargo publish
