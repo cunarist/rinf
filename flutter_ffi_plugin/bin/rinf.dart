@@ -263,7 +263,9 @@ Future<void> _buildWebassembly({bool isReleaseMode = false}) async {
 
   // Prepare the webassembly output path.
   final flutterProjectPath = Directory.current;
-  final wasmOutputPath = flutterProjectPath.uri.resolve('web/pkg').toFilePath();
+  final wasmOutputSubfolder = './web/pkg';
+  final wasmOutputPath =
+      flutterProjectPath.uri.resolve(wasmOutputSubfolder).toFilePath();
 
   // Build the webassembly module.
   print("Compiling Rust with `wasm-pack`...");
@@ -272,6 +274,7 @@ Future<void> _buildWebassembly({bool isReleaseMode = false}) async {
     wasmOutput: wasmOutputPath,
     isReleaseMode: isReleaseMode,
   );
+  print("Saved `.wasm` and `.js` files to `${wasmOutputSubfolder}`.");
 
   print("🎉 Webassembly module is now ready! 🎉");
 }
