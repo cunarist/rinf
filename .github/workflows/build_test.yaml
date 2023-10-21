@@ -25,7 +25,6 @@ jobs:
   build:
     name: ${{ matrix.runner }} / ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 60
     strategy:
       fail-fast: false # Important
       matrix:

@@ -13,7 +13,7 @@ name: publication
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+*" # Should match the tag pattern set on `pub.dev`.
+      - "v[0-9]+.[0-9]+.[0-9]+*" # Should match the tag pattern set on `pub.dev`
   workflow_dispatch:
 
 jobs:
@@ -21,14 +21,14 @@ jobs:
     name: upload-all
     runs-on: ubuntu-latest
     permissions:
-      id-token: write # Required for authentication using OIDC for `pub.dev`.
+      id-token: write # Required for authentication using OIDC for `pub.dev`
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Flutter SDK
-        uses: subosito/flutter-action@v2
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@v1 # Required for configuring OIDC token
         with:
           channel: "stable"
 
