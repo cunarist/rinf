@@ -1,22 +1,27 @@
 name: publication
 
+# With default Git settings, Unix-like systems use LF (`\n`) for new lines,
+# while Windows uses CRLF (`\r\n`) in local repositories.
+# This default Git behavior is not ideal for a cross-platform project like Rinf.
+# Also, the file permission system on Windows is not compatible with unix-like OS.
+
+# If you publish the packages on Windows with `dart pub publish`
+# script files are very likely to produce error on unix-like OS.
+# This issue has already been observed with `.sh` files.
+# That's why we use this manually-triggered Ubuntu workflow to publish packages.
+
 on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*" # Should match the tag pattern set on `pub.dev`.
   workflow_dispatch:
 
 jobs:
   upload:
-    name: upload
+    name: upload-all
     runs-on: ubuntu-latest
-
-    # With default Git settings, Unix-like systems use LF (`\n`) for new lines,
-    # while Windows uses CRLF (`\r\n`) in local repositories.
-    # This default Git behavior is not ideal for a cross-platform project like Rinf.
-    # Also, the file permission system on Windows is not compatible with unix-like OS.
-
-    # If you publish the packages on Windows with `dart pub publish`
-    # script files are very likely to produce error on unix-like OS.
-    # This issue has already been observed with `.sh` files.
-    # That's why we use this manually-triggered Ubuntu workflow to publish packages.
+    permissions:
+      id-token: write # Required for authentication using OIDC for `pub.dev`.
 
     steps:
       - name: Checkout repository
@@ -30,6 +35,8 @@ jobs:
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      # https://dart.dev/tools/pub/automated-publishing
+
       - name: Check the Flutter FFI plugin
         working-directory: flutter_ffi_plugin/
         run: dart pub publish --dry-run
@@ -38,10 +45,15 @@ jobs:
         working-directory: flutter_ffi_plugin/
         run: dart pub publish --force
 
+      # Save the `crates.io` API token at
+      # `GitHub repo - Settings - Security - Secrets and variables - Actions`.
+
       - name: Check the Rust crate
         working-directory: rust_crate/
         run: cargo publish --dry-run
 
       - name: Publish the Rust crate
         working-directory: rust_crate/
-        run: cargo publish
+        run: |
+          cargo login ${{ secrets.CRATES_IO_API_TOKEN }}
+          cargo publish
