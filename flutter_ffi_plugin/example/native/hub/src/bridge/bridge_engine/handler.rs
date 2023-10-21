@@ -6,7 +6,7 @@ use std::panic::{RefUnwindSafe, UnwindSafe};
 
 use crate::bridge::bridge_engine::ffi::{IntoDart, MessagePort};
 
-use crate::bridge::bridge_engine::rust2dart::{IntoIntoDart, Rust2Dart, TaskCallback};
+use crate::bridge::bridge_engine::rust_to_dart::{IntoIntoDart, Rust2Dart, TaskCallback};
 use crate::bridge::bridge_engine::support::WireSyncReturn;
 use crate::bridge::bridge_engine::SyncReturn;
 use crate::spawn_bridge_task;
