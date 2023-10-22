@@ -5,7 +5,7 @@ get_filename_component(cargokit_cmake_root "${cargokit_cmake_root}" REALPATH)
 
 if(WIN32)
     # REALPATH does not properly resolve symlinks on windows :-/
-    execute_process(COMMAND powershell -File "${CMAKE_CURRENT_LIST_DIR}/resolve_symlinks.ps1" "${cargokit_cmake_root}" OUTPUT_VARIABLE cargokit_cmake_root OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND powershell -ExecutionPolicy Bypass -File "${CMAKE_CURRENT_LIST_DIR}/resolve_symlinks.ps1" "${cargokit_cmake_root}" OUTPUT_VARIABLE cargokit_cmake_root OUTPUT_STRIP_TRAILING_WHITESPACE)
 endif()
 
 # Arguments
