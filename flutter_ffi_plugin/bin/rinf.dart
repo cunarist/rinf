@@ -92,8 +92,8 @@ Future<void> _applyRustTemplate({bool onlyBridge = false}) async {
       File('$flutterProjectPath/native/hub/src/sample_functions.rs');
   var sampleFunctionsContent = await sampleFunctionsFile.readAsString();
   sampleFunctionsContent = sampleFunctionsContent.replaceAll(
-    'static SHOULD_DEMONSTRATE: bool = true;',
-    'static SHOULD_DEMONSTRATE: bool = false;',
+    'SHOULD_DEMONSTRATE: bool = true',
+    'SHOULD_DEMONSTRATE: bool = false',
   );
   await sampleFunctionsFile.writeAsString(sampleFunctionsContent);
 

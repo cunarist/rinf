@@ -5,10 +5,7 @@ use crate::bridge::api::{RustOperation, RustRequest, RustResponse, RustSignal};
 use crate::bridge::send_rust_signal;
 use prost::Message;
 
-#[cfg(debug_assertions)]
-static SHOULD_DEMONSTRATE: bool = true;
-#[cfg(not(debug_assertions))]
-static SHOULD_DEMONSTRATE: bool = false;
+const SHOULD_DEMONSTRATE: bool = true; // Disabled when applied as template
 
 pub async fn handle_sample_resource(rust_request: RustRequest) -> RustResponse {
     match rust_request.operation {
