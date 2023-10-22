@@ -171,7 +171,7 @@ class ArtifactProvider {
     _log.fine('Downloading signature from $signatureUrl');
     if (signature.statusCode == 404) {
       _log.warning(
-          'Precompiled binaries for available for crate hash $crateHash');
+          'Precompiled binaries not available for crate hash $crateHash ($fileName)');
       return;
     }
     if (signature.statusCode != 200) {
