@@ -60,6 +60,12 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Setup Ninja and GTK3 toolchain (Only Linux target)
+        if: matrix.target == 'linux'
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ninja-build
+
       - name: Setup Java toolchain (Only Android target)
         if: matrix.target == 'android'
         uses: actions/setup-java@v3
