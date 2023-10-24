@@ -132,9 +132,7 @@ pub async fn run_debug_tests() {
     #[cfg(not(debug_assertions))]
     const IS_DEBUG_MODE: bool = false;
 
-    if !SHOULD_DEMONSTRATE {
-        return;
-    } else if !IS_DEBUG_MODE {
+    if !SHOULD_DEMONSTRATE || !IS_DEBUG_MODE {
         return;
     }
 
