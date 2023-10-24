@@ -127,7 +127,14 @@ pub async fn stream_mandelbrot() {
 }
 
 pub async fn run_debug_tests() {
+    #[cfg(debug_assertions)]
+    const IS_DEBUG_MODE: bool = true;
+    #[cfg(not(debug_assertions))]
+    const IS_DEBUG_MODE: bool = false;
+
     if !SHOULD_DEMONSTRATE {
+        return;
+    } else if !IS_DEBUG_MODE {
         return;
     }
 
