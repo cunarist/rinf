@@ -1,3 +1,7 @@
+## 4.13.2
+
+- Fixed small things.
+
 ## 4.13.1
 
 - Fixed formatting issues in Dart code.
