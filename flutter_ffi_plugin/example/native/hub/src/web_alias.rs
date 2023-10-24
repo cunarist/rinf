@@ -35,7 +35,7 @@
 // allows millions of concurrent tasks to run at the same time.
 // On the web, concurrent tasks are executed
 // in JavaScript's single-threaded event loop.
-// Crate `wasm_bindgen_futures` has the ability
+// Crate `async_wasm_task` has the ability
 // to convert Rust `Future`s into JavaScript `Promise`s.
 
 #[cfg(not(target_family = "wasm"))]
