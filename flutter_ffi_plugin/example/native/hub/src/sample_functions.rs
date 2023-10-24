@@ -36,7 +36,8 @@ pub async fn handle_counter_number(rust_request: RustRequest) -> RustResponse {
             // Decode raw bytes into a Rust message object.
             let message_bytes = rust_request.message.unwrap();
             let request_message = ReadRequest::decode(message_bytes.as_slice()).unwrap();
-            crate::debug_print!("{}", request_message.letter);
+            let letter = request_message.letter;
+            crate::debug_print!("{letter}");
 
             // Perform a simple calculation.
             let after_value: i32 = sample_crate::add_seven(request_message.before_number);
@@ -135,12 +136,16 @@ pub async fn run_debug_tests() {
 
     // Get the current time.
     let current_time = sample_crate::get_current_time();
-    crate::debug_print!("System time: {}", current_time);
+    crate::debug_print!("System time: {current_time}");
+
+    // Fetch data from a web API.
+    let web_response = sample_crate::fetch_from_web_api().await;
+    crate::debug_print!("Response from a web API: {web_response}");
 
     // Use a crate that accesses operating system APIs.
     let option = sample_crate::get_hardward_id();
     if let Some(hwid) = option {
-        crate::debug_print!("Hardware ID: {}", hwid);
+        crate::debug_print!("Hardware ID: {hwid}");
     } else {
         crate::debug_print!("Hardware ID is not available on this platform.");
     }

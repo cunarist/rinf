@@ -213,7 +213,7 @@ pub fn start_rust_logic() {
     {
         #[cfg(debug_assertions)]
         std::panic::set_hook(Box::new(|panic_info| {
-            crate::debug_print!("A panic occurred in Rust.\n{}", panic_info);
+            crate::debug_print!("A panic occurred in Rust.\n{panic_info}");
         }));
         IS_MAIN_STARTED.with(move |ref_cell| {
             let is_started = *ref_cell.borrow();
