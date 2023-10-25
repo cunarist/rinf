@@ -301,7 +301,9 @@ impl ErrorHandler for ReportDartErrorHandler {
     }
 
     fn handle_error_sync(&self, error: BridgeError) -> WireSyncReturn {
-        wire_sync_from_data(format!("{}: {}", error.code(), error.message()), false)
+        let error_code = error.code();
+        let error_message = error.message();
+        wire_sync_from_data(format!("{error_code}: {error_message}"), false)
     }
 }
 

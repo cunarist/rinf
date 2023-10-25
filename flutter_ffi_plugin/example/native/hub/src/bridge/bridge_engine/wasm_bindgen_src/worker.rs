@@ -8,9 +8,10 @@ thread_local! {
 }
 
 fn create_worker() -> Worker {
+    let script_path = script_path().unwrap();
     let script = format!(
         "
-        importScripts('{}');
+        importScripts('{script_path}');
         onmessage = event => {{
             let init = wasm_bindgen(...event.data).catch(err => {{
                 setTimeout(() => {{ throw err }})
@@ -32,7 +33,6 @@ fn create_worker() -> Worker {
             }}
         }}
         ",
-        script_path().unwrap()
     );
     let blob = Blob::new_with_blob_sequence_and_options(
         &Array::from_iter([JsValue::from(script)]).into(),
