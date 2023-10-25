@@ -36,8 +36,8 @@ pub fn get_current_time() -> DateTime<offset::Local> {
 
 // `reqwest` supports all platforms, including web.
 
-pub async fn fetch_from_web_api() -> String {
-    reqwest::get("https://jsonplaceholder.typicode.com/todos/1")
+pub async fn fetch_from_web_api(url: &str) -> String {
+    reqwest::get(url)
         .await
         .expect("Could not get the response from the example web API.")
         .text()
