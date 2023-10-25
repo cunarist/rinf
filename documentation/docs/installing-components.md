@@ -1,6 +1,6 @@
 # Installing Components
 
-To get started, you need to have [Flutter SDK](https://docs.flutter.dev/get-started/install), [Rust toolchain](<(https://www.rust-lang.org/tools/install)>), and [Protobuf compiler](https://grpc.io/docs/protoc-installation/) installed on your system.
+To get started, you need to have [Flutter SDK](https://docs.flutter.dev/get-started/install), [Rust toolchain](https://www.rust-lang.org/tools/install), and [Protobuf compiler](https://grpc.io/docs/protoc-installation/) installed on your system.
 
 > If you're working on Linux, do not install Flutter from `snap`. Flutter from `snap` comes with its own binary linker which is fundamentally incompatible with Rust. Instead, follow the manual installation method as written in the Flutter docs.
 
