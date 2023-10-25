@@ -432,6 +432,7 @@ Future<void> _generateMessageCode() async {
     'protoc-gen-prost',
   ]);
   if (cargoInstallCommand.exitCode != 0) {
+    print(cargoInstallCommand.stderr);
     throw Exception('Cannot globally install `protoc-gen-prost` Rust crate');
   }
   for (final entry in resourcesInFolders.entries) {
@@ -444,6 +445,7 @@ Future<void> _generateMessageCode() async {
       ...resourceNames.map((name) => '$name.proto'),
     ]);
     if (protocRustResult.exitCode != 0) {
+      print(protocRustResult.stderr);
       throw Exception('Could not compile `.proto` files into Rust');
     }
   }
@@ -479,6 +481,7 @@ Future<void> _generateMessageCode() async {
     'protoc_plugin',
   ]);
   if (pubGlobalActivateCommand.exitCode != 0) {
+    print(pubGlobalActivateCommand.stderr);
     throw Exception('Cannot globally install `protoc_plugin` Dart package');
   }
   final newEnvironment = Map<String, String>.from(Platform.environment);
@@ -509,6 +512,7 @@ Future<void> _generateMessageCode() async {
       environment: newEnvironment,
     );
     if (protocDartResult.exitCode != 0) {
+      print(protocDartResult.stderr);
       throw Exception('Could not compile `.proto` files into Dart');
     }
   }
