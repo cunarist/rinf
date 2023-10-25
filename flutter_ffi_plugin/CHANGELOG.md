@@ -1,3 +1,8 @@
+## 4.14.0
+
+- Added an web API fetching example to the template.
+- Fixed various things such as template comments, code linting issues.
+
 ## 4.13.2
 
 - Fixed small things.
