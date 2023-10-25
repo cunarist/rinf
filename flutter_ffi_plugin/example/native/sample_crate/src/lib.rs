@@ -33,3 +33,14 @@ use chrono::{offset, DateTime};
 pub fn get_current_time() -> DateTime<offset::Local> {
     offset::Local::now()
 }
+
+// `reqwest` supports all platforms, including web.
+
+pub async fn fetch_from_web_api() -> String {
+    reqwest::get("https://jsonplaceholder.typicode.com/todos/1")
+        .await
+        .expect("Could not get the response from the example web API.")
+        .text()
+        .await
+        .expect("Could not read body from the web response.")
+}

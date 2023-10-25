@@ -1,6 +1,6 @@
 //! The web has many restrictions due to its sandboxed environment
 //! which prevents the use of
-//! threads, atomics, time, file IO, network IO,
+//! threads, time, file IO, network IO,
 //! and many other native functionalities.
 //! Consequently, certain features are missing from various crates
 //! including Rust's `std` due to these limitations.
@@ -35,7 +35,7 @@
 // allows millions of concurrent tasks to run at the same time.
 // On the web, concurrent tasks are executed
 // in JavaScript's single-threaded event loop.
-// Crate `wasm_bindgen_futures` has the ability
+// Crate `async_wasm_task` has the ability
 // to convert Rust `Future`s into JavaScript `Promise`s.
 
 #[cfg(not(target_family = "wasm"))]
