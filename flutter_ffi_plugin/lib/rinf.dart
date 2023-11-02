@@ -64,7 +64,10 @@ class Rinf {
 /// this function will return a failed `RustResponse` object.
 /// You can see the usage example at
 /// https://pub.dev/packages/rinf/example.
-Future<RustResponse> requestToRust(RustRequest rustRequest) async {
+Future<RustResponse> requestToRust(
+  RustRequest rustRequest, {
+  Duration timeout = const Duration(seconds: 60),
+}) async {
   final id = _requestIdGenerator.generateId();
   final requestUnique = RustRequestUnique(id: id, request: rustRequest);
   api.requestToRust(requestUnique: requestUnique);
@@ -72,7 +75,7 @@ Future<RustResponse> requestToRust(RustRequest rustRequest) async {
     return responseUnique.id == id;
   });
   final responseUnique = await future.timeout(
-    const Duration(seconds: 60),
+    timeout,
     onTimeout: () {
       return RustResponseUnique(
         id: id,
