@@ -1,3 +1,7 @@
+## 4.15.0
+
+- Allowed setting custom timeout when using `requestToRust()`. Thanks `@cipherchabon`!
+
 ## 4.14.0
 
 - Added a web API fetching example to the template.
