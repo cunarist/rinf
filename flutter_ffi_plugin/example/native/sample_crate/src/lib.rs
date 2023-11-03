@@ -35,18 +35,7 @@ pub fn get_current_time() -> DateTime<offset::Local> {
 }
 
 // `reqwest` supports all platforms, including web.
-// However, compiling it for Android on Windows can be challenging
-// due to its dependency on the `openssl-sys` crate,
-// which requires the corresponding C library to be installed on the system.
-// Compiling `reqwest` for Android is possible with the right system setup,
-// but it's intentionally disabled in our sample crate
-// to ensure that the example app 'just works'.
 
-#[cfg(any(target_os = "android"))]
-pub async fn fetch_from_web_api(url: &str) -> String {
-    String::from("API fetching is disabled on this platform.")
-}
-#[cfg(not(any(target_os = "android")))]
 pub async fn fetch_from_web_api(url: &str) -> String {
     reqwest::get(url)
         .await

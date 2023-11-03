@@ -144,7 +144,7 @@ pub async fn run_debug_tests() {
     crate::debug_print!("System time: {current_time}");
 
     // Fetch data from a web API.
-    let url = "https://jsonplaceholder.typicode.com/todos/1";
+    let url = "http://jsonplaceholder.typicode.com/todos/1";
     let web_response = sample_crate::fetch_from_web_api(url).await;
     crate::debug_print!("Response from a web API: {web_response}");
 
