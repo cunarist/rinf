@@ -1,3 +1,7 @@
+## 4.15.2
+
+- Now the web API fetching example uses `http` instead of `https` in the example app.
+
 ## 4.15.1
 
 - Now the `reqwest` crate will be disabled when compiling the example app for Android.
