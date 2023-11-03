@@ -40,7 +40,7 @@ pub fn get_current_time() -> DateTime<offset::Local> {
 // which requires the corresponding C library to be installed on the system.
 // Compiling `reqwest` for Android is possible with the right system setup,
 // but it's intentionally disabled in our sample crate
-// to ensure that the example 'just works'.
+// to ensure that the example app 'just works'.
 
 #[cfg(any(target_os = "android"))]
 pub async fn fetch_from_web_api(url: &str) -> String {
