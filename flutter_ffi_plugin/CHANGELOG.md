@@ -1,3 +1,7 @@
+## 4.15.1
+
+- Now the `reqwest` crate will be disabled when compiling the example app for Android.
+
 ## 4.15.0
 
 - Allowed setting custom timeout when using `requestToRust()`. Thanks `@cipherchabon`!
