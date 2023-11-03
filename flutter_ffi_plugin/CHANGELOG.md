@@ -8,7 +8,7 @@
 
 ## 4.15.0
 
-- Allowed setting custom timeout when using `requestToRust()`. Thanks `@cipherchabon`!
+- Allowed setting custom timeout when using `requestToRust()`. Thanks @cipherchabon!
 
 ## 4.14.0
 
@@ -131,7 +131,7 @@
 
 - New `debug_print!` macro that works on all environments, including web and mobile emulators, with the power of Flutter debuggers. To use this, you need to run `rifs template` again.
 - Now panic information in Rust will be properly printed to the CLI. Note that Rust panics don't crash the app and do not hinder stability.
-- Improved docs. There are also more guides about well-known types in Protobuf. Thanks `@LucaCoduriV`!
+- Improved docs. There are also more guides about well-known types in Protobuf. Thanks @LucaCoduriV!
 
 ## 4.5.0
 
@@ -161,7 +161,7 @@
 
 ## 4.2.0
 
-- New command `rifs --help`. Thanks `@bookshiyi`!
+- New command `rifs --help`. Thanks @bookshiyi!
 
 ## 4.1.4
 
@@ -169,7 +169,7 @@
 
 ## 4.1.3
 
-- Made `rifs message` command read `PUB_CACHE` enviornment variable if present. Thanks `@rabbitson87`!
+- Made `rifs message` command read `PUB_CACHE` enviornment variable if present. Thanks @rabbitson87!
 
 ## 4.1.2
 
@@ -331,11 +331,11 @@
 
 ## 3.0.0
 
-- Adopted Protobuf for message serialization. Now communication between Dart and Rust is much more type-safe and faster than before. Because the template has now changed, you need to run `dart run rust_in_flutter template` again when migrating from version 2. Thanks `@wheregmis` and `@bookshiyi`!
+- Adopted Protobuf for message serialization. Now communication between Dart and Rust is much more type-safe and faster than before. Because the template has now changed, you need to run `dart run rust_in_flutter template` again when migrating from version 2. Thanks @wheregmis` and @bookshiyi!
 
 ## 2.9.0
 
-- Removed `corrosion`. Now this package solely relies on `cargokit` and is much more slimmer. Thanks `@bookshiyi`!
+- Removed `corrosion`. Now this package solely relies on `cargokit` and is much more slimmer. Thanks @bookshiyi!
 - Removed unneeded files from pub.dev publication.
 
 ## 2.8.5
@@ -376,19 +376,19 @@
 
 ## 2.7.1
 
-- Organized guides. Thanks `@bookshiyi`!
+- Organized guides. Thanks @bookshiyi!
 
 ## 2.7.0
 
-- Stabilized web-related Rust toolchain's auto-installation. Thanks `@bookshiyi`!
+- Stabilized web-related Rust toolchain's auto-installation. Thanks @bookshiyi!
 
 ## 2.6.0
 
-- Applied continuous integration for checking builds and improving project stability. Thanks `@bookshiyi`!
+- Applied continuous integration for checking builds and improving project stability. Thanks @bookshiyi!
 
 ## 2.5.6
 
-- Updated Cargokit. Thanks `@bookshiyi`!
+- Updated Cargokit. Thanks @bookshiyi!
 
 ## 2.5.5
 
@@ -521,7 +521,7 @@
 
 ## 1.3.2
 
-- Added Chinese guides. Thanks `@moluopro`!
+- Added Chinese guides. Thanks @moluopro!
 - Added Korean guides.
 - Added guides about build tool version issues.
 - Added guides about library bundling.
