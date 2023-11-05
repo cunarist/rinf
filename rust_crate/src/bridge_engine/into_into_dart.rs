@@ -1,4 +1,4 @@
-use crate::bridge::bridge_engine::{ffi::*, DartSafe};
+use crate::bridge_engine::{ffi::*, DartSafe};
 
 /// Basically the Into trait.
 /// We need this separate trait because we need to implement it for Vec<T> etc.

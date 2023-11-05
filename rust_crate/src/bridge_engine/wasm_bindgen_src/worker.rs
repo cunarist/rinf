@@ -1,4 +1,4 @@
-use crate::bridge::bridge_engine::script_path;
+use crate::bridge_engine::script_path;
 use js_sys::Array;
 use wasm_bindgen::prelude::*;
 use web_sys::{Blob, BlobPropertyBag, Url, Worker};

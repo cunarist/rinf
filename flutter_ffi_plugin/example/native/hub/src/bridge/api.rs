@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
-use crate::bridge::bridge_engine::StreamSink;
 use lazy_static::lazy_static;
+use rinf::bridge_engine::StreamSink;
 use std::cell::RefCell;
 use std::sync::Arc;
 use std::sync::Mutex;

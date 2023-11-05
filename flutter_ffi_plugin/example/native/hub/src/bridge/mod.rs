@@ -10,7 +10,6 @@ use api::RustSignal;
 use tokio::sync::mpsc::Receiver;
 
 pub mod api;
-pub mod bridge_engine;
 mod bridge_generated;
 
 /// This function is expected to be used only once

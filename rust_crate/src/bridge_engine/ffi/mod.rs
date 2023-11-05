@@ -44,7 +44,7 @@ pub mod io;
 #[cfg(not(target_family = "wasm"))]
 pub use io::*;
 
-use crate::bridge::bridge_engine::DartSafe;
+use crate::bridge_engine::DartSafe;
 
 /// A wrapper to transfer ownership of T to Dart.
 ///

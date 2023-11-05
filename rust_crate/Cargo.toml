@@ -6,3 +6,25 @@ license = "MIT"
 description = "Rust as your Flutter backend, Flutter as your Rust frontend"
 repository = "https://github.com/cunarist/rinf"
 documentation = "https://rinf-docs.cunarist.com"
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+libc = "0.2"
+dart-sys = { version = "4.0.2" }
+allo-isolate = { version = "0.1.20", features = ["zero-copy"] }
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+wasm-bindgen = { version = "0.2.87" }
+js-sys = "0.3.64"
+web-sys = { version = "0.3.64", features = [
+    "DedicatedWorkerGlobalScope",
+    "MessagePort",
+    "Blob",
+    "BlobPropertyBag",
+    "Worker",
+    "Url",
+    "BroadcastChannel",
+] }
+
+[dependencies]
+bytemuck = "1.14.0"
+lazy_static = "1.4.0"

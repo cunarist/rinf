@@ -95,7 +95,7 @@ elif sys.argv[1] == "bridge-gen":
 
     directory_path = "./flutter_ffi_plugin/example/native/hub/src/bridge"
     search_string = "flutter_rust_bridge::"
-    replace_string = "crate::bridge::bridge_engine::"
+    replace_string = "rinf::bridge_engine::"
     replace_string_in_files(directory_path, search_string, replace_string)
     search_string = "crate::bridge::api_web::"
     replace_string = "crate::bridge::api::"
