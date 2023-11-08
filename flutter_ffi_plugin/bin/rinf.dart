@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:package_config/package_config.dart';
-import 'dart:convert';
 
 Future<void> main(List<String> args) async {
   if (args.length == 0) {
@@ -266,18 +265,36 @@ Future<void> _buildWebassembly({bool isReleaseMode = false}) async {
 
   // Prepare the webassembly output path.
   final flutterProjectPath = Directory.current;
-  final wasmOutputSubfolder = './web/pkg';
-  final wasmOutputPath =
-      flutterProjectPath.uri.resolve(wasmOutputSubfolder).toFilePath();
+  final subPath = './web/pkg';
+  final outputPath = flutterProjectPath.uri.resolve(subPath).toFilePath();
 
   // Build the webassembly module.
   print("Compiling Rust with `wasm-pack`...");
-  await _compile(
-    crateDir: './native/hub',
-    wasmOutput: wasmOutputPath,
-    isReleaseMode: isReleaseMode,
+  final compileCommand = await Process.run(
+    'wasm-pack',
+    [
+      '--quiet',
+      'build',
+      './native/hub',
+      '--out-dir', outputPath,
+      '--out-name', 'hub',
+      '--no-typescript',
+      '--target', 'no-modules',
+      if (!isReleaseMode) '--dev',
+      '--', // Cargo build args comes from here
+      '-Z', 'build-std=std,panic_abort',
+    ],
+    environment: {
+      'RUSTUP_TOOLCHAIN': 'nightly',
+      'RUSTFLAGS': '-C target-feature=+atomics,+bulk-memory,+mutable-globals',
+      if (stdout.supportsAnsiEscapes) 'CARGO_TERM_COLOR': 'always',
+    },
   );
-  print("Saved `.wasm` and `.js` files to `$wasmOutputSubfolder`.");
+  if (compileCommand.exitCode != 0) {
+    print(compileCommand.stderr);
+    throw Exception('Unable to compile Rust into webassembly');
+  }
+  print("Saved `.wasm` and `.js` files to `$subPath`.");
 
   print("🎉 Webassembly module is now ready! 🎉");
 }
@@ -329,53 +346,6 @@ httpServer.defaultResponseHeaders.add(
   final flutterToolsStampPath = '$flutterPath/bin/cache/flutter_tools.stamp';
   if (await File(flutterToolsStampPath).exists()) {
     await File(flutterToolsStampPath).delete();
-  }
-}
-
-Future<void> _compile({
-  required String crateDir,
-  required String wasmOutput,
-  required bool isReleaseMode,
-}) async {
-  final String crateName = 'hub';
-  await _runAdvancedCommand(
-    'wasm-pack',
-    [
-      '--quiet',
-      'build', '-t', 'no-modules', '-d', wasmOutput, '--no-typescript',
-      '--out-name', crateName,
-      if (!isReleaseMode) '--dev', crateDir,
-      '--', // cargo build args
-      '-Z', 'build-std=std,panic_abort',
-    ],
-    env: {
-      'RUSTUP_TOOLCHAIN': 'nightly',
-      'RUSTFLAGS': '-C target-feature=+atomics,+bulk-memory,+mutable-globals',
-      if (stdout.supportsAnsiEscapes) 'CARGO_TERM_COLOR': 'always',
-    },
-  );
-}
-
-Future<void> _runAdvancedCommand(
-  String command,
-  List<String> arguments, {
-  Map<String, String>? env,
-  bool silent = false,
-}) async {
-  final process = await Process.start(
-    command,
-    arguments,
-    environment: env,
-  );
-  final processOutput = <String>[];
-  process.stderr.transform(utf8.decoder).listen((line) {
-    if (!silent) stderr.write(line);
-    processOutput.add(line);
-  });
-  final exitCode = await process.exitCode;
-  if (exitCode != 0) {
-    throw ProcessException(
-        command, arguments, processOutput.join(''), exitCode);
   }
 }
 
