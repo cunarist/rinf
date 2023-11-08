@@ -95,11 +95,12 @@ jobs:
           path: /flutter_ffi_plugin/test_app/Cargo.toml
 
       - name: Add test app's crates to Cargo workspace
-        uses: ciiiii/toml-editor@1.0.0
+        uses: bluwy/substitute-string-action@v1
+        id: sub
         with:
-          file: "Cargo.toml"
-          key: "workspace.members.2"
-          value: "./flutter_ffi_plugin/test_app/native/*"
+          _input-file: Cargo.toml
+          _output-file: Cargo.toml
+          "members = [": 'members = ["./flutter_ffi_plugin/test_app/native/*",'
 
       - name: Generate message files
         working-directory: flutter_ffi_plugin/test_app/
