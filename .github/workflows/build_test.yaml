@@ -100,7 +100,7 @@ jobs:
         with:
           _input-file: Cargo.toml
           _output-file: Cargo.toml
-          "members = [": 'members = ["./flutter_ffi_plugin/test_app/native/*",'
+          "example/native/*": "test_app/native/*"
 
       - name: Generate message files
         working-directory: flutter_ffi_plugin/test_app/
