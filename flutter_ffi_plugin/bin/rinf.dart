@@ -85,7 +85,7 @@ Future<void> _applyRustTemplate({bool onlyBridge = false}) async {
   await _copyDirectory(messagesSource, messagesDestination);
 
   // Create workspace `Cargo.toml`
-      final cargoText = '''
+  final cargoText = '''
 # This file is used for telling Rust-related tools
 # where various Rust crates are.
 # This also unifies `./target` output folder and
@@ -221,6 +221,8 @@ please refer to Rinf's [documentation](https://rinf-docs.cunarist.com).
   }
   await mainFile.writeAsString(mainText);
   await Process.run('dart', ['format', './lib/main.dart']);
+
+  await _generateMessageCode();
 
   print("🎉 Rust template is now ready! 🎉");
 }

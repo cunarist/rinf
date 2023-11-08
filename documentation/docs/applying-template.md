@@ -45,12 +45,6 @@ After running the command, you'll have new files and folders as your starter Rus
     └── ...
 ```
 
-Be aware that the message code in Dart and Rust doesn't exist yet. You need to generate message code from the `.proto` files in the `./messages` folder. To do this, run the following command:
-
-```bash
-rinf message
-```
-
 Don't forget to read the guides in `./native/README.md` first. Various comments are written in the actual code to help you understand the whole structure. Also, you might want to remove `sample_crate` in production.
 
 If you already have a Rust crate that you want to use here, just put it inside `./native` and set it as a dependency of the `hub` crate.

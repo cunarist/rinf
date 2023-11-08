@@ -154,8 +154,6 @@ elif sys.argv[1] == "create-test-app":
     os.system(command)
     command = "rinf template"
     os.system(command)
-    command = "rinf message"
-    os.system(command)
 
     os.remove("Cargo.toml")
 
