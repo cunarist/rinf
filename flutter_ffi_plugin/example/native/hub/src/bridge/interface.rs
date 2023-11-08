@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use lazy_static::lazy_static;
+use rinf::dependencies::lazy_static::lazy_static;
 use rinf::engine::StreamSink;
 use std::cell::RefCell;
 use std::sync::Arc;
@@ -8,6 +8,7 @@ use std::sync::Mutex;
 use tokio::sync::mpsc::channel;
 use tokio::sync::mpsc::Receiver;
 use tokio::sync::mpsc::Sender;
+use tokio_with_wasm::tokio;
 
 /// Available operations that a `RustRequest` object can hold.
 /// There are 4 options, `Create`,`Read`,`Update`, and `Delete`.
@@ -104,8 +105,8 @@ lazy_static! {
 
 #[cfg(not(target_family = "wasm"))]
 lazy_static! {
-    pub static ref TOKIO_RUNTIME: os_thread_local::ThreadLocal<Cell<tokio::runtime::Runtime>> =
-        os_thread_local::ThreadLocal::new(|| RefCell::new(None));
+    pub static ref TOKIO_RUNTIME: rinf::dependencies::os_thread_local::ThreadLocal<Cell<tokio::runtime::Runtime>> =
+        rinf::dependencies::os_thread_local::ThreadLocal::new(|| RefCell::new(None));
 }
 
 #[cfg(target_family = "wasm")]
@@ -167,6 +168,7 @@ pub fn check_rust_streams() -> bool {
 pub fn start_rust_logic() {
     #[cfg(not(target_family = "wasm"))]
     {
+        use rinf::dependencies::backtrace;
         #[cfg(debug_assertions)]
         std::panic::set_hook(Box::new(|panic_info| {
             let mut frames_filtered = Vec::new();
@@ -218,7 +220,7 @@ pub fn start_rust_logic() {
         IS_MAIN_STARTED.with(move |ref_cell| {
             let is_started = *ref_cell.borrow();
             if !is_started {
-                wasm_bindgen_futures::spawn_local(crate::main());
+                tokio::spawn(crate::main());
                 ref_cell.replace(true);
             }
         });

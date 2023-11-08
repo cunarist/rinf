@@ -4,6 +4,7 @@
 use crate::bridge::send_rust_signal;
 use crate::bridge::{RustOperation, RustRequest, RustResponse, RustSignal};
 use prost::Message;
+use tokio_with_wasm::tokio;
 
 const SHOULD_DEMONSTRATE: bool = true; // Disabled when applied as template
 
@@ -72,10 +73,10 @@ pub async fn stream_mandelbrot() {
     let (frame_sender, mut frame_receiver) = tokio::sync::mpsc::channel(5);
 
     // Send frame join handles in order.
-    crate::spawn(async move {
+    tokio::spawn(async move {
         loop {
             // Wait for 40 milliseconds on each frame
-            crate::sleep(std::time::Duration::from_millis(40)).await;
+            tokio::time::sleep(std::time::Duration::from_millis(40)).await;
             if frame_sender.capacity() == 0 {
                 continue;
             }
@@ -87,7 +88,7 @@ pub async fn stream_mandelbrot() {
 
             // Calculate the mandelbrot image
             // parallelly in a separate thread pool.
-            let join_handle = crate::spawn_blocking(move || {
+            let join_handle = tokio::task::spawn_blocking(move || {
                 sample_crate::mandelbrot(
                     sample_crate::Size {
                         width: 384,
@@ -105,7 +106,7 @@ pub async fn stream_mandelbrot() {
     });
 
     // Receive frame join handles in order.
-    crate::spawn(async move {
+    tokio::spawn(async move {
         loop {
             let join_handle = frame_receiver.recv().await.unwrap();
             let received_frame = join_handle.await.unwrap();
@@ -136,7 +137,7 @@ pub async fn run_debug_tests() {
         return;
     }
 
-    crate::sleep(std::time::Duration::from_secs(1)).await;
+    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
     crate::debug_print!("Starting debug tests.");
 
     // Get the current time.
@@ -158,15 +159,15 @@ pub async fn run_debug_tests() {
 
     // Test `tokio::join!` for futures.
     let join_first = async {
-        crate::sleep(std::time::Duration::from_secs(1)).await;
+        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
         crate::debug_print!("First future finished.");
     };
     let join_second = async {
-        crate::sleep(std::time::Duration::from_secs(2)).await;
+        tokio::time::sleep(std::time::Duration::from_secs(2)).await;
         crate::debug_print!("Second future finished.");
     };
     let join_third = async {
-        crate::sleep(std::time::Duration::from_secs(3)).await;
+        tokio::time::sleep(std::time::Duration::from_secs(3)).await;
         crate::debug_print!("Third future finished.");
     };
     tokio::join!(join_first, join_second, join_third);
@@ -178,7 +179,7 @@ pub async fn run_debug_tests() {
     loop {
         count += 1;
         if count % 10000 == 0 {
-            crate::yield_now().await;
+            tokio::task::yield_now().await;
             let time_passed = sample_crate::get_current_time() - last_time;
             if time_passed.num_milliseconds() > 1000 {
                 crate::debug_print!("Counted to {count}, yielding regularly.");
@@ -195,7 +196,7 @@ pub async fn run_debug_tests() {
     let mut join_handles = Vec::new();
     let chunk_size = 10_i32.pow(6);
     for level in 0..10 {
-        let join_handle = crate::spawn_blocking(move || {
+        let join_handle = tokio::task::spawn_blocking(move || {
             let mut prime_count = 0;
             let count_from = level * chunk_size + 1;
             let count_to = (level + 1) * chunk_size;

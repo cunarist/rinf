@@ -7,6 +7,7 @@
 
 pub use interface::*;
 use tokio::sync::mpsc::Receiver;
+use tokio_with_wasm::tokio;
 
 mod generated;
 mod interface;
