@@ -80,7 +80,7 @@ Now, write our new endpoint Rust function `sample_functions::handle_tutorial_res
 ```rust
 // native/hub/src/sample_functions.rs
 ...
-use crate::bridge::api::{RustOperation, RustRequest, RustResponse, RustSignal};
+use crate::bridge::{RustOperation, RustRequest, RustResponse, RustSignal};
 ...
 pub async fn handle_tutorial_resource(rust_request: RustRequest) -> RustResponse {
     use crate::messages::tutorial_resource::{ReadRequest, ReadResponse};
@@ -120,7 +120,7 @@ The name of the new Rust resource was `tutorial_resource`. Make sure that the re
 ```rust
 // native/hub/src/with_request.rs
 ...
-use crate::bridge::api::{RustRequestUnique, RustResponse, RustResponseUnique};
+use crate::bridge::{RustRequestUnique, RustResponse, RustResponseUnique};
 use crate::messages;
 use crate::sample_functions;
 ...
@@ -202,7 +202,7 @@ Define an async Rust function that runs forever, sending numbers to Dart every s
 ```rust
 // native/hub/src/sample_functions.rs
 ...
-use crate::bridge::api::{RustOperation, RustRequest, RustResponse, RustSignal};
+use crate::bridge::{RustOperation, RustRequest, RustResponse, RustSignal};
 use crate::bridge::send_rust_signal;
 ...
 pub async fn stream_increasing_number() {
@@ -210,7 +210,7 @@ pub async fn stream_increasing_number() {
 
     let mut current_number: i32 = 1;
     loop {
-        crate::sleep(std::time::Duration::from_secs(1)).await;
+        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 
         let signal_message = StateSignal { current_number };
         let rust_signal = RustSignal {
@@ -233,8 +233,8 @@ Spawn the async function in Rust.
 ...
 mod sample_functions;
 ...
-crate::spawn(sample_functions::stream_mandelbrot());
-crate::spawn(sample_functions::stream_increasing_number()); // ADD THIS LINE
+tokio::spawn(sample_functions::stream_mandelbrot());
+tokio::spawn(sample_functions::stream_increasing_number()); // ADD THIS LINE
 while let Some(request_unique) = request_receiver.recv().await {
 ...
 ```

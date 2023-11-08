@@ -12,7 +12,7 @@ mod with_request;
 async fn main() {
     // This is `tokio::sync::mpsc::Reciver` that receives the requests from Dart.
     let mut request_receiver = bridge::get_request_receiver();
-    // Repeat `crate::spawn` anywhere in your code
+    // Repeat `tokio::spawn` anywhere in your code
     // if more concurrent tasks are needed.
     tokio::spawn(sample_functions::stream_mandelbrot());
     tokio::spawn(sample_functions::run_debug_tests());

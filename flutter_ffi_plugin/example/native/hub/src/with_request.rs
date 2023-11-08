@@ -11,7 +11,7 @@ pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUn
     let rust_request = request_unique.request;
     let interaction_id = request_unique.id;
 
-    // Run the function that handles the resource.
+    // Run the function that handles the Rust resource.
     let rust_resource = rust_request.resource;
     let rust_response = match rust_resource {
         messages::counter_number::ID => sample_functions::handle_counter_number(rust_request).await,
