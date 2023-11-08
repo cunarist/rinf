@@ -95,11 +95,11 @@ jobs:
           path: /flutter_ffi_plugin/test_app/Cargo.toml
 
       - name: Add test app's crates to Cargo workspace
-        uses: MathieuSoysal/replace-string-in-file@v1.0.0
+        uses: richardrigutins/replace-in-files@v2
         with:
-          file: Cargo.toml
-          old-string: example/native/
-          new-string: test_app/native/
+          files: Cargo.toml
+          search-text: example/native/*
+          replacement-text: test_app/native/*
 
       - name: Generate message files
         working-directory: flutter_ffi_plugin/test_app/
