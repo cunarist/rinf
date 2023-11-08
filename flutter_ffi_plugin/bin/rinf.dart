@@ -85,9 +85,18 @@ Future<void> _applyRustTemplate({bool onlyBridge = false}) async {
   await _copyDirectory(messagesSource, messagesDestination);
 
   // Copy `Cargo.toml`
-  final cargoSource = File('$packagePath/example/Cargo.toml');
-  final cargoDestination = File('$flutterProjectPath/Cargo.toml');
-  await cargoSource.copy(cargoDestination.path);
+      final cargoText = '''
+# This file is used for telling Rust-related tools
+# where various Rust crates are.
+# This also unifies `./target` output folder and
+# various Rust configurations.
+
+[workspace]
+members = ["./native/*"]
+resolver = "2"
+''';
+  final cargoFile = File('$flutterProjectPath/Cargo.toml');
+  await cargoFile.writeAsString(cargoText);
 
   // Disable demonstrations in sample functions
   final sampleFunctionsFile =

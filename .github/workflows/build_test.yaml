@@ -89,6 +89,11 @@ jobs:
         working-directory: flutter_ffi_plugin/test_app/
         run: rinf template
 
+      - name: Remove the workspace Cargo file
+        uses: JesseTG/rm@v1.0.3
+        with:
+          path: flutter_ffi_plugin/test_app/Cargo.toml
+
       - name: Generate message files
         working-directory: flutter_ffi_plugin/test_app/
         run: rinf message
