@@ -98,8 +98,8 @@ jobs:
         uses: richardrigutins/replace-in-files@v2
         with:
           files: Cargo.toml
-          search-text: example/native/*
-          replacement-text: test_app/native/*
+          search-text: "example/native/*"
+          replacement-text: "test_app/native/*"
 
       - name: Generate message files
         working-directory: flutter_ffi_plugin/test_app/
