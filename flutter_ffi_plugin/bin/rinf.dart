@@ -222,7 +222,7 @@ please refer to Rinf's [documentation](https://rinf-docs.cunarist.com).
   await mainFile.writeAsString(mainText);
   await Process.run('dart', ['format', './lib/main.dart']);
 
-  await _generateMessageCode();
+  await _generateMessageCode(silent: true);
 
   print("🎉 Rust template is now ready! 🎉");
 }
@@ -360,7 +360,7 @@ httpServer.defaultResponseHeaders.add(
   }
 }
 
-Future<void> _generateMessageCode() async {
+Future<void> _generateMessageCode({bool silent = false}) async {
   // Prepare paths.
   final flutterProjectPath = Directory.current;
   final protoPath = flutterProjectPath.uri.resolve('messages').toFilePath();
@@ -520,7 +520,9 @@ Future<void> _generateMessageCode() async {
   }
 
   // Notify that it's done
-  print("🎉 Message code in Dart and Rust is now ready! 🎉");
+  if (!silent) {
+    print("🎉 Message code in Dart and Rust is now ready! 🎉");
+  }
 }
 
 Future<void> _emptyDirectory(String directoryPath) async {

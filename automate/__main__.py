@@ -141,7 +141,7 @@ elif sys.argv[1] == "create-test-app":
     filepath = ".gitignore"
     with open(filepath, mode="r", encoding="utf8") as file:
         content: str = file.read()
-    content += "/test_app/"
+    content += "\n/test_app/"
     with open(filepath, mode="w", encoding="utf8") as file:
         file.write(content)
 
@@ -163,8 +163,8 @@ elif sys.argv[1] == "create-test-app":
     with open(filepath, mode="r", encoding="utf8") as file:
         content: str = file.read()
     content = content.replace(
-        "members = [",
-        'members = ["./test_app/native/*", ',
+        "flutter_ffi_plugin/example/native/*",
+        "test_app/native/*",
     )
     with open(filepath, mode="w", encoding="utf8") as file:
         file.write(content)
