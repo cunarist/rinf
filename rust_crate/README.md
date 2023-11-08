@@ -1,7 +1,7 @@
 # Rinf: Rust in Flutter
 
 [![Pub Version](https://img.shields.io/pub/v/rinf)](https://pub.dev/packages/rinf)
-[![Pub Points](https://img.shields.io/pub/points/rinf)](https://pub.dev/packages/rinf)
+[![Crate Version](https://img.shields.io/crates/v/rinf)](https://crates.io/crates/rinf)
 [![GitHub Stars](https://img.shields.io/github/stars/cunarist/rinf)](https://github.com/cunarist/rinf/stargazers)
 [![Build Test](https://github.com/cunarist/rinf/actions/workflows/build_test.yaml/badge.svg)](https://github.com/cunarist/rinf/actions/workflows/build_test.yaml?query=branch%3Amain)
 [![GitHub License](https://img.shields.io/github/license/cunarist/rinf)](https://github.com/cunarist/rinf/blob/main/LICENSE)

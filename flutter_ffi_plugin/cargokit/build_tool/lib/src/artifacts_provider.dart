@@ -157,6 +157,27 @@ class ArtifactProvider {
     return res;
   }
 
+  static Future<Response> _get(Uri url, {Map<String, String>? headers}) async {
+    int attempt = 0;
+    const maxAttempts = 10;
+    while (true) {
+      try {
+        return await get(url, headers: headers);
+      } on SocketException catch (e) {
+        // Try to detect reset by peer error and retry.
+        if (attempt++ < maxAttempts &&
+            (e.osError?.errorCode == 54 || e.osError?.errorCode == 10054)) {
+          _log.severe(
+              'Failed to download $url: $e, attempt $attempt of $maxAttempts, will retry...');
+          await Future.delayed(Duration(seconds: 1));
+          continue;
+        } else {
+          rethrow;
+        }
+      }
+    }
+  }
+
   Future<void> _tryDownloadArtifacts({
     required String crateHash,
     required String fileName,
@@ -167,11 +188,11 @@ class ArtifactProvider {
     final prefix = precompiledBinaries.uriPrefix;
     final url = Uri.parse('$prefix$crateHash/$fileName');
     final signatureUrl = Uri.parse('$prefix$crateHash/$signatureFileName');
-    final signature = await get(signatureUrl);
     _log.fine('Downloading signature from $signatureUrl');
+    final signature = await _get(signatureUrl);
     if (signature.statusCode == 404) {
       _log.warning(
-          'Precompiled binaries for available for crate hash $crateHash');
+          'Precompiled binaries not available for crate hash $crateHash ($fileName)');
       return;
     }
     if (signature.statusCode != 200) {
@@ -180,7 +201,7 @@ class ArtifactProvider {
       return;
     }
     _log.fine('Downloading binary from $url');
-    final res = await get(url);
+    final res = await _get(url);
     if (res.statusCode != 200) {
       _log.severe('Failed to download binary $url: status ${res.statusCode}');
       return;

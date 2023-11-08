@@ -4,7 +4,17 @@
 
 Let's say that you want to make a new button that sends an array of numbers and a string from Dart to Rust to perform some calculation on it. You can follow these steps to understand how to send a request and wait for the response.
 
-Let's start from our [default example](https://github.com/cunarist/rinf/tree/main/flutter_ffi_plugin/example).
+First, create a `Column` somewhere in your widget tree. This will contain our tutorial widgets.
+
+```dart
+// lib/main.dart
+...
+child: Column(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [],
+)
+...
+```
 
 Create a new `.proto` file in `./messages` that represents the new Rust resource.
 
@@ -80,7 +90,7 @@ Now, write our new endpoint Rust function `sample_functions::handle_tutorial_res
 ```rust
 // native/hub/src/sample_functions.rs
 ...
-use crate::bridge::api::{RustOperation, RustRequest, RustResponse, RustSignal};
+use crate::bridge::{RustOperation, RustRequest, RustResponse, RustSignal};
 ...
 pub async fn handle_tutorial_resource(rust_request: RustRequest) -> RustResponse {
     use crate::messages::tutorial_resource::{ReadRequest, ReadResponse};
@@ -120,7 +130,7 @@ The name of the new Rust resource was `tutorial_resource`. Make sure that the re
 ```rust
 // native/hub/src/with_request.rs
 ...
-use crate::bridge::api::{RustRequestUnique, RustResponse, RustResponseUnique};
+use crate::bridge::{RustRequestUnique, RustResponse, RustResponseUnique};
 use crate::messages;
 use crate::sample_functions;
 ...
@@ -202,7 +212,7 @@ Define an async Rust function that runs forever, sending numbers to Dart every s
 ```rust
 // native/hub/src/sample_functions.rs
 ...
-use crate::bridge::api::{RustOperation, RustRequest, RustResponse, RustSignal};
+use crate::bridge::{RustOperation, RustRequest, RustResponse, RustSignal};
 use crate::bridge::send_rust_signal;
 ...
 pub async fn stream_increasing_number() {
@@ -210,7 +220,7 @@ pub async fn stream_increasing_number() {
 
     let mut current_number: i32 = 1;
     loop {
-        crate::sleep(std::time::Duration::from_secs(1)).await;
+        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 
         let signal_message = StateSignal { current_number };
         let rust_signal = RustSignal {
@@ -233,8 +243,8 @@ Spawn the async function in Rust.
 ...
 mod sample_functions;
 ...
-crate::spawn(sample_functions::stream_mandelbrot());
-crate::spawn(sample_functions::stream_increasing_number()); // ADD THIS LINE
+tokio::spawn(sample_functions::stream_mandelbrot());
+tokio::spawn(sample_functions::stream_increasing_number()); // ADD THIS LINE
 while let Some(request_unique) = request_receiver.recv().await {
 ...
 ```
@@ -307,3 +317,52 @@ crate::debug_print!("My object is {my_object:?}");
 ```
 
 `debug_print!` is also better than `println!` because it only works in debug mode, resulting in a smaller and cleaner release binary.
+
+## 🌅 The `ensureFinalized()` method
+
+When the Flutter app is closed, the whole `tokio` runtime on the Rust side will be terminated automatically. However, some error messages can appear in the console if the Rust side sends messages to the Dart side after even after the Dart VM has stopped. To prevent this, you can call `Rinf.ensureFinalized()` in Dart to terminate all Rust tasks before closing the Flutter app.
+
+```dart
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:rinf/rinf.dart';
+
+...
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _appLifecycleListener = AppLifecycleListener(
+    onExitRequested: () async {
+      // Terminate Rust tasks before closing the Flutter app.
+      await Rinf.ensureFinalized();
+      return AppExitResponse.exit;
+    },
+  );
+
+  @override
+  void dispose() {
+    _appLifecycleListener.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Rinf Example',
+      theme: ThemeData(
+        useMaterial3: true,
+        brightness: MediaQuery.platformBrightnessOf(context),
+      ),
+      home: MyHomePage(),
+    );
+  }
+}
+
+...
+```

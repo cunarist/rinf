@@ -1,7 +1,7 @@
 import 'dart:io' as io;
 import 'dart:ffi';
-import 'bridge_generated.dart';
-import 'bridge_definitions.dart';
+import 'bridge/generated.dart';
+import 'bridge/definitions.dart';
 
 final Bridge api = BridgeImpl(loadNativeLibrary());
 
