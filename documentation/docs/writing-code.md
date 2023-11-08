@@ -307,3 +307,52 @@ crate::debug_print!("My object is {my_object:?}");
 ```
 
 `debug_print!` is also better than `println!` because it only works in debug mode, resulting in a smaller and cleaner release binary.
+
+## 🌅 The `ensureFinalized()` method
+
+When the Flutter app is closed, the whole `tokio` runtime on the Rust side will be terminated automatically. However, some error messages can appear in the console if the Rust side sends messages to the Dart side after even after the Dart VM has stopped. To prevent this, you can call `Rinf.ensureFinalized()` in Dart to terminate all Rust tasks before closing the Flutter app.
+
+```dart
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:rinf/rinf.dart';
+
+...
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _appLifecycleListener = AppLifecycleListener(
+    onExitRequested: () async {
+      // Terminate Rust tasks before closing the Flutter app.
+      await Rinf.ensureFinalized();
+      return AppExitResponse.exit;
+    },
+  );
+
+  @override
+  void dispose() {
+    _appLifecycleListener.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Rinf Example',
+      theme: ThemeData(
+        useMaterial3: true,
+        brightness: MediaQuery.platformBrightnessOf(context),
+      ),
+      home: MyHomePage(),
+    );
+  }
+}
+
+...
+```
