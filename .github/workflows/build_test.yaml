@@ -95,12 +95,11 @@ jobs:
           path: /flutter_ffi_plugin/test_app/Cargo.toml
 
       - name: Add test app's crates to Cargo workspace
-        uses: bluwy/substitute-string-action@v1
-        id: sub
+        uses: jacobtomlinson/gha-find-replace@v3
         with:
-          _input-file: Cargo.toml
-          _output-file: Cargo.toml
-          "example/native/*": "test_app/native/*"
+          find: "example/native/*"
+          replace: "test_app/native/*"
+          include: Cargo.toml
 
       - name: Generate message files
         working-directory: flutter_ffi_plugin/test_app/
