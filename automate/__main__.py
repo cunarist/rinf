@@ -131,7 +131,6 @@ elif sys.argv[1] == "cargokit-update":
     command += " --prefix flutter_ffi_plugin/cargokit"
     command += " https://github.com/irondash/cargokit.git"
     command += " main"
-    command += " --squash"
     os.system(command)
 
 elif sys.argv[1] == "create-test-app":
