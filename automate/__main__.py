@@ -101,9 +101,6 @@ elif sys.argv[1] == "bridge-gen":
     search_string = "flutter_rust_bridge::"
     replace_string = "rinf::engine::"
     replace_string_in_files(directory_path, search_string, replace_string)
-    search_string = "crate::bridge::api_web::"
-    replace_string = "crate::bridge::api::"
-    replace_string_in_files(directory_path, search_string, replace_string)
     search_string = "FLUTTER_RUST_BRIDGE_HANDLER"
     replace_string = "BRIDGE_HANDLER"
     replace_string_in_files(directory_path, search_string, replace_string)
