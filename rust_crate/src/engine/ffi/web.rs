@@ -2,10 +2,10 @@ use std::iter::FromIterator;
 
 use super::DartAbi;
 use super::MessagePort;
-use crate::bridge_engine::support;
-use crate::bridge_engine::DartOpaque;
-use crate::bridge_engine::DartSafe;
-use crate::bridge_engine::RustOpaque;
+use crate::engine::support;
+use crate::engine::DartOpaque;
+use crate::engine::DartSafe;
+use crate::engine::RustOpaque;
 pub use js_sys::Array as JsArray;
 use js_sys::*;
 pub use wasm_bindgen;

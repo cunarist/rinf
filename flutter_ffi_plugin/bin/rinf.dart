@@ -70,6 +70,9 @@ Future<void> _applyRustTemplate({bool onlyBridge = false}) async {
   if (onlyBridge) {
     final source = Directory('$packagePath/example/native/hub/src/bridge');
     final destination = Directory('$flutterProjectPath/native/hub/src/bridge');
+    if (await destination.exists()) {
+      await destination.delete();
+    }
     await _copyDirectory(source, destination);
     return;
   }

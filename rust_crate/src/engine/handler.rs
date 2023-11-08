@@ -4,11 +4,11 @@ use std::any::Any;
 use std::panic;
 use std::panic::{RefUnwindSafe, UnwindSafe};
 
-use crate::bridge_engine::ffi::{IntoDart, MessagePort};
+use crate::engine::ffi::{IntoDart, MessagePort};
 
-use crate::bridge_engine::rust2dart::{IntoIntoDart, Rust2Dart, TaskCallback};
-use crate::bridge_engine::support::WireSyncReturn;
-use crate::bridge_engine::SyncReturn;
+use crate::engine::rust2dart::{IntoIntoDart, Rust2Dart, TaskCallback};
+use crate::engine::support::WireSyncReturn;
+use crate::engine::SyncReturn;
 use crate::spawn_bridge_task;
 
 /// The types of return values for a particular Rust function.
@@ -311,7 +311,7 @@ fn wire_sync_from_data<T: IntoDart>(data: T, success: bool) -> WireSyncReturn {
     let sync_return = vec![data.into_dart(), success.into_dart()].into_dart();
 
     #[cfg(not(target_family = "wasm"))]
-    return crate::bridge_engine::support::new_leak_box_ptr(sync_return);
+    return crate::engine::support::new_leak_box_ptr(sync_return);
 
     #[cfg(target_family = "wasm")]
     return sync_return;

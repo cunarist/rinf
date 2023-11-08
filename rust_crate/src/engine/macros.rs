@@ -8,7 +8,7 @@ macro_rules! spawn_bridge_task {
         }
         #[cfg(target_family = "wasm")]
         {
-            $crate::bridge_engine::wasm_bindgen_src::worker::WEB_WORKER.with(|worker| {
+            $crate::engine::wasm_bindgen_src::worker::WEB_WORKER.with(|worker| {
                 let _ = bridge_task.apply(worker);
             });
         }
@@ -42,7 +42,7 @@ macro_rules! transfer {
         #[cfg(target_family = "wasm")]
         {
             use wasm_bindgen::JsValue;
-            use $crate::bridge_engine::ffi::Transfer;
+            use $crate::engine::ffi::Transfer;
             #[allow(unused_variables)]
             let worker = move |transfer: &[JsValue]| {
                 let idx = 0;
@@ -53,7 +53,7 @@ macro_rules! transfer {
                 $block
             };
             let transferables = [$($param.transferables()),*].concat();
-            $crate::bridge_engine::ffi::TransferClosure::new(
+            $crate::engine::ffi::TransferClosure::new(
                 vec![$($param.serialize()),*],
                 transferables,
                 worker,
@@ -68,6 +68,6 @@ macro_rules! console_error {
         $crate::error($lit)
     };
     ($($tt:tt)*) => {
-        $crate::bridge_engine::error(&format!($($tt)*))
+        $crate::engine::error(&format!($($tt)*))
     };
 }

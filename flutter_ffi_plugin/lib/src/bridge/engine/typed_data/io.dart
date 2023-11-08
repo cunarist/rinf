@@ -2,7 +2,7 @@ export 'dart:typed_data' hide Int64List, Uint64List;
 import 'dart:collection';
 import 'dart:typed_data' as $data;
 
-import 'package:rinf/src/bridge_engine/exports.dart';
+import 'package:rinf/src/bridge/engine/exports.dart';
 
 abstract class _TypedList<T> extends ListMixin<T> {
   List<int> get inner;

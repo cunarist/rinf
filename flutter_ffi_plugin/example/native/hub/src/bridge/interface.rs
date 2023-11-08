@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use lazy_static::lazy_static;
-use rinf::bridge_engine::StreamSink;
+use rinf::engine::StreamSink;
 use std::cell::RefCell;
 use std::sync::Arc;
 use std::sync::Mutex;

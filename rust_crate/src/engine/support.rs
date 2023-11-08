@@ -4,10 +4,10 @@
 
 use std::mem;
 
-pub use crate::bridge_engine::ffi::*;
+pub use crate::engine::ffi::*;
 pub use lazy_static::lazy_static;
 
-pub use crate::bridge_engine::handler::DefaultHandler;
+pub use crate::engine::handler::DefaultHandler;
 
 // ref https://stackoverflow.com/questions/39224904/how-to-expose-a-rust-vect-to-ffi
 pub fn new_leak_vec_ptr<T: Clone>(fill: T, length: i32) -> *mut T {

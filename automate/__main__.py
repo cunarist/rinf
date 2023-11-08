@@ -48,15 +48,19 @@ elif sys.argv[1] == "bridge-gen":
     remove_files_in_folder(
         "./flutter_ffi_plugin/example/native/hub/src/bridge", "bridge"
     )
-    remove_files_in_folder("./flutter_ffi_plugin/lib/src", "bridge")
+    remove_files_in_folder("./flutter_ffi_plugin/lib/src/bridge", "bridge")
 
     # Generate bridge files.
     command = "flutter_rust_bridge_codegen"
-    command += " --rust-input ./flutter_ffi_plugin/example/native/hub/src/bridge/api.rs"
-    command += " --rust-output ./flutter_ffi_plugin/example/native/hub/src/bridge/bridge_generated.rs"
-    command += " --dart-output ./flutter_ffi_plugin/lib/src/bridge_generated.dart"
     command += (
-        " --dart-decl-output ./flutter_ffi_plugin/lib/src/bridge_definitions.dart"
+        " --rust-input ./flutter_ffi_plugin/example/native/hub/src/bridge/interface.rs"
+    )
+    command += (
+        " --rust-output ./flutter_ffi_plugin/example/native/hub/src/bridge/generated.rs"
+    )
+    command += " --dart-output ./flutter_ffi_plugin/lib/src/bridge/generated.dart"
+    command += (
+        " --dart-decl-output ./flutter_ffi_plugin/lib/src/bridge/definitions.dart"
     )
     command += " --class-name Bridge"
     command += " --wasm"
@@ -73,9 +77,9 @@ elif sys.argv[1] == "bridge-gen":
         file.write("".join(lines))
 
     # Modify some code.
-    directory_path = "./flutter_ffi_plugin/lib/src/"
+    directory_path = "./flutter_ffi_plugin/lib/src/bridge"
     search_string = "package:flutter_rust_bridge/flutter_rust_bridge.dart"
-    replace_string = "bridge_engine/exports.dart"
+    replace_string = "engine/exports.dart"
     replace_string_in_files(directory_path, search_string, replace_string)
     search_string = "\nimport 'package:uuid/uuid.dart';"
     replace_string = ""
@@ -95,7 +99,7 @@ elif sys.argv[1] == "bridge-gen":
 
     directory_path = "./flutter_ffi_plugin/example/native/hub/src/bridge"
     search_string = "flutter_rust_bridge::"
-    replace_string = "rinf::bridge_engine::"
+    replace_string = "rinf::engine::"
     replace_string_in_files(directory_path, search_string, replace_string)
     search_string = "crate::bridge::api_web::"
     replace_string = "crate::bridge::api::"

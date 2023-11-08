@@ -1,8 +1,8 @@
 //! This module is only for demonstration purposes.
 //! You might want to remove this module in production.
 
-use crate::bridge::api::{RustOperation, RustRequest, RustResponse, RustSignal};
 use crate::bridge::send_rust_signal;
+use crate::bridge::{RustOperation, RustRequest, RustResponse, RustSignal};
 use prost::Message;
 
 const SHOULD_DEMONSTRATE: bool = true; // Disabled when applied as template

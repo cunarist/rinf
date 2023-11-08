@@ -6,8 +6,8 @@ use std::marker::PhantomData;
 ///
 /// Its implementation lies with the Dart language and therefore should not be
 /// depended on to be stable.
-pub use crate::bridge_engine::ffi::*;
-pub use crate::bridge_engine::into_into_dart::IntoIntoDart;
+pub use crate::engine::ffi::*;
+pub use crate::engine::into_into_dart::IntoIntoDart;
 
 /// A wrapper around a Dart [`Isolate`].
 #[derive(Clone)]
