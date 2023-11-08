@@ -170,8 +170,7 @@ cargo install rinf
 ```
 
 Messages sent between Dart and Rust are implemented using Protobuf.
-If you have newly cloned the project repository
-or made changes to the `.proto` files in the `./messages` directory,
+If you have made changes to the `.proto` files in the `./messages` directory,
 run the following command:
 
 ```bash
