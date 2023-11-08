@@ -13,7 +13,7 @@ crate-type = ["lib", "cdylib", "staticlib"]
 
 [dependencies]
 rinf = { path = "../../../../rust_crate" }
-tokio_with_wasm = { path = "../../../../../async-wasm-task" }
-wasm-bindgen = { version = "0.2.87" }
+tokio_with_wasm = "0.3.1"
+wasm-bindgen = "0.2.87"
 prost = "0.12.0"
 sample_crate = { path = "../sample_crate" }
