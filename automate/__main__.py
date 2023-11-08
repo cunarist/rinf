@@ -137,12 +137,39 @@ elif sys.argv[1] == "cargokit-update":
     command += " --squash"
     os.system(command)
 
+elif sys.argv[1] == "create-test-app":
+    os.chdir("./flutter_ffi_plugin/")
+    command = "flutter create test_app"
+    os.system(command)
+
+    os.chdir("./test_app/")
+    command = "dart pub add \"rinf:{'path':'../'}\""
+    os.system(command)
+    command = "rinf template"
+    os.system(command)
+    command = "rinf message"
+    os.system(command)
+
+    os.remove("Cargo.toml")
+
+    os.chdir("../../")
+    filepath = "Cargo.toml"
+    with open(filepath, mode="r", encoding="utf8") as file:
+        content: str = file.read()
+    content = content.replace(
+        "members = [",
+        'members = ["./flutter_ffi_plugin/test_app/native/*", ',
+    )
+    with open(filepath, mode="w", encoding="utf8") as file:
+        file.write(content)
+
 elif sys.argv[1] == "--help" or sys.argv[1] == "-h":
     print("Usage: python automate [arguments]")
     print("Arguments:")
     print("  -h, --help        Shows this usage information.")
     print("  bridge-gen        Generates bridge files.")
     print("  cargokit-update   Updates CargoKit.")
+    print("  create-test-app   Creates a temporary test app.")
 
 else:
     print("No such option for automation is available.")

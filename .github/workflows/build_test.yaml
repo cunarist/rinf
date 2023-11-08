@@ -73,37 +73,15 @@ jobs:
           distribution: "zulu"
           java-version: "11"
 
+      - name: Setup Python
+        uses: actions/setup-python@v4
+
       - name: Install the CLI tool
         working-directory: rust_crate/
         run: cargo install --path ./
 
       - name: Create a Flutter app for testing
-        working-directory: flutter_ffi_plugin/
-        run: flutter create test_app
-
-      - name: Add this framework as a dependency
-        working-directory: flutter_ffi_plugin/test_app/
-        run: dart pub add "rinf:{'path':'../'}"
-
-      - name: Apply Rust template
-        working-directory: flutter_ffi_plugin/test_app/
-        run: rinf template
-
-      - name: Remove the template workspace Cargo file
-        uses: JesseTG/rm@v1.0.3
-        with:
-          path: ./flutter_ffi_plugin/test_app/Cargo.toml
-
-      - name: Add test app's crates to Cargo workspace
-        uses: richardrigutins/replace-in-files@v2
-        with:
-          files: Cargo.toml
-          search-text: "example/native/*"
-          replacement-text: "test_app/native/*"
-
-      - name: Generate message files
-        working-directory: flutter_ffi_plugin/test_app/
-        run: rinf message
+        run: python automate create-test-app
 
       - name: Build the example app
         if: matrix.target == 'linux'
