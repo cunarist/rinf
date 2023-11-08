@@ -84,7 +84,7 @@ Future<void> _applyRustTemplate({bool onlyBridge = false}) async {
   final messagesDestination = Directory('$flutterProjectPath/messages');
   await _copyDirectory(messagesSource, messagesDestination);
 
-  // Copy `Cargo.toml`
+  // Create workspace `Cargo.toml`
       final cargoText = '''
 # This file is used for telling Rust-related tools
 # where various Rust crates are.
