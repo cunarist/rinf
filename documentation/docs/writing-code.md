@@ -4,7 +4,17 @@
 
 Let's say that you want to make a new button that sends an array of numbers and a string from Dart to Rust to perform some calculation on it. You can follow these steps to understand how to send a request and wait for the response.
 
-Let's start from our [default example](https://github.com/cunarist/rinf/tree/main/flutter_ffi_plugin/example).
+First, create a `Column` somewhere in your widget tree. This will contain our tutorial widgets.
+
+```dart
+// lib/main.dart
+...
+child: Column(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [],
+)
+...
+```
 
 Create a new `.proto` file in `./messages` that represents the new Rust resource.
 
