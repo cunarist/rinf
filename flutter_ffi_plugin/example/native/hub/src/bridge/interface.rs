@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
-use rinf::dependencies::lazy_static::lazy_static;
 use rinf::engine::StreamSink;
+use rinf::externs::lazy_static::lazy_static;
 use std::cell::RefCell;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -105,8 +105,8 @@ lazy_static! {
 
 #[cfg(not(target_family = "wasm"))]
 lazy_static! {
-    pub static ref TOKIO_RUNTIME: rinf::dependencies::os_thread_local::ThreadLocal<Cell<tokio::runtime::Runtime>> =
-        rinf::dependencies::os_thread_local::ThreadLocal::new(|| RefCell::new(None));
+    pub static ref TOKIO_RUNTIME: rinf::externs::os_thread_local::ThreadLocal<Cell<tokio::runtime::Runtime>> =
+        rinf::externs::os_thread_local::ThreadLocal::new(|| RefCell::new(None));
 }
 
 #[cfg(target_family = "wasm")]
@@ -168,7 +168,7 @@ pub fn check_rust_streams() -> bool {
 pub fn start_rust_logic() {
     #[cfg(not(target_family = "wasm"))]
     {
-        use rinf::dependencies::backtrace;
+        use rinf::externs::backtrace;
         #[cfg(debug_assertions)]
         std::panic::set_hook(Box::new(|panic_info| {
             let mut frames_filtered = Vec::new();

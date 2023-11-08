@@ -115,7 +115,7 @@ impl Wire2Api<u8> for JsValue {
 }
 impl Wire2Api<Vec<u8>> for JsValue {
     fn wire2api(self) -> Vec<u8> {
-        self.unchecked_into::<rinf::dependencies::js_sys::Uint8Array>()
+        self.unchecked_into::<rinf::externs::js_sys::Uint8Array>()
             .to_vec()
             .into()
     }
