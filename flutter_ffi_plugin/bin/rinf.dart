@@ -70,9 +70,10 @@ Future<void> _applyRustTemplate({bool onlyBridge = false}) async {
     final source = Directory('$packagePath/example/native/hub/src/bridge');
     final destination = Directory('$flutterProjectPath/native/hub/src/bridge');
     if (await destination.exists()) {
-      await destination.delete();
+      await destination.delete(recursive: true);
     }
     await _copyDirectory(source, destination);
+    print("🎉 Rust bridge module is now ready! 🎉");
     return;
   }
 
