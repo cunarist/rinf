@@ -1,3 +1,7 @@
+## 4.16.0
+
+- Vastly organized files, dependencies, and code readability. Now the `hub` crate is much cleaner than before. If you already have an app using older Rinf versions, it is recommended to run `rinf template --bridge` and add `rinf = "4.16.0"` to `Cargo.toml` of the `hub` crate.
+
 ## 4.15.2
 
 - Now the web API fetching example uses `http` instead of `https` in the example app.

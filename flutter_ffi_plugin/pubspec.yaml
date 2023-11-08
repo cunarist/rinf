@@ -1,6 +1,6 @@
 name: rinf
 description: '"Rust as your Flutter backend, Flutter as your Rust frontend"'
-version: 4.15.2
+version: 4.16.0
 repository: https://github.com/cunarist/rinf
 
 environment:
