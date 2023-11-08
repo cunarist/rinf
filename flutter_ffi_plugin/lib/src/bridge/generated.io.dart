@@ -6,7 +6,7 @@ import "definitions.dart";
 import 'dart:convert';
 import 'dart:async';
 
-import 'engine/exports.dart';
+import '../engine/exports.dart';
 import 'generated.dart';
 export 'generated.dart';
 import 'dart:ffi' as ffi;

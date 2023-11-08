@@ -6,7 +6,7 @@ import 'generated.io.dart' if (dart.library.html) 'generated.web.dart';
 import 'dart:convert';
 import 'dart:async';
 
-import 'engine/exports.dart';
+import '../engine/exports.dart';
 
 abstract class Bridge {
   /// Returns a stream object in Dart that listens to Rust.

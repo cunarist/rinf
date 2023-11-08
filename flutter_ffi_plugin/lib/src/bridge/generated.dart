@@ -6,7 +6,7 @@ import "definitions.dart";
 import 'dart:convert';
 import 'dart:async';
 
-import 'engine/exports.dart';
+import '../engine/exports.dart';
 import 'generated.io.dart' if (dart.library.html) 'generated.web.dart';
 
 class BridgeImpl implements Bridge {
