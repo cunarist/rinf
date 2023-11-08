@@ -92,7 +92,7 @@ jobs:
       - name: Remove the template workspace Cargo file
         uses: JesseTG/rm@v1.0.3
         with:
-          path: /flutter_ffi_plugin/test_app/Cargo.toml
+          path: ./flutter_ffi_plugin/test_app/Cargo.toml
 
       - name: Add test app's crates to Cargo workspace
         uses: richardrigutins/replace-in-files@v2
