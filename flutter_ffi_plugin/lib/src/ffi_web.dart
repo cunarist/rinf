@@ -1,4 +1,4 @@
-import 'bridge/engine/exports.dart';
+import 'engine/exports.dart';
 import 'bridge/generated.dart';
 
 final api = BridgeImpl.wasm(

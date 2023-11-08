@@ -7,7 +7,7 @@ import 'dart:async';
 import 'dart:html' as html;
 import 'dart:html' hide MessagePort;
 
-import 'package:rinf/src/bridge/engine/ffi/web.dart';
+import 'package:rinf/src/engine/ffi/web.dart';
 
 typedef MessagePort = PortLike;
 
