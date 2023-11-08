@@ -138,12 +138,19 @@ elif sys.argv[1] == "cargokit-update":
     os.system(command)
 
 elif sys.argv[1] == "create-test-app":
-    os.chdir("./flutter_ffi_plugin/")
+    filepath = ".gitignore"
+    with open(filepath, mode="r", encoding="utf8") as file:
+        content: str = file.read()
+    content += "/test_app/"
+    with open(filepath, mode="w", encoding="utf8") as file:
+        file.write(content)
+
     command = "flutter create test_app"
     os.system(command)
 
     os.chdir("./test_app/")
-    command = "dart pub add \"rinf:{'path':'../'}\""
+
+    command = "dart pub add \"rinf:{'path':'../flutter_ffi_plugin'}\""
     os.system(command)
     command = "rinf template"
     os.system(command)
@@ -152,13 +159,14 @@ elif sys.argv[1] == "create-test-app":
 
     os.remove("Cargo.toml")
 
-    os.chdir("../../")
+    os.chdir("../")
+
     filepath = "Cargo.toml"
     with open(filepath, mode="r", encoding="utf8") as file:
         content: str = file.read()
     content = content.replace(
         "members = [",
-        'members = ["./flutter_ffi_plugin/test_app/native/*", ',
+        'members = ["./test_app/native/*", ',
     )
     with open(filepath, mode="w", encoding="utf8") as file:
         file.write(content)
