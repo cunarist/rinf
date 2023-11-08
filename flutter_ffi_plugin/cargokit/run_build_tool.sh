@@ -82,4 +82,7 @@ if [ $exit_code == 253 ]; then
   "$DART" pub get --no-precompile
   "$DART" compile kernel bin/build_tool_runner.dart
   "$DART" bin/build_tool_runner.dill "$@"
+  exit_code=$?
 fi
+
+exit $exit_code
