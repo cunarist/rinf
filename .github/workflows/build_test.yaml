@@ -98,8 +98,8 @@ jobs:
         uses: MathieuSoysal/replace-string-in-file@v1.0.0
         with:
           file: Cargo.toml
-          old-string: example/native/*
-          new-string: test_app/native/*
+          old-string: example/native/
+          new-string: test_app/native/
 
       - name: Generate message files
         working-directory: flutter_ffi_plugin/test_app/
