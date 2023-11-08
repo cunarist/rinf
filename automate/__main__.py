@@ -36,11 +36,12 @@ elif sys.argv[1] == "bridge-gen":
     # You must install `flutter_rust_bridge_codegen` version 1.80
     # with `cargo install flutter_rust_bridge_codegen --version ~1.80`
 
-    # Temporarily add `ffi` package
-    # because `flutter_rust_bridge_codegen` wants it,
-    # though the generated code doesn't use it.
+    # Temporarily add some packages
+    # because `flutter_rust_bridge_codegen` wants it.
     os.chdir("./flutter_ffi_plugin/")
-    command = "dart pub add ffi"
+    command = "dart pub add ffi:'^2.0.1'"
+    os.system(command)
+    command = "dart pub add dev:ffigen:'^8.0.0'"
     os.system(command)
     os.chdir("../")
 
@@ -119,9 +120,11 @@ elif sys.argv[1] == "bridge-gen":
     command = "cargo clippy --fix --allow-dirty"
     os.system(command)
 
-    # Remove temporarily added `ffi` package.
+    # Remove temporarily added packages.
     os.chdir("./flutter_ffi_plugin/")
     command = "dart pub remove ffi"
+    os.system(command)
+    command = "dart pub remove ffigen"
     os.system(command)
     os.chdir("../")
 

@@ -14,12 +14,6 @@ dependencies:
   package_config: ^2.1.0
   js: ^0.6.4
 
-dev_dependencies:
-  ffigen: ^8.0.0
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^2.0.0
-
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
