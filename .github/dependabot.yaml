@@ -4,6 +4,10 @@ updates:
     directory: "flutter_ffi_plugin/"
     schedule:
       interval: daily
+  - package-ecosystem: pub
+    directory: "flutter_ffi_plugin/example/"
+    schedule:
+      interval: daily
   - package-ecosystem: cargo
     directory: "/"
     schedule:
