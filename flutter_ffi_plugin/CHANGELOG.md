@@ -1,3 +1,7 @@
+## 4.16.2
+
+- Improved guides to avoid misconceptions about the communication system. Rinf only uses FFI without any web server.
+
 ## 4.16.1
 
 - Fixed the broken `rinf template --bridge` command
