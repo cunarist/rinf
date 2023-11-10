@@ -306,7 +306,7 @@ final rustResponse = await requestToRust(
 );
 ```
 
-## 🖨️ The `debug_print!` Macro
+## 🖨️ Printing for Debugging
 
 You might be used to `println!` macro in Rust. However, using that macro isn't a very good idea in our apps made with Flutter and Rust because `println!` outputs cannot be seen on the web and mobile emulators.
 
@@ -318,7 +318,7 @@ crate::debug_print!("My object is {my_object:?}");
 
 `debug_print!` is also better than `println!` because it only works in debug mode, resulting in a smaller and cleaner release binary.
 
-## 🌅 The `ensureFinalized()` method
+## 🌅 Closing the App Gracefully
 
 When the Flutter app is closed, the whole `tokio` runtime on the Rust side will be terminated automatically. However, some error messages can appear in the console if the Rust side sends messages to the Dart side after even after the Dart VM has stopped. To prevent this, you can call `Rinf.ensureFinalized()` in Dart to terminate all Rust tasks before closing the Flutter app.
 
