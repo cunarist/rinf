@@ -6,7 +6,7 @@
 [![Build Test](https://github.com/cunarist/rinf/actions/workflows/build_test.yaml/badge.svg)](https://github.com/cunarist/rinf/actions/workflows/build_test.yaml?query=branch%3Amain)
 [![GitHub License](https://img.shields.io/github/license/cunarist/rinf)](https://github.com/cunarist/rinf/blob/main/LICENSE)
 
-**Rust as your Flutter backend, Flutter as your Rust frontend**
+**Rust for native business logic, Flutter for flexible and beautiful GUI**
 
 ![Preview](assets/preview.gif)
 
@@ -30,21 +30,19 @@ All platforms available with Flutter are [tested](https://github.com/cunarist/ri
 ## 🎁 Benefits
 
 - **Truly easy**: It only takes about about a minute or two to fully setup your app. No other solution provides this level of convenience.
+- **Efficient**: All communication occurs solely through native FFI. There are no webviews, web servers, hidden threads, or unnecessary memory copying that might cause performance overhead. This setup acts as a very thin wrapper around Dart and Rust.
 - **Minimal**: This is not a bulky framework that requires you to install so many dependencies and use complicated CLI commands. Just focus on your code using your preferred Flutter and Rust libraries.
+- **Scalable**: Creating hundreds or even thousands of message APIs between Dart and Rust feels smooth and clean. Additionally, you have the flexibility to utilize any number of Rust library crates, perhaps including those you might have been working on.
 - **High-level interface**: No messing with sensitive build files, no concerns about memory safety. Stay with Dart and Rust that you're familiar with.
 - **Low-level control**: Though the hard things are kept beneath the surface, you are free to modify the underlying logic such as concurrency or debugging features. There is no hidden mechanism that prevents your understanding.
 - **Well maintained**: Our [automated workflows](https://github.com/cunarist/rinf/actions) including build tests are always kept passing, thanks to the main branch protection rule. Also, the number of external dependencies is kept as low as possible and documentations are thoughtfully organized.
-- **Efficient**: No memory copy when sending native data, no hidden threads and web workers with memory overhead. This is a really thin wrapper around Dart and Rust.
-- **Scalable**: You are able to use an arbitrary number of Rust library crates as you want, perhaps including ones that you've already been working on.
-- **Logical API**: You declare RESTful messages, not functions for APIs, which provides greater stability. Requesting from Dart and responsing from Rust, as well as streaming from Rust to Dart is possible. Messages are type-safe and flexible because it's powered by the well-known [Protobuf](https://protobuf.dev/) serialization. You also have the ability to send large binary data from Rust to Dart without any memory copy.
-- **File-based messages**: No more headaches from extremely big API code files that hinders readability. Even defining hundereds and thousands of API endpoints between Dart and Rust is easy and clean.
 - **Async interaction**: Rust operations will never block Flutter's main thread because they are spawned in a separate thread pool.
 - **Convenient debugging**: All the debugging functionalities are provided by default, without the need for dealing with browsers or mobile emulators. Also, the whole Rust logic is automatically restarted on Dart's hot restart.
-- **Reliable**: This framework simply provides a connection between Dart and Rust without complex code generation mechanism. Each component is backed by big communities, which is especially important for ensuring safety.
+- **Reliable**: This framework serves as a direct link between Dart and Rust without complex code generation mechanisms. Each component is supported by huge communities, ensuring a strong emphasis on safety. You can easily assure your team of stability since this framework's underlying concept is fairly simple.
 
 ## 🐦 Why Use Flutter?
 
-While Rust is a powerful language for high-performance native programming, its ecosystem for building graphical user interfaces is far from being mature. Though it already has some GUI frameworks like `iced`, `egui`, `gtk-rs`, and others, it doesn't compete with extensive support and smooth development experience that Flutter provides. It's only Flutter that compiles to all 6 major platforms from a single codebase.
+While Rust is a powerful language for high-performance native programming, its ecosystem for building graphical user interfaces is far from being mature. Though Rust already has some GUI frameworks, they don't compete with extensive support and smooth development experience that Flutter provides. It's only Flutter that compiles to all 6 major platforms from a single codebase.
 
 Flutter is a powerful and versatile framework that has gained immense popularity for building cross-platform applications with stunning user interfaces. It provides declarative pattern, beautiful widgets, hot reload, convenient debugging tools, and dedicated packages for user interfaces right out-of-the-box.
 

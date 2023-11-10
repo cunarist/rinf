@@ -306,6 +306,10 @@ final rustResponse = await requestToRust(
 );
 ```
 
+### Efficiency
+
+While Rinf's API system may resemble that of web development, it relies only on native FFI for communication. It does NOT use any web protocols, hidden threads, and unnecessary memory copying to prevent any performance overhead.
+
 ## 🖨️ Printing for Debugging
 
 You might be used to `println!` macro in Rust. However, using that macro isn't a very good idea in our apps made with Flutter and Rust because `println!` outputs cannot be seen on the web and mobile emulators.
