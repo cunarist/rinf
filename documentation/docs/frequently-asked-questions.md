@@ -149,3 +149,22 @@ rustflags = ["-C", "target-feature=+atomics,+bulk-memory,+mutable-globals"]
 [unstable]
 build-std = ['std', 'panic_abort']
 ```
+
+### CMake cache is broken after I moved the app folder
+
+```
+CMake Error: The current CMakeCache.txt directory C:/.../CMakeCache.txt is different than the directory C:/... where CMakeCache.txt was created. This may result in binaries being created in the wrong place. If you are not sure, reedit the CMakeCache.txt
+
+CMake Error: The source "C:/.../CMakeLists.txt" does not match the source "C:/.../CMakeLists.txt" used to generate cache.  Re-run cmake with a different source directory.
+
+Building Windows application...                                     80ms
+
+Exception: Unable to generate build files
+```
+
+This error can simply be fixed with the command below.
+
+```
+flutter clean
+cargo clean
+```
