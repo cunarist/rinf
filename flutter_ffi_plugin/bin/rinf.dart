@@ -38,8 +38,7 @@ Future<void> main(List<String> args) async {
       print("  template          Applies Rust template to current project.");
       print("    -b, --bridge    Only applies `bridge` Rust module.");
       print("  message           Generates message code from `.proto` files.");
-      print(
-          "    -w, --watch       Continuously watching `.proto` files changes then generates message code.");
+      print("    -w, --watch     Continuously watches `.proto` files.");
       print("  wasm              Builds webassembly module.");
       print("    -r, --release   Builds in release mode.");
     default:
@@ -57,6 +56,7 @@ Future<void> _watchAndGenerateMessageCode() async {
   var watcher;
 
   void startWatch() {
+    // Note that the Linux platform doesn't support recursive watching
     watcher = messagesDirectory
         .watch(recursive: true)
         .listen((FileSystemEvent event) {
@@ -86,19 +86,17 @@ Future<void> _watchAndGenerateMessageCode() async {
     watcher.cancel();
   }
 
-  // Linux platform doesn't support recursive watch
-  print(
-      "Start watching ${Platform.isLinux ? "without recursive" : "with recursive"}：${messagesDirectory.path}");
+  print("Started watching `.proto` files...\n${messagesDirectory.path}");
   startWatch();
+
   while (true) {
     await Future.delayed(Duration(seconds: 1));
     if (!generated) {
       stopWatch();
       print("Generating message code...");
-      await _generateMessageCode().then((x) {
-        generated = true;
-        startWatch();
-      });
+      await _generateMessageCode(silent: true);
+      generated = true;
+      startWatch();
     }
   }
 }
@@ -472,8 +470,10 @@ Future<void> _generateMessageCode({bool silent = false}) async {
   }
 
   // Generate Rust message files.
-  print("Verifying `protoc-gen-prost` for Rust." +
-      " This might take a while if there are new updates to be installed.");
+  if (!silent) {
+    print("Verifying `protoc-gen-prost` for Rust." +
+        " This might take a while if there are new updates to be installed.");
+  }
   final cargoInstallCommand = await Process.run('cargo', [
     'install',
     'protoc-gen-prost',
@@ -519,8 +519,10 @@ Future<void> _generateMessageCode({bool silent = false}) async {
   }
 
   // Generate Dart message files.
-  print("Verifying `protoc_plugin` for Dart." +
-      " This might take a while if there are new updates to be installed.");
+  if (!silent) {
+    print("Verifying `protoc_plugin` for Dart." +
+        " This might take a while if there are new updates to be installed.");
+  }
   final pubGlobalActivateCommand = await Process.run('dart', [
     'pub',
     'global',
