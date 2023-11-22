@@ -35,10 +35,10 @@ message ReadResponse {
 }
 ```
 
-Next, generate Dart and Rust message code from `.proto` files.
+Next, generate Dart and Rust message code from `.proto` files. If optional argument `-w` or `--watch` was added, the generation process will be automatically after `.proto` files are modified.
 
 ```bash
-rinf message
+rinf message [-w|--watch]
 ```
 
 Create a button widget in Dart that accepts the user input.
@@ -204,7 +204,7 @@ message StateSignal { int32 current_number = 1; }
 Generate Dart and Rust message code from `.proto` files.
 
 ```bash
-rinf message
+rinf message [-w|--watch]
 ```
 
 Define an async Rust function that runs forever, sending numbers to Dart every second.
