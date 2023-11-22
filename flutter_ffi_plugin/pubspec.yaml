@@ -13,6 +13,7 @@ dependencies:
   plugin_platform_interface: ^2.0.2
   package_config: ^2.1.0
   js: ^0.6.4
+  path: ^1.8.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
