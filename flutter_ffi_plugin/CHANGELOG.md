@@ -1,3 +1,7 @@
+## 4.17.0
+
+- New command `rinf message --watch` for automatic message code generation. Thanks @bookshiyi!
+
 ## 4.16.3
 
 - Updated package descriptions.
