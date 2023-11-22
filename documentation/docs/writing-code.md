@@ -1,6 +1,8 @@
 # How to Write Code
 
-## 🔄 Request from Dart, Response from Rust
+## 📡 Tutorial
+
+### Request from Dart, Response from Rust
 
 Let's say that you want to make a new button that sends an array of numbers and a string from Dart to Rust to perform some calculation on it. You can follow these steps to understand how to send a request and wait for the response.
 
@@ -35,10 +37,10 @@ message ReadResponse {
 }
 ```
 
-Next, generate Dart and Rust message code from `.proto` files. If optional argument `-w` or `--watch` was added, the generation process will be automatically after `.proto` files are modified.
+Next, generate Dart and Rust message code from `.proto` files.
 
 ```bash
-rinf message [-w|--watch]
+rinf message
 ```
 
 Create a button widget in Dart that accepts the user input.
@@ -184,7 +186,7 @@ We just simply print the message here, but the response data will be used for re
 
 You can extend this RESTful API pattern and create hundreds and thousands of endpoints as you need. If you have a web background, this system might look familiar.
 
-## 📡 Streaming from Rust to Dart
+### Streaming from Rust to Dart
 
 Let's say that you want to send increasing numbers every second from Rust to Dart. In this case, it would be inefficient for Dart to send requests repeatedly. This is where streaming is needed.
 
@@ -204,7 +206,7 @@ message StateSignal { int32 current_number = 1; }
 Generate Dart and Rust message code from `.proto` files.
 
 ```bash
-rinf message [-w|--watch]
+rinf message
 ```
 
 Define an async Rust function that runs forever, sending numbers to Dart every second.
@@ -309,6 +311,14 @@ final rustResponse = await requestToRust(
 ### Efficiency
 
 While Rinf's API system may resemble that of web development, it relies only on native FFI for communication. It does NOT use any web protocols, hidden threads, and unnecessary memory copying to prevent any performance overhead.
+
+## ⌛ Continuous Message Generation
+
+If you add the optional argument `-w` or `--watch` to the `rinf message` command, the message code will automatically generated when `.proto` files are modified. When you add this argument, the command will not exit on its own.
+
+```bash
+rinf message --watch
+```
 
 ## 🖨️ Printing for Debugging
 
