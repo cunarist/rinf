@@ -312,13 +312,29 @@ final rustResponse = await requestToRust(
 
 While Rinf's API system may resemble that of web development, it relies only on native FFI for communication. It does NOT use any web protocols, hidden threads, and unnecessary memory copying to prevent any performance overhead.
 
-## ⌛ Continuous Message Generation
+## 📦 Message Code Generation
+
+### Path
+
+- `./messages` : The `.proto` files under here and its subdirectories will be used to generating message code.
+
+- `./lib/messages` : The generated Dart code will be placed here.
+
+- `./native/hub/src/messages` : The generated Rust code will be placed here.
+
+### Continuous Message Generation
 
 If you add the optional argument `-w` or `--watch` to the `rinf message` command, the message code will automatically generated when `.proto` files are modified. When you add this argument, the command will not exit on its own.
 
 ```bash
 rinf message --watch
 ```
+
+|         | Recursively Watch | Recursively Generate |
+| ------- | ----------------- | -------------------- |
+| Linux   | ❌                | ✅                   |
+| macOS   | ✅                | ✅                   |
+| Windows | ✅                | ✅                   |
 
 ## 🖨️ Printing for Debugging
 
