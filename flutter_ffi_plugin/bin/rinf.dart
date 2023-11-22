@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:path/path.dart';
 import 'package:package_config/package_config.dart';
 
 Future<void> main(List<String> args) async {
@@ -16,7 +17,11 @@ Future<void> main(List<String> args) async {
       }
       break;
     case "message":
-      await _generateMessageCode();
+      if (args.contains("--watch") || args.contains("-w")) {
+        await _watchAndGenerateMessageCode();
+      } else {
+        await _generateMessageCode();
+      }
       break;
     case "wasm":
       if (args.contains("--release") || args.contains("-r")) {
@@ -33,11 +38,68 @@ Future<void> main(List<String> args) async {
       print("  template          Applies Rust template to current project.");
       print("    -b, --bridge    Only applies `bridge` Rust module.");
       print("  message           Generates message code from `.proto` files.");
+      print(
+          "    -w, --watch       Continuously watching `.proto` files changes then generates message code.");
       print("  wasm              Builds webassembly module.");
       print("    -r, --release   Builds in release mode.");
     default:
       print("No such operation is available.");
       print("Use `rinf --help` to see all available operations.");
+  }
+}
+
+Future<void> _watchAndGenerateMessageCode() async {
+  final currentDirectory = Directory.current;
+  final messagesPath = join(currentDirectory.path, "messages");
+  var messagesDirectory = Directory(messagesPath);
+
+  var generated = true;
+  var watcher;
+
+  void startWatch() {
+    watcher = messagesDirectory
+        .watch(recursive: true)
+        .listen((FileSystemEvent event) {
+      if (event.path.endsWith(".proto") && generated) {
+        String eventTypeStr = "";
+        switch (event.type) {
+          case FileSystemEvent.create:
+            eventTypeStr = "Created";
+            break;
+          case FileSystemEvent.modify:
+            eventTypeStr = "Modified";
+            break;
+          case FileSystemEvent.delete:
+            eventTypeStr = "Deleted";
+            break;
+          case FileSystemEvent.move:
+            eventTypeStr = "Moved";
+            break;
+        }
+        print("$eventTypeStr: ${relative(event.path, from: messagesPath)}");
+        generated = false;
+      }
+    });
+  }
+
+  void stopWatch() {
+    watcher.cancel();
+  }
+
+  // Linux platform doesn't support recursive watch
+  print(
+      "Start watching ${Platform.isLinux ? "without recursive" : "with recursive"}：${messagesDirectory.path}");
+  startWatch();
+  while (true) {
+    await Future.delayed(Duration(seconds: 1));
+    if (!generated) {
+      stopWatch();
+      print("Generating message code...");
+      await _generateMessageCode().then((x) {
+        generated = true;
+        startWatch();
+      });
+    }
   }
 }
 
