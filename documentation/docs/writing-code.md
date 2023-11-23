@@ -316,25 +316,27 @@ While Rinf's API system may resemble that of web development, it relies only on 
 
 ### Path
 
+When you generate message code using the `rinf message` command, the resulting Dart and Rust modules' names and subpaths will precisely correspond to those of the `.proto` files.
+
 - `./messages` : The `.proto` files under here and its subdirectories will be used to generating message code.
-
 - `./lib/messages` : The generated Dart code will be placed here.
-
 - `./native/hub/src/messages` : The generated Rust code will be placed here.
 
 ### Continuous Message Generation
 
-If you add the optional argument `-w` or `--watch` to the `rinf message` command, the message code will automatically generated when `.proto` files are modified. When you add this argument, the command will not exit on its own.
+If you add the optional argument `-w` or `--watch` to the `rinf message` command, the message code will automatically generated when `.proto` files are modified. If you add this argument, the command will not exit on its own.
 
 ```bash
 rinf message --watch
 ```
 
-|         | Recursively Watch | Recursively Generate |
-| ------- | ----------------- | -------------------- |
-| Linux   | ❌                | ✅                   |
-| macOS   | ✅                | ✅                   |
-| Windows | ✅                | ✅                   |
+Currently, recursive watching is not supported on all platforms.
+
+|         | While watching | One-time gen |
+| ------- | -------------- | ------------ |
+| Linux   | ❌             | ✅           |
+| macOS   | ✅             | ✅           |
+| Windows | ✅             | ✅           |
 
 ## 🖨️ Printing for Debugging
 
