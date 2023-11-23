@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:path/path.dart';
+import 'package:watcher/watcher.dart';
 import 'package:package_config/package_config.dart';
 
 Future<void> main(List<String> args) async {
@@ -52,51 +53,28 @@ Future<void> _watchAndGenerateMessageCode() async {
   final messagesPath = join(currentDirectory.path, "messages");
   var messagesDirectory = Directory(messagesPath);
 
+  var watcher = PollingDirectoryWatcher(messagesDirectory.path);
   var generated = true;
-  var watcher;
-
-  void startWatch() {
-    // Note that the Linux platform doesn't support recursive watching
-    watcher = messagesDirectory
-        .watch(recursive: true)
-        .listen((FileSystemEvent event) {
-      if (event.path.endsWith(".proto") && generated) {
-        String eventTypeStr = "";
-        switch (event.type) {
-          case FileSystemEvent.create:
-            eventTypeStr = "Created";
-            break;
-          case FileSystemEvent.modify:
-            eventTypeStr = "Modified";
-            break;
-          case FileSystemEvent.delete:
-            eventTypeStr = "Deleted";
-            break;
-          case FileSystemEvent.move:
-            eventTypeStr = "Moved";
-            break;
-        }
-        print("$eventTypeStr: ${relative(event.path, from: messagesPath)}");
-        generated = false;
-      }
-    });
-  }
-
-  void stopWatch() {
-    watcher.cancel();
-  }
 
   print("Started watching `.proto` files...\n${messagesDirectory.path}");
-  startWatch();
+
+  watcher.events.listen((e) {
+    if (e.path.endsWith(".proto") && generated) {
+      final eventTypeStr =
+          e.type.toString()[0].toUpperCase() + e.type.toString().substring(1);
+      final fileRelativePath = relative(e.path, from: messagesPath);
+      print("$eventTypeStr: $fileRelativePath");
+      generated = false;
+    }
+  });
 
   while (true) {
     await Future.delayed(Duration(seconds: 1));
     if (!generated) {
-      stopWatch();
       print("Generating message code...");
       await _generateMessageCode(silent: true);
+      print("Generating is done, watching continues...");
       generated = true;
-      startWatch();
     }
   }
 }
