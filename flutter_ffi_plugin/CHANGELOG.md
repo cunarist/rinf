@@ -1,3 +1,7 @@
+## 4.17.1
+
+- Now `rinf message --watch` works on all platforms. Thanks @bookshiyi!
+
 ## 4.17.0
 
 - New command `rinf message --watch` for automatic message code generation. Thanks @bookshiyi!

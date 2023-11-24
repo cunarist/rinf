@@ -1,6 +1,6 @@
 [package]
 name = "rinf"
-version = "4.17.0"
+version = "4.17.1"
 edition = "2021"
 license = "MIT"
 description = "Rust for native business logic, Flutter for flexible and beautiful GUI"
