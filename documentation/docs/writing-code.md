@@ -344,7 +344,7 @@ crate::debug_print!("My object is {my_object:?}");
 
 ## 🌅 Closing the App Gracefully
 
-When the Flutter app is closed, the whole `tokio` runtime on the Rust side will be terminated automatically. However, some error messages can appear in the console if the Rust side sends messages to the Dart side after even after the Dart VM has stopped. To prevent this, you can call `Rinf.ensureFinalized()` in Dart to terminate all Rust tasks before closing the Flutter app.
+When the Flutter app is closed, the whole `tokio` runtime on the Rust side will be terminated automatically. However, some error messages can appear in the console if the Rust side sends messages to the Dart side even after the Dart VM has stopped. To prevent this, you can call `Rinf.ensureFinalized()` in Dart to terminate all Rust tasks before closing the Flutter app.
 
 ```dart
 import 'dart:ui';
