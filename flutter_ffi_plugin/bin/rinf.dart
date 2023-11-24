@@ -51,19 +51,19 @@ Future<void> main(List<String> args) async {
 Future<void> _watchAndGenerateMessageCode() async {
   final currentDirectory = Directory.current;
   final messagesPath = join(currentDirectory.path, "messages");
-  var messagesDirectory = Directory(messagesPath);
+  final messagesDirectory = Directory(messagesPath);
 
-  var watcher = PollingDirectoryWatcher(messagesDirectory.path);
+  final watcher = PollingDirectoryWatcher(messagesDirectory.path);
   var generated = true;
 
   print("Started watching `.proto` files...\n${messagesDirectory.path}");
 
-  watcher.events.listen((e) {
-    if (e.path.endsWith(".proto") && generated) {
-      final eventTypeStr =
-          e.type.toString()[0].toUpperCase() + e.type.toString().substring(1);
-      final fileRelativePath = relative(e.path, from: messagesPath);
-      print("$eventTypeStr: $fileRelativePath");
+  watcher.events.listen((event) {
+    if (event.path.endsWith(".proto") && generated) {
+      var eventType = event.type.toString();
+      eventType = eventType[0].toUpperCase() + eventType.substring(1);
+      final fileRelativePath = relative(event.path, from: messagesPath);
+      print("$eventType: $fileRelativePath");
       generated = false;
     }
   });
@@ -71,9 +71,12 @@ Future<void> _watchAndGenerateMessageCode() async {
   while (true) {
     await Future.delayed(Duration(seconds: 1));
     if (!generated) {
-      print("Generating message code...");
-      await _generateMessageCode(silent: true);
-      print("Generating is done, watching continues...");
+      try {
+        await _generateMessageCode(silent: true);
+        print("Message code generated");
+      } catch (error) {
+        // When message code generation has failed
+      }
       generated = true;
     }
   }
@@ -341,7 +344,7 @@ Future<void> _buildWebassembly({bool isReleaseMode = false}) async {
     },
   );
   if (compileCommand.exitCode != 0) {
-    print(compileCommand.stderr);
+    print(compileCommand.stderr.toString().trim());
     throw Exception('Unable to compile Rust into webassembly');
   }
   print("Saved `.wasm` and `.js` files to `$subPath`.");
@@ -457,7 +460,7 @@ Future<void> _generateMessageCode({bool silent = false}) async {
     'protoc-gen-prost',
   ]);
   if (cargoInstallCommand.exitCode != 0) {
-    print(cargoInstallCommand.stderr);
+    print(cargoInstallCommand.stderr.toString().trim());
     throw Exception('Cannot globally install `protoc-gen-prost` Rust crate');
   }
   for (final entry in resourcesInFolders.entries) {
@@ -470,7 +473,7 @@ Future<void> _generateMessageCode({bool silent = false}) async {
       ...resourceNames.map((name) => '$name.proto'),
     ]);
     if (protocRustResult.exitCode != 0) {
-      print(protocRustResult.stderr);
+      print(protocRustResult.stderr.toString().trim());
       throw Exception('Could not compile `.proto` files into Rust');
     }
   }
@@ -508,7 +511,7 @@ Future<void> _generateMessageCode({bool silent = false}) async {
     'protoc_plugin',
   ]);
   if (pubGlobalActivateCommand.exitCode != 0) {
-    print(pubGlobalActivateCommand.stderr);
+    print(pubGlobalActivateCommand.stderr.toString().trim());
     throw Exception('Cannot globally install `protoc_plugin` Dart package');
   }
   final newEnvironment = Map<String, String>.from(Platform.environment);
@@ -539,7 +542,7 @@ Future<void> _generateMessageCode({bool silent = false}) async {
       environment: newEnvironment,
     );
     if (protocDartResult.exitCode != 0) {
-      print(protocDartResult.stderr);
+      print(protocDartResult.stderr.toString().trim());
       throw Exception('Could not compile `.proto` files into Dart');
     }
   }
