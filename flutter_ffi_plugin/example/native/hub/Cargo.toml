@@ -14,6 +14,6 @@ crate-type = ["lib", "cdylib", "staticlib"]
 [dependencies]
 rinf = "4.17.1"
 tokio_with_wasm = "0.3.2"
-wasm-bindgen = "0.2.87"
-prost = "0.12.0"
+wasm-bindgen = "0.2.88"
+prost = "0.12.3"
 sample_crate = { path = "../sample_crate" }

@@ -15,9 +15,9 @@ os-thread-local = "0.1.3"
 backtrace = "0.3.69"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-wasm-bindgen = { version = "0.2.87" }
-js-sys = "0.3.64"
-web-sys = { version = "0.3.64", features = [
+wasm-bindgen = { version = "0.2.88" }
+js-sys = "0.3.65"
+web-sys = { version = "0.3.65", features = [
     "DedicatedWorkerGlobalScope",
     "MessagePort",
     "Blob",
