@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:path/path.dart';
+import 'package:watcher/watcher.dart';
 import 'package:package_config/package_config.dart';
 
 Future<void> main(List<String> args) async {
@@ -50,53 +51,33 @@ Future<void> main(List<String> args) async {
 Future<void> _watchAndGenerateMessageCode() async {
   final currentDirectory = Directory.current;
   final messagesPath = join(currentDirectory.path, "messages");
-  var messagesDirectory = Directory(messagesPath);
+  final messagesDirectory = Directory(messagesPath);
 
+  final watcher = PollingDirectoryWatcher(messagesDirectory.path);
   var generated = true;
-  var watcher;
-
-  void startWatch() {
-    // Note that the Linux platform doesn't support recursive watching
-    watcher = messagesDirectory
-        .watch(recursive: true)
-        .listen((FileSystemEvent event) {
-      if (event.path.endsWith(".proto") && generated) {
-        String eventTypeStr = "";
-        switch (event.type) {
-          case FileSystemEvent.create:
-            eventTypeStr = "Created";
-            break;
-          case FileSystemEvent.modify:
-            eventTypeStr = "Modified";
-            break;
-          case FileSystemEvent.delete:
-            eventTypeStr = "Deleted";
-            break;
-          case FileSystemEvent.move:
-            eventTypeStr = "Moved";
-            break;
-        }
-        print("$eventTypeStr: ${relative(event.path, from: messagesPath)}");
-        generated = false;
-      }
-    });
-  }
-
-  void stopWatch() {
-    watcher.cancel();
-  }
 
   print("Started watching `.proto` files...\n${messagesDirectory.path}");
-  startWatch();
+
+  watcher.events.listen((event) {
+    if (event.path.endsWith(".proto") && generated) {
+      var eventType = event.type.toString();
+      eventType = eventType[0].toUpperCase() + eventType.substring(1);
+      final fileRelativePath = relative(event.path, from: messagesPath);
+      print("$eventType: $fileRelativePath");
+      generated = false;
+    }
+  });
 
   while (true) {
     await Future.delayed(Duration(seconds: 1));
     if (!generated) {
-      stopWatch();
-      print("Generating message code...");
-      await _generateMessageCode(silent: true);
+      try {
+        await _generateMessageCode(silent: true);
+        print("Message code generated");
+      } catch (error) {
+        // When message code generation has failed
+      }
       generated = true;
-      startWatch();
     }
   }
 }
@@ -363,7 +344,7 @@ Future<void> _buildWebassembly({bool isReleaseMode = false}) async {
     },
   );
   if (compileCommand.exitCode != 0) {
-    print(compileCommand.stderr);
+    print(compileCommand.stderr.toString().trim());
     throw Exception('Unable to compile Rust into webassembly');
   }
   print("Saved `.wasm` and `.js` files to `$subPath`.");
@@ -479,7 +460,7 @@ Future<void> _generateMessageCode({bool silent = false}) async {
     'protoc-gen-prost',
   ]);
   if (cargoInstallCommand.exitCode != 0) {
-    print(cargoInstallCommand.stderr);
+    print(cargoInstallCommand.stderr.toString().trim());
     throw Exception('Cannot globally install `protoc-gen-prost` Rust crate');
   }
   for (final entry in resourcesInFolders.entries) {
@@ -492,7 +473,7 @@ Future<void> _generateMessageCode({bool silent = false}) async {
       ...resourceNames.map((name) => '$name.proto'),
     ]);
     if (protocRustResult.exitCode != 0) {
-      print(protocRustResult.stderr);
+      print(protocRustResult.stderr.toString().trim());
       throw Exception('Could not compile `.proto` files into Rust');
     }
   }
@@ -530,7 +511,7 @@ Future<void> _generateMessageCode({bool silent = false}) async {
     'protoc_plugin',
   ]);
   if (pubGlobalActivateCommand.exitCode != 0) {
-    print(pubGlobalActivateCommand.stderr);
+    print(pubGlobalActivateCommand.stderr.toString().trim());
     throw Exception('Cannot globally install `protoc_plugin` Dart package');
   }
   final newEnvironment = Map<String, String>.from(Platform.environment);
@@ -561,7 +542,7 @@ Future<void> _generateMessageCode({bool silent = false}) async {
       environment: newEnvironment,
     );
     if (protocDartResult.exitCode != 0) {
-      print(protocDartResult.stderr);
+      print(protocDartResult.stderr.toString().trim());
       throw Exception('Could not compile `.proto` files into Dart');
     }
   }
