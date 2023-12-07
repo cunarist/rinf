@@ -1,3 +1,7 @@
+## 4.18.0
+
+- Now `null` can be provided to the `timeout` parameter in the `requestToRust()` Dart function. This enables awaiting a Rust response forever, but it should be used cautiously because it may potentially lead to resource leaks.
+
 ## 4.17.1
 
 - Now `rinf message --watch` works on all platforms. Thanks @bookshiyi!
