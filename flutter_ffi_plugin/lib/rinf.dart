@@ -66,7 +66,7 @@ class Rinf {
 /// https://pub.dev/packages/rinf/example.
 Future<RustResponse> requestToRust(
   RustRequest rustRequest, {
-  Duration timeout = const Duration(seconds: 60),
+  Duration? timeout = const Duration(seconds: 60),
 }) async {
   final id = _requestIdGenerator.generateId();
   final requestUnique = RustRequestUnique(id: id, request: rustRequest);
@@ -74,19 +74,24 @@ Future<RustResponse> requestToRust(
   final future = _responseBroadcaster.stream.firstWhere((responseUnique) {
     return responseUnique.id == id;
   });
-  final responseUnique = await future.timeout(
-    timeout,
-    onTimeout: () {
-      return RustResponseUnique(
-        id: id,
-        response: RustResponse(
-          successful: false,
-          message: null,
-          blob: null,
-        ),
-      );
-    },
-  );
+  final RustResponseUnique responseUnique;
+  if (timeout != null) {
+    responseUnique = await future.timeout(
+      timeout,
+      onTimeout: () {
+        return RustResponseUnique(
+          id: id,
+          response: RustResponse(
+            successful: false,
+            message: null,
+            blob: null,
+          ),
+        );
+      },
+    );
+  } else {
+    responseUnique = await future;
+  }
   final rustResponse = responseUnique.response;
   return rustResponse;
 }
