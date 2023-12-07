@@ -308,6 +308,8 @@ final rustResponse = await requestToRust(
 );
 ```
 
+When you set the timeout parameter as `null`, it means Dart will wait forever until it receives a response from the Rust side. It's important to use this cautiously because if, Rust fails to respond for any reason, Dart will continuously await this event, potentially causing a resource leak.
+
 ### Efficiency
 
 While Rinf's API system may resemble that of web development, it relies only on native FFI for communication. It does NOT use any web protocols, hidden threads, and unnecessary memory copying to prevent any performance overhead.
