@@ -1,3 +1,7 @@
+## 4.19.0
+
+- The mechanism for awaiting Rust's responses from Dart has become much more efficient.
+
 ## 4.18.0
 
 - Now `null` can be provided to the `timeout` parameter in the `requestToRust()` Dart function. This enables awaiting a Rust response forever, but it should be used cautiously because it may potentially lead to resource leaks.
