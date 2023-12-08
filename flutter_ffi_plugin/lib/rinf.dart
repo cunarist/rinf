@@ -73,11 +73,6 @@ Future<RustResponse> requestToRust(
   Duration? timeout = const Duration(seconds: 60),
 }) async {
   final interactionId = _requestIdGenerator.generateId();
-  final rustRequestUnique = RustRequestUnique(
-    id: interactionId,
-    request: rustRequest,
-  );
-  api.requestToRust(requestUnique: rustRequestUnique);
   final previousCompleter = _responseCompleters.remove(interactionId);
   if (previousCompleter != null) {
     previousCompleter.completeError(StateError(
@@ -86,6 +81,11 @@ Future<RustResponse> requestToRust(
   }
   final responseCompleter = Completer<RustResponse>();
   _responseCompleters[interactionId] = responseCompleter;
+  final rustRequestUnique = RustRequestUnique(
+    id: interactionId,
+    request: rustRequest,
+  );
+  api.requestToRust(requestUnique: rustRequestUnique);
   final RustResponse rustResponse;
   if (timeout != null) {
     rustResponse = await responseCompleter.future.timeout(
