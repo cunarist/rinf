@@ -16,7 +16,7 @@ export 'src/exports.dart' show RustSignal;
 /// You can see the usage example at
 /// https://pub.dev/packages/rinf/example.
 final rustBroadcaster = StreamController<RustSignal>.broadcast();
-final _responseBroadcaster = StreamController<RustResponseUnique>.broadcast();
+final _responseCompleters = Map<int, Completer<RustResponse>>();
 final _requestIdGenerator = _IdGenerator();
 
 /// Contains basic functionalities of this framework.
@@ -29,9 +29,13 @@ class Rinf {
     rustSignalStream.listen((rustSignal) {
       rustBroadcaster.add(rustSignal);
     });
-    final rustResponseStream = api.prepareRustResponseStream();
-    rustResponseStream.listen((rustResponseUnique) {
-      _responseBroadcaster.add(rustResponseUnique);
+    final rustResponseUniqueStream = api.prepareRustResponseStream();
+    rustResponseUniqueStream.listen((rustResponseUnique) {
+      final interactionId = rustResponseUnique.id;
+      final responseCompleter = _responseCompleters.remove(interactionId);
+      if (responseCompleter != null) {
+        responseCompleter.complete(rustResponseUnique.response);
+      }
     });
     if (kDebugMode) {
       final rustReportStream = api.prepareRustReportStream();
@@ -68,31 +72,35 @@ Future<RustResponse> requestToRust(
   RustRequest rustRequest, {
   Duration? timeout = const Duration(seconds: 60),
 }) async {
-  final id = _requestIdGenerator.generateId();
-  final requestUnique = RustRequestUnique(id: id, request: rustRequest);
-  api.requestToRust(requestUnique: requestUnique);
-  final future = _responseBroadcaster.stream.firstWhere((responseUnique) {
-    return responseUnique.id == id;
-  });
-  final RustResponseUnique responseUnique;
+  final interactionId = _requestIdGenerator.generateId();
+  final previousCompleter = _responseCompleters.remove(interactionId);
+  if (previousCompleter != null) {
+    previousCompleter.completeError(StateError(
+      'Rust response completer got forgotten',
+    ));
+  }
+  final responseCompleter = Completer<RustResponse>();
+  _responseCompleters[interactionId] = responseCompleter;
+  final rustRequestUnique = RustRequestUnique(
+    id: interactionId,
+    request: rustRequest,
+  );
+  api.requestToRust(requestUnique: rustRequestUnique);
+  final RustResponse rustResponse;
   if (timeout != null) {
-    responseUnique = await future.timeout(
+    rustResponse = await responseCompleter.future.timeout(
       timeout,
       onTimeout: () {
-        return RustResponseUnique(
-          id: id,
-          response: RustResponse(
-            successful: false,
-            message: null,
-            blob: null,
-          ),
+        return RustResponse(
+          successful: false,
+          message: null,
+          blob: null,
         );
       },
     );
   } else {
-    responseUnique = await future;
+    rustResponse = await responseCompleter.future;
   }
-  final rustResponse = responseUnique.response;
   return rustResponse;
 }
 
