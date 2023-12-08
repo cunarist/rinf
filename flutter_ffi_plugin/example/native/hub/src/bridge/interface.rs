@@ -127,9 +127,9 @@ pub fn prepare_rust_response_stream(response_stream: StreamSink<RustResponseUniq
 }
 
 /// Returns a stream object in Dart that gives strings to print from Rust.
-pub fn prepare_rust_report_stream(print_stream: StreamSink<String>) {
+pub fn prepare_rust_report_stream(report_stream: StreamSink<String>) {
     let cell = REPORT_STREAM_SHARED.lock().unwrap();
-    cell.replace(Some(print_stream));
+    cell.replace(Some(report_stream));
 }
 
 /// Prepare channels that are used in the Rust world.
