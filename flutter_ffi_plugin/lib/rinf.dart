@@ -16,7 +16,6 @@ export 'src/exports.dart' show RustSignal;
 /// You can see the usage example at
 /// https://pub.dev/packages/rinf/example.
 final rustBroadcaster = StreamController<RustSignal>.broadcast();
-late final Stream<RustResponseUnique> _responseStream;
 final _responseCompleters = Map<int, Completer<RustResponse>>();
 final _requestIdGenerator = _IdGenerator();
 
@@ -30,8 +29,8 @@ class Rinf {
     rustSignalStream.listen((rustSignal) {
       rustBroadcaster.add(rustSignal);
     });
-    _responseStream = api.prepareRustResponseStream();
-    _responseStream.listen((rustResponseUnique) {
+    final rustResponseUniqueStream = api.prepareRustResponseStream();
+    rustResponseUniqueStream.listen((rustResponseUnique) {
       final interactionId = rustResponseUnique.id;
       final responseCompleter = _responseCompleters.remove(interactionId);
       if (responseCompleter != null) {
