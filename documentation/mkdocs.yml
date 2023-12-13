@@ -1,4 +1,4 @@
-site_name: Rinf Docs
+site_name: Rinf
 
 theme:
   name: material
@@ -40,3 +40,15 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/cunarist
+    - icon: fontawesome/brands/youtube
+      link: https://www.youtube.com/channel/UCJzQ3TSwHzH9dNG2L8GPDbA
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/cunarist
+
+copyright: Copyright &copy; 2023 Cunarist
