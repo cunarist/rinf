@@ -25,6 +25,7 @@ theme:
     - navigation.tracking
     - navigation.path
     - navigation.footer
+  custom_dir: overrides
 
 plugins:
   - search
