@@ -7,6 +7,12 @@
     padding: 24px;
     text-align: center;
   }
+  .front-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 92svh;
+  }
   .rows {
     display: flex;
     flex-direction: column;
@@ -72,7 +78,7 @@
 </style>
 
 <div class="md-grid md-typeset outermost">
-  <div class="mdx-hero">
+  <div class="front-panel">
     <div class="spacing"></div>
     <div class="centered">
       <img src="assets/preview.apng" loop draggable="false" />
@@ -84,24 +90,24 @@
       <p class="web-title">Rinf</p>
       <p class="semi-transparent"><strong>RUST IN FLUTTER</strong></p>
     </div>
-  </div>
-  <div class="spacing"></div>
-  <div class="centered">
-    <a
-      href="{{ page.next_page.url | url }}"
-      title="Quick start"
-      class="md-button md-button--primary"
-    >
-      Quick start
-    </a>
-    <a
-      href="https://rinf-demo.cunarist.com"
-      title="Visit demo"
-      class="md-button"
-      target="_blank"
-    >
-      Visit demo
-    </a>
+    <div class="spacing"></div>
+    <div class="centered">
+      <a
+        href="{{ page.next_page.url | url }}"
+        title="Quick start"
+        class="md-button md-button--primary"
+      >
+        Quick start
+      </a>
+      <a
+        href="https://rinf-demo.cunarist.com"
+        title="Visit demo"
+        class="md-button"
+        target="_blank"
+      >
+        Visit demo
+      </a>
+    </div>
   </div>
   <div class="spacing"></div>
   <div class="centered">
