@@ -5,7 +5,7 @@ edition = "2021"
 license = "MIT"
 description = "Rust for native business logic, Flutter for flexible and beautiful GUI"
 repository = "https://github.com/cunarist/rinf"
-documentation = "https://rinf-docs.cunarist.com"
+documentation = "https://rinf.cunarist.com"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 libc = "0.2"

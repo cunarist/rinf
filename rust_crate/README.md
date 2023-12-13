@@ -54,7 +54,7 @@ Rust has garnered a devoted following, being [the most loved programming languag
 
 ## 📖 Documentation
 
-Check out the [documentation](https://rinf-docs.cunarist.com) for everything you need to know about how to use this thing.
+Check out the [documentation](https://rinf.cunarist.com) for everything you need to know about how to use this thing.
 
 ## 👥 Contribution
 

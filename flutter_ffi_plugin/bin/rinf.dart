@@ -226,7 +226,7 @@ flutter run
 ```
 
 For detailed instructions on writing Rust and Flutter together,
-please refer to Rinf's [documentation](https://rinf-docs.cunarist.com).
+please refer to Rinf's [documentation](https://rinf.cunarist.com).
 ''';
     readmeSplitted.add(text);
   }
