@@ -1,3 +1,7 @@
+## 4.19.1
+
+- Switched to the new official website `rinf.cunarist.com`.
+
 ## 4.19.0
 
 - The mechanism for awaiting Rust's responses from Dart has become much more efficient.
