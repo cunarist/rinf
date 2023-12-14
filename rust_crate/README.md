@@ -38,7 +38,7 @@ All platforms available with Flutter are [tested](https://github.com/cunarist/ri
 - **Well maintained**: Our [automated workflows](https://github.com/cunarist/rinf/actions) including build tests are always kept passing, thanks to the main branch protection rule. Also, the number of external dependencies is kept as low as possible and documentations are thoughtfully organized.
 - **Async interaction**: Rust operations will never block Flutter's main thread because they are spawned in a separate thread pool.
 - **Convenient debugging**: All the debugging functionalities are provided by default, without the need for dealing with browsers or mobile emulators. Also, the whole Rust logic is automatically restarted on Dart's hot restart.
-- **Reliable**: This framework serves as a direct link between Dart and Rust without complex code generation mechanisms. Each component is supported by huge communities, ensuring a strong emphasis on safety. You can easily assure your team of stability since this framework's underlying concept is fairly simple.
+- **Reliable**: Each component is supported by huge communities, ensuring a strong emphasis on future safety. You can easily assure your team of stability since this framework's underlying concept is fairly simple.
 
 ## 🐦 Why Use Flutter?
 
