@@ -1,3 +1,7 @@
+## 4.20.0
+
+- Added support for Android Gradle Plugin 8.
+
 ## 4.19.1
 
 - Switched to the new official website `rinf.cunarist.com`.
