@@ -20,6 +20,8 @@
  *
  * Link `dart_api_dl.c` file into your library and invoke
  * `Dart_InitializeApiDL` with `NativeApi.initializeApiDLData`.
+ *
+ * Returns 0 on success.
  */
 
 DART_EXPORT intptr_t Dart_InitializeApiDL(void* data);
@@ -80,16 +82,15 @@ typedef void (*Dart_NativeMessageHandler_DL)(Dart_Port_DL dest_port_id,
     (Dart_Handle object, void* peer, intptr_t external_allocation_size,        \
      Dart_HandleFinalizer callback))                                           \
   F(Dart_DeleteWeakPersistentHandle, void, (Dart_WeakPersistentHandle object)) \
-  F(Dart_UpdateExternalSize, void,                                             \
-    (Dart_WeakPersistentHandle object, intptr_t external_allocation_size))     \
   F(Dart_NewFinalizableHandle, Dart_FinalizableHandle,                         \
     (Dart_Handle object, void* peer, intptr_t external_allocation_size,        \
      Dart_HandleFinalizer callback))                                           \
   F(Dart_DeleteFinalizableHandle, void,                                        \
     (Dart_FinalizableHandle object, Dart_Handle strong_ref_to_object))         \
-  F(Dart_UpdateFinalizableExternalSize, void,                                  \
-    (Dart_FinalizableHandle object, Dart_Handle strong_ref_to_object,          \
-     intptr_t external_allocation_size))                                       \
+  /* Isolates */                                                               \
+  F(Dart_CurrentIsolate, Dart_Isolate, (void))                                 \
+  F(Dart_ExitIsolate, void, (void))                                            \
+  F(Dart_EnterIsolate, void, (Dart_Isolate))                                   \
   /* Dart_Port */                                                              \
   F(Dart_Post, bool, (Dart_Port_DL port_id, Dart_Handle object))               \
   F(Dart_NewSendPort, Dart_Handle, (Dart_Port_DL port_id))                     \
@@ -99,7 +100,18 @@ typedef void (*Dart_NativeMessageHandler_DL)(Dart_Port_DL dest_port_id,
   F(Dart_EnterScope, void, (void))                                             \
   F(Dart_ExitScope, void, (void))                                              \
   /* Objects */                                                                \
-  F(Dart_IsNull, bool, (Dart_Handle))
+  F(Dart_IsNull, bool, (Dart_Handle))                                          \
+  F(Dart_Null, Dart_Handle, (void))
+
+// dart_api.h symbols that have been deprecated but are retained here
+// until we can make a breaking change bumping the major version number
+// (DART_API_DL_MAJOR_VERSION)
+#define DART_API_DEPRECATED_DL_SYMBOLS(F)                                      \
+  F(Dart_UpdateExternalSize, void,                                             \
+    (Dart_WeakPersistentHandle object, intptr_t external_allocation_size))     \
+  F(Dart_UpdateFinalizableExternalSize, void,                                  \
+    (Dart_FinalizableHandle object, Dart_Handle strong_ref_to_object,          \
+     intptr_t external_allocation_size))
 
 #define DART_API_ALL_DL_SYMBOLS(F)                                             \
   DART_NATIVE_API_DL_SYMBOLS(F)                                                \
@@ -144,6 +156,7 @@ typedef void (*Dart_NativeMessageHandler_DL)(Dart_Port_DL dest_port_id,
   DART_EXPORT_DL name##_Type name##_DL;
 
 DART_API_ALL_DL_SYMBOLS(DART_API_DL_DECLARATIONS)
+DART_API_DEPRECATED_DL_SYMBOLS(DART_API_DL_DECLARATIONS)
 
 #undef DART_API_DL_DECLARATIONS
 
