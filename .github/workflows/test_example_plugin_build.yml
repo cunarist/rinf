@@ -38,7 +38,7 @@ jobs:
             # "advanced" branch has extra iOS flavor and uses rust nightly for release builds
             git clone -b advanced https://github.com/irondash/hello_rust_ffi_plugin
             cd hello_rust_ffi_plugin
-            git subtree pull --prefix cargokit https://github.com/${{ github.repository }} ${{ steps.extract_branch.outputs.branch }} --squash
+            git subtree pull --prefix cargokit https://github.com/${{ github.event.pull_request.repo.full_name || github.repository }} ${{ steps.extract_branch.outputs.branch }} --squash
       - uses: subosito/flutter-action@cc97e1648fff6ca5cc647fa67f47e70f7895510b # 2.11.0
         with:
           channel: "stable"
