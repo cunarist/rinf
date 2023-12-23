@@ -25,6 +25,10 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
+#if defined(__Fuchsia__)
+#include <zircon/types.h>
+#endif
+
 #ifdef __cplusplus
 #define DART_EXTERN_C extern "C"
 #else
@@ -54,10 +58,13 @@
 
 #if __GNUC__
 #define DART_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+#define DART_DEPRECATED(msg) __attribute__((deprecated(msg)))
 #elif _MSC_VER
 #define DART_WARN_UNUSED_RESULT _Check_return_
+#define DART_DEPRECATED(msg) __declspec(deprecated(msg))
 #else
 #define DART_WARN_UNUSED_RESULT
+#define DART_DEPRECATED(msg)
 #endif
 
 /*
@@ -499,14 +506,6 @@ DART_EXPORT void Dart_DeleteWeakPersistentHandle(
     Dart_WeakPersistentHandle object);
 
 /**
- * Updates the external memory size for the given weak persistent handle.
- *
- * May trigger garbage collection.
- */
-DART_EXPORT void Dart_UpdateExternalSize(Dart_WeakPersistentHandle object,
-                                         intptr_t external_allocation_size);
-
-/**
  * Allocates a finalizable handle for an object.
  *
  * This handle has the lifetime of the current isolate group unless the object
@@ -557,18 +556,6 @@ Dart_NewFinalizableHandle(Dart_Handle object,
 DART_EXPORT void Dart_DeleteFinalizableHandle(Dart_FinalizableHandle object,
                                               Dart_Handle strong_ref_to_object);
 
-/**
- * Updates the external memory size for the given finalizable handle.
- *
- * The caller has to provide the actual Dart object the handle was created from
- * to prove the object (and therefore the finalizable handle) is still alive.
- *
- * May trigger garbage collection.
- */
-DART_EXPORT void Dart_UpdateFinalizableExternalSize(
-    Dart_FinalizableHandle object,
-    Dart_Handle strong_ref_to_object,
-    intptr_t external_allocation_size);
 
 /*
  * ==========================
@@ -849,7 +836,7 @@ typedef Dart_Handle (*Dart_GetVMServiceAssetsArchive)(void);
  * The current version of the Dart_InitializeFlags. Should be incremented every
  * time Dart_InitializeFlags changes in a binary incompatible way.
  */
-#define DART_INITIALIZE_PARAMS_CURRENT_VERSION (0x00000007)
+#define DART_INITIALIZE_PARAMS_CURRENT_VERSION (0x00000008)
 
 /** Forward declaration */
 struct Dart_CodeObserver;
@@ -992,6 +979,15 @@ typedef struct {
    * Kernel blob unregistration callback function. See Dart_UnregisterKernelBlobCallback.
    */
   Dart_UnregisterKernelBlobCallback unregister_kernel_blob;
+
+#if defined(__Fuchsia__)
+  /**
+   * The resource needed to use zx_vmo_replace_as_executable. Can be
+   * ZX_HANDLE_INVALID if the process has ambient-replace-as-executable or if
+   * executable memory is not needed (e.g., this is an AOT runtime).
+   */
+  zx_handle_t vmex_resource;
+#endif
 } Dart_InitializeParams;
 
 /**
@@ -1210,7 +1206,7 @@ DART_EXPORT void* Dart_CurrentIsolateGroupData(void);
  * It is the responsibility of the caller to free the returned ID.
  */
 typedef int64_t Dart_IsolateGroupId;
-DART_EXPORT Dart_IsolateGroupId Dart_CurrentIsolateGroupId();
+DART_EXPORT Dart_IsolateGroupId Dart_CurrentIsolateGroupId(void);
 
 /**
  * Returns the callback data associated with the specified isolate group. This
@@ -1282,24 +1278,24 @@ DART_EXPORT void Dart_KillIsolate(Dart_Isolate isolate);
 DART_EXPORT void Dart_NotifyIdle(int64_t deadline);
 
 typedef void (*Dart_HeapSamplingReportCallback)(void* context,
-                                                intptr_t heap_size,
-                                                const char* cls_name,
                                                 void* data);
 
 typedef void* (*Dart_HeapSamplingCreateCallback)(
     Dart_Isolate isolate,
-    Dart_IsolateGroup isolate_group);
+    Dart_IsolateGroup isolate_group,
+    const char* cls_name,
+    intptr_t allocation_size);
 typedef void (*Dart_HeapSamplingDeleteCallback)(void* data);
 
 /**
  * Starts the heap sampling profiler for each thread in the VM.
  */
-DART_EXPORT void Dart_EnableHeapSampling();
+DART_EXPORT void Dart_EnableHeapSampling(void);
 
 /*
  * Stops the heap sampling profiler for each thread in the VM.
  */
-DART_EXPORT void Dart_DisableHeapSampling();
+DART_EXPORT void Dart_DisableHeapSampling(void);
 
 /* Registers callbacks are invoked once per sampled allocation upon object
  * allocation and garbage collection.
@@ -1336,10 +1332,14 @@ DART_EXPORT void Dart_RegisterHeapSamplingCallback(
  *    freed by the VM at any point after the method returns.
  *  - |data| will be set to the data associated with the sample by
  *    |Dart_HeapSamplingCreateCallback|.
+ *
+ * If |force_gc| is true, a full GC will be performed before reporting the
+ * allocations.
  */
 DART_EXPORT void Dart_ReportSurvivingAllocations(
     Dart_HeapSamplingReportCallback callback,
-    void* context);
+    void* context,
+    bool force_gc);
 
 /*
  * Sets the average heap sampling rate based on a number of |bytes| for each
@@ -2242,6 +2242,17 @@ DART_EXPORT Dart_Handle Dart_BooleanValue(Dart_Handle boolean_obj, bool* value);
 DART_EXPORT Dart_Handle Dart_StringLength(Dart_Handle str, intptr_t* length);
 
 /**
+ * Gets the length of UTF-8 encoded representation for a string.
+ *
+ * \param str A String.
+ * \param length Returns the length of UTF-8 encoded representation for string.
+ *
+ * \return A valid handle if no error occurs during the operation.
+ */
+DART_EXPORT Dart_Handle Dart_StringUTF8Length(Dart_Handle str,
+                                              intptr_t* length);
+
+/**
  * Returns a String built from the provided C string
  * (There is an implicit assumption that the C string passed in contains
  *  UTF-8 encoded characters and '\0' is considered as a termination
@@ -2367,6 +2378,24 @@ DART_EXPORT Dart_Handle Dart_StringToCString(Dart_Handle str,
 DART_EXPORT Dart_Handle Dart_StringToUTF8(Dart_Handle str,
                                           uint8_t** utf8_array,
                                           intptr_t* length);
+
+/**
+ * Copies the UTF-8 encoded representation of a String into specified buffer.
+ *
+ * Any unpaired surrogate code points in the string will be converted as
+ * replacement characters (U+FFFD, 0xEF 0xBF 0xBD in UTF-8).
+ *
+ * \param str A string.
+ * \param utf8_array Buffer into which the UTF-8 encoded representation of
+ *   the string is copied into.
+ *   The buffer is allocated and managed by the caller.
+ * \param length Specifies the length of the buffer passed in.
+ *
+ * \return A valid handle if no error occurs during the operation.
+ */
+DART_EXPORT Dart_Handle Dart_CopyUTF8EncodingOfString(Dart_Handle str,
+                                                      uint8_t* utf8_array,
+                                                      intptr_t length);
 
 /**
  * Gets the data corresponding to the string object. This function returns
@@ -3343,7 +3372,7 @@ DART_EXPORT Dart_Handle Dart_GetNativeSymbol(Dart_Handle library,
 /**
  * Sets the callback used to resolve FFI native functions for a library.
  * The resolved functions are expected to be a C function pointer of the
- * correct signature (as specified in the `@FfiNative<NFT>()` function
+ * correct signature (as specified in the `@Native<NFT>()` function
  * annotation in Dart code).
  *
  * NOTE: This is an experimental feature and might change in the future.
@@ -3759,7 +3788,6 @@ typedef enum {
 
 typedef struct {
   Dart_KernelCompilationStatus status;
-  bool null_safety;
   char* error;
   uint8_t* kernel;
   intptr_t kernel_size;
@@ -3788,6 +3816,9 @@ DART_EXPORT Dart_Port Dart_KernelPort(void);
  * This is used by the frontend to determine if compilation related information
  * should be printed to console (e.g., null safety mode).
  *
+ * \param embed_sources Set to `true` when sources should be embedded in the
+ * kernel file.
+ *
  * \param verbosity Specifies the logging behavior of the kernel compilation
  * service.
  *
@@ -3809,6 +3840,7 @@ Dart_CompileToKernel(const char* script_uri,
                      const intptr_t platform_kernel_size,
                      bool incremental_compile,
                      bool snapshot_compile,
+                     bool embed_sources,
                      const char* package_config,
                      Dart_KernelCompilationVerbosityLevel verbosity);
 
