@@ -8,31 +8,31 @@ use tokio_with_wasm::tokio;
 
 const SHOULD_DEMONSTRATE: bool = true; // Disabled when applied as template
 
-pub async fn handle_sample_resource(rust_request: RustRequest) -> RustResponse {
+pub async fn handle_sample_resource(rust_request: RustRequest) -> Option<RustResponse> {
     match rust_request.operation {
-        RustOperation::Create => RustResponse::default(),
-        RustOperation::Read => RustResponse::default(),
-        RustOperation::Update => RustResponse::default(),
-        RustOperation::Delete => RustResponse::default(),
+        RustOperation::Create => None,
+        RustOperation::Read => None,
+        RustOperation::Update => None,
+        RustOperation::Delete => None,
     }
 }
 
-pub async fn handle_deeper_resource(rust_request: RustRequest) -> RustResponse {
+pub async fn handle_deeper_resource(rust_request: RustRequest) -> Option<RustResponse> {
     match rust_request.operation {
-        RustOperation::Create => RustResponse::default(),
-        RustOperation::Read => RustResponse::default(),
-        RustOperation::Update => RustResponse::default(),
-        RustOperation::Delete => RustResponse::default(),
+        RustOperation::Create => None,
+        RustOperation::Read => None,
+        RustOperation::Update => None,
+        RustOperation::Delete => None,
     }
 }
 
-pub async fn handle_counter_number(rust_request: RustRequest) -> RustResponse {
+pub async fn handle_counter_number(rust_request: RustRequest) -> Option<RustResponse> {
     use crate::messages::counter_number::{ReadRequest, ReadResponse};
     // We import message structs in this handler function
     // because schema will differ by Rust resource.
 
     match rust_request.operation {
-        RustOperation::Create => RustResponse::default(),
+        RustOperation::Create => None,
         RustOperation::Read => {
             // Decode raw bytes into a Rust message object.
             let message_bytes = rust_request.message.unwrap();
@@ -50,14 +50,13 @@ pub async fn handle_counter_number(rust_request: RustRequest) -> RustResponse {
                 dummy_two: request_message.dummy_two,
                 dummy_three: request_message.dummy_three,
             };
-            RustResponse {
-                successful: true,
+            Some(RustResponse {
                 message: Some(response_message.encode_to_vec()),
                 blob: None,
-            }
+            })
         }
-        RustOperation::Update => RustResponse::default(),
-        RustOperation::Delete => RustResponse::default(),
+        RustOperation::Update => None,
+        RustOperation::Delete => None,
     }
 }
 

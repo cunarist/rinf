@@ -2,9 +2,10 @@
 //! when a `RustRequest` was received from Dart
 //! and returns a `RustResponse`.
 
-use crate::bridge::{RustRequestUnique, RustResponse, RustResponseUnique};
+use crate::bridge::{RustRequestUnique, RustResponseUnique};
 use crate::messages;
 use crate::sample_functions;
+use tokio_with_wasm::tokio;
 
 pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUnique {
     // Get the request data from Dart.
@@ -13,20 +14,34 @@ pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUn
 
     // Run the function that handles the Rust resource.
     let rust_resource = rust_request.resource;
-    let rust_response = match rust_resource {
-        messages::counter_number::ID => sample_functions::handle_counter_number(rust_request).await,
-        messages::sample_folder::sample_resource::ID => {
-            sample_functions::handle_sample_resource(rust_request).await
+    let operation_result = tokio::spawn(async move {
+        match rust_resource {
+            messages::counter_number::ID => {
+                sample_functions::handle_counter_number(rust_request).await
+            }
+            messages::sample_folder::sample_resource::ID => {
+                sample_functions::handle_sample_resource(rust_request).await
+            }
+            messages::sample_folder::deeper_folder::deeper_resource::ID => {
+                sample_functions::handle_deeper_resource(rust_request).await
+            }
+            _ => None,
         }
-        messages::sample_folder::deeper_folder::deeper_resource::ID => {
-            sample_functions::handle_deeper_resource(rust_request).await
-        }
-        _ => RustResponse::default(),
-    };
+    })
+    .await;
 
     // Return the response to Dart.
-    RustResponseUnique {
-        id: interaction_id,
-        response: rust_response,
+    if let Ok(response_option) = operation_result {
+        // When the handler function returned `Some` or `None`.
+        RustResponseUnique {
+            id: interaction_id,
+            response: response_option,
+        }
+    } else {
+        // When the handler function panicked.
+        RustResponseUnique {
+            id: interaction_id,
+            response: None,
+        }
     }
 }

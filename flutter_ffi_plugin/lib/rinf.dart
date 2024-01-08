@@ -16,7 +16,7 @@ export 'src/exports.dart' show RustSignal;
 /// You can see the usage example at
 /// https://pub.dev/packages/rinf/example.
 final rustBroadcaster = StreamController<RustSignal>.broadcast();
-final _responseCompleters = Map<int, Completer<RustResponse>>();
+final _responseCompleters = Map<int, Completer<RustResponse?>>();
 final _requestIdGenerator = _IdGenerator();
 
 /// Contains basic functionalities of this framework.
@@ -64,14 +64,11 @@ class Rinf {
 /// and is very similar to HTTP request.
 /// Returns `RustResponse` object that is somehow calculated
 /// from the Rust side.
-/// If the Rust doesn't respond for 60 seconds,
-/// this function will return a failed `RustResponse` object.
+/// If the Rust side fails to respond for some reason,
+/// `null` will be returned.
 /// You can see the usage example at
 /// https://pub.dev/packages/rinf/example.
-Future<RustResponse> requestToRust(
-  RustRequest rustRequest, {
-  Duration? timeout = const Duration(seconds: 60),
-}) async {
+Future<RustResponse?> requestToRust(RustRequest rustRequest) async {
   final interactionId = _requestIdGenerator.generateId();
   final previousCompleter = _responseCompleters.remove(interactionId);
   if (previousCompleter != null) {
@@ -79,28 +76,14 @@ Future<RustResponse> requestToRust(
       'Rust response completer got forgotten',
     ));
   }
-  final responseCompleter = Completer<RustResponse>();
+  final responseCompleter = Completer<RustResponse?>();
   _responseCompleters[interactionId] = responseCompleter;
   final rustRequestUnique = RustRequestUnique(
     id: interactionId,
     request: rustRequest,
   );
   api.requestToRust(requestUnique: rustRequestUnique);
-  final RustResponse rustResponse;
-  if (timeout != null) {
-    rustResponse = await responseCompleter.future.timeout(
-      timeout,
-      onTimeout: () {
-        return RustResponse(
-          successful: false,
-          message: null,
-          blob: null,
-        );
-      },
-    );
-  } else {
-    rustResponse = await responseCompleter.future;
-  }
+  final rustResponse = await responseCompleter.future;
   return rustResponse;
 }
 

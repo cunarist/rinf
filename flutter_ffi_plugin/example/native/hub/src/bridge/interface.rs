@@ -44,27 +44,15 @@ pub struct RustRequestUnique {
 /// Response object that is sent from Rust to Dart.
 #[derive(Clone)]
 pub struct RustResponse {
-    pub successful: bool,
     pub message: Option<Vec<u8>>,
     pub blob: Option<Vec<u8>>,
-}
-
-impl Default for RustResponse {
-    /// Empty response with the successful value of false.
-    fn default() -> RustResponse {
-        RustResponse {
-            successful: false,
-            message: None,
-            blob: None,
-        }
-    }
 }
 
 /// Wrapper for `RustResponse` with a unique ID.
 #[derive(Clone)]
 pub struct RustResponseUnique {
     pub id: i32,
-    pub response: RustResponse,
+    pub response: Option<RustResponse>,
 }
 
 type Cell<T> = RefCell<Option<T>>;
