@@ -94,11 +94,11 @@ Now, write our new endpoint Rust function `sample_functions::handle_tutorial_res
 ...
 use crate::bridge::{RustOperation, RustRequest, RustResponse, RustSignal};
 ...
-pub async fn handle_tutorial_resource(rust_request: RustRequest) -> RustResponse {
+pub async fn handle_tutorial_resource(rust_request: RustRequest) -> Option<RustResponse> {
     use crate::messages::tutorial_resource::{ReadRequest, ReadResponse};
 
     match rust_request.operation {
-        RustOperation::Create => RustResponse::default(),
+        RustOperation::Create => None,
         RustOperation::Read => {
             let message_bytes = rust_request.message.unwrap();
             let request_message = ReadRequest::decode(message_bytes.as_slice()).unwrap();
@@ -120,8 +120,8 @@ pub async fn handle_tutorial_resource(rust_request: RustRequest) -> RustResponse
                 blob: None,
             }
         }
-        RustOperation::Update => RustResponse::default(),
-        RustOperation::Delete => RustResponse::default(),
+        RustOperation::Update => None,
+        RustOperation::Delete => None,
     }
 }
 ...
@@ -137,19 +137,24 @@ use crate::messages;
 use crate::sample_functions;
 ...
 let rust_resource = rust_request.resource;
-let rust_response = match rust_resource {
-    messages::counter_number::ID => sample_functions::handle_counter_number(rust_request).await,
-    messages::sample_folder::sample_resource::ID => {
-        sample_functions::handle_sample_resource(rust_request).await
+let operation_result = tokio::spawn(async move {
+    match rust_resource {
+        messages::counter_number::ID => {
+            sample_functions::handle_counter_number(rust_request).await
+        }
+        messages::sample_folder::sample_resource::ID => {
+            sample_functions::handle_sample_resource(rust_request).await
+        }
+        messages::sample_folder::deeper_folder::deeper_resource::ID => {
+            sample_functions::handle_deeper_resource(rust_request).await
+        }
+        messages::tutorial_resource::ID => {
+            sample_functions::handle_tutorial_resource(rust_request).await // ADD THIS BLOCK
+        }
+        _ => None,
     }
-    messages::sample_folder::deeper_folder::deeper_resource::ID => {
-        sample_functions::handle_sample_resource(rust_request).await
-    }
-    messages::tutorial_resource::ID => {
-        sample_functions::handle_tutorial_resource(rust_request).await // ADD THIS BLOCK
-    }
-    _ => RustResponse::default(),
-};
+})
+.await;
 ...
 ```
 
@@ -163,6 +168,9 @@ import 'package:example_app/messages/tutorial_resource.pb.dart'
     as tutorialResource;
 ...
     final rustResponse = await requestToRust(rustRequest);
+    if (rustResponse == null){
+      return;
+    }
     final responseMessage =
         tutorialResource.ReadResponse.fromBuffer(
       rustResponse.message!,
@@ -297,18 +305,11 @@ We've seen how to pass `RustRequest`, `RustResponse`, and `RustSignal` between D
 
 - Field `blob`: This is also a bytes array intended to contain large data, possibly up to a few gigabytes. You can send any kind of binary as you wish such as a high-resolution image or some kind of file data. Sending a blob from Rust to Dart is a zero-copy operation, meaning there's no memory copy involved. In contrast, sending a blob from Dart to Rust is a copy operation. This field is optional and can be `null` or `None`.
 
-### Response Timeout
+### When Rust Fails to Respond
 
-By default, Dart will receive a failed `RustResponse` if Rust doesn't respond within 60 seconds. To set a custom timeout for your `RustRequest`, you can optionally provide a timeout argument to the `requestToRust` function like this:
+When the handler function in Rust panics, the `requestToRust` Dart function will simply return `null`. Flutter will not receive any information about errors, so it is highly recommended to consume panic information within Rust for logging purposes, etc.
 
-```dart
-final rustResponse = await requestToRust(
-  rustRequest,
-  timeout: const Duration(minutes: 5),
-);
-```
-
-When you set the timeout parameter as `null`, it means Dart will wait forever until it receives a response from the Rust side. It's important to use this cautiously because if, Rust fails to respond for any reason, Dart will continuously await this event, potentially causing a resource leak.
+> In Rinf 4.20 and earlier versions, a `timeout` parameter could be provided to `requestToRust` Dart function. However, starting from Rinf 4.21, the `timeout` parameter has been removed because Dart will consistently receive a response, regardless of whether Rust handled the request successfully or not.
 
 ### Efficiency
 

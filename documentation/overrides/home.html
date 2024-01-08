@@ -141,14 +141,14 @@
         <h3>Rust with Business Logic</h3>
         <div>
           <pre>
-<code>pub async fn do(rust_request: RustRequest) -> RustResponse {
+<code>pub async fn do(rust_request: RustRequest) -> Option&lt;RustResponse&gt; {
   use crate::messages::tutorial_resource::{
     ReadRequest,
     ReadResponse,
   };
 
   match rust_request.operation {
-    RustOperation::Create => RustResponse::default(),
+    RustOperation::Create => None,
     RustOperation::Read => {
       let message_bytes = rust_request.message.unwrap();
       let request_message = ReadRequest::decode(
@@ -165,8 +165,8 @@
         blob: None,
       }
     }
-    RustOperation::Update => RustResponse::default(),
-    RustOperation::Delete => RustResponse::default(),
+    RustOperation::Update => None,
+    RustOperation::Delete => None,
   }
 }</code>
           </pre>
