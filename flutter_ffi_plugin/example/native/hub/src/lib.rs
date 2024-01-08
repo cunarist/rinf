@@ -17,9 +17,7 @@ async fn main() {
     tokio::spawn(sample_functions::stream_mandelbrot());
     tokio::spawn(sample_functions::run_debug_tests());
     while let Some(request_unique) = request_receiver.recv().await {
-        tokio::spawn(async {
-            let response_unique = handle_request(request_unique).await;
-            respond_to_dart(response_unique);
-        });
+        let response_unique = handle_request(request_unique).await;
+        respond_to_dart(response_unique);
     }
 }
