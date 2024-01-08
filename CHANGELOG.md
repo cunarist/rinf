@@ -1,3 +1,7 @@
+## 5.0.0
+
+- Now `requestToRust` Dart function will return `null` when the handler function in Rust cannot respond or has panicked. This is a breaking change, so when you upgrade to this version, you need to run `rinf template --bridge` in the terminal and refactor some of the code where IDE warns you about mismatches. You also need to modify `lib.rs` and `with_request.rs` modules of the `hub` crate. Also, the `timeout` parameter was removed from the `requestToRust` function because Dart will always get some return value from Rust in all cases. Please refer to the example code and documentation tutorials if you need detailed information.
+
 ## 4.20.0
 
 - Added support for Android Gradle Plugin 8.
