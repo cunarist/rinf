@@ -64,8 +64,8 @@ class Rinf {
 /// and is very similar to HTTP request.
 /// Returns `RustResponse` object that is somehow calculated
 /// from the Rust side.
-/// If the Rust doesn't respond for 60 seconds,
-/// this function will return a failed `RustResponse` object.
+/// If the Rust side fails to respond for some reason,
+/// `null` will be returned.
 /// You can see the usage example at
 /// https://pub.dev/packages/rinf/example.
 Future<RustResponse?> requestToRust(RustRequest rustRequest) async {
