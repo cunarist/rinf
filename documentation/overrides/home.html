@@ -96,10 +96,7 @@
     </div>
     <div class="spacing"></div>
     <div class="centered">
-      <a
-        href="{{ page.next_page.url | url }}"
-        class="md-button md-button--primary fixed-button"
-      >
+      <a href="{{ page.next_page.url | url }}" class="md-button fixed-button">
         Quick start
       </a>
       <a
@@ -113,70 +110,7 @@
   </div>
   <div class="spacing"></div>
   <div class="centered">
-    <h2>Communication</h2>
-    <div class="columns">
-      <div class="guide-box">
-        <h3>Dart with Widgets</h3>
-        <div>
-          <pre>
-<code>ElevatedButton(
-  onPressed: () async {
-    final requestMessage = tutorialResource.ReadRequest(
-      inputNumbers: [3, 4, 5],
-      inputString: 'Zero-cost abstraction',
-    );
-    final rustRequest = RustRequest(
-      resource: tutorialResource.ID,
-      operation: RustOperation.Read,
-      message: requestMessage.writeToBuffer(),
-    );
-    final rustResponse = await requestToRust(rustRequest);
-  },
-  child: Text("Request to Rust"),
-)</code>
-          </pre>
-        </div>
-      </div>
-      <div class="guide-box">
-        <h3>Rust with Business Logic</h3>
-        <div>
-          <pre>
-<code>pub async fn do(rust_request: RustRequest) -> Option&lt;RustResponse&gt; {
-  use crate::messages::tutorial_resource::{
-    ReadRequest,
-    ReadResponse,
-  };
-
-  match rust_request.operation {
-    RustOperation::Create => None,
-    RustOperation::Read => {
-      let message_bytes = rust_request.message.unwrap();
-      let request_message = ReadRequest::decode(
-        message_bytes.as_slice()
-      ).unwrap();
-
-      let response_message = ReadResponse {
-        output_numbers: vec![1, 2, 3],
-        output_string: String::from("HI"),
-      };
-      RustResponse {
-        successful: true,
-        message: Some(response_message.encode_to_vec()),
-        blob: None,
-      }
-    }
-    RustOperation::Update => None,
-    RustOperation::Delete => None,
-  }
-}</code>
-          </pre>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="spacing"></div>
-  <div class="centered">
-    <h2>Reason for the Combination</h2>
+    <h2>The Combination</h2>
     <div class="columns">
       <div class="guide-box">
         <img class="lang-icon" src="assets/flutter_icon.svg" />
@@ -251,6 +185,69 @@
         <li>✅ iOS: Tested and supported</li>
         <li>✅ Web: Tested and supported</li>
       </ul>
+    </div>
+  </div>
+  <div class="spacing"></div>
+  <div class="centered">
+    <h2>Communication</h2>
+    <div class="columns">
+      <div class="guide-box">
+        <h3>Dart with Widgets</h3>
+        <div>
+          <pre>
+<code>ElevatedButton(
+  onPressed: () async {
+    final requestMessage = tutorialResource.ReadRequest(
+      inputNumbers: [3, 4, 5],
+      inputString: 'Zero-cost abstraction',
+    );
+    final rustRequest = RustRequest(
+      resource: tutorialResource.ID,
+      operation: RustOperation.Read,
+      message: requestMessage.writeToBuffer(),
+    );
+    final rustResponse = await requestToRust(rustRequest);
+  },
+  child: Text("Request to Rust"),
+)</code>
+          </pre>
+        </div>
+      </div>
+      <div class="guide-box">
+        <h3>Rust with Business Logic</h3>
+        <div>
+          <pre>
+<code>pub async fn do(rust_request: RustRequest) -> Option&lt;RustResponse&gt; {
+  use crate::messages::tutorial_resource::{
+    ReadRequest,
+    ReadResponse,
+  };
+
+  match rust_request.operation {
+    RustOperation::Create => None,
+    RustOperation::Read => {
+      let message_bytes = rust_request.message.unwrap();
+      let request_message = ReadRequest::decode(
+        message_bytes.as_slice()
+      ).unwrap();
+
+      let response_message = ReadResponse {
+        output_numbers: vec![1, 2, 3],
+        output_string: String::from("HI"),
+      };
+      RustResponse {
+        successful: true,
+        message: Some(response_message.encode_to_vec()),
+        blob: None,
+      }
+    }
+    RustOperation::Update => None,
+    RustOperation::Delete => None,
+  }
+}</code>
+          </pre>
+        </div>
+      </div>
     </div>
   </div>
   <div class="spacing"></div>
