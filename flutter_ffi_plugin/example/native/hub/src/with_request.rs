@@ -25,7 +25,7 @@ pub async fn handle_request(request_unique: RustRequestUnique) -> RustResponseUn
             messages::sample_folder::deeper_folder::deeper_resource::ID => {
                 sample_functions::handle_deeper_resource(rust_request).await
             }
-            _ => panic!("No such Rust resource ID exists."),
+            _ => None,
         }
     })
     .await;
