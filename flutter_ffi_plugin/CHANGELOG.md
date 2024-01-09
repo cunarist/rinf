@@ -1,3 +1,7 @@
+## 5.1.0
+
+- All the code from `flutter_rust_bridge` was removed. This was due to criticisms about Rinf from the community and FRB devs. Also, internal bridge and FFI code is now much smaller. User API remains unchanged.
+
 ## 5.0.0
 
 - Now `requestToRust` Dart function will return `null` when the handler function in Rust cannot respond or has panicked. This is a breaking change, so when you upgrade to this version, you need to run `rinf template --bridge` in the terminal and refactor some of the code where IDE warns you about mismatches. You also need to modify `lib.rs` and `with_request.rs` modules of the `hub` crate. Also, the `timeout` parameter was removed from the `requestToRust` function because Dart will always get some return value from Rust in all cases. Please refer to the example code and documentation tutorials if you need detailed information.
