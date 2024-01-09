@@ -3,9 +3,10 @@
 /// receiving stream signals from Rust are possible.
 
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:math';
 import 'src/exports.dart';
-import 'package:flutter/foundation.dart';
+import 'dart:isolate';
 
 export 'src/exports.dart' show RustOperation;
 export 'src/exports.dart' show RustRequest;
@@ -24,27 +25,49 @@ class Rinf {
   /// Makes sure that the Rust side is ready.
   /// Don't forget to call this function in the `main` function of Dart.
   static Future<void> ensureInitialized() async {
-    await api.prepareChannels();
-    final rustSignalStream = api.prepareRustSignalStream();
-    rustSignalStream.listen((rustSignal) {
+    final rustSignalReceiver = ReceivePort();
+    final rustResponseUniqueReceiver = ReceivePort();
+    final rustReportReceiver = ReceivePort();
+
+    rustSignalReceiver.listen((rustSignalRaw) {
+      final rustSignal = RustSignal(
+        resource: rustSignalRaw[0],
+        message: rustSignalRaw[1],
+        blob: rustSignalRaw[2],
+      );
       rustBroadcaster.add(rustSignal);
     });
-    final rustResponseUniqueStream = api.prepareRustResponseStream();
-    rustResponseUniqueStream.listen((rustResponseUnique) {
-      final interactionId = rustResponseUnique.id;
+
+    rustResponseUniqueReceiver.listen((rustResponseUniqueRaw) {
+      final int interactionId = rustResponseUniqueRaw[0];
+      final List? rustResponseRaw = rustResponseUniqueRaw[1];
+      final RustResponse? rustResponse;
+      if (rustResponseRaw == null) {
+        rustResponse = null;
+      } else {
+        rustResponse = RustResponse(
+          message: rustResponseRaw[0],
+          blob: rustResponseRaw[1],
+        );
+      }
       final responseCompleter = _responseCompleters.remove(interactionId);
       if (responseCompleter != null) {
-        responseCompleter.complete(rustResponseUnique.response);
+        responseCompleter.complete(rustResponse);
       }
     });
-    if (kDebugMode) {
-      final rustReportStream = api.prepareRustReportStream();
-      rustReportStream.listen((rustReport) {
-        print(rustReport);
-      });
-    }
-    while (!(await api.checkRustStreams())) {}
-    api.startRustLogic();
+
+    rustReportReceiver.listen((rustReport) {
+      print(rustReport);
+    });
+
+    storeDartPostCObject(); // Needed for `allo-isolate`.
+    prepareIsolatesExtern(
+      rustSignalReceiver.sendPort.nativePort,
+      rustResponseUniqueReceiver.sendPort.nativePort,
+      rustReportReceiver.sendPort.nativePort,
+    );
+    prepareChannelsExtern();
+    startRustLogicExtern();
   }
 
   /// Ensure that all Rust tasks are terminated
@@ -54,7 +77,7 @@ class Rinf {
   /// Please note that on the web, this function does not have any effect,
   /// as tasks are managed by the JavaScript runtime, not Rust.
   static Future<void> ensureFinalized() async {
-    await api.stopRustLogic();
+    stopRustLogicExtern();
   }
 }
 
@@ -82,7 +105,7 @@ Future<RustResponse?> requestToRust(RustRequest rustRequest) async {
     id: interactionId,
     request: rustRequest,
   );
-  api.requestToRust(requestUnique: rustRequestUnique);
+  requestToRustExtern(rustRequestUnique);
   final rustResponse = await responseCompleter.future;
   return rustResponse;
 }

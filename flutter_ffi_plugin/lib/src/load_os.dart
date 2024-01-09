@@ -1,9 +1,7 @@
 import 'dart:io' as io;
 import 'dart:ffi';
-import 'bridge/generated.dart';
-import 'bridge/definitions.dart';
 
-final Bridge api = BridgeImpl(loadNativeLibrary());
+final DynamicLibrary rustLibrary = loadNativeLibrary();
 
 DynamicLibrary loadNativeLibrary() {
   if (io.Platform.isLinux) {
@@ -17,6 +15,6 @@ DynamicLibrary loadNativeLibrary() {
   } else if (io.Platform.isMacOS) {
     return DynamicLibrary.executable(); // Static library
   } else {
-    return DynamicLibrary.executable(); // Dummy return value
+    throw UnsupportedError('The operating system is not supported.');
   }
 }
