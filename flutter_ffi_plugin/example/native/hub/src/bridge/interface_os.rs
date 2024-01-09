@@ -96,9 +96,12 @@ pub extern "C" fn prepare_isolates_extern(port_signal: i64, port_response: i64, 
     let cell = RESPONSE_ISOLATE_SHARED.lock().unwrap();
     cell.replace(Some(isolate));
 
-    let isolate = Isolate::new(port_report);
-    let cell = REPORT_ISOLATE_SHARED.lock().unwrap();
-    cell.replace(Some(isolate));
+    #[cfg(debug_assertions)]
+    {
+        let isolate = Isolate::new(port_report);
+        let cell = REPORT_ISOLATE_SHARED.lock().unwrap();
+        cell.replace(Some(isolate));
+    }
 }
 
 #[no_mangle]
@@ -159,6 +162,7 @@ pub fn respond_to_dart_extern(response_unique: RustResponseUnique) {
     });
 }
 
+#[cfg(debug_assertions)]
 pub fn send_rust_report_extern(rust_report: String) {
     REPORT_ISOLATE.with(|inner| {
         let mut borrowed = inner.borrow_mut();

@@ -84,6 +84,7 @@ extern "C" {
         message_raw: Uint8Array,
         blob_raw: Uint8Array,
     );
+    #[cfg(debug_assertions)]
     #[wasm_bindgen(js_name = rinf_send_rust_report_extern)]
     pub fn send_rust_report_extern(rust_report: String);
 }
