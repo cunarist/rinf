@@ -8,7 +8,11 @@
 pub use interface::*;
 
 mod interface;
+
+#[cfg(not(target_family = "wasm"))]
 mod interface_os;
+#[cfg(target_family = "wasm")]
+mod interface_web;
 
 /// Delegates the printing operation to Flutter,
 /// which excels at handling various platforms

@@ -332,7 +332,7 @@ Future<void> _buildWebassembly({bool isReleaseMode = false}) async {
       '--out-dir', outputPath,
       '--out-name', 'hub',
       '--no-typescript',
-      '--target', 'no-modules',
+      '--target', 'web',
       if (!isReleaseMode) '--dev',
       '--', // Cargo build args comes from here
       '-Z', 'build-std=std,panic_abort',

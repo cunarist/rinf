@@ -3,10 +3,8 @@
 /// receiving stream signals from Rust are possible.
 
 import 'dart:async';
-import 'dart:ffi';
 import 'dart:math';
 import 'src/exports.dart';
-import 'dart:isolate';
 
 export 'src/exports.dart' show RustOperation;
 export 'src/exports.dart' show RustRequest;
@@ -25,47 +23,25 @@ class Rinf {
   /// Makes sure that the Rust side is ready.
   /// Don't forget to call this function in the `main` function of Dart.
   static Future<void> ensureInitialized() async {
-    final rustSignalReceiver = ReceivePort();
-    final rustResponseUniqueReceiver = ReceivePort();
-    final rustReportReceiver = ReceivePort();
+    await prepareNativeExtern();
 
-    rustSignalReceiver.listen((rustSignalRaw) {
-      final rustSignal = RustSignal(
-        resource: rustSignalRaw[0],
-        message: rustSignalRaw[1],
-        blob: rustSignalRaw[2],
-      );
+    rustSignalStream.stream.listen((rustSignal) {
       rustBroadcaster.add(rustSignal);
     });
 
-    rustResponseUniqueReceiver.listen((rustResponseUniqueRaw) {
-      final int interactionId = rustResponseUniqueRaw[0];
-      final List? rustResponseRaw = rustResponseUniqueRaw[1];
-      final RustResponse? rustResponse;
-      if (rustResponseRaw == null) {
-        rustResponse = null;
-      } else {
-        rustResponse = RustResponse(
-          message: rustResponseRaw[0],
-          blob: rustResponseRaw[1],
-        );
-      }
+    rustResponseUniqueStream.stream.listen((rustResponseUnique) {
+      final interactionId = rustResponseUnique.id;
+      final rustResponse = rustResponseUnique.response;
       final responseCompleter = _responseCompleters.remove(interactionId);
       if (responseCompleter != null) {
         responseCompleter.complete(rustResponse);
       }
     });
 
-    rustReportReceiver.listen((rustReport) {
+    rustReportStream.stream.listen((rustReport) {
       print(rustReport);
     });
 
-    storeDartPostCObject(); // Needed for `allo-isolate`.
-    prepareIsolatesExtern(
-      rustSignalReceiver.sendPort.nativePort,
-      rustResponseUniqueReceiver.sendPort.nativePort,
-      rustReportReceiver.sendPort.nativePort,
-    );
     prepareChannelsExtern();
     startRustLogicExtern();
   }

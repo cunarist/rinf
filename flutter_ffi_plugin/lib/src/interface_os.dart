@@ -4,19 +4,68 @@ import 'load_os.dart';
 import 'package:ffi/ffi.dart';
 import 'dart:async';
 import 'interface.dart';
+import 'dart:isolate';
+
+final rustSignalStream = StreamController<RustSignal>();
+final rustResponseUniqueStream = StreamController<RustResponseUnique>();
+final rustReportStream = StreamController<String>();
 
 typedef StoreDartPostCObject = Pointer Function(
     Pointer<NativeFunction<Int8 Function(Int64, Pointer<Dart_CObject>)>>);
 
 /// This should be called once at startup
 /// to enable `allo_isolate` to send data from the Rust side.
-void storeDartPostCObject() {
+Future<void> prepareNativeExtern() async {
+  // Look up the Rust function
   final rustFunction =
       rustLibrary.lookupFunction<StoreDartPostCObject, StoreDartPostCObject>(
     'store_dart_post_cobject',
   );
   // Call the Rust function
   rustFunction(NativeApi.postCObject);
+
+  // Prepare ports that can communicate over isolates
+  final rustSignalPort = ReceivePort();
+  final rustResponseUniquePort = ReceivePort();
+  final rustReportPort = ReceivePort();
+
+  // Make the ports listen to Rust
+  rustSignalPort.listen((rustSignalRaw) {
+    final rustSignal = RustSignal(
+      resource: rustSignalRaw[0],
+      message: rustSignalRaw[1],
+      blob: rustSignalRaw[2],
+    );
+    rustSignalStream.add(rustSignal);
+  });
+  rustResponseUniquePort.listen((rustResponseUniqueRaw) {
+    final int interactionId = rustResponseUniqueRaw[0];
+    final List? rustResponseRaw = rustResponseUniqueRaw[1];
+    final RustResponse? rustResponse;
+    if (rustResponseRaw == null) {
+      rustResponse = null;
+    } else {
+      rustResponse = RustResponse(
+        message: rustResponseRaw[0],
+        blob: rustResponseRaw[1],
+      );
+    }
+    final rustResponseUnique = RustResponseUnique(
+      id: interactionId,
+      response: rustResponse,
+    );
+    rustResponseUniqueStream.add(rustResponseUnique);
+  });
+  rustReportPort.listen((rustReport) {
+    rustReportStream.add(rustReport);
+  });
+
+  // Make Rust have its own isolates to send data to Dart
+  prepareIsolatesExtern(
+    rustSignalPort.sendPort.nativePort,
+    rustResponseUniquePort.sendPort.nativePort,
+    rustReportPort.sendPort.nativePort,
+  );
 }
 
 void startRustLogicExtern() {
@@ -85,7 +134,8 @@ void prepareIsolatesExtern(int portSignal, int portResponse, int portReport) {
   final rustFunction = rustLibrary.lookupFunction<
       Void Function(IntPtr, IntPtr, IntPtr),
       void Function(int, int, int)>('prepare_isolates_extern');
-  // Call the Rust function
+  // Call the Rust function    final rustSignalReceiver = ReceivePort();
+
   rustFunction(portSignal, portResponse, portReport);
 }
 
