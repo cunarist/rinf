@@ -13,7 +13,8 @@ crate-type = ["lib", "cdylib", "staticlib"]
 
 [dependencies]
 rinf = "5.0.0"
-tokio_with_wasm = "0.3.2"
-wasm-bindgen = "0.2.88"
+allo-isolate = { version = "0.1.23", features = ["zero-copy"] }
+wasm-bindgen = "0.2.89"
+tokio_with_wasm = "0.4.0"
 prost = "0.12.3"
 sample_crate = { path = "../sample_crate" }

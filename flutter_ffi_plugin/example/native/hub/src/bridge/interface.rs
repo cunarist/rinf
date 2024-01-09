@@ -1,6 +1,5 @@
 #![allow(dead_code)]
 
-use rinf::engine::StreamSink;
 use rinf::externs::lazy_static::lazy_static;
 use std::cell::RefCell;
 use std::sync::Arc;
@@ -9,6 +8,11 @@ use tokio::sync::mpsc::channel;
 use tokio::sync::mpsc::Receiver;
 use tokio::sync::mpsc::Sender;
 use tokio_with_wasm::tokio;
+
+#[cfg(not(target_family = "wasm"))]
+use super::interface_os::*;
+#[cfg(target_family = "wasm")]
+use super::interface_web::*;
 
 /// Available operations that a `RustRequest` object can hold.
 /// There are 4 options, `Create`,`Read`,`Update`, and `Delete`.
@@ -58,9 +62,6 @@ pub struct RustResponseUnique {
 type Cell<T> = RefCell<Option<T>>;
 type SharedCell<T> = Arc<Mutex<Cell<T>>>;
 
-type RustSignalStream = StreamSink<RustSignal>;
-type RustResponseStream = StreamSink<RustResponseUnique>;
-type RustReportStream = StreamSink<String>;
 type RustRequestSender = Sender<RustRequestUnique>;
 type RustRequestReceiver = Receiver<RustRequestUnique>;
 
@@ -70,23 +71,9 @@ thread_local! {
     pub static REQUEST_SENDER: Cell<RustRequestSender> = RefCell::new(None);
 }
 
-// Native: `tokio` runtime threads
-// Web: Worker thread
-thread_local! {
-    pub static SIGNAL_STREAM: Cell<RustSignalStream> = RefCell::new(None);
-    pub static RESPONSE_STREAM: Cell<RustResponseStream> = RefCell::new(None);
-    pub static REPORT_STREAM: Cell<RustReportStream> = RefCell::new(None);
-}
-
 // Native: All threads
 // Web: Worker thread
 lazy_static! {
-    pub static ref SIGNAL_STREAM_SHARED: SharedCell<RustSignalStream> =
-        Arc::new(Mutex::new(RefCell::new(None)));
-    pub static ref RESPONSE_STREAM_SHARED: SharedCell<RustResponseStream> =
-        Arc::new(Mutex::new(RefCell::new(None)));
-    pub static ref REPORT_STREAM_SHARED: SharedCell<RustReportStream> =
-        Arc::new(Mutex::new(RefCell::new(None)));
     pub static ref REQUST_RECEIVER_SHARED: SharedCell<RustRequestReceiver> =
         Arc::new(Mutex::new(RefCell::new(None)));
 }
@@ -102,24 +89,6 @@ thread_local! {
     pub static IS_MAIN_STARTED: RefCell<bool> = RefCell::new(false);
 }
 
-/// Returns a stream object in Dart that listens to Rust.
-pub fn prepare_rust_signal_stream(signal_stream: StreamSink<RustSignal>) {
-    let cell = SIGNAL_STREAM_SHARED.lock().unwrap();
-    cell.replace(Some(signal_stream));
-}
-
-/// Returns a stream object in Dart that gives responses from Rust.
-pub fn prepare_rust_response_stream(response_stream: StreamSink<RustResponseUnique>) {
-    let cell = RESPONSE_STREAM_SHARED.lock().unwrap();
-    cell.replace(Some(response_stream));
-}
-
-/// Returns a stream object in Dart that gives strings to print from Rust.
-pub fn prepare_rust_report_stream(report_stream: StreamSink<String>) {
-    let cell = REPORT_STREAM_SHARED.lock().unwrap();
-    cell.replace(Some(report_stream));
-}
-
 /// Prepare channels that are used in the Rust world.
 pub fn prepare_channels() {
     let (request_sender, request_receiver) = channel(1024);
@@ -128,28 +97,6 @@ pub fn prepare_channels() {
     });
     let cell = REQUST_RECEIVER_SHARED.lock().unwrap();
     cell.replace(Some(request_receiver));
-}
-
-/// Check if the streams are ready in Rust.
-/// This should be done before starting the Rust logic.
-pub fn check_rust_streams() -> bool {
-    let mut are_all_ready = true;
-    let cell = SIGNAL_STREAM_SHARED.lock().unwrap();
-    if cell.borrow().is_none() {
-        are_all_ready = false;
-    };
-    let cell = RESPONSE_STREAM_SHARED.lock().unwrap();
-    if cell.borrow().is_none() {
-        are_all_ready = false;
-    };
-    #[cfg(debug_assertions)]
-    {
-        let cell = REPORT_STREAM_SHARED.lock().unwrap();
-        if cell.borrow().is_none() {
-            are_all_ready = false;
-        };
-    }
-    are_all_ready
 }
 
 /// Start the main function of Rust.
@@ -230,4 +177,34 @@ pub fn request_to_rust(request_unique: RustRequestUnique) {
         let sender = borrowed.as_ref().unwrap();
         sender.try_send(request_unique).ok();
     });
+}
+
+/// This function is expected to be used only once
+/// during the initialization of the Rust logic.
+pub fn get_request_receiver() -> Receiver<RustRequestUnique> {
+    let cell = REQUST_RECEIVER_SHARED.lock().unwrap();
+    let option = cell.replace(None);
+    option.unwrap()
+}
+
+/// Sending the signal will notify the Flutter widgets
+/// and trigger the rebuild.
+/// No memory copy is involved as the bytes are moved directly to Dart.
+pub fn send_rust_signal(rust_signal: RustSignal) {
+    send_rust_signal_extern(rust_signal);
+}
+
+/// Sends a response to Dart with a unique interaction ID
+/// to remember which request that response corresponds to.
+/// No memory copy is involved as the bytes are moved directly to Dart.
+pub fn respond_to_dart(response_unique: RustResponseUnique) {
+    respond_to_dart_extern(response_unique);
+}
+
+/// Sends a string to Dart that should be printed in the CLI.
+/// Do NOT use this function directly in the code.
+/// Use `debug_print!` macro instead.
+#[cfg(debug_assertions)]
+pub fn send_rust_report(rust_report: String) {
+    send_rust_report_extern(rust_report);
 }

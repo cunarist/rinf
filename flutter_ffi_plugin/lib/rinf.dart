@@ -5,7 +5,6 @@
 import 'dart:async';
 import 'dart:math';
 import 'src/exports.dart';
-import 'package:flutter/foundation.dart';
 
 export 'src/exports.dart' show RustOperation;
 export 'src/exports.dart' show RustRequest;
@@ -24,27 +23,27 @@ class Rinf {
   /// Makes sure that the Rust side is ready.
   /// Don't forget to call this function in the `main` function of Dart.
   static Future<void> ensureInitialized() async {
-    await api.prepareChannels();
-    final rustSignalStream = api.prepareRustSignalStream();
-    rustSignalStream.listen((rustSignal) {
+    await prepareNativeExtern();
+
+    rustSignalStream.stream.listen((rustSignal) {
       rustBroadcaster.add(rustSignal);
     });
-    final rustResponseUniqueStream = api.prepareRustResponseStream();
-    rustResponseUniqueStream.listen((rustResponseUnique) {
+
+    rustResponseUniqueStream.stream.listen((rustResponseUnique) {
       final interactionId = rustResponseUnique.id;
+      final rustResponse = rustResponseUnique.response;
       final responseCompleter = _responseCompleters.remove(interactionId);
       if (responseCompleter != null) {
-        responseCompleter.complete(rustResponseUnique.response);
+        responseCompleter.complete(rustResponse);
       }
     });
-    if (kDebugMode) {
-      final rustReportStream = api.prepareRustReportStream();
-      rustReportStream.listen((rustReport) {
-        print(rustReport);
-      });
-    }
-    while (!(await api.checkRustStreams())) {}
-    api.startRustLogic();
+
+    rustReportStream.stream.listen((rustReport) {
+      print(rustReport);
+    });
+
+    prepareChannelsExtern();
+    startRustLogicExtern();
   }
 
   /// Ensure that all Rust tasks are terminated
@@ -54,7 +53,7 @@ class Rinf {
   /// Please note that on the web, this function does not have any effect,
   /// as tasks are managed by the JavaScript runtime, not Rust.
   static Future<void> ensureFinalized() async {
-    await api.stopRustLogic();
+    stopRustLogicExtern();
   }
 }
 
@@ -82,7 +81,7 @@ Future<RustResponse?> requestToRust(RustRequest rustRequest) async {
     id: interactionId,
     request: rustRequest,
   );
-  api.requestToRust(requestUnique: rustRequestUnique);
+  requestToRustExtern(rustRequestUnique);
   final rustResponse = await responseCompleter.future;
   return rustResponse;
 }
