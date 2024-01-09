@@ -21,14 +21,14 @@ pub fn request_to_rust_extern(
     blob_raw: &[u8],
 ) {
     let message_bytes = message_raw.to_vec();
-    let message = if message_bytes.len() == 0 {
+    let message = if message_bytes.is_empty() {
         None
     } else {
         Some(message_bytes)
     };
 
     let blob_bytes = blob_raw.to_vec();
-    let blob = if blob_bytes.len() == 0 {
+    let blob = if blob_bytes.is_empty() {
         None
     } else {
         Some(blob_bytes)
@@ -46,14 +46,14 @@ pub fn request_to_rust_extern(
     }
 
     let rust_request = RustRequest {
-        resource: resource as i32,
+        resource,
         operation: operation_enum,
         message,
         blob,
     };
 
     let rust_request_unique = RustRequestUnique {
-        id: interaction_id as i32,
+        id: interaction_id,
         request: rust_request,
     };
 
@@ -94,8 +94,8 @@ extern "C" {
 }
 
 pub fn send_rust_signal_extern(rust_signal: RustSignal) {
-    let message_raw = rust_signal.message.unwrap_or(vec![]);
-    let blob_raw = rust_signal.blob.unwrap_or(vec![]);
+    let message_raw = rust_signal.message.unwrap_or_default();
+    let blob_raw = rust_signal.blob.unwrap_or_default();
 
     send_rust_signal_extern_raw(
         rust_signal.resource,
