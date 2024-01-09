@@ -9,6 +9,11 @@ use tokio::sync::mpsc::Receiver;
 use tokio::sync::mpsc::Sender;
 use tokio_with_wasm::tokio;
 
+#[cfg(not(target_family = "wasm"))]
+use super::interface_os::*;
+#[cfg(target_family = "wasm")]
+use super::interface_web::*;
+
 /// Available operations that a `RustRequest` object can hold.
 /// There are 4 options, `Create`,`Read`,`Update`, and `Delete`.
 pub enum RustOperation {
@@ -186,48 +191,14 @@ pub fn get_request_receiver() -> Receiver<RustRequestUnique> {
 /// and trigger the rebuild.
 /// No memory copy is involved as the bytes are moved directly to Dart.
 pub fn send_rust_signal(rust_signal: RustSignal) {
-    #[cfg(not(target_family = "wasm"))]
-    super::interface_os::send_rust_signal_extern(rust_signal);
-    #[cfg(target_family = "wasm")]
-    {
-        let message_raw = rust_signal.message.unwrap_or(vec![]);
-        let blob_raw = rust_signal.blob.unwrap_or(vec![]);
-
-        super::interface_web::send_rust_signal_extern(
-            rust_signal.resource,
-            rinf::externs::js_sys::Uint8Array::from(message_raw.as_slice()),
-            rinf::externs::js_sys::Uint8Array::from(blob_raw.as_slice()),
-        );
-    }
+    send_rust_signal_extern(rust_signal);
 }
 
 /// Sends a response to Dart with a unique interaction ID
 /// to remember which request that response corresponds to.
 /// No memory copy is involved as the bytes are moved directly to Dart.
 pub fn respond_to_dart(response_unique: RustResponseUnique) {
-    #[cfg(not(target_family = "wasm"))]
-    super::interface_os::respond_to_dart_extern(response_unique);
-    #[cfg(target_family = "wasm")]
-    {
-        let option = response_unique.response;
-
-        let (successful, message_raw, blob_raw) = if let Some(rust_response) = option {
-            (
-                true,
-                rust_response.message.unwrap_or(vec![]),
-                rust_response.blob.unwrap_or(vec![]),
-            )
-        } else {
-            (false, vec![], vec![])
-        };
-
-        super::interface_web::respond_to_dart_extern(
-            response_unique.id,
-            successful,
-            rinf::externs::js_sys::Uint8Array::from(message_raw.as_slice()),
-            rinf::externs::js_sys::Uint8Array::from(blob_raw.as_slice()),
-        );
-    }
+    respond_to_dart_extern(response_unique);
 }
 
 /// Sends a string to Dart that should be printed in the CLI.
@@ -235,8 +206,5 @@ pub fn respond_to_dart(response_unique: RustResponseUnique) {
 /// Use `debug_print!` macro instead.
 #[cfg(debug_assertions)]
 pub fn send_rust_report(rust_report: String) {
-    #[cfg(not(target_family = "wasm"))]
-    super::interface_os::send_rust_report_extern(rust_report);
-    #[cfg(target_family = "wasm")]
-    super::interface_web::send_rust_report_extern(rust_report);
+    send_rust_report_extern(rust_report);
 }
