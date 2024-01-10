@@ -8,7 +8,7 @@
 
 **Rust for native business logic, Flutter for flexible and beautiful GUI**
 
-![Preview](https://github.com/cunarist/rinf/assets/66480156/ae82aad9-02f9-4a1e-93f9-69907511baf8)
+![Preview](https://github.com/cunarist/rinf/assets/66480156/5c9a7fb6-e566-4c4e-bd77-d72c1c064d6c)
 
 Rinf is a production-ready framework for creating beautiful and performant cross-platform apps using Flutter and Rust with batteries fully included. Simply add this framework to your app project, and you're all set to write Flutter and Rust together!
 
