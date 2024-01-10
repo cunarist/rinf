@@ -1,3 +1,7 @@
+## 5.1.3
+
+- Fixed introductions.
+
 ## 5.1.2
 
 - Fixed a bug with memory freeing.
