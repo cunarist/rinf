@@ -3,7 +3,6 @@
 //! https://github.com/abour/fractal
 
 use image::{self, ImageEncoder};
-use rand::{thread_rng, Rng};
 
 const WIDTH: u32 = 384;
 const HEIGHT: u32 = 384;
@@ -45,20 +44,18 @@ fn write_line(buffer: &mut Vec<u8>, line: &Vec<u8>, line_number: u32) {
 }
 
 fn render_line(line_number: u32, px: f64, py: f64, scale: f64) -> (Vec<u8>, u32) {
-    let mut rng = thread_rng();
-
     let line_size = WIDTH * 3;
     let mut line: Vec<u8> = vec![0; line_size as usize];
 
     for x in 0..WIDTH {
+        // Calculate the offset from the center for x and y
+        let center_offset_x = (x as f64 - WIDTH as f64 / 2.0) / (WIDTH as f64 / 2.0);
+        let center_offset_y = (line_number as f64 - HEIGHT as f64 / 2.0) / (HEIGHT as f64 / 2.0);
+
         let sampled_colours = (0..NB_SAMPLES)
             .map(|_| {
-                let nx =
-                    SIZE * (((x as f64) + rng.gen_range(0.0..1.0)) / (WIDTH as f64)) * scale + px;
-                let ny = SIZE
-                    * (((line_number as f64) + rng.gen_range(0.0..1.0)) / (HEIGHT as f64))
-                    * scale
-                    + py;
+                let nx = SIZE * center_offset_x * scale + px;
+                let ny = SIZE * center_offset_y * scale + py;
                 let (m_res, m_iter) = mandelbrot_iter(nx, ny);
                 paint(m_res, m_iter)
             })
