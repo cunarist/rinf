@@ -1,3 +1,7 @@
+## 5.1.2
+
+- Fixed a bug with memory freeing.
+
 ## 5.1.1
 
 - The codebase was organized further.
