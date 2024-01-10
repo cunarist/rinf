@@ -103,11 +103,11 @@ Future<void> requestToRustExtern(RustRequestUnique rustRequestUnique) async {
   }
 
   var messageBytes = rustRequest.message ?? Uint8List(0);
-  final Pointer<Uint8> messageMemory = malloc<Uint8>(messageBytes.length);
+  final Pointer<Uint8> messageMemory = malloc.allocate(messageBytes.length);
   messageMemory.asTypedList(messageBytes.length).setAll(0, messageBytes);
 
   var blobBytes = rustRequest.blob ?? Uint8List(0);
-  final Pointer<Uint8> blobMemory = malloc<Uint8>(blobBytes.length);
+  final Pointer<Uint8> blobMemory = malloc.allocate(blobBytes.length);
   blobMemory.asTypedList(blobBytes.length).setAll(0, blobBytes);
 
   // Look up the Rust function
@@ -128,8 +128,11 @@ Future<void> requestToRustExtern(RustRequestUnique rustRequestUnique) async {
     blobBytes.length,
   );
 
-  malloc.free(messageMemory);
-  malloc.free(blobMemory);
+  // Note that we do not free memory here with `malloc.free()`,
+  // because Rust will take the ownership of the memory space
+  // with `Vec::from_raw_parts()`.
+  // Rust will properly deallocate the memory later
+  // when `Vec<u8>` is dropped.
 }
 
 void prepareIsolatesExtern(int portSignal, int portResponse, int portReport) {

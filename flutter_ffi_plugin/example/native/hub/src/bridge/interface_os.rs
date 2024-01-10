@@ -2,7 +2,6 @@ use super::interface::*;
 use allo_isolate::Isolate;
 use rinf::externs::lazy_static::lazy_static;
 use std::cell::RefCell;
-use std::slice;
 use std::sync::Arc;
 use std::sync::Mutex;
 
@@ -29,13 +28,25 @@ pub extern "C" fn request_to_rust_extern(
     let message = if message_size == 0 {
         None
     } else {
-        unsafe { Some(slice::from_raw_parts(message_pointer, message_size).to_vec()) }
+        unsafe {
+            Some(Vec::from_raw_parts(
+                message_pointer as *mut u8,
+                message_size,
+                message_size,
+            ))
+        }
     };
 
     let blob = if blob_size == 0 {
         None
     } else {
-        unsafe { Some(slice::from_raw_parts(blob_pointer, blob_size).to_vec()) }
+        unsafe {
+            Some(Vec::from_raw_parts(
+                blob_pointer as *mut u8,
+                blob_size,
+                blob_size,
+            ))
+        }
     };
 
     let operation_enum;
