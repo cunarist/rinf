@@ -1,9 +1,9 @@
 //! This crate is only for demonstration purposes.
 //! You might want to remove this crate in production.
 
-pub use mandelbrot::{mandelbrot, Point, Size};
+pub use fractal::fractal;
 
-mod mandelbrot;
+mod fractal;
 
 // This is just a simple Rust function.
 
