@@ -80,26 +80,14 @@ pub async fn stream_mandelbrot() {
                 continue;
             }
 
-            scale *= 0.98;
-            if scale < 1e-7 {
+            scale *= 1.02;
+            if scale > 1e+7 {
                 scale = 1.0
             };
 
             // Calculate the mandelbrot image
             // parallelly in a separate thread pool.
-            let join_handle = tokio::task::spawn_blocking(move || {
-                sample_crate::mandelbrot(
-                    sample_crate::Size {
-                        width: 384,
-                        height: 384,
-                    },
-                    sample_crate::Point {
-                        x: 0.360,
-                        y: -0.641,
-                    },
-                    scale,
-                )
-            });
+            let join_handle = tokio::task::spawn_blocking(move || sample_crate::fractal(scale));
             let _ = frame_sender.send(join_handle).await;
         }
     });
