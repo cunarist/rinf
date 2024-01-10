@@ -1,3 +1,7 @@
+## 5.2.0
+
+- Unnecessary memory copy is now avoided.
+
 ## 5.1.3
 
 - Fixed introductions.
