@@ -1,7 +1,7 @@
 import 'load_web.dart';
 import 'package:js/js.dart';
 import 'dart:typed_data';
-import 'dart:js' as js;
+import 'package:universal_html/js.dart' as js;
 import 'interface.dart';
 import 'dart:async';
 

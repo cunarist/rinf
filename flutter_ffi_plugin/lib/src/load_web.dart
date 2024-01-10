@@ -1,5 +1,5 @@
-import 'dart:html';
-import 'dart:js' as js;
+import 'package:universal_html/js.dart' as js;
+import 'package:universal_html/html.dart';
 import 'dart:async';
 
 Future<void> loadJsFile() async {
