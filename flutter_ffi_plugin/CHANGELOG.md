@@ -1,3 +1,8 @@
+## 5.1.1
+
+- The codebase was organized further.
+- Fixed a problem with Dart analysis.
+
 ## 5.1.0
 
 - All the code from `flutter_rust_bridge` was removed. This was due to criticisms about Rinf from the community and FRB devs. Also, internal bridge and FFI code is now much smaller. User API remains unchanged.
