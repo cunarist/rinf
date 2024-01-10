@@ -103,11 +103,11 @@ Future<void> requestToRustExtern(RustRequestUnique rustRequestUnique) async {
   }
 
   var messageBytes = rustRequest.message ?? Uint8List(0);
-  final Pointer<Uint8> messageMemory = calloc<Uint8>(messageBytes.length);
+  final Pointer<Uint8> messageMemory = malloc<Uint8>(messageBytes.length);
   messageMemory.asTypedList(messageBytes.length).setAll(0, messageBytes);
 
   var blobBytes = rustRequest.blob ?? Uint8List(0);
-  final Pointer<Uint8> blobMemory = calloc<Uint8>(blobBytes.length);
+  final Pointer<Uint8> blobMemory = malloc<Uint8>(blobBytes.length);
   blobMemory.asTypedList(blobBytes.length).setAll(0, blobBytes);
 
   // Look up the Rust function
@@ -127,6 +127,9 @@ Future<void> requestToRustExtern(RustRequestUnique rustRequestUnique) async {
     blobMemory.cast(),
     blobBytes.length,
   );
+
+  malloc.free(messageMemory);
+  malloc.free(blobMemory);
 }
 
 void prepareIsolatesExtern(int portSignal, int portResponse, int portReport) {
