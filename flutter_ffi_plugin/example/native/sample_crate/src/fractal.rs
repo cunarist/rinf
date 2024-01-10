@@ -8,19 +8,18 @@ use rand::{thread_rng, Rng};
 const WIDTH: u32 = 384;
 const HEIGHT: u32 = 384;
 const BUF_SIZE: u32 = WIDTH * HEIGHT * 3;
-const NB_SAMPLES: u32 = 50;
+const NB_SAMPLES: u32 = 1;
 const SIZE: f64 = 0.000000001;
 const MAX_ITER: u32 = 1000;
 
 pub fn fractal(scale: f64) -> Option<Vec<u8>> {
-    let point_x: f64 = -0.5557506; // Adjust point_x with scale
-    let point_y: f64 = -0.55560; // Adjust point_y with scale
-    let mut buffer: Vec<u8> = Vec::with_capacity(BUF_SIZE as usize);
-    buffer.resize(BUF_SIZE as usize, 0);
+    let point_x: f64 = -0.5557506;
+    let point_y: f64 = -0.55560;
+    let mut buffer: Vec<u8> = vec![0; BUF_SIZE as usize];
 
-    render(&mut buffer, HEIGHT, point_x, point_y, scale); // Pass scale to render
+    render(&mut buffer, HEIGHT, point_x, point_y, scale);
 
-    let mut image_data: Vec<u8> = Vec::new(); // Image data creation
+    let mut image_data: Vec<u8> = Vec::new();
     let encoder = image::codecs::png::PngEncoder::new(&mut image_data);
     let result = encoder.write_image(buffer.as_slice(), WIDTH, HEIGHT, image::ColorType::Rgb8);
 
@@ -75,7 +74,7 @@ fn render_line(line_number: u32, px: f64, py: f64, scale: f64) -> (Vec<u8>, u32)
         line[((x * 3) + 2) as usize] = ((b as f64) / (NB_SAMPLES as f64)) as u8;
     }
 
-    return (line, line_number);
+    (line, line_number)
 }
 
 fn paint(r: f64, n: u32) -> (u8, u8, u8) {
@@ -104,7 +103,7 @@ fn mandelbrot_iter(px: f64, py: f64) -> (f64, u32) {
     return (xx + yy, MAX_ITER);
 }
 
-pub fn hsl_to_rgb(h: f64, s: f64, l: f64) -> (u8, u8, u8) {
+fn hsl_to_rgb(h: f64, s: f64, l: f64) -> (u8, u8, u8) {
     let (r, g, b);
 
     if s == 0. {
