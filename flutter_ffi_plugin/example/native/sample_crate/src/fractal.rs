@@ -28,14 +28,14 @@ pub fn fractal(scale: f64) -> Option<Vec<u8>> {
     }
 }
 
-fn render(buffer: &mut Vec<u8>, height: u32, point_x: f64, point_y: f64, scale: f64) {
+fn render(buffer: &mut [u8], height: u32, point_x: f64, point_y: f64, scale: f64) {
     for y in 0..height {
         let (line, line_number) = render_line(y, point_x, point_y, scale);
         write_line(buffer, &line, line_number);
     }
 }
 
-fn write_line(buffer: &mut Vec<u8>, line: &Vec<u8>, line_number: u32) {
+fn write_line(buffer: &mut [u8], line: &[u8], line_number: u32) {
     for i in 0..WIDTH {
         buffer[(((line_number * WIDTH) + i) * 3) as usize] = line[(i * 3) as usize];
         buffer[((((line_number * WIDTH) + i) * 3) + 1) as usize] = line[((i * 3) + 1) as usize];
@@ -76,9 +76,9 @@ fn render_line(line_number: u32, px: f64, py: f64, scale: f64) -> (Vec<u8>, u32)
 
 fn paint(r: f64, n: u32) -> (u8, u8, u8) {
     if r > 4. {
-        return hsl_to_rgb(n as f64 / 800. * r, 1., 0.5);
+        hsl_to_rgb(n as f64 / 800. * r, 1., 0.5)
     } else {
-        return (255, 255, 255);
+        (255, 255, 255)
     }
 }
 
@@ -97,7 +97,7 @@ fn mandelbrot_iter(px: f64, py: f64) -> (f64, u32) {
         y = 2. * xy + py;
     }
 
-    return (xx + yy, MAX_ITER);
+    (xx + yy, MAX_ITER)
 }
 
 fn hsl_to_rgb(h: f64, s: f64, l: f64) -> (u8, u8, u8) {
@@ -121,7 +121,7 @@ fn hsl_to_rgb(h: f64, s: f64, l: f64) -> (u8, u8, u8) {
         b = hue_to_rgb(p, q, h - 1.0 / 3.0);
     }
 
-    return ((r * 255.) as u8, (g * 255.) as u8, (b * 255.) as u8);
+    ((r * 255.) as u8, (g * 255.) as u8, (b * 255.) as u8)
 }
 
 fn hue_to_rgb(p: f64, q: f64, mut t: f64) -> f64 {
@@ -140,5 +140,5 @@ fn hue_to_rgb(p: f64, q: f64, mut t: f64) -> f64 {
         return p + (q - p) * (2.0 / 3.0 - t) * 6.0;
     }
 
-    return p;
+    p
 }
