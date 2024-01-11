@@ -9,8 +9,12 @@ final rustSignalStream = StreamController<RustSignal>();
 final rustResponseUniqueStream = StreamController<RustResponseUnique>();
 final rustReportStream = StreamController<String>();
 
-Future<void> prepareNativeExtern() async {
-  await loadJsFile();
+Future<void> prepareNativeBridge() async {
+  final isAlreadyDone = await loadJsFile();
+
+  if (isAlreadyDone) {
+    return;
+  }
 
   js.context['rinf_send_rust_signal_extern'] = (
     int resource,
@@ -44,6 +48,9 @@ Future<void> prepareNativeExtern() async {
   js.context['rinf_send_rust_report_extern'] = (String rustReport) {
     rustReportStream.add(rustReport);
   };
+
+  prepareChannelsExtern();
+  startRustLogicExtern();
 }
 
 @JS('wasm_bindgen.start_rust_logic_extern')

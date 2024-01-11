@@ -78,39 +78,26 @@ pub extern "C" fn request_to_rust_extern(
 type Cell<T> = RefCell<Option<T>>;
 type SharedCell<T> = Arc<Mutex<Cell<T>>>;
 
-// Native: `tokio` runtime threads
-// Web: Worker thread
-thread_local! {
-    pub static SIGNAL_ISOLATE: Cell<Isolate> = RefCell::new(None);
-    pub static RESPONSE_ISOLATE: Cell<Isolate> = RefCell::new(None);
-    pub static REPORT_ISOLATE: Cell<Isolate> = RefCell::new(None);
-}
-
-// Native: All threads
-// Web: Worker thread
 lazy_static! {
-    pub static ref SIGNAL_ISOLATE_SHARED: SharedCell<Isolate> =
-        Arc::new(Mutex::new(RefCell::new(None)));
-    pub static ref RESPONSE_ISOLATE_SHARED: SharedCell<Isolate> =
-        Arc::new(Mutex::new(RefCell::new(None)));
-    pub static ref REPORT_ISOLATE_SHARED: SharedCell<Isolate> =
-        Arc::new(Mutex::new(RefCell::new(None)));
+    pub static ref SIGNAL_ISOLATE: SharedCell<Isolate> = Arc::new(Mutex::new(RefCell::new(None)));
+    pub static ref RESPONSE_ISOLATE: SharedCell<Isolate> = Arc::new(Mutex::new(RefCell::new(None)));
+    pub static ref REPORT_ISOLATE: SharedCell<Isolate> = Arc::new(Mutex::new(RefCell::new(None)));
 }
 
 #[no_mangle]
 pub extern "C" fn prepare_isolates_extern(port_signal: i64, port_response: i64, port_report: i64) {
     let isolate = Isolate::new(port_signal);
-    let cell = SIGNAL_ISOLATE_SHARED.lock().unwrap();
+    let cell = SIGNAL_ISOLATE.lock().unwrap();
     cell.replace(Some(isolate));
 
     let isolate = Isolate::new(port_response);
-    let cell = RESPONSE_ISOLATE_SHARED.lock().unwrap();
+    let cell = RESPONSE_ISOLATE.lock().unwrap();
     cell.replace(Some(isolate));
 
     #[cfg(debug_assertions)]
     {
         let isolate = Isolate::new(port_report);
-        let cell = REPORT_ISOLATE_SHARED.lock().unwrap();
+        let cell = REPORT_ISOLATE.lock().unwrap();
         cell.replace(Some(isolate));
     }
 }
@@ -132,18 +119,9 @@ impl allo_isolate::IntoDart for RustSignal {
 }
 
 pub fn send_rust_signal_extern(rust_signal: RustSignal) {
-    SIGNAL_ISOLATE.with(|inner| {
-        let mut borrowed = inner.borrow_mut();
-        let option = borrowed.as_ref();
-        if let Some(isolate) = option {
-            isolate.post(rust_signal);
-        } else {
-            let cell = SIGNAL_ISOLATE_SHARED.lock().unwrap();
-            let isolate = *cell.borrow().as_ref().unwrap();
-            isolate.post(rust_signal);
-            borrowed.replace(isolate);
-        }
-    });
+    let cell = SIGNAL_ISOLATE.lock().unwrap();
+    let dart_isolate = cell.borrow().unwrap();
+    dart_isolate.post(rust_signal);
 }
 
 impl allo_isolate::IntoDart for RustResponse {
@@ -159,32 +137,14 @@ impl allo_isolate::IntoDart for RustResponseUnique {
 }
 
 pub fn respond_to_dart_extern(response_unique: RustResponseUnique) {
-    RESPONSE_ISOLATE.with(|inner| {
-        let mut borrowed = inner.borrow_mut();
-        let option = borrowed.as_ref();
-        if let Some(isolate) = option {
-            isolate.post(response_unique);
-        } else {
-            let cell = RESPONSE_ISOLATE_SHARED.lock().unwrap();
-            let isolate = *cell.borrow().as_ref().unwrap();
-            isolate.post(response_unique);
-            borrowed.replace(isolate);
-        }
-    });
+    let cell = RESPONSE_ISOLATE.lock().unwrap();
+    let dart_isolate = cell.borrow().unwrap();
+    dart_isolate.post(response_unique);
 }
 
 #[cfg(debug_assertions)]
 pub fn send_rust_report_extern(rust_report: String) {
-    REPORT_ISOLATE.with(|inner| {
-        let mut borrowed = inner.borrow_mut();
-        let option = borrowed.as_ref();
-        if let Some(isolate) = option {
-            isolate.post(rust_report);
-        } else {
-            let cell = REPORT_ISOLATE_SHARED.lock().unwrap();
-            let isolate = *cell.borrow().as_ref().unwrap();
-            isolate.post(rust_report);
-            borrowed.replace(isolate);
-        }
-    });
+    let cell = REPORT_ISOLATE.lock().unwrap();
+    let dart_isolate = cell.borrow().unwrap();
+    dart_isolate.post(rust_report);
 }

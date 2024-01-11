@@ -66,13 +66,13 @@ type RustRequestSender = Sender<RustRequestUnique>;
 type RustRequestReceiver = Receiver<RustRequestUnique>;
 
 // Native: Main thread
-// Web: Worker thread
+// Web: Main thread
 thread_local! {
     pub static REQUEST_SENDER: Cell<RustRequestSender> = RefCell::new(None);
 }
 
 // Native: All threads
-// Web: Worker thread
+// Web: Main thread
 lazy_static! {
     pub static ref REQUST_RECEIVER_SHARED: SharedCell<RustRequestReceiver> =
         Arc::new(Mutex::new(RefCell::new(None)));
@@ -82,11 +82,6 @@ lazy_static! {
 lazy_static! {
     pub static ref TOKIO_RUNTIME: rinf::externs::os_thread_local::ThreadLocal<Cell<tokio::runtime::Runtime>> =
         rinf::externs::os_thread_local::ThreadLocal::new(|| RefCell::new(None));
-}
-
-#[cfg(target_family = "wasm")]
-thread_local! {
-    pub static IS_MAIN_STARTED: RefCell<bool> = RefCell::new(false);
 }
 
 /// Prepare channels that are used in the Rust world.
@@ -143,22 +138,20 @@ pub fn start_rust_logic() {
                 .build()
                 .unwrap();
             tokio_runtime.spawn(crate::main());
+            // If there was already a tokio runtime previously,
+            // most likely due to Dart's hot restart,
+            // its tasks as well as itself will be terminated,
+            // being replaced with the new one.
             inner.replace(Some(tokio_runtime));
         });
     }
     #[cfg(target_family = "wasm")]
     {
+        tokio::spawn(crate::main());
         #[cfg(debug_assertions)]
         std::panic::set_hook(Box::new(|panic_info| {
             crate::debug_print!("A panic occurred in Rust.\n{panic_info}");
         }));
-        IS_MAIN_STARTED.with(move |ref_cell| {
-            let is_started = *ref_cell.borrow();
-            if !is_started {
-                tokio::spawn(crate::main());
-                ref_cell.replace(true);
-            }
-        });
     }
 }
 
