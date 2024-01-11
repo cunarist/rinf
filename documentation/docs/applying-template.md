@@ -33,7 +33,8 @@ After running the command, you'll have new files and folders as your starter Rus
 +   ├── messages/
 +   │   ├── sample_folder/
 +   │   ├── counter_number.proto
-+   │   └── fractal.proto
++   │   ├── fractal.proto
++   │   └── README.md
 +   ├── native/
 +   │   ├── hub/
 +   │   │   ├── src/
