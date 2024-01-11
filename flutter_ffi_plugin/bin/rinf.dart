@@ -467,8 +467,12 @@ Future<void> _generateMessageCode({bool silent = false}) async {
     final subPath = entry.key;
     final resourceNames = entry.value;
     await Directory('$rustOutputPath$subPath').create(recursive: true);
+    final protoPaths = <String>[];
+    for (final key in resourcesInFolders.keys) {
+      protoPaths.add('--proto_path=$protoPath$key');
+    }
     final protocRustResult = await Process.run('protoc', [
-      '--proto_path=$protoPath$subPath',
+      ...protoPaths,
       '--prost_out=$rustOutputPath$subPath',
       ...resourceNames.map((name) => '$name.proto'),
     ]);
@@ -532,10 +536,14 @@ Future<void> _generateMessageCode({bool silent = false}) async {
     final subPath = entry.key;
     final resourceNames = entry.value;
     await Directory('$dartOutputPath$subPath').create(recursive: true);
+    final protoPaths = <String>[];
+    for (final key in resourcesInFolders.keys) {
+      protoPaths.add('--proto_path=$protoPath$key');
+    }
     final protocDartResult = await Process.run(
       'protoc',
       [
-        '--proto_path=$protoPath$subPath',
+        ...protoPaths,
         '--dart_out=$dartOutputPath$subPath',
         ...resourceNames.map((name) => '$name.proto'),
       ],
