@@ -114,11 +114,10 @@ pub async fn handle_tutorial_resource(rust_request: RustRequest) -> Option<RustR
                 output_numbers: new_numbers,
                 output_string: new_string,
             };
-            RustResponse {
-                successful: true,
+            Some(RustResponse {
                 message: Some(response_message.encode_to_vec()),
                 blob: None,
-            }
+            })
         }
         RustOperation::Update => None,
         RustOperation::Delete => None,
