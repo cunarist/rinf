@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:rinf/rinf.dart';
 import 'package:example_app/messages/counter_number.pb.dart' as counterNumber;
-import 'package:example_app/messages/mandelbrot.pb.dart' as mandelbrot;
+import 'package:example_app/messages/fractal.pb.dart' as fractal;
 
 void main() async {
   // Wait for Rust initialization to be completed first.
@@ -103,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
               // only when there are signals
               // related to a specific Rust resource it is interested in.
               stream: rustBroadcaster.stream.where((rustSignal) {
-                return rustSignal.resource == mandelbrot.ID;
+                return rustSignal.resource == fractal.ID;
               }),
               builder: (context, snapshot) {
                 // If the app has just started and widget is built

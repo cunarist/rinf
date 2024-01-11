@@ -60,8 +60,8 @@ pub async fn handle_counter_number(rust_request: RustRequest) -> Option<RustResp
     }
 }
 
-pub async fn stream_mandelbrot() {
-    use crate::messages::mandelbrot::{StateSignal, ID};
+pub async fn stream_fractal() {
+    use crate::messages::fractal::{StateSignal, ID};
 
     if !SHOULD_DEMONSTRATE {
         return;
@@ -85,7 +85,7 @@ pub async fn stream_mandelbrot() {
                 scale = 1.0
             };
 
-            // Calculate the mandelbrot image
+            // Calculate the fractal image
             // parallelly in a separate thread pool.
             let join_handle = tokio::task::spawn_blocking(move || sample_crate::fractal(scale));
             let _ = frame_sender.send(join_handle).await;
@@ -97,7 +97,7 @@ pub async fn stream_mandelbrot() {
         loop {
             let join_handle = frame_receiver.recv().await.unwrap();
             let received_frame = join_handle.await.unwrap();
-            if let Some(mandelbrot) = received_frame {
+            if let Some(fractal) = received_frame {
                 // Stream the signal to Dart.
                 let signal_message = StateSignal {
                     id: 0,
@@ -106,7 +106,7 @@ pub async fn stream_mandelbrot() {
                 let rust_signal = RustSignal {
                     resource: ID,
                     message: Some(signal_message.encode_to_vec()),
-                    blob: Some(mandelbrot),
+                    blob: Some(fractal),
                 };
                 send_rust_signal(rust_signal);
             };

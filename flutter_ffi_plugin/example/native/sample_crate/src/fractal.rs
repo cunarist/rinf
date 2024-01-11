@@ -56,7 +56,7 @@ fn render_line(line_number: u32, px: f64, py: f64, scale: f64) -> (Vec<u8>, u32)
             .map(|_| {
                 let nx = SIZE * center_offset_x * scale + px;
                 let ny = SIZE * center_offset_y * scale + py;
-                let (m_res, m_iter) = mandelbrot_iter(nx, ny);
+                let (m_res, m_iter) = fractal_iter(nx, ny);
                 paint(m_res, m_iter)
             })
             .map(|(r, g, b)| (r as i32, g as i32, b as i32));
@@ -82,7 +82,7 @@ fn paint(r: f64, n: u32) -> (u8, u8, u8) {
     }
 }
 
-fn mandelbrot_iter(px: f64, py: f64) -> (f64, u32) {
+fn fractal_iter(px: f64, py: f64) -> (f64, u32) {
     let (mut x, mut y, mut xx, mut yy) = (0., 0., 0., 0.);
     let mut xy;
 

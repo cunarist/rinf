@@ -14,7 +14,7 @@ async fn main() {
     let mut request_receiver = bridge::get_request_receiver();
     // Repeat `tokio::spawn` anywhere in your code
     // if more concurrent tasks are needed.
-    tokio::spawn(sample_functions::stream_mandelbrot());
+    tokio::spawn(sample_functions::stream_fractal());
     tokio::spawn(sample_functions::run_debug_tests());
     while let Some(request_unique) = request_receiver.recv().await {
         let response_unique = handle_request(request_unique).await;

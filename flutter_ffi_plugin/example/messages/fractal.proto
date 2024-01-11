@@ -1,5 +1,5 @@
 syntax = "proto3";
-package mandelbrot;
+package fractal;
 
 message StateSignal {
   int32 id = 1;
