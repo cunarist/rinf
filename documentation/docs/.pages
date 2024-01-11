@@ -2,7 +2,6 @@ nav:
   - index.md
   - installing-components.md
   - applying-template.md
-  - shorthand-command.md
   - running-and-building.md
   - rust-resource-api.md
   - writing-code.md

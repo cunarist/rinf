@@ -8,6 +8,12 @@ First of all, add this framework to your Flutter project.
 flutter pub add rinf
 ```
 
+Now install the shorthand command tool to easily execute Rinf commands in the CLI.
+
+```bash
+cargo install rinf
+```
+
 Then, simply run this in the command-line from your Flutter project's directory.
 
 ```bash
@@ -50,3 +56,5 @@ Don't forget to read the guides in `./native/README.md` first. Various comments 
 If you already have a Rust crate that you want to use here, just put it inside `./native` and set it as a dependency of the `hub` crate.
 
 Now by heading over to `./native/hub/src/lib.rs`, you can start writing Rust!
+
+> If you're curious about all the available commands, use `rinf --help`. All the commands of this framework can originally be executed with `dart run rinf ...`. However, this is quite long and cumbersome to write over and over again. That's why this framework provides a shorthand command executable.
