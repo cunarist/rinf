@@ -1,7 +1,7 @@
 ## 5.3.0
 
 - Now it is possible to use `import` statements in `.proto` files.
-- Now you can use Flutter's hot restart properly while developing.
+- Now you can properly use Flutter's hot restart while developing.
 - Tutorials and guides are improved.
 - Fixed a bug with `rinf message`, that might fail if some of the folders are empty.
   
