@@ -76,6 +76,7 @@ If %ERRORLEVEL% neq 0 (
 REM There is no CUR_PACKAGE_INFO it was renamed in previous step to %PREV_PACKAGE_INFO%
 REM which means  we need to do pub get and precompile
 if not exist "%PRECOMPILED%" (
+    echo Running pub get in "%cd%"
     "%DART%" pub get --no-precompile
     "%DART%" compile kernel bin/build_tool_runner.dart
 )
