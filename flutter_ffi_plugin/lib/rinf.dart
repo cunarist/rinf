@@ -23,8 +23,6 @@ class Rinf {
   /// Makes sure that the Rust side is ready.
   /// Don't forget to call this function in the `main` function of Dart.
   static Future<void> ensureInitialized() async {
-    await prepareNativeExtern();
-
     rustSignalStream.stream.listen((rustSignal) {
       rustBroadcaster.add(rustSignal);
     });
@@ -42,8 +40,7 @@ class Rinf {
       print(rustReport);
     });
 
-    prepareChannelsExtern();
-    startRustLogicExtern();
+    await prepareNativeBridge();
   }
 
   /// Ensure that all Rust tasks are terminated

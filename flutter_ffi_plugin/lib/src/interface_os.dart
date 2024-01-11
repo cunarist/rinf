@@ -15,7 +15,7 @@ typedef StoreDartPostCObject = Pointer Function(
 
 /// This should be called once at startup
 /// to enable `allo_isolate` to send data from the Rust side.
-Future<void> prepareNativeExtern() async {
+Future<void> prepareNativeBridge() async {
   // Look up the Rust function
   final rustFunction =
       rustLibrary.lookupFunction<StoreDartPostCObject, StoreDartPostCObject>(
@@ -66,6 +66,8 @@ Future<void> prepareNativeExtern() async {
     rustResponseUniquePort.sendPort.nativePort,
     rustReportPort.sendPort.nativePort,
   );
+  prepareChannelsExtern();
+  startRustLogicExtern();
 }
 
 void startRustLogicExtern() {
