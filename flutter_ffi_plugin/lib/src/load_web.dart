@@ -15,7 +15,6 @@ Future<bool> loadJsFile() async {
     // as a global JavaScript variable.
     return true;
   }
-  ;
 
   final scriptElement = ScriptElement();
   scriptElement.type = "module";
