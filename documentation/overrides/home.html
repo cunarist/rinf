@@ -246,11 +246,10 @@
         output_numbers: vec![1, 2, 3],
         output_string: String::from("HI"),
       };
-      RustResponse {
-        successful: true,
+      Some(RustResponse {
         message: Some(response_message.encode_to_vec()),
         blob: None,
-      }
+      })
     }
     RustOperation::Update => None,
     RustOperation::Delete => None,

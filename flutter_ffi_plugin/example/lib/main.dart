@@ -74,14 +74,15 @@ class _MyHomePageState extends State<MyHomePage> {
     // Use `requestToRust` from `rinf.dart`
     // to send the request to Rust and get the response.
     final rustResponse = await requestToRust(rustRequest);
-    if (rustResponse != null) {
-      final responseMessage = counterNumber.ReadResponse.fromBuffer(
-        rustResponse.message!,
-      );
-      setState(() {
-        _counter = responseMessage.afterNumber;
-      });
+    if (rustResponse == null) {
+      return;
     }
+    final responseMessage = counterNumber.ReadResponse.fromBuffer(
+      rustResponse.message!,
+    );
+    setState(() {
+      _counter = responseMessage.afterNumber;
+    });
   }
 
   @override

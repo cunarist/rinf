@@ -127,6 +127,8 @@ However, we also promise to deliver the best development experience as it is mai
 
 A Rust panic doesn't crash the app; it simply cancels the spawned async task. You don't need to worry about app stability due to Rust panics. When a panic occurs, the information will be displayed in the CLI if the app is running in debug mode.
 
+> On the web, unfortunately, Rust panic is not propageted up the stack because of [this limitation](https://github.com/rustwasm/wasm-bindgen/issues/2724) in `wasm-bindgen` as of January 2024.
+
 ### How do I make Rust-analyzer lint in webassembly mode?
 
 There might be various Rust codes with these attribute above:

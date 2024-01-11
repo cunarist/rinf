@@ -35,12 +35,18 @@ Future<void> prepareNativeBridge() async {
     Uint8List message,
     Uint8List blob,
   ) {
-    final rustResponseUnique = RustResponseUnique(
-      id: id,
-      response: RustResponse(
+    final RustResponse? rustResponse;
+    if (successful) {
+      rustResponse = RustResponse(
         message: message.length == 0 ? null : message,
         blob: blob.length == 0 ? null : blob,
-      ),
+      );
+    } else {
+      rustResponse = null;
+    }
+    final rustResponseUnique = RustResponseUnique(
+      id: id,
+      response: rustResponse,
     );
     rustResponseUniqueStream.add(rustResponseUnique);
   };
