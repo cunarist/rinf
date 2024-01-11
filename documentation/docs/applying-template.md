@@ -57,4 +57,6 @@ If you already have a Rust crate that you want to use here, just put it inside `
 
 Now by heading over to `./native/hub/src/lib.rs`, you can start writing Rust!
 
-> If you're curious about all the available commands, use `rinf --help`. All the commands of this framework can originally be executed with `dart run rinf ...`. However, this is quite long and cumbersome to write over and over again. That's why this framework provides a shorthand command executable.
+> If you're curious about all the available commands, use `rinf --help`.
+
+> All the commands of this framework can originally be executed with `dart run rinf ...`. However, this is quite long and cumbersome to write over and over again. That's why this framework provides a shorthand command executable.
