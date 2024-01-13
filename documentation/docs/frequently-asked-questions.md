@@ -178,7 +178,6 @@ If you are using older Android versions, you may encounter errors due to issues 
 
 To address this, you can modify `AndroidManifest.xml` files under `./android/app/src/` as follows.
 
-
 ```xml
 ...
 <application
