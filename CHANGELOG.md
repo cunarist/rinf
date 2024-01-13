@@ -1,3 +1,7 @@
+## 5.3.1
+
+- Fixed a bug with `rinf message` that omits `mod.rs` inside a folder without any message.
+
 ## 5.3.0
 
 - Now it is possible to use `import` statements in `.proto` files.
