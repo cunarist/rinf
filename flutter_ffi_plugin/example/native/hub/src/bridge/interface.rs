@@ -68,7 +68,7 @@ type RustRequestReceiver = Receiver<RustRequestUnique>;
 // Native: Main thread
 // Web: Main thread
 thread_local! {
-    pub static REQUEST_SENDER: Cell<RustRequestSender> = RefCell::new(None);
+    pub static REQUEST_SENDER: Cell<RustRequestSender> = const { RefCell::new(None) };
 }
 
 // Native: All threads
