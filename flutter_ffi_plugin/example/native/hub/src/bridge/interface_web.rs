@@ -61,19 +61,6 @@ pub fn request_to_rust_extern(
 }
 
 #[wasm_bindgen]
-pub fn prepare_isolates_extern(port_signal: i32, port_response: i32, port_report: i32) {
-    // This function does nothing on the web.
-    let _ = port_signal;
-    let _ = port_response;
-    let _ = port_report;
-}
-
-#[wasm_bindgen]
-pub fn prepare_channels_extern() {
-    prepare_channels();
-}
-
-#[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = rinf_send_rust_signal_extern)]
     pub fn send_rust_signal_extern_raw(
