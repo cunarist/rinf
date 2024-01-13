@@ -4,6 +4,7 @@ import 'package:watcher/watcher.dart';
 import 'package:package_config/package_config.dart';
 
 const DEFAULT_RUST_TYPES_OUTPUT_DIR = "native/hub/src/messages";
+const DEFAULT_MESSAGES_INPUT_DIR = "messages";
 
 Future<void> main(List<String> args) async {
   if (args.length == 0) {
@@ -20,17 +21,30 @@ Future<void> main(List<String> args) async {
       }
       break;
     case "message":
+      final messagesDirIndex = args.indexWhere(
+        (arg) => arg == "--msg-dir" || arg == "-m",
+      );
+      final messagesInputDir = messagesDirIndex != -1
+          ? args[messagesDirIndex + 1]
+          : DEFAULT_MESSAGES_INPUT_DIR;
+
       final rustOutdirIndex = args.indexWhere(
         (arg) => arg == "--rust-dir" || arg == "-r",
       );
       final rustTypesOutputDir = rustOutdirIndex != -1
           ? args[rustOutdirIndex + 1]
           : DEFAULT_RUST_TYPES_OUTPUT_DIR;
+
       if (args.contains("--watch") || args.contains("-w")) {
         await _watchAndGenerateMessageCode(
-            rustTypesOutputDir: rustTypesOutputDir);
+          messagesInputDir: messagesInputDir,
+          rustTypesOutputDir: rustTypesOutputDir,
+        );
       } else {
-        await _generateMessageCode(rustTypesOutputDir: rustTypesOutputDir);
+        await _generateMessageCode(
+          messagesInputDir: messagesInputDir,
+          rustTypesOutputDir: rustTypesOutputDir,
+        );
       }
       break;
     case "wasm":
@@ -52,6 +66,9 @@ Future<void> main(List<String> args) async {
       print("    -r, --rust-dir  Directory into which to generate Rust types,"
           " relative to the project root.\n"
           "                    Default: '$DEFAULT_RUST_TYPES_OUTPUT_DIR'");
+      print("    -m, --msg-dir   Directory from which to read message files,"
+          " relative to the project root.\n"
+          "                    Default: '$DEFAULT_MESSAGES_INPUT_DIR'");
       print("  wasm              Builds webassembly module.");
       print("    -r, --release   Builds in release mode.");
     default:
@@ -60,8 +77,10 @@ Future<void> main(List<String> args) async {
   }
 }
 
-Future<void> _watchAndGenerateMessageCode(
-    {required String rustTypesOutputDir}) async {
+Future<void> _watchAndGenerateMessageCode({
+  required String messagesInputDir,
+  required String rustTypesOutputDir,
+}) async {
   final currentDirectory = Directory.current;
   final messagesPath = join(currentDirectory.path, "messages");
   final messagesDirectory = Directory(messagesPath);
@@ -87,6 +106,7 @@ Future<void> _watchAndGenerateMessageCode(
       try {
         await _generateMessageCode(
           silent: true,
+          messagesInputDir: messagesInputDir,
           rustTypesOutputDir: rustTypesOutputDir,
         );
         print("Message code generated");
@@ -282,6 +302,7 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
 
   await _generateMessageCode(
     silent: true,
+    messagesInputDir: DEFAULT_MESSAGES_INPUT_DIR,
     rustTypesOutputDir: DEFAULT_RUST_TYPES_OUTPUT_DIR,
   );
 
@@ -421,11 +442,15 @@ httpServer.defaultResponseHeaders.add(
   }
 }
 
-Future<void> _generateMessageCode(
-    {bool silent = false, required String rustTypesOutputDir}) async {
+Future<void> _generateMessageCode({
+  bool silent = false,
+  required String messagesInputDir,
+  required String rustTypesOutputDir,
+}) async {
   // Prepare paths.
   final flutterProjectPath = Directory.current;
-  final protoPath = flutterProjectPath.uri.resolve('messages').toFilePath();
+  final protoPath =
+      flutterProjectPath.uri.resolve(messagesInputDir).toFilePath();
   final rustOutputPath =
       flutterProjectPath.uri.resolve(rustTypesOutputDir).toFilePath();
   final dartOutputPath =
