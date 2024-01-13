@@ -3,6 +3,8 @@ import 'package:path/path.dart';
 import 'package:watcher/watcher.dart';
 import 'package:package_config/package_config.dart';
 
+const DEFAULT_RUST_TYPES_OUTPUT_DIR = "native/hub/src/messages";
+
 Future<void> main(List<String> args) async {
   if (args.length == 0) {
     print("No operation is provided.");
@@ -18,10 +20,17 @@ Future<void> main(List<String> args) async {
       }
       break;
     case "message":
+      final rustOutdirIndex = args.indexWhere(
+        (arg) => arg == "--rust-dir" || arg == "-r",
+      );
+      final rustTypesOutputDir = rustOutdirIndex != -1
+          ? args[rustOutdirIndex + 1]
+          : DEFAULT_RUST_TYPES_OUTPUT_DIR;
       if (args.contains("--watch") || args.contains("-w")) {
-        await _watchAndGenerateMessageCode();
+        await _watchAndGenerateMessageCode(
+            rustTypesOutputDir: rustTypesOutputDir);
       } else {
-        await _generateMessageCode();
+        await _generateMessageCode(rustTypesOutputDir: rustTypesOutputDir);
       }
       break;
     case "wasm":
@@ -40,6 +49,9 @@ Future<void> main(List<String> args) async {
       print("    -b, --bridge    Only applies `bridge` Rust module.");
       print("  message           Generates message code from `.proto` files.");
       print("    -w, --watch     Continuously watches `.proto` files.");
+      print("    -r, --rust-dir  Directory into which to generate Rust types,"
+          " relative to the project root.\n"
+          "                    Default: '$DEFAULT_RUST_TYPES_OUTPUT_DIR'");
       print("  wasm              Builds webassembly module.");
       print("    -r, --release   Builds in release mode.");
     default:
@@ -48,7 +60,8 @@ Future<void> main(List<String> args) async {
   }
 }
 
-Future<void> _watchAndGenerateMessageCode() async {
+Future<void> _watchAndGenerateMessageCode(
+    {required String rustTypesOutputDir}) async {
   final currentDirectory = Directory.current;
   final messagesPath = join(currentDirectory.path, "messages");
   final messagesDirectory = Directory(messagesPath);
@@ -72,7 +85,10 @@ Future<void> _watchAndGenerateMessageCode() async {
     await Future.delayed(Duration(seconds: 1));
     if (!generated) {
       try {
-        await _generateMessageCode(silent: true);
+        await _generateMessageCode(
+          silent: true,
+          rustTypesOutputDir: rustTypesOutputDir,
+        );
         print("Message code generated");
       } catch (error) {
         // When message code generation has failed
@@ -264,7 +280,10 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
   await mainFile.writeAsString(mainText);
   await Process.run('dart', ['format', './lib/main.dart']);
 
-  await _generateMessageCode(silent: true);
+  await _generateMessageCode(
+    silent: true,
+    rustTypesOutputDir: DEFAULT_RUST_TYPES_OUTPUT_DIR,
+  );
 
   print("🎉 Rust template is now ready! 🎉");
 }
@@ -402,12 +421,13 @@ httpServer.defaultResponseHeaders.add(
   }
 }
 
-Future<void> _generateMessageCode({bool silent = false}) async {
+Future<void> _generateMessageCode(
+    {bool silent = false, required String rustTypesOutputDir}) async {
   // Prepare paths.
   final flutterProjectPath = Directory.current;
   final protoPath = flutterProjectPath.uri.resolve('messages').toFilePath();
   final rustOutputPath =
-      flutterProjectPath.uri.resolve('native/hub/src/messages').toFilePath();
+      flutterProjectPath.uri.resolve(rustTypesOutputDir).toFilePath();
   final dartOutputPath =
       flutterProjectPath.uri.resolve('lib/messages').toFilePath();
   await Directory(rustOutputPath).create(recursive: true);
@@ -454,6 +474,7 @@ Future<void> _generateMessageCode({bool silent = false}) async {
   if (!silent) {
     print("Verifying `protoc-gen-prost` for Rust." +
         " This might take a while if there are new updates to be installed.");
+    print("Generating Rust message types into '$rustTypesOutputDir'.");
   }
   final cargoInstallCommand = await Process.run('cargo', [
     'install',
