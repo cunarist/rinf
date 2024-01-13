@@ -8,8 +8,8 @@ Future<bool> loadJsFile() async {
     completer.complete();
   };
 
-  final isAlreadyDone = js.context.hasProperty("wasm_bindgen");
-  if (isAlreadyDone) {
+  final isAlreadyStarted = js.context.hasProperty("wasm_bindgen");
+  if (isAlreadyStarted) {
     // When Dart performs hot restart,
     // the `wasm_bindgen` object is already defined
     // as a global JavaScript variable.
