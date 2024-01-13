@@ -467,6 +467,9 @@ Future<void> _generateMessageCode({bool silent = false}) async {
     final subPath = entry.key;
     final resourceNames = entry.value;
     await Directory('$rustOutputPath$subPath').create(recursive: true);
+    if (resourceNames.length == 0) {
+      continue;
+    }
     final protoPaths = <String>[];
     for (final key in resourcesInFolders.keys) {
       protoPaths.add('--proto_path=$protoPath$key');
@@ -536,6 +539,9 @@ Future<void> _generateMessageCode({bool silent = false}) async {
     final subPath = entry.key;
     final resourceNames = entry.value;
     await Directory('$dartOutputPath$subPath').create(recursive: true);
+    if (resourceNames.length == 0) {
+      continue;
+    }
     final protoPaths = <String>[];
     for (final key in resourcesInFolders.keys) {
       protoPaths.add('--proto_path=$protoPath$key');
@@ -633,7 +639,5 @@ Future<void> _collectProtoFiles(
     }
   }
   final folderPath = directory.path.replaceFirst(rootDirectory.path, '');
-  if (resources.length > 0) {
-    resourcesInFolders[folderPath] = resources;
-  }
+  resourcesInFolders[folderPath] = resources;
 }
