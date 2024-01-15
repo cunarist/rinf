@@ -2,17 +2,17 @@ import 'package:path/path.dart';
 import 'package:watcher/watcher.dart';
 import 'dart:io';
 
-enum RinfAttribute {
+enum MarkType {
   fromDart,
   fromRust,
 }
 
 class MarkedMessage {
-  RinfAttribute rinfAttribute;
+  MarkType markType;
   String name;
   int id;
   MarkedMessage(
-    this.rinfAttribute,
+    this.markType,
     this.name,
     this.id,
   );
@@ -118,6 +118,9 @@ Future<void> generateMessageCode({bool silent = false}) async {
         }
       }
     }
+    if (subPath == "") {
+      modRsLines.add("pub mod receive;");
+    }
     final modRsContent = modRsLines.join('\n');
     await File('$rustOutputPath$subPath/mod.rs').writeAsString(modRsContent);
   }
@@ -195,7 +198,7 @@ Future<void> generateMessageCode({bool silent = false}) async {
         final dartPath = '$dartOutputPath$subPath/$filename.pb.dart';
         final dartFile = File(dartPath);
         final dartContent = await dartFile.readAsString();
-        if (markedMessage.rinfAttribute == RinfAttribute.fromDart) {
+        if (markedMessage.markType == MarkType.fromDart) {
           if (!dartContent.contains("import 'dart:async'")) {
             await insertTextToFile(
               dartPath,
@@ -236,13 +239,13 @@ use tokio::sync::mpsc::Sender;
             rustPath,
             '''
 lazy_static! {
-    pub static ref ${snakeName}_RECEIVER: Arc<Mutex<RefCell<Option<Receiver<<$messageName>>>>>> =
+    pub static ref ${snakeName}_RECEIVER: Arc<Mutex<RefCell<Option<Receiver<$messageName>>>>> =
         Arc::new(Mutex::new(RefCell::new(None)));
 }
 ''',
           );
         }
-        if (markedMessage.rinfAttribute == RinfAttribute.fromRust) {
+        if (markedMessage.markType == MarkType.fromRust) {
           if (!dartContent.contains("import 'dart:async'")) {
             await insertTextToFile(
               dartPath,
@@ -283,7 +286,7 @@ use tokio::sync::mpsc::Sender;
             rustPath,
             '''
 lazy_static! {
-    pub static ref ${snakeName}_SENDER: Arc<Mutex<RefCell<Option<Sender<<$messageName>>>>>> =
+    pub static ref ${snakeName}_SENDER: Arc<Mutex<RefCell<Option<Sender<$messageName>>>>> =
         Arc::new(Mutex::new(RefCell::new(None)));
 }
 ''',
@@ -292,6 +295,79 @@ lazy_static! {
       }
     }
   }
+
+  // Get ready to receive messages in Rust.
+  var rustReceiveScript = "";
+  rustReceiveScript += '''
+use prost::Message;
+
+pub fn handle_received(message_id: i32, message_bytes: Vec<u8>) {
+''';
+  for (final entry in markedMessagesAll.entries) {
+    final subpath = entry.key.replaceAll("\\", "/");
+    final files = entry.value;
+    for (final entry in files.entries) {
+      final filename = entry.key;
+      final markedMessages = entry.value;
+      for (final markedMessage in markedMessages) {
+        if (markedMessage.markType == MarkType.fromDart) {
+          final snakeName = pascalToSnake(markedMessage.name, true);
+          var modulePath = subpath.replaceAll("/", "::");
+          rustReceiveScript += '''
+if message_id == ${markedMessage.id} {
+    use crate::messages$modulePath::$filename::*;
+    let decoded = ${markedMessage.name}::decode(message_bytes.as_slice()).unwrap();
+    ${snakeName}_RECEIVER;
+    return;
+}
+''';
+        }
+      }
+    }
+  }
+  rustReceiveScript += '''
+}
+''';
+  await File('$rustOutputPath/receive.rs').writeAsString(rustReceiveScript);
+
+  // Get ready to receive messages in Dart.
+  var dartReceiveScript = "";
+  dartReceiveScript += '''
+import 'dart:typed_data';
+
+void receive_messages(int messageId, Uint8List messageBytes) {
+''';
+  for (final entry in markedMessagesAll.entries) {
+    final subpath = entry.key.replaceAll("\\", "/");
+    final files = entry.value;
+    for (final entry in files.entries) {
+      final filename = entry.key;
+      final markedMessages = entry.value;
+      for (final markedMessage in markedMessages) {
+        if (markedMessage.markType == MarkType.fromRust) {
+          final camelName = pascalToCamel(markedMessage.name);
+          final importPath = '$subpath/$filename.pb.dart';
+          if (!dartReceiveScript.contains(importPath)) {
+            dartReceiveScript = '''
+import '.$importPath';
+''' +
+                dartReceiveScript;
+          }
+          dartReceiveScript += '''
+if (messageId == ${markedMessage.id}) {
+  final decoded = ${markedMessage.name}.fromBuffer(messageBytes);
+  ${camelName}Stream;
+  return;
+}
+''';
+        }
+      }
+    }
+  }
+  dartReceiveScript += '''
+}
+''';
+  await File('$dartOutputPath/receive.dart').writeAsString(dartReceiveScript);
 
   // Notify that it's done
   if (!silent) {
@@ -480,7 +556,7 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> parseProtoFiles(
             if (trimmed.startsWith("message")) {
               final messageName = trimmed.replaceFirst("message", "").trim();
               markedMessages[subpath]![filename]!.add(MarkedMessage(
-                RinfAttribute.fromDart,
+                MarkType.fromDart,
                 messageName,
                 messageId,
               ));
@@ -494,7 +570,7 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> parseProtoFiles(
             if (trimmed.startsWith("message")) {
               final messageName = trimmed.replaceFirst("message", "").trim();
               markedMessages[subpath]![filename]!.add(MarkedMessage(
-                RinfAttribute.fromRust,
+                MarkType.fromRust,
                 messageName,
                 messageId,
               ));
