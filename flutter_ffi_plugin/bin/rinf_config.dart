@@ -56,7 +56,7 @@ class RinfConfig {
 ///
 /// If no rinf configuration is found, the default configuration is returned.
 /// If the rinf configuration is invalid, an exception is thrown.
-/// Otherwise it loads applies all values found in the config, using defaults for missing values.
+/// Otherwise it loads all values found in the config, using defaults for missing values.
 ///
 /// Example:
 ///
