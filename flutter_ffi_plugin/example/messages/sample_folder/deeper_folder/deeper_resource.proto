@@ -1,2 +1,4 @@
 syntax = "proto3";
 package deeper_resource;
+
+message DeeperDummy {}

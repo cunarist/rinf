@@ -1,7 +1,5 @@
 syntax = "proto3";
 package fractal;
 
-message StateSignal {
-  int32 id = 1;
-  double current_scale = 2;
-}
+// FROM:RUST
+message ScaleState { double current_scale = 1; }

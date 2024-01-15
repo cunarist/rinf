@@ -1,2 +1,4 @@
 syntax = "proto3";
 package sample_resource;
+
+message SampleDummy {}

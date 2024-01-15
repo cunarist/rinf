@@ -2,6 +2,22 @@ import 'package:path/path.dart';
 import 'package:watcher/watcher.dart';
 import 'dart:io';
 
+enum RinfAttribute {
+  fromDart,
+  fromRust,
+}
+
+class MarkedMessage {
+  RinfAttribute rinfAttribute;
+  String name;
+  int id;
+  MarkedMessage(
+    this.rinfAttribute,
+    this.name,
+    this.id,
+  );
+}
+
 Future<void> generateMessageCode({bool silent = false}) async {
   // Prepare paths.
   final flutterProjectPath = Directory.current;
@@ -161,21 +177,118 @@ Future<void> generateMessageCode({bool silent = false}) async {
     }
   }
 
-  // Assign Rust resource index to each message module.
-  var resourceIndex = 0;
-  for (final entry in resourcesInFolders.entries) {
+  // Get ready to prepare channels between Dart and Rust.
+  final markedMessagesAll = await parseProtoFiles(
+    protoPath,
+    resourcesInFolders,
+  );
+  for (final entry in markedMessagesAll.entries) {
     final subPath = entry.key;
-    final resourceNames = entry.value;
-    for (final resourceName in resourceNames) {
-      appendLineToFile(
-        '$rustOutputPath$subPath/$resourceName.rs',
-        'pub const ID: i32 = $resourceIndex;',
-      );
-      appendLineToFile(
-        '$dartOutputPath$subPath/$resourceName.pb.dart',
-        'const ID = $resourceIndex;',
-      );
-      resourceIndex += 1;
+    final filesAndMarks = entry.value;
+    for (final entry in filesAndMarks.entries) {
+      final filename = entry.key;
+      final markedMessages = entry.value;
+      for (final markedMessage in markedMessages) {
+        final camelName = pascalToCamel(markedMessage.name);
+        final snakeName = pascalToSnake(markedMessage.name, true);
+        final dartPath = '$dartOutputPath$subPath/$filename.pb.dart';
+        final dartFile = File(dartPath);
+        final dartContent = await dartFile.readAsString();
+        if (markedMessage.rinfAttribute == RinfAttribute.fromDart) {
+          if (!dartContent.contains("import 'dart:async'")) {
+            await insertTextToFile(
+              dartPath,
+              '''
+// ignore_for_file: invalid_language_version_override
+import 'dart:async';
+''',
+              atFront: true,
+            );
+          }
+          await insertTextToFile(
+            dartPath,
+            '''
+final ${camelName}Controller = StreamController();
+final ${camelName}Stream = ${camelName}Controller.stream;
+''',
+          );
+          final rustPath = '$rustOutputPath$subPath/$filename.rs';
+          final rustFile = File(rustPath);
+          final rustContent = await rustFile.readAsString();
+          if (!rustContent.contains("use std::sync")) {
+            await insertTextToFile(
+              rustPath,
+              '''
+#![allow(unused_imports)]
+use crate::tokio;
+use rinf::externs::lazy_static::lazy_static;
+use std::cell::RefCell;
+use std::sync::Arc;
+use std::sync::Mutex;
+use tokio::sync::mpsc::Receiver;
+use tokio::sync::mpsc::Sender;
+''',
+              atFront: true,
+            );
+          }
+          await insertTextToFile(
+            rustPath,
+            '''
+lazy_static! {
+    pub static ref ${snakeName}_RECEIVER: Arc<Mutex<RefCell<Option<Receiver<i32>>>>> =
+        Arc::new(Mutex::new(RefCell::new(None)));
+}
+''',
+          );
+        }
+        if (markedMessage.rinfAttribute == RinfAttribute.fromRust) {
+          if (!dartContent.contains("import 'dart:async'")) {
+            await insertTextToFile(
+              dartPath,
+              '''
+// ignore_for_file: invalid_language_version_override
+import 'dart:async';
+''',
+              atFront: true,
+            );
+          }
+          await insertTextToFile(
+            dartPath,
+            '''
+final ${camelName}Controller = StreamController();
+final ${camelName}Stream = ${camelName}Controller.stream;
+''',
+          );
+          final rustPath = '$rustOutputPath$subPath/$filename.rs';
+          final rustFile = File(rustPath);
+          final rustContent = await rustFile.readAsString();
+          if (!rustContent.contains("use std::sync")) {
+            await insertTextToFile(
+              rustPath,
+              '''
+#![allow(unused_imports)]
+use crate::tokio;
+use rinf::externs::lazy_static::lazy_static;
+use std::cell::RefCell;
+use std::sync::Arc;
+use std::sync::Mutex;
+use tokio::sync::mpsc::Receiver;
+use tokio::sync::mpsc::Sender;
+''',
+              atFront: true,
+            );
+          }
+          await insertTextToFile(
+            rustPath,
+            '''
+lazy_static! {
+    pub static ref ${snakeName}_SENDER: Arc<Mutex<RefCell<Option<Sender<i32>>>>> =
+        Arc::new(Mutex::new(RefCell::new(None)));
+}
+''',
+          );
+        }
+      }
     }
   }
 
@@ -310,7 +423,11 @@ Future<void> emptyDirectory(String directoryPath) async {
   }
 }
 
-Future<void> appendLineToFile(String filePath, String textToAppend) async {
+Future<void> insertTextToFile(
+  String filePath,
+  String textToAppend, {
+  bool atFront = false,
+}) async {
   // Read the existing content of the file
   final file = File(filePath);
   if (!(await file.exists())) {
@@ -319,9 +436,97 @@ Future<void> appendLineToFile(String filePath, String textToAppend) async {
   String fileContent = await file.readAsString();
 
   // Append the new text to the existing content
-  fileContent += '\n';
-  fileContent += textToAppend;
+  if (atFront) {
+    fileContent = textToAppend + '\n' + fileContent;
+  } else {
+    fileContent = fileContent + '\n' + textToAppend;
+  }
 
   // Write the updated content back to the file
   await file.writeAsString(fileContent);
+}
+
+Future<Map<String, Map<String, List<MarkedMessage>>>> parseProtoFiles(
+  String protoPath,
+  Map<String, List<String>> resourcesInFolders,
+) async {
+  final markedMessages = <String, Map<String, List<MarkedMessage>>>{};
+  for (final entry in resourcesInFolders.entries) {
+    final subpath = entry.key;
+    final filenames = entry.value;
+    final markedMessagesInFiles = <String, List<MarkedMessage>>{};
+    for (final filename in filenames) {
+      markedMessagesInFiles[filename] = [];
+    }
+    markedMessages[subpath] = markedMessagesInFiles;
+  }
+  int messageId = 0;
+  for (final entry in resourcesInFolders.entries) {
+    final subpath = entry.key;
+    for (final filename in entry.value) {
+      final protoFile = File('$protoPath/$subpath/$filename.proto');
+      final content = await protoFile.readAsString();
+      final regExp = RegExp(r'{[^}]*}');
+      // Remove all { ... } blocks from the string
+      final contentWithoutBlocks = content.replaceAll(regExp, ';');
+      final statements = contentWithoutBlocks.split(";");
+      for (final statementRaw in statements) {
+        final statement = statementRaw.trim();
+        if (statement.startsWith("// FROM:DART")) {
+          final lines = statement.split('\n');
+          for (final line in lines) {
+            final trimmed = line.trim();
+            if (trimmed.startsWith("message")) {
+              final messageName = trimmed.replaceFirst("message", "").trim();
+              markedMessages[subpath]![filename]!.add(MarkedMessage(
+                RinfAttribute.fromDart,
+                messageName,
+                messageId,
+              ));
+              messageId += 1;
+            }
+          }
+        } else if (statement.startsWith("// FROM:RUST")) {
+          final lines = statement.split('\n');
+          for (final line in lines) {
+            final trimmed = line.trim();
+            if (trimmed.startsWith("message")) {
+              final messageName = trimmed.replaceFirst("message", "").trim();
+              markedMessages[subpath]![filename]!.add(MarkedMessage(
+                RinfAttribute.fromRust,
+                messageName,
+                messageId,
+              ));
+              messageId += 1;
+            }
+          }
+        }
+      }
+    }
+  }
+  return markedMessages;
+}
+
+String pascalToCamel(String input) {
+  if (input.isEmpty) {
+    return input;
+  }
+
+  return input[0].toLowerCase() + input.substring(1);
+}
+
+String pascalToSnake(String input, bool upperCase) {
+  if (input.isEmpty) {
+    return input;
+  }
+
+  final camelCase = pascalToCamel(input);
+  String snakeCase = camelCase.replaceAllMapped(
+      RegExp(r'[A-Z]'), (Match match) => '_${match.group(0)?.toLowerCase()}');
+
+  if (upperCase) {
+    snakeCase = snakeCase.toUpperCase();
+  }
+
+  return snakeCase;
 }
