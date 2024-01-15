@@ -485,9 +485,9 @@ Future<void> collectProtoFiles(
       ); // Recursive call for subdirectories
     }
   }
-  var folderPath = directory.path.replaceFirst(rootDirectory.path, '');
-  folderPath = folderPath.replaceAll("\\", "/"); // For Windows
-  resourcesInFolders[folderPath] = resources;
+  var subPath = directory.path.replaceFirst(rootDirectory.path, '');
+  subPath = subPath.replaceAll("\\", "/"); // For Windows
+  resourcesInFolders[subPath] = resources;
 }
 
 Future<void> emptyDirectory(String directoryPath) async {
