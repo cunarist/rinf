@@ -241,6 +241,8 @@ use tokio::sync::mpsc::Sender;
 lazy_static! {
     pub static ref ${snakeName}_RECEIVER: Arc<Mutex<RefCell<Option<Receiver<$messageName>>>>> =
         Arc::new(Mutex::new(RefCell::new(None)));
+    pub static ref ${snakeName}_SENDER: Arc<Mutex<RefCell<Option<Sender<$messageName>>>>> =
+        Arc::new(Mutex::new(RefCell::new(None)));
 }
 ''',
           );
@@ -316,8 +318,9 @@ pub fn handle_received(message_id: i32, message_bytes: Vec<u8>) {
           rustReceiveScript += '''
 if message_id == ${markedMessage.id} {
     use crate::messages$modulePath::$filename::*;
-    let decoded = ${markedMessage.name}::decode(message_bytes.as_slice()).unwrap();
-    ${snakeName}_RECEIVER;
+    let decoded = ${markedMessage.name}::decode(message_bytes.as_slice()).unwrap();     
+    let sender = ${snakeName}_SENDER.lock().unwrap().borrow().unwrap();
+    sender.send(decoded);
     return;
 }
 ''';
@@ -356,7 +359,7 @@ import '.$importPath';
           dartReceiveScript += '''
 if (messageId == ${markedMessage.id}) {
   final decoded = ${markedMessage.name}.fromBuffer(messageBytes);
-  ${camelName}Stream;
+  ${camelName}Controller.add(decoded);
   return;
 }
 ''';
