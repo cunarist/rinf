@@ -4,6 +4,7 @@
 
 import 'dart:async';
 import 'src/exports.dart';
+import 'dart:typed_data';
 
 export 'src/exports.dart' show sendDartSignalExtern;
 export 'src/exports.dart' show RustSignal;
@@ -25,4 +26,21 @@ class Rinf {
   static Future<void> ensureFinalized() async {
     stopRustLogicExtern();
   }
+}
+
+Future<void> sendDartSignal(
+  int messageId,
+  Uint8List messageBytes,
+  Uint8List? blob,
+) async {
+  bool blobValid;
+  Uint8List blobBytes;
+  if (blob == null) {
+    blobValid = false;
+    blobBytes = Uint8List(0);
+  } else {
+    blobValid = true;
+    blobBytes = blob;
+  }
+  sendDartSignalExtern(messageId, messageBytes, blobValid, blobBytes);
 }

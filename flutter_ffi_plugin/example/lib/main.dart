@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:rinf/rinf.dart';
@@ -68,7 +67,6 @@ class _MyHomePageState extends State<MyHomePage> {
             sampleFieldTwo: false,
           ),
           dummyThree: [4, 5, 6]),
-      Uint8List(0),
     );
   }
 
@@ -108,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                   }
                   // Return an image container if some data is received.
-                  final imageData = rustSignal.blob;
+                  final imageData = rustSignal.blob!;
                   return Container(
                     margin: const EdgeInsets.all(20),
                     width: 256,

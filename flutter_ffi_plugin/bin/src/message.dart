@@ -234,11 +234,11 @@ use tokio::sync::mpsc::Sender;
           await insertTextToFile(
             dartPath,
             '''
-void ${camelName}Send(${messageName} message, Uint8List blob_bytes) {
-    sendDartSignalExtern(
+void ${camelName}Send(${messageName} message, [Uint8List? blob]) {
+    sendDartSignal(
         ${markedMessage.id},
         message.writeToBuffer(),
-        blob_bytes,
+        blob,
     );
 }
 ''',
@@ -271,11 +271,11 @@ final ${camelName}Stream = ${camelName}Controller.stream;
           await insertTextToFile(
             rustPath,
             '''
-pub fn ${snakeName}_send(message: ${messageName}, blob_bytes: Vec<u8>) {
-    crate::bridge::send_rust_signal_extern(
+pub fn ${snakeName}_send(message: ${messageName}, blob: Option<Vec<u8>>) {
+    crate::bridge::send_rust_signal(
         ${markedMessage.id},
         message.encode_to_vec(),
-        blob_bytes,
+        blob,
     );
 }
 ''',
@@ -291,7 +291,7 @@ pub fn ${snakeName}_send(message: ${messageName}, blob_bytes: Vec<u8>) {
 use prost::Message;
 use crate::bridge::*;
 
-pub fn receive_messages(message_id: i32, message_bytes: Vec<u8>, blob_bytes: Vec<u8>) {
+pub fn receive_messages(message_id: i32, message_bytes: Vec<u8>, blob: Option<Vec<u8>>) {
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -309,7 +309,7 @@ if message_id == ${markedMessage.id} {
     let decoded = ${markedMessage.name}::decode(message_bytes.as_slice()).unwrap();     
     let signal = DartSignal {
         message: decoded,
-        blob: blob_bytes
+        blob,
     };
     let cell = ${snakeName.toUpperCase()}_SENDER.lock().unwrap();
     let sender = cell.clone().replace(None).unwrap();
@@ -332,7 +332,7 @@ if message_id == ${markedMessage.id} {
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
 
-void receiveMessages(int messageId, Uint8List messageBytes, Uint8List blobBytes) {
+void receiveMessages(int messageId, Uint8List messageBytes, Uint8List? blob) {
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -356,7 +356,7 @@ if (messageId == ${markedMessage.id}) {
   final decoded = $camelFilename.${markedMessage.name}.fromBuffer(messageBytes);
   final bridgeSignal = RustSignal(
     decoded,
-    blobBytes,
+    blob,
   );
   $camelFilename.${camelName}Controller.add(bridgeSignal);
   return;

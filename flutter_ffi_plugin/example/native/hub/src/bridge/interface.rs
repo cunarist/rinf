@@ -12,7 +12,7 @@ pub use super::interface_web::*;
 
 pub struct DartSignal<T> {
     pub message: T,
-    pub blob: Vec<u8>,
+    pub blob: Option<Vec<u8>>,
 }
 
 type Cell<T> = RefCell<Option<T>>;
@@ -103,7 +103,17 @@ pub fn stop_rust_logic() {
     });
 }
 
-/// Sends a string to Dart that should be printed in the CLI.
+/// Send a message signal to Dart.
+pub fn send_rust_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Vec<u8>>) {
+    send_rust_signal_extern(
+        message_id,
+        message_bytes,
+        blob.is_some(),
+        blob.unwrap_or_default(),
+    );
+}
+
+/// Send a string to Dart that should be printed in the CLI.
 /// Do NOT use this function directly in the code.
 /// Use `debug_print!` macro instead.
 #[cfg(debug_assertions)]

@@ -15,10 +15,17 @@ Future<void> prepareNativeBridge(ReceiveMessages receiveMessages) async {
   // Listen to Rust via JavaScript
   js.context['rinf_send_rust_signal_extern'] = (
     int messageId,
-    Uint8List message,
-    Uint8List blob,
+    Uint8List messageBytes,
+    bool blobValid,
+    Uint8List blobBytes,
   ) {
-    receiveMessages(messageId, message, blob);
+    Uint8List? blob;
+    if (blobValid) {
+      blob = blobBytes;
+    } else {
+      blob = null;
+    }
+    receiveMessages(messageId, messageBytes, blob);
   };
   js.context['rinf_send_rust_report_extern'] = (String rustReport) {
     print(rustReport);
@@ -37,12 +44,6 @@ external void stopRustLogicExtern();
 external void sendDartSignalExtern(
   int messageId,
   Uint8List messageBytes,
+  bool blobValid,
   Uint8List blobBytes,
-);
-
-@JS('wasm_bindgen.prepare_isolates_extern')
-external void prepareIsolatesExtern(
-  int portSignal,
-  int portResponse,
-  int portReport,
 );

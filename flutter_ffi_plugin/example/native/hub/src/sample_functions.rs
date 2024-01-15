@@ -22,7 +22,7 @@ pub async fn handle_number(received: counter_number::NumberInput) {
         dummy_two: received.dummy_two,
         dummy_three: received.dummy_three,
     };
-    counter_number::number_output_send(message, Vec::new());
+    counter_number::number_output_send(message, None);
 }
 
 pub async fn stream_fractal() {
@@ -66,7 +66,7 @@ pub async fn stream_fractal() {
                     fractal::ScaleState {
                         current_scale: scale,
                     },
-                    fractal,
+                    Some(fractal),
                 );
             };
         }

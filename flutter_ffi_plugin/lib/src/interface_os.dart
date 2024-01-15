@@ -26,10 +26,16 @@ Future<void> prepareNativeBridge(ReceiveMessages receiveMessages) async {
 
   // Listen to Rust via isolate ports
   rustSignalPort.listen((rustSignalRaw) {
+    Uint8List? blob;
+    if (rustSignalRaw[2]) {
+      blob = rustSignalRaw[3];
+    } else {
+      blob = null;
+    }
     receiveMessages(
       rustSignalRaw[0],
       rustSignalRaw[1],
-      rustSignalRaw[2],
+      blob,
     );
   });
   rustReportPort.listen((rustReport) {
@@ -66,6 +72,7 @@ void stopRustLogicExtern() {
 Future<void> sendDartSignalExtern(
   int messageId,
   Uint8List messageBytes,
+  bool blobValid,
   Uint8List blobBytes,
 ) async {
   final Pointer<Uint8> messageMemory = malloc.allocate(messageBytes.length);
@@ -76,8 +83,9 @@ Future<void> sendDartSignalExtern(
 
   // Look up the Rust function
   final rustFunction = rustLibrary.lookupFunction<
-      Void Function(IntPtr, Pointer<Uint8>, IntPtr, Pointer<Uint8>, IntPtr),
-      void Function(int, Pointer<Uint8>, int, Pointer<Uint8>,
+      Void Function(
+          IntPtr, Pointer<Uint8>, IntPtr, Bool, Pointer<Uint8>, IntPtr),
+      void Function(int, Pointer<Uint8>, int, bool, Pointer<Uint8>,
           int)>('send_dart_signal_extern');
 
   // Call the Rust function
@@ -85,6 +93,7 @@ Future<void> sendDartSignalExtern(
     messageId,
     messageMemory.cast(),
     messageBytes.length,
+    blobValid,
     blobMemory.cast(),
     blobBytes.length,
   );
@@ -100,7 +109,5 @@ void prepareIsolatesExtern(int portSignal, int portReport) {
   // Look up the Rust function
   final rustFunction = rustLibrary.lookupFunction<Void Function(IntPtr, IntPtr),
       void Function(int, int)>('prepare_isolates_extern');
-  // Call the Rust function    final rustSignalReceiver = ReceivePort();
-
   rustFunction(portSignal, portReport);
 }
