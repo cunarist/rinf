@@ -1,88 +1,28 @@
 #![allow(dead_code)]
 
-use rinf::externs::lazy_static::lazy_static;
+use crate::tokio;
 use std::cell::RefCell;
 use std::sync::Arc;
 use std::sync::Mutex;
-use tokio::sync::mpsc::channel;
-use tokio::sync::mpsc::Receiver;
-use tokio::sync::mpsc::Sender;
-use tokio_with_wasm::tokio;
 
 #[cfg(not(target_family = "wasm"))]
-use super::interface_os::*;
+pub use super::interface_os::*;
 #[cfg(target_family = "wasm")]
-use super::interface_web::*;
+pub use super::interface_web::*;
 
-/// Available operations that a `RustRequest` object can hold.
-/// There are 4 options, `Create`,`Read`,`Update`, and `Delete`.
-pub enum RustOperation {
-    Create,
-    Read,
-    Update,
-    Delete,
-}
-
-/// Holds the data that Rust streams to Dart.
-#[derive(Clone)]
-pub struct RustSignal {
-    pub resource: i32,
-    pub message: Option<Vec<u8>>,
-    pub blob: Option<Vec<u8>>,
-}
-
-/// Request object that is sent from Dart to Rust.
-pub struct RustRequest {
-    pub resource: i32,
-    pub operation: RustOperation,
-    pub message: Option<Vec<u8>>,
-    pub blob: Option<Vec<u8>>,
-}
-
-/// Wrapper for `RustRequest` with a unique ID.
-pub struct RustRequestUnique {
-    pub id: i32,
-    pub request: RustRequest,
-}
-
-/// Response object that is sent from Rust to Dart.
-#[derive(Clone)]
-pub struct RustResponse {
-    pub message: Option<Vec<u8>>,
-    pub blob: Option<Vec<u8>>,
-}
-
-/// Wrapper for `RustResponse` with a unique ID.
-#[derive(Clone)]
-pub struct RustResponseUnique {
-    pub id: i32,
-    pub response: Option<RustResponse>,
+pub struct DartSignal<T> {
+    pub message: T,
+    pub blob: Vec<u8>,
 }
 
 type Cell<T> = RefCell<Option<T>>;
 type SharedCell<T> = Arc<Mutex<Cell<T>>>;
 
-type RustRequestSender = Sender<RustRequestUnique>;
-type RustRequestReceiver = Receiver<RustRequestUnique>;
-
-// Native: Main thread
-// Web: Main thread
-thread_local! {
-    pub static REQUEST_SENDER: Cell<RustRequestSender> = const { RefCell::new(None) };
-}
-
-// Native: All threads
-// Web: Main thread
-lazy_static! {
-    pub static ref REQUST_RECEIVER_SHARED: SharedCell<RustRequestReceiver> =
-        Arc::new(Mutex::new(RefCell::new(None)));
-}
-
 #[cfg(not(target_family = "wasm"))]
-lazy_static! {
-    pub static ref TOKIO_RUNTIME: rinf::externs::os_thread_local::ThreadLocal<Cell<tokio::runtime::Runtime>> =
-        rinf::externs::os_thread_local::ThreadLocal::new(|| RefCell::new(None));
-}
+rinf::externs::lazy_static::lazy_static!(
+pub static ref TOKIO_RUNTIME: rinf::externs::os_thread_local::ThreadLocal<Cell<tokio::runtime::Runtime>> =
+    rinf::externs::os_thread_local::ThreadLocal::new(|| RefCell::new(None));
+);
 
 /// Start the main function of Rust.
 pub fn start_rust_logic() {
@@ -133,14 +73,6 @@ pub fn start_rust_logic() {
         }
     }
 
-    // Prepare channels in Rust.
-    let (request_sender, request_receiver) = channel(1024);
-    REQUEST_SENDER.with(move |inner| {
-        inner.replace(Some(request_sender));
-    });
-    let cell = REQUST_RECEIVER_SHARED.lock().unwrap();
-    cell.replace(Some(request_receiver));
-
     // Run the main function.
     #[cfg(not(target_family = "wasm"))]
     {
@@ -169,37 +101,6 @@ pub fn stop_rust_logic() {
     TOKIO_RUNTIME.with(move |ref_cell| {
         ref_cell.replace(None);
     });
-}
-
-/// Send a request to Rust and receive a response in Dart.
-pub fn request_to_rust(request_unique: RustRequestUnique) {
-    REQUEST_SENDER.with(move |inner| {
-        let borrowed = inner.borrow();
-        let sender = borrowed.as_ref().unwrap();
-        sender.try_send(request_unique).ok();
-    });
-}
-
-/// This function is expected to be used only once
-/// during the initialization of the Rust logic.
-pub fn get_request_receiver() -> Receiver<RustRequestUnique> {
-    let cell = REQUST_RECEIVER_SHARED.lock().unwrap();
-    let option = cell.replace(None);
-    option.unwrap()
-}
-
-/// Sending the signal will notify the Flutter widgets
-/// and trigger the rebuild.
-/// No memory copy is involved as the bytes are moved directly to Dart.
-pub fn send_rust_signal(rust_signal: RustSignal) {
-    send_rust_signal_extern(rust_signal);
-}
-
-/// Sends a response to Dart with a unique interaction ID
-/// to remember which request that response corresponds to.
-/// No memory copy is involved as the bytes are moved directly to Dart.
-pub fn respond_to_dart(response_unique: RustResponseUnique) {
-    respond_to_dart_extern(response_unique);
 }
 
 /// Sends a string to Dart that should be printed in the CLI.

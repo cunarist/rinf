@@ -1,12 +1,14 @@
+import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:rinf/rinf.dart';
-import 'package:example_app/messages/counter_number.pb.dart' as counterNumber;
-import 'package:example_app/messages/fractal.pb.dart' as fractal;
+import './messages/counter_number.pb.dart';
+import './messages/fractal.pb.dart';
+import './messages/receive.dart';
 
 void main() async {
   // Wait for Rust initialization to be completed first.
-  await Rinf.ensureInitialized();
+  await Rinf.ensureInitialized(receiveMessages);
   runApp(const MyApp());
 }
 
@@ -56,33 +58,18 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   void _incrementCounter() async {
-    final requestMessage = counterNumber.ReadRequest(
-      letter: "Hello from Dart!",
-      beforeNumber: _counter,
-      dummyOne: 1,
-      dummyTwo: counterNumber.SampleSchema(
-        sampleFieldOne: true,
-        sampleFieldTwo: false,
-      ),
-      dummyThree: [3, 4, 5],
+    numberFromDartSend(
+      NumberFromDart(
+          letter: "HELLO FROM DART!",
+          beforeNumber: _counter,
+          dummyOne: 25,
+          dummyTwo: SampleSchema(
+            sampleFieldOne: true,
+            sampleFieldTwo: false,
+          ),
+          dummyThree: [4, 5, 6]),
+      Uint8List(0),
     );
-    final rustRequest = RustRequest(
-      resource: counterNumber.ID,
-      operation: RustOperation.Read,
-      message: requestMessage.writeToBuffer(),
-    );
-    // Use `requestToRust` from `rinf.dart`
-    // to send the request to Rust and get the response.
-    final rustResponse = await requestToRust(rustRequest);
-    if (rustResponse == null) {
-      return;
-    }
-    final responseMessage = counterNumber.ReadResponse.fromBuffer(
-      rustResponse.message!,
-    );
-    setState(() {
-      _counter = responseMessage.afterNumber;
-    });
   }
 
   @override
@@ -94,36 +81,34 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             // `StreamBuilder` listens to a stream
             // and rebuilds the widget accordingly.
-            StreamBuilder<RustSignal>(
-              // Receive signals from Rust
-              // with `rustBroadcaster` from `rinf.dart`,
-              // For better performance, filter signals
-              // by checking the `resource` field with the `where` method.
-              // This approach allows the builder to rebuild its widget
-              // only when there are signals
-              // related to a specific Rust resource it is interested in.
-              stream: rustBroadcaster.stream.where((rustSignal) {
-                return rustSignal.resource == fractal.ID;
-              }),
-              builder: (context, snapshot) {
-                // If the app has just started and widget is built
-                // without receiving a Rust signal,
-                // the snapshot's data will be null.
-                final rustSignal = snapshot.data;
-                if (rustSignal == null) {
-                  // Return a black container if the received data is null.
-                  return Container(
-                    margin: const EdgeInsets.all(20),
-                    width: 256,
-                    height: 256,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24.0),
-                      color: Colors.black,
-                    ),
-                  );
-                } else {
+            StreamBuilder<RustSignal<ScaleState>>(
+                // Receive signals from Rust
+                // with `rustBroadcaster` from `rinf.dart`,
+                // For better performance, filter signals
+                // by checking the `resource` field with the `where` method.
+                // This approach allows the builder to rebuild its widget
+                // only when there are signals
+                // related to a specific Rust resource it is interested in.
+                stream: scaleStateStream,
+                builder: (context, snapshot) {
+                  // If the app has just started and widget is built
+                  // without receiving a Rust signal,
+                  // the snapshot's data will be null.
+                  final rustSignal = snapshot.data;
+                  if (rustSignal == null) {
+                    // Return a black container if the received data is null.
+                    return Container(
+                      margin: const EdgeInsets.all(20),
+                      width: 256,
+                      height: 256,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(24.0),
+                        color: Colors.black,
+                      ),
+                    );
+                  }
                   // Return an image container if some data is received.
-                  final imageData = rustSignal.blob!;
+                  final imageData = rustSignal.blob;
                   return Container(
                     margin: const EdgeInsets.all(20),
                     width: 256,
@@ -141,11 +126,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                   );
+                }),
+            StreamBuilder<RustSignal<NumberFromRust>>(
+              stream: numberFromRustStream,
+              builder: (context, snapshot) {
+                final rustSignal = snapshot.data;
+                if (rustSignal == null) {
+                  return Text('Initial value 0');
                 }
+                _counter = rustSignal.message.afterNumber;
+                return Text('Current value is $_counter');
               },
-            ),
-            Text(
-              "Current value is $_counter",
             ),
           ],
         ),

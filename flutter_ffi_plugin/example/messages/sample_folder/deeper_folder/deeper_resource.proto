@@ -1,5 +1,4 @@
 syntax = "proto3";
 package deeper_resource;
 
-// FROM:RUST
 message DeeperDummy {}

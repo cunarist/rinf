@@ -1,5 +1,4 @@
 syntax = "proto3";
 package sample_resource;
 
-// FROM:DART
 message SampleDummy {}
