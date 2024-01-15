@@ -339,6 +339,7 @@ void receiveMessages(int messageId, Uint8List messageBytes, Uint8List blobBytes)
     final files = entry.value;
     for (final entry in files.entries) {
       final filename = entry.key;
+      final camelFilename = snakeToCamel(filename);
       final markedMessages = entry.value;
       for (final markedMessage in markedMessages) {
         if (markedMessage.markType == MarkType.fromRust) {
@@ -346,18 +347,18 @@ void receiveMessages(int messageId, Uint8List messageBytes, Uint8List blobBytes)
           final importPath = '$subpath/$filename.pb.dart';
           if (!dartReceiveScript.contains(importPath)) {
             dartReceiveScript = '''
-import '.$importPath';
+import '.$importPath' as $camelFilename;
 ''' +
                 dartReceiveScript;
           }
           dartReceiveScript += '''
 if (messageId == ${markedMessage.id}) {
-  final decoded = ${markedMessage.name}.fromBuffer(messageBytes);
+  final decoded = $camelFilename.${markedMessage.name}.fromBuffer(messageBytes);
   final bridgeSignal = RustSignal(
     decoded,
     blobBytes,
   );
-  ${camelName}Controller.add(bridgeSignal);
+  $camelFilename.${camelName}Controller.add(bridgeSignal);
   return;
 }
 ''';
@@ -604,4 +605,24 @@ String pascalToSnake(String input) {
       RegExp(r'[A-Z]'), (Match match) => '_${match.group(0)?.toLowerCase()}');
 
   return snakeCase;
+}
+
+String snakeToCamel(String input) {
+  List<String> parts = input.split('_');
+  String camelCase = parts[0];
+
+  for (int i = 1; i < parts.length; i++) {
+    camelCase += parts[i][0].toUpperCase() + parts[i].substring(1);
+  }
+
+  return camelCase;
+}
+
+void main() {
+  // Example usage:
+  String snakeCaseString = 'example_snake_case';
+  String camelCaseString = snakeToCamel(snakeCaseString);
+
+  print('Original: $snakeCaseString');
+  print('Converted: $camelCaseString');
 }
