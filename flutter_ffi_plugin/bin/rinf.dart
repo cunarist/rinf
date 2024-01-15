@@ -1,4 +1,5 @@
 import 'src/helpers.dart';
+import 'src/message.dart';
 
 Future<void> main(List<String> args) async {
   if (args.length == 0) {
