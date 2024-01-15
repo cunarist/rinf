@@ -46,10 +46,9 @@ class RinfConfig {
 
   @override
   String toString() {
-    return '''RinfConfig {
+    return '''rinf:
   messagesInputDir: $messagesInputDir
-  rustTypesOutputDir: $rustTypesOutputDir
-}''';
+  rustTypesOutputDir: $rustTypesOutputDir''';
   }
 }
 

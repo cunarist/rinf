@@ -3,8 +3,7 @@ import 'package:path/path.dart';
 import 'package:watcher/watcher.dart';
 import 'package:package_config/package_config.dart';
 
-const DEFAULT_RUST_TYPES_OUTPUT_DIR = "native/hub/src/messages";
-const DEFAULT_MESSAGES_INPUT_DIR = "messages";
+import 'rinf_config.dart';
 
 Future<void> main(List<String> args) async {
   if (args.length == 0) {
@@ -12,7 +11,13 @@ Future<void> main(List<String> args) async {
     print("Use `rinf --help` to see all available operations.");
     return;
   }
+
+  final rinfConfig = await loadVerifiedRinfConfig("pubspec.yaml");
+
   switch (args[0]) {
+    case "config":
+      print(rinfConfig);
+      break;
     case "template":
       if (args.contains("--bridge") || args.contains("-b")) {
         await _applyRustTemplate(onlyBridge: true);
@@ -21,19 +26,8 @@ Future<void> main(List<String> args) async {
       }
       break;
     case "message":
-      final messagesDirIndex = args.indexWhere(
-        (arg) => arg == "--msg-dir" || arg == "-m",
-      );
-      final messagesInputDir = messagesDirIndex != -1
-          ? args[messagesDirIndex + 1]
-          : DEFAULT_MESSAGES_INPUT_DIR;
-
-      final rustOutdirIndex = args.indexWhere(
-        (arg) => arg == "--rust-dir" || arg == "-r",
-      );
-      final rustTypesOutputDir = rustOutdirIndex != -1
-          ? args[rustOutdirIndex + 1]
-          : DEFAULT_RUST_TYPES_OUTPUT_DIR;
+      final messagesInputDir = rinfConfig.messagesInputDir;
+      final rustTypesOutputDir = rinfConfig.rustTypesOutputDir;
 
       if (args.contains("--watch") || args.contains("-w")) {
         await _watchAndGenerateMessageCode(
@@ -59,16 +53,12 @@ Future<void> main(List<String> args) async {
       print("Usage: rinf [arguments]");
       print("Arguments:");
       print("  -h, --help        Shows this usage information.");
+      print(
+          "  config            Prints the rinf config resolved from the pubspec.yaml with defaults applied.");
       print("  template          Applies Rust template to current project.");
       print("    -b, --bridge    Only applies `bridge` Rust module.");
       print("  message           Generates message code from `.proto` files.");
       print("    -w, --watch     Continuously watches `.proto` files.");
-      print("    -r, --rust-dir  Directory into which to generate Rust types,"
-          " relative to the project root.\n"
-          "                    Default: '$DEFAULT_RUST_TYPES_OUTPUT_DIR'");
-      print("    -m, --msg-dir   Directory from which to read message files,"
-          " relative to the project root.\n"
-          "                    Default: '$DEFAULT_MESSAGES_INPUT_DIR'");
       print("  wasm              Builds webassembly module.");
       print("    -r, --release   Builds in release mode.");
     default:
