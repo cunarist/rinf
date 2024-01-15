@@ -306,7 +306,7 @@ use prost::Message;
 pub fn handle_received(message_id: i32, message_bytes: Vec<u8>) {
 ''';
   for (final entry in markedMessagesAll.entries) {
-    final subpath = entry.key.replaceAll("\\", "/");
+    final subpath = entry.key;
     final files = entry.value;
     for (final entry in files.entries) {
       final filename = entry.key;
@@ -341,7 +341,7 @@ import 'dart:typed_data';
 void receive_messages(int messageId, Uint8List messageBytes) {
 ''';
   for (final entry in markedMessagesAll.entries) {
-    final subpath = entry.key.replaceAll("\\", "/");
+    final subpath = entry.key;
     final files = entry.value;
     for (final entry in files.entries) {
       final filename = entry.key;
@@ -485,7 +485,8 @@ Future<void> collectProtoFiles(
       ); // Recursive call for subdirectories
     }
   }
-  final folderPath = directory.path.replaceFirst(rootDirectory.path, '');
+  var folderPath = directory.path.replaceFirst(rootDirectory.path, '');
+  folderPath = folderPath.replaceAll("\\", "/"); // For Windows
   resourcesInFolders[folderPath] = resources;
 }
 
