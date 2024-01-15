@@ -1,8 +1,9 @@
-use std::env;
-use std::fs;
-use std::process::Command;
-
+#[cfg(not(target_family = "wasm"))]
 fn main() {
+    use std::env;
+    use std::fs;
+    use std::process::Command;
+
     // Install and remember Protobuf compiler's path
     let home_path = home::home_dir().unwrap();
     let out_path = home_path.join(".local").join("bin");
@@ -33,4 +34,9 @@ fn main() {
 
     // Execute the command
     let _ = command.status();
+}
+
+#[cfg(target_family = "wasm")]
+fn main() {
+    // Separate dummy function to make the linter happy
 }
