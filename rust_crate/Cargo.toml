@@ -16,3 +16,5 @@ js-sys = "0.3.65"
 
 [dependencies]
 lazy_static = "1.4.0"
+protoc-prebuilt = "0.2.0"
+home = "0.5.9"

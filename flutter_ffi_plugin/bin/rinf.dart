@@ -191,16 +191,14 @@ utilizing the capabilities of the
 [Rinf](https://pub.dev/packages/rinf) framework.
 
 To run and build this app, you need to have
-[Flutter SDK](https://docs.flutter.dev/get-started/install),
-[Rust toolchain](https://www.rust-lang.org/tools/install),
-and [Protobuf compiler](https://grpc.io/docs/protoc-installation)
+[Flutter SDK](https://docs.flutter.dev/get-started/install)
+and [Rust toolchain](https://www.rust-lang.org/tools/install)
 installed on your system.
 You can check that your system is ready with the commands below.
 Note that all the Flutter subcomponents should be installed.
 
 ```bash
 rustc --version
-protoc --version
 flutter doctor
 ```
 
