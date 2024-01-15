@@ -1,3 +1,7 @@
+## 5.4.0
+
+- Now users do not have to manually install `protoc` binary executable anymore. Protobuf compiler is now automatically installed. Note that you need to run `cargo install rinf` again to use this new version.
+
 ## 5.3.1
 
 - Fixed a bug with `rinf message` that omits `mod.rs` inside a folder without any message.
