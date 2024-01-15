@@ -62,9 +62,13 @@ pub async fn stream_fractal() {
             let received_frame = join_handle.await.unwrap();
             if let Some(fractal) = received_frame {
                 // Stream the image data to Dart.
-                fractal::scale_state_send(
-                    fractal::ScaleState {
+                fractal::fractal_scale_send(
+                    fractal::FractalScale {
                         current_scale: scale,
+                        dummy: Some(counter_number::SampleSchema {
+                            sample_field_one: true,
+                            sample_field_two: false,
+                        }),
                     },
                     Some(fractal),
                 );

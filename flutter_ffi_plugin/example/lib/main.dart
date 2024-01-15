@@ -79,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             // `StreamBuilder` listens to a stream
             // and rebuilds the widget accordingly.
-            StreamBuilder<RustSignal<ScaleState>>(
+            StreamBuilder<RustSignal<FractalScale>>(
                 // Receive signals from Rust
                 // with `rustBroadcaster` from `rinf.dart`,
                 // For better performance, filter signals
@@ -87,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 // This approach allows the builder to rebuild its widget
                 // only when there are signals
                 // related to a specific Rust resource it is interested in.
-                stream: scaleStateStream,
+                stream: fractalScaleStream,
                 builder: (context, snapshot) {
                   // If the app has just started and widget is built
                   // without receiving a Rust signal,

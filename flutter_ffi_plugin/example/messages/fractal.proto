@@ -1,5 +1,12 @@
 syntax = "proto3";
 package fractal;
 
+import "counter_number.proto";
+
 // FROM:RUST
-message ScaleState { double current_scale = 1; }
+// You can add your custom comments like this.
+// Protobuf's import statement also works well.
+message FractalScale {
+  double current_scale = 1;
+  counter_number.SampleSchema dummy = 2;
+}
