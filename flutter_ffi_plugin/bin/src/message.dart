@@ -189,8 +189,9 @@ Future<void> generateMessageCode({bool silent = false}) async {
       final filename = entry.key;
       final markedMessages = entry.value;
       for (final markedMessage in markedMessages) {
-        final camelName = pascalToCamel(markedMessage.name);
-        final snakeName = pascalToSnake(markedMessage.name, true);
+        final messageName = markedMessage.name;
+        final camelName = pascalToCamel(messageName);
+        final snakeName = pascalToSnake(messageName, true);
         final dartPath = '$dartOutputPath$subPath/$filename.pb.dart';
         final dartFile = File(dartPath);
         final dartContent = await dartFile.readAsString();
@@ -208,7 +209,7 @@ import 'dart:async';
           await insertTextToFile(
             dartPath,
             '''
-final ${camelName}Controller = StreamController();
+final ${camelName}Controller = StreamController<$messageName>();
 final ${camelName}Stream = ${camelName}Controller.stream;
 ''',
           );
@@ -235,7 +236,7 @@ use tokio::sync::mpsc::Sender;
             rustPath,
             '''
 lazy_static! {
-    pub static ref ${snakeName}_RECEIVER: Arc<Mutex<RefCell<Option<Receiver<i32>>>>> =
+    pub static ref ${snakeName}_RECEIVER: Arc<Mutex<RefCell<Option<Receiver<<$messageName>>>>>> =
         Arc::new(Mutex::new(RefCell::new(None)));
 }
 ''',
@@ -255,7 +256,7 @@ import 'dart:async';
           await insertTextToFile(
             dartPath,
             '''
-final ${camelName}Controller = StreamController();
+final ${camelName}Controller = StreamController<$messageName>();
 final ${camelName}Stream = ${camelName}Controller.stream;
 ''',
           );
@@ -282,7 +283,7 @@ use tokio::sync::mpsc::Sender;
             rustPath,
             '''
 lazy_static! {
-    pub static ref ${snakeName}_SENDER: Arc<Mutex<RefCell<Option<Sender<i32>>>>> =
+    pub static ref ${snakeName}_SENDER: Arc<Mutex<RefCell<Option<Sender<<$messageName>>>>>> =
         Arc::new(Mutex::new(RefCell::new(None)));
 }
 ''',
