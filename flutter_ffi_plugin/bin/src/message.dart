@@ -617,12 +617,3 @@ String snakeToCamel(String input) {
 
   return camelCase;
 }
-
-void main() {
-  // Example usage:
-  String snakeCaseString = 'example_snake_case';
-  String camelCaseString = snakeToCamel(snakeCaseString);
-
-  print('Original: $snakeCaseString');
-  print('Converted: $camelCaseString');
-}
