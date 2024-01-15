@@ -7,7 +7,7 @@ import './messages/receive.dart';
 
 void main() async {
   // Wait for Rust initialization to be completed first.
-  await Rinf.ensureInitialized(receiveMessages);
+  await Rinf.ensureInitialized(receiveSignal);
   runApp(const MyApp());
 }
 

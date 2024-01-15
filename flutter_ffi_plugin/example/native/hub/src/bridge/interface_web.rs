@@ -27,7 +27,7 @@ pub fn send_dart_signal_extern(
         None
     };
 
-    crate::messages::receive::receive_messages(message_id, message_bytes, blob);
+    crate::messages::receive::receive_signal(message_id, message_bytes, blob);
 }
 
 #[wasm_bindgen]

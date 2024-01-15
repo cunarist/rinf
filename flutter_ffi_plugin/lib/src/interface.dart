@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-typedef ReceiveMessages = void Function(int, Uint8List, Uint8List?);
+typedef ReceiveSignal = void Function(int, Uint8List, Uint8List?);
 
 class RustSignal<T> {
   T message;

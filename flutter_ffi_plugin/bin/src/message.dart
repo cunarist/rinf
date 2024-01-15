@@ -291,7 +291,7 @@ pub fn ${snakeName}_send(message: ${messageName}, blob: Option<Vec<u8>>) {
 use prost::Message;
 use crate::bridge::*;
 
-pub fn receive_messages(message_id: i32, message_bytes: Vec<u8>, blob: Option<Vec<u8>>) {
+pub fn receive_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Vec<u8>>) {
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -332,7 +332,7 @@ if message_id == ${markedMessage.id} {
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
 
-void receiveMessages(int messageId, Uint8List messageBytes, Uint8List? blob) {
+void receiveSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;

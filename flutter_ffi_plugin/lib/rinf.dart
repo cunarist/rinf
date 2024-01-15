@@ -13,8 +13,8 @@ export 'src/exports.dart' show RustSignal;
 class Rinf {
   /// Makes sure that the Rust side is ready.
   /// Don't forget to call this function in the `main` function of Dart.
-  static Future<void> ensureInitialized(ReceiveMessages receiveMessages) async {
-    await prepareNativeBridge(receiveMessages);
+  static Future<void> ensureInitialized(ReceiveSignal receiveSignal) async {
+    await prepareNativeBridge(receiveSignal);
   }
 
   /// Ensure that all Rust tasks are terminated
