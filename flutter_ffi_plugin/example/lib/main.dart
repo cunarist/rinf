@@ -58,8 +58,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   void _incrementCounter() async {
-    numberFromDartSend(
-      NumberFromDart(
+    numberInputSend(
+      NumberInput(
           letter: "HELLO FROM DART!",
           beforeNumber: _counter,
           dummyOne: 25,
@@ -127,8 +127,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   );
                 }),
-            StreamBuilder<RustSignal<NumberFromRust>>(
-              stream: numberFromRustStream,
+            StreamBuilder<RustSignal<NumberOutput>>(
+              stream: numberOutputStream,
               builder: (context, snapshot) {
                 final rustSignal = snapshot.data;
                 if (rustSignal == null) {

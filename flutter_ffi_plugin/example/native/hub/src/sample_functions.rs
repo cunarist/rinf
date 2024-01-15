@@ -7,7 +7,7 @@ use crate::tokio;
 
 const SHOULD_DEMONSTRATE: bool = true; // Disabled when applied as template
 
-pub async fn handle_number(received: counter_number::NumberFromDart) {
+pub async fn handle_number(received: counter_number::NumberInput) {
     // Decode raw bytes into a Rust message object.
     let letter = received.letter;
     crate::debug_print!("{letter}");
@@ -16,13 +16,13 @@ pub async fn handle_number(received: counter_number::NumberFromDart) {
     let after_value: i32 = sample_crate::add_seven(received.before_number);
 
     // Return the message that will be sent to Dart.
-    let message = counter_number::NumberFromRust {
+    let message = counter_number::NumberOutput {
         after_number: after_value,
         dummy_one: received.dummy_one,
         dummy_two: received.dummy_two,
         dummy_three: received.dummy_three,
     };
-    counter_number::number_from_rust_send(message, Vec::new());
+    counter_number::number_output_send(message, Vec::new());
 }
 
 pub async fn stream_fractal() {

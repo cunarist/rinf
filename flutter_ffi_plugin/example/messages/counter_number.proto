@@ -2,7 +2,7 @@ syntax = "proto3";
 package counter_number;
 
 // FROM:DART
-message NumberFromDart {
+message NumberInput {
   string letter = 1;
   int32 before_number = 2;
   uint32 dummy_one = 3;
@@ -11,7 +11,7 @@ message NumberFromDart {
 }
 
 // FROM:RUST
-message NumberFromRust {
+message NumberOutput {
   int32 after_number = 1;
   uint32 dummy_one = 2;
   SampleSchema dummy_two = 3;
