@@ -6,12 +6,11 @@ import 'dart:async';
 import 'src/exports.dart';
 import 'dart:typed_data';
 
-export 'src/exports.dart' show sendDartSignalExtern;
 export 'src/exports.dart' show RustSignal;
 
-/// Contains basic functionalities of this framework.
+/// This contains basic functionalities of this framework.
 class Rinf {
-  /// Makes sure that the Rust side is ready.
+  /// Make sure that the Rust side is ready.
   /// Don't forget to call this function in the `main` function of Dart.
   static Future<void> initialize(ReceiveSignal handleSignal) async {
     await prepareNativeBridge(handleSignal);
@@ -28,6 +27,7 @@ class Rinf {
   }
 }
 
+/// Send a signal to Rust.
 Future<void> sendDartSignal(
   int messageId,
   Uint8List messageBytes,
