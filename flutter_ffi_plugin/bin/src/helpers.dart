@@ -165,6 +165,10 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
       lastImportIndex + 1,
       "import 'package:rinf/rinf.dart';",
     );
+    lines.insert(
+      lastImportIndex + 1,
+      "import './messages/receive.dart';",
+    );
     mainText = lines.join("\n");
   }
   if (mainText.contains('main() {')) {
@@ -173,10 +177,10 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
       'main() async {',
     );
   }
-  if (!mainText.contains('Rinf.ensureInitialized()')) {
+  if (!mainText.contains('Rinf.ensureInitialized(receiveSignal)')) {
     mainText = mainText.replaceFirst(
       'main() async {',
-      'main() async { await Rinf.ensureInitialized();',
+      'main() async { await Rinf.ensureInitialized(receiveSignal);',
     );
   }
   await mainFile.writeAsString(mainText);
