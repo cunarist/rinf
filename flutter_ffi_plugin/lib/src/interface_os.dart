@@ -5,6 +5,7 @@ import 'package:ffi/ffi.dart';
 import 'dart:async';
 import 'dart:isolate';
 import 'interface.dart';
+import 'dart:convert';
 
 typedef StoreDartPostCObject = Pointer Function(
     Pointer<NativeFunction<Int8 Function(Int64, Pointer<Dart_CObject>)>>);
@@ -22,7 +23,6 @@ Future<void> prepareNativeBridge(ReceiveSignal receiveSignal) async {
 
   // Prepare ports that can communicate over isolates
   final rustSignalPort = ReceivePort();
-  final rustReportPort = ReceivePort();
 
   // Listen to Rust via isolate ports
   rustSignalPort.listen((rustSignalRaw) {
@@ -32,21 +32,20 @@ Future<void> prepareNativeBridge(ReceiveSignal receiveSignal) async {
     } else {
       blob = null;
     }
+    if (rustSignalRaw[0] == -1) {
+      // -1 is a special message ID for Rust reports
+      String rustReport = utf8.decode(rustSignalRaw[3]);
+      print(rustReport);
+    }
     receiveSignal(
       rustSignalRaw[0],
       rustSignalRaw[1],
       blob,
     );
   });
-  rustReportPort.listen((rustReport) {
-    print(rustReport);
-  });
 
   // Make Rust have its own isolates to send data to Dart
-  prepareIsolatesExtern(
-    rustSignalPort.sendPort.nativePort,
-    rustReportPort.sendPort.nativePort,
-  );
+  prepareIsolatesExtern(rustSignalPort.sendPort.nativePort);
   startRustLogicExtern();
 }
 
@@ -105,9 +104,10 @@ Future<void> sendDartSignalExtern(
   // when `Vec<u8>` is dropped.
 }
 
-void prepareIsolatesExtern(int portSignal, int portReport) {
+void prepareIsolatesExtern(int portSignal) {
   // Look up the Rust function
-  final rustFunction = rustLibrary.lookupFunction<Void Function(IntPtr, IntPtr),
-      void Function(int, int)>('prepare_isolates_extern');
-  rustFunction(portSignal, portReport);
+  final rustFunction =
+      rustLibrary.lookupFunction<Void Function(IntPtr), void Function(int)>(
+          'prepare_isolates_extern');
+  rustFunction(portSignal);
 }

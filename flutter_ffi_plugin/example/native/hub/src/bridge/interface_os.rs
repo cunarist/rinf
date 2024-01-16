@@ -15,17 +15,10 @@ lazy_static! {
 }
 
 #[no_mangle]
-pub extern "C" fn prepare_isolates_extern(port_message: i64, port_report: i64) {
-    let isolate = Isolate::new(port_message);
+pub extern "C" fn prepare_isolates_extern(port_signal: i64) {
+    let isolate = Isolate::new(port_signal);
     let cell = SIGNAL_ISOLATE.lock().unwrap();
     cell.replace(Some(isolate));
-
-    #[cfg(debug_assertions)]
-    {
-        let isolate = Isolate::new(port_report);
-        let cell = REPORT_ISOLATE.lock().unwrap();
-        cell.replace(Some(isolate));
-    }
 }
 
 #[no_mangle]

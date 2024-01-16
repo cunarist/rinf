@@ -118,5 +118,10 @@ pub fn send_rust_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Ve
 /// Use `debug_print!` macro instead.
 #[cfg(debug_assertions)]
 pub fn send_rust_report(rust_report: String) {
-    send_rust_report_extern(rust_report);
+    send_rust_signal_extern(
+        -1, // This is a special message ID for Rust reports
+        Vec::new(),
+        true,
+        rust_report.into_bytes(),
+    );
 }
