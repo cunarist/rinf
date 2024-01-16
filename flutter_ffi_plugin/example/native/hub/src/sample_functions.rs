@@ -21,7 +21,7 @@ pub async fn tell_numbers() {
 
         // Return the message that will be sent to Dart.
         let number_output = counter_number::NumberOutput {
-            current_number: current_number,
+            current_number,
             dummy_one: number_input.dummy_one,
             dummy_two: number_input.dummy_two,
             dummy_three: number_input.dummy_three,
