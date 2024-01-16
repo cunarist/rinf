@@ -200,6 +200,7 @@ Future<void> generateMessageCode({bool silent = false}) async {
           dartPath,
           '''
 // ignore_for_file: invalid_language_version_override
+
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
@@ -212,6 +213,7 @@ import 'package:rinf/rinf.dart';
           rustPath,
           '''
 #![allow(unused_imports)]
+
 use crate::bridge::*;
 use crate::tokio;
 use prost::Message;
@@ -246,8 +248,9 @@ void ${camelName}Send($messageName message, [Uint8List? blob]) {
           await insertTextToFile(
             rustPath,
             '''
+type ${messageName}Cell = Arc<Mutex<RefCell<Option<Sender<DartSignal<$messageName>>>>>>;
 lazy_static! {
-    pub static ref ${snakeName.toUpperCase()}_SENDER: Arc<Mutex<RefCell<Option<Sender<DartSignal<$messageName>>>>>> =
+    pub static ref ${snakeName.toUpperCase()}_SENDER: ${messageName}Cell =
         Arc::new(Mutex::new(RefCell::new(None)));
 }
 
