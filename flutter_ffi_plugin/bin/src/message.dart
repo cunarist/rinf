@@ -30,7 +30,7 @@ Future<void> generateMessageCode({
   final rustOutputPath =
       flutterProjectPath.uri.resolve(messageConfig.rustOutputDir).toFilePath();
   final dartOutputPath =
-      flutterProjectPath.uri.resolve(messageConfig.rustOutputDir).toFilePath();
+      flutterProjectPath.uri.resolve(messageConfig.dartOutputDir).toFilePath();
   await Directory(rustOutputPath).create(recursive: true);
   await emptyDirectory(rustOutputPath);
   await Directory(dartOutputPath).create(recursive: true);
