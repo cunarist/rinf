@@ -1,30 +1,72 @@
 import 'dart:io';
 
-import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:yaml/yaml.dart';
 
-const DEFAULT_RUST_TYPES_OUTPUT_DIR = "native/hub/src/messages";
-const DEFAULT_MESSAGES_INPUT_DIR = "messages";
+class RinfConfigMessage {
+  final String inputDir;
+  final String rustOutputDir;
+  final String dartOutputDir;
 
-const KEY_MESSAGES_INPUT_DIR = "messagesInputDir";
-const KEY_RUST_TYPES_OUTPUT_DIR = "rustTypesOutputDir";
-
-const RINF_CONFIG_KEYS = [KEY_MESSAGES_INPUT_DIR, KEY_RUST_TYPES_OUTPUT_DIR];
-
-class RinfConfig {
-  final String messagesInputDir;
-  final String rustTypesOutputDir;
-
-  RinfConfig._({
-    required this.messagesInputDir,
-    required this.rustTypesOutputDir,
+  RinfConfigMessage._({
+    required this.inputDir,
+    required this.rustOutputDir,
+    required this.dartOutputDir,
   });
 
-  factory RinfConfig.defaultConfig() {
-    return RinfConfig._(
-      messagesInputDir: DEFAULT_MESSAGES_INPUT_DIR,
-      rustTypesOutputDir: DEFAULT_RUST_TYPES_OUTPUT_DIR,
+  factory RinfConfigMessage.defaultConfig() {
+    return RinfConfigMessage._(
+      inputDir: DEFAULT_INPUT_DIR,
+      rustOutputDir: DEFAULT_RUST_OUTPUT_DIR,
+      dartOutputDir: DEFAULT_DART_OUTPUT_DIR,
     );
+  }
+
+  factory RinfConfigMessage.from(YamlMap yaml) {
+    for (final key in yaml.keys) {
+      if (!MESSAGE_CONFIG_KEYS.contains(key)) {
+        throw Exception(
+          "Unknown key '$key' in rinf message configuration.\n"
+          "Available keys are: $MESSAGE_CONFIG_KEYS",
+        );
+      }
+    }
+    return RinfConfigMessage._(
+      inputDir: yaml[KEY_INPUT_DIR] ?? DEFAULT_INPUT_DIR,
+      rustOutputDir: yaml[KEY_RUST_OUTPUT_DIR] ?? DEFAULT_RUST_OUTPUT_DIR,
+      dartOutputDir: yaml[KEY_DART_OUTPUT_DIR] ?? DEFAULT_DART_OUTPUT_DIR,
+    );
+  }
+
+  @override
+  String toString() {
+    return '''message:
+    $KEY_INPUT_DIR: $inputDir
+    $KEY_RUST_OUTPUT_DIR: $rustOutputDir
+    $KEY_DART_OUTPUT_DIR: $dartOutputDir''';
+  }
+
+  static const KEY_INPUT_DIR = "input_dir";
+  static const KEY_RUST_OUTPUT_DIR = "rust_output_dir";
+  static const KEY_DART_OUTPUT_DIR = "dart_output_dir";
+
+  static const DEFAULT_INPUT_DIR = "messages";
+  static const DEFAULT_RUST_OUTPUT_DIR = "native/hub/src/messages";
+  static const DEFAULT_DART_OUTPUT_DIR = "lib/messages";
+
+  static const MESSAGE_CONFIG_KEYS = [
+    KEY_INPUT_DIR,
+    KEY_RUST_OUTPUT_DIR,
+    KEY_DART_OUTPUT_DIR,
+  ];
+}
+
+class RinfConfig {
+  final RinfConfigMessage message;
+
+  RinfConfig._({required this.message});
+
+  factory RinfConfig.defaultConfig() {
+    return RinfConfig._(message: RinfConfigMessage.defaultConfig());
   }
 
   factory RinfConfig.fromYaml(YamlMap yaml) {
@@ -36,20 +78,22 @@ class RinfConfig {
         );
       }
     }
-    return RinfConfig._(
-      messagesInputDir:
-          yaml[KEY_MESSAGES_INPUT_DIR] ?? DEFAULT_MESSAGES_INPUT_DIR,
-      rustTypesOutputDir:
-          yaml[KEY_RUST_TYPES_OUTPUT_DIR] ?? DEFAULT_RUST_TYPES_OUTPUT_DIR,
-    );
+    final YamlMap? messageYaml = yaml[KEY_MESSAGE];
+    final message = messageYaml == null
+        ? RinfConfigMessage.defaultConfig()
+        : RinfConfigMessage.from(messageYaml);
+
+    return RinfConfig._(message: message);
   }
 
   @override
   String toString() {
     return '''rinf:
-  messagesInputDir: $messagesInputDir
-  rustTypesOutputDir: $rustTypesOutputDir''';
+  $KEY_MESSAGE: $message''';
   }
+
+  static const KEY_MESSAGE = "message";
+  static const RINF_CONFIG_KEYS = [KEY_MESSAGE];
 }
 
 /// Attempts to load the rinf configuration from the provided pubspec.yaml file.
@@ -61,14 +105,15 @@ class RinfConfig {
 /// Example:
 ///
 /// ```yaml
-/// flutter:
-///   rinf:
-///     messagesInputDir: messages
-///     rustTypesOutputDir: native/hub/src/messages
+/// rinf:
+///   message: message:
+///     input_dir: messages
+///     rust_output_dir: native/hub/src/messages
+///     dart_output_dir: lib/messages
 /// ```
-Future<RinfConfig> loadVerifiedRinfConfig(String pubspecYamlFile) async {
-  final pubspec = Pubspec.parse(await File(pubspecYamlFile).readAsString());
-  final YamlMap? rinfConfig = pubspec.flutter?['rinf'];
+RinfConfig loadVerifiedRinfConfig(String pubspecYamlFile) {
+  final pubspec = loadYaml(File(pubspecYamlFile).readAsStringSync());
+  final YamlMap? rinfConfig = pubspec['rinf'];
   return rinfConfig == null
       ? RinfConfig.defaultConfig()
       : RinfConfig.fromYaml(rinfConfig);

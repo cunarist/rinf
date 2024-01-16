@@ -12,7 +12,7 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  final rinfConfig = await loadVerifiedRinfConfig("pubspec.yaml");
+  final rinfConfig = loadVerifiedRinfConfig("pubspec.yaml");
 
   switch (args[0]) {
     case "config":
@@ -20,25 +20,19 @@ Future<void> main(List<String> args) async {
       break;
     case "template":
       if (args.contains("--bridge") || args.contains("-b")) {
-        await _applyRustTemplate(onlyBridge: true);
+        await _applyRustTemplate(
+          onlyBridge: true,
+          messageConfig: rinfConfig.message,
+        );
       } else {
-        await _applyRustTemplate();
+        await _applyRustTemplate(messageConfig: rinfConfig.message);
       }
       break;
     case "message":
-      final messagesInputDir = rinfConfig.messagesInputDir;
-      final rustTypesOutputDir = rinfConfig.rustTypesOutputDir;
-
       if (args.contains("--watch") || args.contains("-w")) {
-        await _watchAndGenerateMessageCode(
-          messagesInputDir: messagesInputDir,
-          rustTypesOutputDir: rustTypesOutputDir,
-        );
+        await _watchAndGenerateMessageCode(messageConfig: rinfConfig.message);
       } else {
-        await _generateMessageCode(
-          messagesInputDir: messagesInputDir,
-          rustTypesOutputDir: rustTypesOutputDir,
-        );
+        await _generateMessageCode(messageConfig: rinfConfig.message);
       }
       break;
     case "wasm":
@@ -67,10 +61,8 @@ Future<void> main(List<String> args) async {
   }
 }
 
-Future<void> _watchAndGenerateMessageCode({
-  required String messagesInputDir,
-  required String rustTypesOutputDir,
-}) async {
+Future<void> _watchAndGenerateMessageCode(
+    {required RinfConfigMessage messageConfig}) async {
   final currentDirectory = Directory.current;
   final messagesPath = join(currentDirectory.path, "messages");
   final messagesDirectory = Directory(messagesPath);
@@ -94,11 +86,7 @@ Future<void> _watchAndGenerateMessageCode({
     await Future.delayed(Duration(seconds: 1));
     if (!generated) {
       try {
-        await _generateMessageCode(
-          silent: true,
-          messagesInputDir: messagesInputDir,
-          rustTypesOutputDir: rustTypesOutputDir,
-        );
+        await _generateMessageCode(silent: true, messageConfig: messageConfig);
         print("Message code generated");
       } catch (error) {
         // When message code generation has failed
@@ -109,7 +97,10 @@ Future<void> _watchAndGenerateMessageCode({
 }
 
 /// Creates new folders and files to an existing Flutter project folder.
-Future<void> _applyRustTemplate({bool onlyBridge = false}) async {
+Future<void> _applyRustTemplate({
+  bool onlyBridge = false,
+  required RinfConfigMessage messageConfig,
+}) async {
   // Get the path of the current project directory
   final flutterProjectPath = Directory.current.path;
 
@@ -290,11 +281,7 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
   await mainFile.writeAsString(mainText);
   await Process.run('dart', ['format', './lib/main.dart']);
 
-  await _generateMessageCode(
-    silent: true,
-    messagesInputDir: DEFAULT_MESSAGES_INPUT_DIR,
-    rustTypesOutputDir: DEFAULT_RUST_TYPES_OUTPUT_DIR,
-  );
+  await _generateMessageCode(silent: true, messageConfig: messageConfig);
 
   print("🎉 Rust template is now ready! 🎉");
 }
@@ -434,17 +421,16 @@ httpServer.defaultResponseHeaders.add(
 
 Future<void> _generateMessageCode({
   bool silent = false,
-  required String messagesInputDir,
-  required String rustTypesOutputDir,
+  required RinfConfigMessage messageConfig,
 }) async {
   // Prepare paths.
   final flutterProjectPath = Directory.current;
   final protoPath =
-      flutterProjectPath.uri.resolve(messagesInputDir).toFilePath();
+      flutterProjectPath.uri.resolve(messageConfig.inputDir).toFilePath();
   final rustOutputPath =
-      flutterProjectPath.uri.resolve(rustTypesOutputDir).toFilePath();
+      flutterProjectPath.uri.resolve(messageConfig.rustOutputDir).toFilePath();
   final dartOutputPath =
-      flutterProjectPath.uri.resolve('lib/messages').toFilePath();
+      flutterProjectPath.uri.resolve(messageConfig.rustOutputDir).toFilePath();
   await Directory(rustOutputPath).create(recursive: true);
   await _emptyDirectory(rustOutputPath);
   await Directory(dartOutputPath).create(recursive: true);
@@ -487,9 +473,13 @@ Future<void> _generateMessageCode({
 
   // Generate Rust message files.
   if (!silent) {
+    print("Reading message proto types from '${messageConfig.inputDir}'.");
     print("Verifying `protoc-gen-prost` for Rust." +
         " This might take a while if there are new updates to be installed.");
-    print("Generating Rust message types into '$rustTypesOutputDir'.");
+    print(
+        "Generating Rust message types into '${messageConfig.rustOutputDir}'.");
+    print(
+        "Generating Dart message types into '${messageConfig.dartOutputDir}'.");
   }
   final cargoInstallCommand = await Process.run('cargo', [
     'install',
