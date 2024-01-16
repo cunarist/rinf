@@ -49,9 +49,9 @@ class RinfConfigMessage {
   static const KEY_RUST_OUTPUT_DIR = "rust_output_dir";
   static const KEY_DART_OUTPUT_DIR = "dart_output_dir";
 
-  static const DEFAULT_INPUT_DIR = "messages";
-  static const DEFAULT_RUST_OUTPUT_DIR = "native/hub/src/messages";
-  static const DEFAULT_DART_OUTPUT_DIR = "lib/messages";
+  static const DEFAULT_INPUT_DIR = "messages/";
+  static const DEFAULT_RUST_OUTPUT_DIR = "native/hub/src/messages/";
+  static const DEFAULT_DART_OUTPUT_DIR = "lib/messages/";
 
   static const MESSAGE_CONFIG_KEYS = [
     KEY_INPUT_DIR,
@@ -111,8 +111,8 @@ class RinfConfig {
 ///     rust_output_dir: native/hub/src/messages
 ///     dart_output_dir: lib/messages
 /// ```
-RinfConfig loadVerifiedRinfConfig(String pubspecYamlFile) {
-  final pubspec = loadYaml(File(pubspecYamlFile).readAsStringSync());
+Future<RinfConfig> loadVerifiedRinfConfig(String pubspecYamlFile) async {
+  final pubspec = loadYaml(await File(pubspecYamlFile).readAsString());
   final YamlMap? rinfConfig = pubspec['rinf'];
   return rinfConfig == null
       ? RinfConfig.defaultConfig()

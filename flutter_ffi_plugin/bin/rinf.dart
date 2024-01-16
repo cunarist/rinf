@@ -9,7 +9,7 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  final rinfConfig = loadVerifiedRinfConfig("pubspec.yaml");
+  final rinfConfig = await loadVerifiedRinfConfig("pubspec.yaml");
 
   switch (args[0]) {
     case "config":
