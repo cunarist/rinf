@@ -1,7 +1,12 @@
 syntax = "proto3";
 package fractal;
 
-message StateSignal {
-  int32 id = 1;
-  double current_scale = 2;
+import "counter_number.proto";
+
+// [RINF:RUST-SIGNAL]
+// You can add your custom comments like this.
+// Protobuf's import statement also works well.
+message FractalScale {
+  double current_scale = 1;
+  counter_number.SampleSchema dummy = 2;
 }

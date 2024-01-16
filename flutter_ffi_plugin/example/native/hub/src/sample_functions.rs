@@ -1,82 +1,50 @@
 //! This module is only for demonstration purposes.
 //! You might want to remove this module in production.
 
-use crate::bridge::send_rust_signal;
-use crate::bridge::{RustOperation, RustRequest, RustResponse, RustSignal};
-use prost::Message;
-use tokio_with_wasm::tokio;
+use crate::messages::counter_number;
+use crate::messages::fractal;
+use crate::tokio;
 
 const SHOULD_DEMONSTRATE: bool = true; // Disabled when applied as template
 
-pub async fn handle_sample_resource(rust_request: RustRequest) -> Option<RustResponse> {
-    match rust_request.operation {
-        RustOperation::Create => None,
-        RustOperation::Read => None,
-        RustOperation::Update => None,
-        RustOperation::Delete => None,
-    }
-}
+pub async fn tell_numbers() {
+    let mut receiver = counter_number::number_input_receiver();
+    let mut current_number = 0;
+    while let Some(dart_signal) = receiver.recv().await {
+        // Decode raw bytes into a Rust message object.
+        let number_input = dart_signal.message;
+        let letter = number_input.letter;
+        crate::debug_print!("{letter}");
 
-pub async fn handle_deeper_resource(rust_request: RustRequest) -> Option<RustResponse> {
-    match rust_request.operation {
-        RustOperation::Create => None,
-        RustOperation::Read => None,
-        RustOperation::Update => None,
-        RustOperation::Delete => None,
-    }
-}
+        // Perform a simple calculation.
+        current_number = sample_crate::add_seven(current_number);
 
-pub async fn handle_counter_number(rust_request: RustRequest) -> Option<RustResponse> {
-    use crate::messages::counter_number::{ReadRequest, ReadResponse};
-    // We import message structs in this handler function
-    // because schema will differ by Rust resource.
-
-    match rust_request.operation {
-        RustOperation::Create => None,
-        RustOperation::Read => {
-            // Decode raw bytes into a Rust message object.
-            let message_bytes = rust_request.message.unwrap();
-            let request_message = ReadRequest::decode(message_bytes.as_slice()).unwrap();
-            let letter = request_message.letter;
-            crate::debug_print!("{letter}");
-
-            // Perform a simple calculation.
-            let after_value: i32 = sample_crate::add_seven(request_message.before_number);
-
-            // Return the response that will be sent to Dart.
-            let response_message = ReadResponse {
-                after_number: after_value,
-                dummy_one: request_message.dummy_one,
-                dummy_two: request_message.dummy_two,
-                dummy_three: request_message.dummy_three,
-            };
-            Some(RustResponse {
-                message: Some(response_message.encode_to_vec()),
-                blob: None,
-            })
-        }
-        RustOperation::Update => None,
-        RustOperation::Delete => None,
+        // Return the message that will be sent to Dart.
+        let number_output = counter_number::NumberOutput {
+            current_number,
+            dummy_one: number_input.dummy_one,
+            dummy_two: number_input.dummy_two,
+            dummy_three: number_input.dummy_three,
+        };
+        counter_number::number_output_send(number_output, None);
     }
 }
 
 pub async fn stream_fractal() {
-    use crate::messages::fractal::{StateSignal, ID};
-
     if !SHOULD_DEMONSTRATE {
         return;
     }
 
     let mut scale: f64 = 1.0;
 
-    let (frame_sender, mut frame_receiver) = tokio::sync::mpsc::channel(5);
+    let (sender, mut receiver) = tokio::sync::mpsc::channel(5);
 
     // Send frame join handles in order.
     tokio::spawn(async move {
         loop {
             // Wait for 40 milliseconds on each frame
             tokio::time::sleep(std::time::Duration::from_millis(40)).await;
-            if frame_sender.capacity() == 0 {
+            if sender.capacity() == 0 {
                 continue;
             }
 
@@ -88,27 +56,27 @@ pub async fn stream_fractal() {
             // Calculate the fractal image
             // parallelly in a separate thread pool.
             let join_handle = tokio::task::spawn_blocking(move || sample_crate::fractal(scale));
-            let _ = frame_sender.send(join_handle).await;
+            let _ = sender.send(join_handle).await;
         }
     });
 
     // Receive frame join handles in order.
     tokio::spawn(async move {
         loop {
-            let join_handle = frame_receiver.recv().await.unwrap();
+            let join_handle = receiver.recv().await.unwrap();
             let received_frame = join_handle.await.unwrap();
-            if let Some(fractal) = received_frame {
-                // Stream the signal to Dart.
-                let signal_message = StateSignal {
-                    id: 0,
-                    current_scale: scale,
-                };
-                let rust_signal = RustSignal {
-                    resource: ID,
-                    message: Some(signal_message.encode_to_vec()),
-                    blob: Some(fractal),
-                };
-                send_rust_signal(rust_signal);
+            if let Some(fractal_image) = received_frame {
+                // Stream the image data to Dart.
+                fractal::fractal_scale_send(
+                    fractal::FractalScale {
+                        current_scale: scale,
+                        dummy: Some(counter_number::SampleSchema {
+                            sample_field_one: true,
+                            sample_field_two: false,
+                        }),
+                    },
+                    Some(fractal_image),
+                );
             };
         }
     });

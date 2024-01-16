@@ -1,16 +1,17 @@
 syntax = "proto3";
 package counter_number;
 
-message ReadRequest {
+// [RINF:DART-SIGNAL]
+message NumberInput {
   string letter = 1;
-  int32 before_number = 2;
-  uint32 dummy_one = 3;
-  SampleSchema dummy_two = 4;
-  repeated int32 dummy_three = 5;
+  uint32 dummy_one = 2;
+  SampleSchema dummy_two = 3;
+  repeated int32 dummy_three = 4;
 }
 
-message ReadResponse {
-  int32 after_number = 1;
+// [RINF:RUST-SIGNAL]
+message NumberOutput {
+  int32 current_number = 1;
   uint32 dummy_one = 2;
   SampleSchema dummy_two = 3;
   repeated int32 dummy_three = 4;

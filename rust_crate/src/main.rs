@@ -7,11 +7,9 @@ fn main() {
     // Install and remember Protobuf compiler's path
     let home_path = home::home_dir().unwrap();
     let out_path = home_path.join(".local").join("bin");
-    println!("{:?}", out_path);
     fs::create_dir_all(&out_path).unwrap();
     env::set_var("OUT_DIR", out_path.to_str().unwrap());
     let (protoc_path, _) = protoc_prebuilt::init("22.0").unwrap();
-    println!("{:?}", protoc_path.parent().unwrap().to_path_buf());
     let mut path_var = match env::var_os("PATH") {
         Some(val) => env::split_paths(&val).collect::<Vec<_>>(),
         None => Vec::new(),

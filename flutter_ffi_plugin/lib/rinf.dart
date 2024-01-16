@@ -3,44 +3,17 @@
 /// receiving stream signals from Rust are possible.
 
 import 'dart:async';
-import 'dart:math';
 import 'src/exports.dart';
+import 'dart:typed_data';
 
-export 'src/exports.dart' show RustOperation;
-export 'src/exports.dart' show RustRequest;
-export 'src/exports.dart' show RustResponse;
 export 'src/exports.dart' show RustSignal;
 
-/// Listens to a stream from Rust and broadcasts the data in Dart.
-/// You can see the usage example at
-/// https://pub.dev/packages/rinf/example.
-final rustBroadcaster = StreamController<RustSignal>.broadcast();
-final _responseCompleters = Map<int, Completer<RustResponse?>>();
-final _requestIdGenerator = _IdGenerator();
-
-/// Contains basic functionalities of this framework.
+/// This contains basic functionalities of this framework.
 class Rinf {
-  /// Makes sure that the Rust side is ready.
+  /// Make sure that the Rust side is ready.
   /// Don't forget to call this function in the `main` function of Dart.
-  static Future<void> ensureInitialized() async {
-    rustSignalStream.stream.listen((rustSignal) {
-      rustBroadcaster.add(rustSignal);
-    });
-
-    rustResponseUniqueStream.stream.listen((rustResponseUnique) {
-      final interactionId = rustResponseUnique.id;
-      final rustResponse = rustResponseUnique.response;
-      final responseCompleter = _responseCompleters.remove(interactionId);
-      if (responseCompleter != null) {
-        responseCompleter.complete(rustResponse);
-      }
-    });
-
-    rustReportStream.stream.listen((rustReport) {
-      print(rustReport);
-    });
-
-    await prepareNativeBridge();
+  static Future<void> initialize(ReceiveSignal handleSignal) async {
+    await prepareNativeBridge(handleSignal);
   }
 
   /// Ensure that all Rust tasks are terminated
@@ -49,48 +22,25 @@ class Rinf {
   /// when Rust attempts to send data after the Dart VM has been turned off.
   /// Please note that on the web, this function does not have any effect,
   /// as tasks are managed by the JavaScript runtime, not Rust.
-  static Future<void> ensureFinalized() async {
+  static Future<void> finalize() async {
     stopRustLogicExtern();
   }
 }
 
-/// Sends bytes data to Rust wrapped in `RustRequest` object
-/// with operation and address fields.
-/// This system follows the definition of RESTful API
-/// and is very similar to HTTP request.
-/// Returns `RustResponse` object that is somehow calculated
-/// from the Rust side.
-/// If the Rust side fails to respond for some reason,
-/// `null` will be returned.
-/// You can see the usage example at
-/// https://pub.dev/packages/rinf/example.
-Future<RustResponse?> requestToRust(RustRequest rustRequest) async {
-  final interactionId = _requestIdGenerator.generateId();
-  final previousCompleter = _responseCompleters.remove(interactionId);
-  if (previousCompleter != null) {
-    previousCompleter.completeError(StateError(
-      'Rust response completer got forgotten',
-    ));
+/// Send a signal to Rust.
+Future<void> sendDartSignal(
+  int messageId,
+  Uint8List messageBytes,
+  Uint8List? blob,
+) async {
+  bool blobValid;
+  Uint8List blobBytes;
+  if (blob == null) {
+    blobValid = false;
+    blobBytes = Uint8List(0);
+  } else {
+    blobValid = true;
+    blobBytes = blob;
   }
-  final responseCompleter = Completer<RustResponse?>();
-  _responseCompleters[interactionId] = responseCompleter;
-  final rustRequestUnique = RustRequestUnique(
-    id: interactionId,
-    request: rustRequest,
-  );
-  requestToRustExtern(rustRequestUnique);
-  final rustResponse = await responseCompleter.future;
-  return rustResponse;
-}
-
-class _IdGenerator {
-  final _maxLimit = pow(2, 31).toInt() - 1;
-  final _minLimit = -pow(2, 31).toInt();
-  int _counter = 0;
-  int generateId() {
-    final id = _counter;
-    final increased = _counter + 1;
-    _counter = increased <= _maxLimit ? increased : _minLimit;
-    return id;
-  }
+  sendDartSignalExtern(messageId, messageBytes, blobValid, blobBytes);
 }

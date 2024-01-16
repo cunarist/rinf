@@ -29,7 +29,7 @@ All platforms available with Flutter are [tested](https://github.com/cunarist/ri
 
 ## 🎁 Benefits
 
-- **Truly easy**: It only takes about about a minute or two to fully setup your app. No other solution provides this level of convenience.
+- **Truly easy**: It only takes about about a minute or two to fully setup your app.
 - **Efficient**: All communication occurs solely through native FFI. There are no webviews, web servers, hidden threads, or unnecessary memory copying that might cause performance overhead. This setup acts as a very thin wrapper around Dart and Rust.
 - **Minimal**: This is not a bulky framework that requires you to install so many dependencies and use complicated CLI commands. Just focus on your code using your preferred Flutter and Rust libraries.
 - **Scalable**: Creating hundreds or even thousands of message APIs between Dart and Rust feels smooth and clean. Additionally, you have the flexibility to utilize any number of Rust library crates, perhaps including those you might have been working on.

@@ -3,128 +3,88 @@ import 'dart:typed_data';
 import 'load_os.dart';
 import 'package:ffi/ffi.dart';
 import 'dart:async';
-import 'interface.dart';
 import 'dart:isolate';
-
-final rustSignalStream = StreamController<RustSignal>();
-final rustResponseUniqueStream = StreamController<RustResponseUnique>();
-final rustReportStream = StreamController<String>();
+import 'interface.dart';
+import 'dart:convert';
 
 typedef StoreDartPostCObject = Pointer Function(
     Pointer<NativeFunction<Int8 Function(Int64, Pointer<Dart_CObject>)>>);
 
-/// This should be called once at startup
-/// to enable `allo_isolate` to send data from the Rust side.
-Future<void> prepareNativeBridge() async {
-  // Look up the Rust function
+Future<void> prepareNativeBridge(ReceiveSignal handleSignal) async {
+  /// This should be called once at startup
+  /// to enable `allo_isolate` to send data from the Rust side.
   final rustFunction =
       rustLibrary.lookupFunction<StoreDartPostCObject, StoreDartPostCObject>(
     'store_dart_post_cobject',
   );
-  // Call the Rust function
   rustFunction(NativeApi.postCObject);
 
-  // Prepare ports that can communicate over isolates
+  // Prepare ports for communication over isolates.
   final rustSignalPort = ReceivePort();
-  final rustResponseUniquePort = ReceivePort();
-  final rustReportPort = ReceivePort();
 
-  // Make the ports listen to Rust
+  // Listen to Rust via isolate port.
   rustSignalPort.listen((rustSignalRaw) {
-    final rustSignal = RustSignal(
-      resource: rustSignalRaw[0],
-      message: rustSignalRaw[1],
-      blob: rustSignalRaw[2],
-    );
-    rustSignalStream.add(rustSignal);
-  });
-  rustResponseUniquePort.listen((rustResponseUniqueRaw) {
-    final int interactionId = rustResponseUniqueRaw[0];
-    final List? rustResponseRaw = rustResponseUniqueRaw[1];
-    final RustResponse? rustResponse;
-    if (rustResponseRaw == null) {
-      rustResponse = null;
+    Uint8List? blob;
+    if (rustSignalRaw[2]) {
+      blob = rustSignalRaw[3];
     } else {
-      rustResponse = RustResponse(
-        message: rustResponseRaw[0],
-        blob: rustResponseRaw[1],
-      );
+      blob = null;
     }
-    final rustResponseUnique = RustResponseUnique(
-      id: interactionId,
-      response: rustResponse,
+    if (rustSignalRaw[0] == -1) {
+      // -1 is a special message ID for Rust reports.
+      String rustReport = utf8.decode(rustSignalRaw[3]);
+      print(rustReport);
+    }
+    handleSignal(
+      rustSignalRaw[0],
+      rustSignalRaw[1],
+      blob,
     );
-    rustResponseUniqueStream.add(rustResponseUnique);
-  });
-  rustReportPort.listen((rustReport) {
-    rustReportStream.add(rustReport);
   });
 
-  // Make Rust have its own isolates to send data to Dart
-  prepareIsolatesExtern(
-    rustSignalPort.sendPort.nativePort,
-    rustResponseUniquePort.sendPort.nativePort,
-    rustReportPort.sendPort.nativePort,
-  );
+  // Make Rust prepare its isolate to send data to Dart.
+  prepareIsolatesExtern(rustSignalPort.sendPort.nativePort);
   startRustLogicExtern();
 }
 
 void startRustLogicExtern() {
-  // Look up the Rust function
   final rustFunction =
       rustLibrary.lookupFunction<Void Function(), void Function()>(
           'start_rust_logic_extern');
-  // Call the Rust function
   rustFunction();
 }
 
 void stopRustLogicExtern() {
-  // Look up the Rust function
   final rustFunction =
       rustLibrary.lookupFunction<Void Function(), void Function()>(
           'stop_rust_logic_extern');
-  // Call the Rust function
   rustFunction();
 }
 
 /// Sends bytes to Rust.
-Future<void> requestToRustExtern(RustRequestUnique rustRequestUnique) async {
-  final interactionId = rustRequestUnique.id;
-  final rustRequest = rustRequestUnique.request;
-
-  final int rustOperation;
-  if (rustRequest.operation == RustOperation.Create) {
-    rustOperation = 0;
-  } else if (rustRequest.operation == RustOperation.Read) {
-    rustOperation = 1;
-  } else if (rustRequest.operation == RustOperation.Update) {
-    rustOperation = 2;
-  } else {
-    rustOperation = 3;
-  }
-
-  var messageBytes = rustRequest.message ?? Uint8List(0);
+Future<void> sendDartSignalExtern(
+  int messageId,
+  Uint8List messageBytes,
+  bool blobValid,
+  Uint8List blobBytes,
+) async {
   final Pointer<Uint8> messageMemory = malloc.allocate(messageBytes.length);
   messageMemory.asTypedList(messageBytes.length).setAll(0, messageBytes);
 
-  var blobBytes = rustRequest.blob ?? Uint8List(0);
   final Pointer<Uint8> blobMemory = malloc.allocate(blobBytes.length);
   blobMemory.asTypedList(blobBytes.length).setAll(0, blobBytes);
 
-  // Look up the Rust function
   final rustFunction = rustLibrary.lookupFunction<
-      Void Function(IntPtr, IntPtr, IntPtr, Pointer<Uint8>, IntPtr,
-          Pointer<Uint8>, IntPtr),
-      void Function(int, int, int, Pointer<Uint8>, int, Pointer<Uint8>,
-          int)>('request_to_rust_extern');
+      Void Function(
+          IntPtr, Pointer<Uint8>, IntPtr, Bool, Pointer<Uint8>, IntPtr),
+      void Function(int, Pointer<Uint8>, int, bool, Pointer<Uint8>,
+          int)>('send_dart_signal_extern');
 
-  // Call the Rust function
   rustFunction(
-    interactionId,
-    rustRequest.resource,
-    rustOperation,
+    messageId,
     messageMemory.cast(),
     messageBytes.length,
+    blobValid,
     blobMemory.cast(),
     blobBytes.length,
   );
@@ -136,12 +96,9 @@ Future<void> requestToRustExtern(RustRequestUnique rustRequestUnique) async {
   // when `Vec<u8>` is dropped.
 }
 
-void prepareIsolatesExtern(int portSignal, int portResponse, int portReport) {
-  // Look up the Rust function
-  final rustFunction = rustLibrary.lookupFunction<
-      Void Function(IntPtr, IntPtr, IntPtr),
-      void Function(int, int, int)>('prepare_isolates_extern');
-  // Call the Rust function    final rustSignalReceiver = ReceivePort();
-
-  rustFunction(portSignal, portResponse, portReport);
+void prepareIsolatesExtern(int portSignal) {
+  final rustFunction =
+      rustLibrary.lookupFunction<Void Function(IntPtr), void Function(int)>(
+          'prepare_isolates_extern');
+  rustFunction(portSignal);
 }
