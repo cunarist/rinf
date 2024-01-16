@@ -10,21 +10,19 @@ import 'dart:convert';
 typedef StoreDartPostCObject = Pointer Function(
     Pointer<NativeFunction<Int8 Function(Int64, Pointer<Dart_CObject>)>>);
 
-/// This should be called once at startup
-/// to enable `allo_isolate` to send data from the Rust side.
 Future<void> prepareNativeBridge(ReceiveSignal handleSignal) async {
-  // Look up the Rust function
+  /// This should be called once at startup
+  /// to enable `allo_isolate` to send data from the Rust side.
   final rustFunction =
       rustLibrary.lookupFunction<StoreDartPostCObject, StoreDartPostCObject>(
     'store_dart_post_cobject',
   );
-  // Call the Rust function
   rustFunction(NativeApi.postCObject);
 
-  // Prepare ports that can communicate over isolates
+  // Prepare ports for communication over isolates.
   final rustSignalPort = ReceivePort();
 
-  // Listen to Rust via isolate ports
+  // Listen to Rust via isolate port.
   rustSignalPort.listen((rustSignalRaw) {
     Uint8List? blob;
     if (rustSignalRaw[2]) {
@@ -33,7 +31,7 @@ Future<void> prepareNativeBridge(ReceiveSignal handleSignal) async {
       blob = null;
     }
     if (rustSignalRaw[0] == -1) {
-      // -1 is a special message ID for Rust reports
+      // -1 is a special message ID for Rust reports.
       String rustReport = utf8.decode(rustSignalRaw[3]);
       print(rustReport);
     }
@@ -44,26 +42,22 @@ Future<void> prepareNativeBridge(ReceiveSignal handleSignal) async {
     );
   });
 
-  // Make Rust have its own isolates to send data to Dart
+  // Make Rust prepare its isolate to send data to Dart.
   prepareIsolatesExtern(rustSignalPort.sendPort.nativePort);
   startRustLogicExtern();
 }
 
 void startRustLogicExtern() {
-  // Look up the Rust function
   final rustFunction =
       rustLibrary.lookupFunction<Void Function(), void Function()>(
           'start_rust_logic_extern');
-  // Call the Rust function
   rustFunction();
 }
 
 void stopRustLogicExtern() {
-  // Look up the Rust function
   final rustFunction =
       rustLibrary.lookupFunction<Void Function(), void Function()>(
           'stop_rust_logic_extern');
-  // Call the Rust function
   rustFunction();
 }
 
@@ -80,14 +74,12 @@ Future<void> sendDartSignalExtern(
   final Pointer<Uint8> blobMemory = malloc.allocate(blobBytes.length);
   blobMemory.asTypedList(blobBytes.length).setAll(0, blobBytes);
 
-  // Look up the Rust function
   final rustFunction = rustLibrary.lookupFunction<
       Void Function(
           IntPtr, Pointer<Uint8>, IntPtr, Bool, Pointer<Uint8>, IntPtr),
       void Function(int, Pointer<Uint8>, int, bool, Pointer<Uint8>,
           int)>('send_dart_signal_extern');
 
-  // Call the Rust function
   rustFunction(
     messageId,
     messageMemory.cast(),
@@ -105,7 +97,6 @@ Future<void> sendDartSignalExtern(
 }
 
 void prepareIsolatesExtern(int portSignal) {
-  // Look up the Rust function
   final rustFunction =
       rustLibrary.lookupFunction<Void Function(IntPtr), void Function(int)>(
           'prepare_isolates_extern');

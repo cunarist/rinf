@@ -25,10 +25,7 @@ pub fn send_dart_signal_extern(
     } else {
         None
     };
-    let cell = SIGNAL_HANDLER.lock().unwrap();
-    let borrowed = cell.borrow();
-    let callable = borrowed.as_ref().unwrap();
-    callable(message_id as i32, message_bytes, blob);
+    crate::messages::handle::handle_signal(message_id as i32, message_bytes, blob);
 }
 
 #[wasm_bindgen]
@@ -40,9 +37,6 @@ extern "C" {
         blob_valid: bool,
         blob_bytes: Uint8Array,
     );
-    #[cfg(debug_assertions)]
-    #[wasm_bindgen(js_name = rinf_send_rust_report_extern)]
-    pub fn send_rust_report_extern(rust_report: String);
 }
 
 pub fn send_rust_signal_extern(
