@@ -1,7 +1,8 @@
 syntax = "proto3";
 package counter_number;
 
-message ReadRequest {
+// FROM:DART
+message NumberInput {
   string letter = 1;
   int32 before_number = 2;
   uint32 dummy_one = 3;
@@ -9,7 +10,8 @@ message ReadRequest {
   repeated int32 dummy_three = 5;
 }
 
-message ReadResponse {
+// FROM:RUST
+message NumberOutput {
   int32 after_number = 1;
   uint32 dummy_one = 2;
   SampleSchema dummy_two = 3;
