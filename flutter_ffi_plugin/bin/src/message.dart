@@ -115,7 +115,8 @@ Future<void> generateMessageCode({
     }).toList();
     for (final otherSubPath in resourcesInFolders.keys) {
       if (otherSubPath != subPath && otherSubPath.contains(subPath)) {
-        final relation = otherSubPath.replaceFirst(subPath, "");
+        final relation =
+            otherSubPath.replaceFirst(subPath, "").replaceFirst('/', '');
         if (!relation.contains('/')) {
           modRsLines.add('pub mod $relation;');
         }
