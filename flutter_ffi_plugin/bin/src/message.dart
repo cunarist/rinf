@@ -554,7 +554,7 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> parseProtoFiles(
       final statements = contentWithoutBlocks.split(";");
       for (final statementRaw in statements) {
         final statement = statementRaw.trim();
-        if (statement.startsWith("// FROM:DART")) {
+        if (statement.startsWith("// [RINF:DART-SIGNAL]")) {
           final lines = statement.split('\n');
           for (final line in lines) {
             final trimmed = line.trim();
@@ -568,7 +568,7 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> parseProtoFiles(
               messageId += 1;
             }
           }
-        } else if (statement.startsWith("// FROM:RUST")) {
+        } else if (statement.startsWith("// [RINF:RUST-SIGNAL]")) {
           final lines = statement.split('\n');
           for (final line in lines) {
             final trimmed = line.trim();

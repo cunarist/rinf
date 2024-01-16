@@ -1,7 +1,7 @@
 syntax = "proto3";
 package counter_number;
 
-// FROM:DART
+// [RINF:DART-SIGNAL]
 message NumberInput {
   string letter = 1;
   int32 before_number = 2;
@@ -10,7 +10,7 @@ message NumberInput {
   repeated int32 dummy_three = 5;
 }
 
-// FROM:RUST
+// [RINF:RUST-SIGNAL]
 message NumberOutput {
   int32 after_number = 1;
   uint32 dummy_one = 2;
