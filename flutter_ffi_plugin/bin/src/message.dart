@@ -234,7 +234,7 @@ use tokio::sync::mpsc::Sender;
           await insertTextToFile(
             dartPath,
             '''
-void ${camelName}Send(${messageName} message, [Uint8List? blob]) {
+void ${camelName}Send($messageName message, [Uint8List? blob]) {
     sendDartSignal(
         ${markedMessage.id},
         message.writeToBuffer(),
@@ -271,7 +271,7 @@ final ${camelName}Stream = ${camelName}Controller.stream;
           await insertTextToFile(
             rustPath,
             '''
-pub fn ${snakeName}_send(message: ${messageName}, blob: Option<Vec<u8>>) {
+pub fn ${snakeName}_send(message: $messageName, blob: Option<Vec<u8>>) {
     crate::bridge::send_rust_signal(
         ${markedMessage.id},
         message.encode_to_vec(),
