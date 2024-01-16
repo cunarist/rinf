@@ -74,7 +74,7 @@ Future<void> generateMessageCode({
   // Generate Rust message files.
   if (!silent) {
     print("Verifying `protoc-gen-prost` for Rust." +
-        " This might take a while if there are new updates to be installed.");
+        "\nThis might take a while if there are new updates.");
   }
   final cargoInstallCommand = await Process.run('cargo', [
     'install',
@@ -131,7 +131,7 @@ Future<void> generateMessageCode({
   // Generate Dart message files.
   if (!silent) {
     print("Verifying `protoc_plugin` for Dart." +
-        " This might take a while if there are new updates to be installed.");
+        "\nThis might take a while if there are new updates.");
   }
   final pubGlobalActivateCommand = await Process.run('dart', [
     'pub',

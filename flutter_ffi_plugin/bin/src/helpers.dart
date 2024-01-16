@@ -217,7 +217,7 @@ Future<void> copyDirectory(Directory source, Directory destination) async {
 Future<void> buildWebassembly({bool isReleaseMode = false}) async {
   // Verify Rust toolchain.
   print("Verifying Rust toolchain for the web." +
-      " This might take a while if there are new updates to be installed.");
+      "\nThis might take a while if there are new updates.");
   await Process.run("rustup", ["toolchain", "install", "nightly"]);
   await Process.run("rustup", [
     "+nightly",
