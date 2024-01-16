@@ -339,7 +339,6 @@ void receiveSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
     final files = entry.value;
     for (final entry in files.entries) {
       final filename = entry.key;
-      final camelFilename = snakeToCamel(filename);
       final markedMessages = entry.value;
       for (final markedMessage in markedMessages) {
         if (markedMessage.markType == MarkType.fromRust) {
@@ -347,18 +346,18 @@ void receiveSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
           final importPath = '$subpath/$filename.pb.dart';
           if (!dartReceiveScript.contains(importPath)) {
             dartReceiveScript = '''
-import '.$importPath' as $camelFilename;
+import '.$importPath' as $filename;
 ''' +
                 dartReceiveScript;
           }
           dartReceiveScript += '''
 if (messageId == ${markedMessage.id}) {
-  final decoded = $camelFilename.${markedMessage.name}.fromBuffer(messageBytes);
+  final decoded = $filename.${markedMessage.name}.fromBuffer(messageBytes);
   final bridgeSignal = RustSignal(
     decoded,
     blob,
   );
-  $camelFilename.${camelName}Controller.add(bridgeSignal);
+  $filename.${camelName}Controller.add(bridgeSignal);
   return;
 }
 ''';
