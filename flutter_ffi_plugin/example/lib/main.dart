@@ -54,13 +54,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
   void _incrementCounter() async {
     numberInputSend(
       NumberInput(
           letter: "HELLO FROM DART!",
-          beforeNumber: _counter,
           dummyOne: 25,
           dummyTwo: SampleSchema(
             sampleFieldOne: true,
@@ -132,8 +129,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 if (rustSignal == null) {
                   return Text('Initial value 0');
                 }
-                _counter = rustSignal.message.afterNumber;
-                return Text('Current value is $_counter');
+                final currentNumber = rustSignal.message.currentNumber;
+                return Text('Current value is $currentNumber');
               },
             ),
           ],
