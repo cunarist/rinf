@@ -1,5 +1,6 @@
 import 'src/helpers.dart';
 import 'src/message.dart';
+import 'src/config.dart';
 
 Future<void> main(List<String> args) async {
   if (args.length == 0) {
@@ -7,19 +8,28 @@ Future<void> main(List<String> args) async {
     print("Use `rinf --help` to see all available operations.");
     return;
   }
+
+  final rinfConfig = await loadVerifiedRinfConfig("pubspec.yaml");
+
   switch (args[0]) {
+    case "config":
+      print(rinfConfig);
+      break;
     case "template":
       if (args.contains("--bridge") || args.contains("-b")) {
-        await applyRustTemplate(onlyBridge: true);
+        await applyRustTemplate(
+          onlyBridge: true,
+          messageConfig: rinfConfig.message,
+        );
       } else {
-        await applyRustTemplate();
+        await applyRustTemplate(messageConfig: rinfConfig.message);
       }
       break;
     case "message":
       if (args.contains("--watch") || args.contains("-w")) {
-        await watchAndGenerateMessageCode();
+        await watchAndGenerateMessageCode(messageConfig: rinfConfig.message);
       } else {
-        await generateMessageCode();
+        await generateMessageCode(messageConfig: rinfConfig.message);
       }
       break;
     case "wasm":
@@ -34,6 +44,9 @@ Future<void> main(List<String> args) async {
       print("Usage: rinf [arguments]");
       print("Arguments:");
       print("  -h, --help        Shows this usage information.");
+      print("  config            Shows current Rinf configuration"
+          "\n                    resolved from `pubspec.yaml`"
+          "\n                    with defaults applied.");
       print("  template          Applies Rust template to current project.");
       print("    -b, --bridge    Only applies `bridge` Rust module.");
       print("  message           Generates message code from `.proto` files.");

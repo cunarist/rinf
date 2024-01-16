@@ -1,6 +1,7 @@
 import 'package:path/path.dart';
 import 'package:watcher/watcher.dart';
 import 'dart:io';
+import 'config.dart';
 
 enum MarkType {
   fromDart,
@@ -18,14 +19,18 @@ class MarkedMessage {
   );
 }
 
-Future<void> generateMessageCode({bool silent = false}) async {
+Future<void> generateMessageCode({
+  bool silent = false,
+  required RinfConfigMessage messageConfig,
+}) async {
   // Prepare paths.
   final flutterProjectPath = Directory.current;
-  final protoPath = flutterProjectPath.uri.resolve('messages').toFilePath();
+  final protoPath =
+      flutterProjectPath.uri.resolve(messageConfig.inputDir).toFilePath();
   final rustOutputPath =
-      flutterProjectPath.uri.resolve('native/hub/src/messages').toFilePath();
+      flutterProjectPath.uri.resolve(messageConfig.rustOutputDir).toFilePath();
   final dartOutputPath =
-      flutterProjectPath.uri.resolve('lib/messages').toFilePath();
+      flutterProjectPath.uri.resolve(messageConfig.dartOutputDir).toFilePath();
   await Directory(rustOutputPath).create(recursive: true);
   await emptyDirectory(rustOutputPath);
   await Directory(dartOutputPath).create(recursive: true);
@@ -69,7 +74,7 @@ Future<void> generateMessageCode({bool silent = false}) async {
   // Generate Rust message files.
   if (!silent) {
     print("Verifying `protoc-gen-prost` for Rust." +
-        " This might take a while if there are new updates to be installed.");
+        "\nThis might take a while if there are new updates.");
   }
   final cargoInstallCommand = await Process.run('cargo', [
     'install',
@@ -127,7 +132,7 @@ Future<void> generateMessageCode({bool silent = false}) async {
   // Generate Dart message files.
   if (!silent) {
     print("Verifying `protoc_plugin` for Dart." +
-        " This might take a while if there are new updates to be installed.");
+        "\nThis might take a while if there are new updates.");
   }
   final pubGlobalActivateCommand = await Process.run('dart', [
     'pub',
@@ -429,7 +434,8 @@ httpServer.defaultResponseHeaders.add(
   }
 }
 
-Future<void> watchAndGenerateMessageCode() async {
+Future<void> watchAndGenerateMessageCode(
+    {required RinfConfigMessage messageConfig}) async {
   final currentDirectory = Directory.current;
   final messagesPath = join(currentDirectory.path, "messages");
   final messagesDirectory = Directory(messagesPath);
@@ -453,7 +459,7 @@ Future<void> watchAndGenerateMessageCode() async {
     await Future.delayed(Duration(seconds: 1));
     if (!generated) {
       try {
-        await generateMessageCode(silent: true);
+        await generateMessageCode(silent: true, messageConfig: messageConfig);
         print("Message code generated");
       } catch (error) {
         // When message code generation has failed

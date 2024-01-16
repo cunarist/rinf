@@ -1,9 +1,13 @@
 import 'dart:io';
 import 'package:package_config/package_config.dart';
 import 'message.dart';
+import 'config.dart';
 
 /// Creates new folders and files to an existing Flutter project folder.
-Future<void> applyRustTemplate({bool onlyBridge = false}) async {
+Future<void> applyRustTemplate({
+  bool onlyBridge = false,
+  required RinfConfigMessage messageConfig,
+}) async {
   // Get the path of the current project directory
   final flutterProjectPath = Directory.current.path;
 
@@ -186,7 +190,7 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
   await mainFile.writeAsString(mainText);
   await Process.run('dart', ['format', './lib/main.dart']);
 
-  await generateMessageCode(silent: true);
+  await generateMessageCode(silent: true, messageConfig: messageConfig);
 
   print("🎉 Rust template is now ready! 🎉");
 }
@@ -213,7 +217,7 @@ Future<void> copyDirectory(Directory source, Directory destination) async {
 Future<void> buildWebassembly({bool isReleaseMode = false}) async {
   // Verify Rust toolchain.
   print("Verifying Rust toolchain for the web." +
-      " This might take a while if there are new updates to be installed.");
+      "\nThis might take a while if there are new updates.");
   await Process.run("rustup", ["toolchain", "install", "nightly"]);
   await Process.run("rustup", [
     "+nightly",
