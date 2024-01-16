@@ -54,7 +54,7 @@ On native platforms, Dart runs in a single thread as usual, while Rust utilizes 
 
 No, the updated Rust code cannot be loaded upon Dart's hot restart. To incorporate the changes, the app needs to be re-compiled, as the app binary must be linked to the newly compiled Rust library files again. This limitation arises from the Rust compilation process, as Rust does not inherently support a hot restart feature.
 
-On native platforms, Dart's hot restart makes the Rust logic, in other words, the `async fn main()` function, restart. On the web, Dart's hot restart has no effect on the Rust logic, because it's not possible to cancel all the async tasks that are already queued inside the JavaScript event loop.
+On native platforms, Dart's hot restart makes the Rust logic restart, in other words, the `async fn main()` function. On the web, Dart's hot restart has no effect on the Rust logic, because it's not possible to cancel all the async tasks that are already queued inside the JavaScript event loop.
 
 ### How do I use nightly Rust?
 
@@ -170,4 +170,19 @@ This error can simply be fixed with the command below.
 ```
 flutter clean
 cargo clean
+```
+
+### I encounter an error related to loading native libraries on older Android versions.
+
+If you are using older Android versions, you may encounter errors due to issues with native library loading.
+
+To address this, you can modify `AndroidManifest.xml` files under `./android/app/src/` as follows.
+
+```xml
+...
+<application
+    android:extractNativeLibs="true"
+    ...
+>
+...
 ```

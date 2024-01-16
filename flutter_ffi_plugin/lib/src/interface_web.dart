@@ -10,9 +10,9 @@ final rustResponseUniqueStream = StreamController<RustResponseUnique>();
 final rustReportStream = StreamController<String>();
 
 Future<void> prepareNativeBridge() async {
-  final isAlreadyDone = await loadJsFile();
+  final isAlreadyPrepared = await loadJsFile();
 
-  if (isAlreadyDone) {
+  if (isAlreadyPrepared) {
     return;
   }
 
@@ -55,7 +55,6 @@ Future<void> prepareNativeBridge() async {
     rustReportStream.add(rustReport);
   };
 
-  prepareChannelsExtern();
   startRustLogicExtern();
 }
 
@@ -104,6 +103,3 @@ external void prepareIsolatesExtern(
   int portResponse,
   int portReport,
 );
-
-@JS('wasm_bindgen.prepare_channels_extern')
-external void prepareChannelsExtern();

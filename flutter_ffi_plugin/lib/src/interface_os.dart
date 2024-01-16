@@ -66,7 +66,6 @@ Future<void> prepareNativeBridge() async {
     rustResponseUniquePort.sendPort.nativePort,
     rustReportPort.sendPort.nativePort,
   );
-  prepareChannelsExtern();
   startRustLogicExtern();
 }
 
@@ -145,13 +144,4 @@ void prepareIsolatesExtern(int portSignal, int portResponse, int portReport) {
   // Call the Rust function    final rustSignalReceiver = ReceivePort();
 
   rustFunction(portSignal, portResponse, portReport);
-}
-
-void prepareChannelsExtern() {
-  // Look up the Rust function
-  final rustFunction =
-      rustLibrary.lookupFunction<Void Function(), void Function()>(
-          'prepare_channels_extern');
-  // Call the Rust function
-  rustFunction();
 }

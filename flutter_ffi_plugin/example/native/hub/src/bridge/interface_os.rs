@@ -5,6 +5,33 @@ use std::cell::RefCell;
 use std::sync::Arc;
 use std::sync::Mutex;
 
+type Cell<T> = RefCell<Option<T>>;
+type SharedCell<T> = Arc<Mutex<Cell<T>>>;
+
+lazy_static! {
+    pub static ref SIGNAL_ISOLATE: SharedCell<Isolate> = Arc::new(Mutex::new(RefCell::new(None)));
+    pub static ref RESPONSE_ISOLATE: SharedCell<Isolate> = Arc::new(Mutex::new(RefCell::new(None)));
+    pub static ref REPORT_ISOLATE: SharedCell<Isolate> = Arc::new(Mutex::new(RefCell::new(None)));
+}
+
+#[no_mangle]
+pub extern "C" fn prepare_isolates_extern(port_signal: i64, port_response: i64, port_report: i64) {
+    let isolate = Isolate::new(port_signal);
+    let cell = SIGNAL_ISOLATE.lock().unwrap();
+    cell.replace(Some(isolate));
+
+    let isolate = Isolate::new(port_response);
+    let cell = RESPONSE_ISOLATE.lock().unwrap();
+    cell.replace(Some(isolate));
+
+    #[cfg(debug_assertions)]
+    {
+        let isolate = Isolate::new(port_report);
+        let cell = REPORT_ISOLATE.lock().unwrap();
+        cell.replace(Some(isolate));
+    }
+}
+
 #[no_mangle]
 pub extern "C" fn start_rust_logic_extern() {
     start_rust_logic();
@@ -73,38 +100,6 @@ pub extern "C" fn request_to_rust_extern(
     };
 
     request_to_rust(rust_request_unique);
-}
-
-type Cell<T> = RefCell<Option<T>>;
-type SharedCell<T> = Arc<Mutex<Cell<T>>>;
-
-lazy_static! {
-    pub static ref SIGNAL_ISOLATE: SharedCell<Isolate> = Arc::new(Mutex::new(RefCell::new(None)));
-    pub static ref RESPONSE_ISOLATE: SharedCell<Isolate> = Arc::new(Mutex::new(RefCell::new(None)));
-    pub static ref REPORT_ISOLATE: SharedCell<Isolate> = Arc::new(Mutex::new(RefCell::new(None)));
-}
-
-#[no_mangle]
-pub extern "C" fn prepare_isolates_extern(port_signal: i64, port_response: i64, port_report: i64) {
-    let isolate = Isolate::new(port_signal);
-    let cell = SIGNAL_ISOLATE.lock().unwrap();
-    cell.replace(Some(isolate));
-
-    let isolate = Isolate::new(port_response);
-    let cell = RESPONSE_ISOLATE.lock().unwrap();
-    cell.replace(Some(isolate));
-
-    #[cfg(debug_assertions)]
-    {
-        let isolate = Isolate::new(port_report);
-        let cell = REPORT_ISOLATE.lock().unwrap();
-        cell.replace(Some(isolate));
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn prepare_channels_extern() {
-    prepare_channels();
 }
 
 impl allo_isolate::IntoDart for RustSignal {

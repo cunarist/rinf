@@ -68,7 +68,7 @@ type RustRequestReceiver = Receiver<RustRequestUnique>;
 // Native: Main thread
 // Web: Main thread
 thread_local! {
-    pub static REQUEST_SENDER: Cell<RustRequestSender> = RefCell::new(None);
+    pub static REQUEST_SENDER: Cell<RustRequestSender> = const { RefCell::new(None) };
 }
 
 // Native: All threads
@@ -84,54 +84,66 @@ lazy_static! {
         rinf::externs::os_thread_local::ThreadLocal::new(|| RefCell::new(None));
 }
 
-/// Prepare channels that are used in the Rust world.
-pub fn prepare_channels() {
+/// Start the main function of Rust.
+pub fn start_rust_logic() {
+    // Enable backtrace output for panics.
+    #[cfg(debug_assertions)]
+    {
+        #[cfg(not(target_family = "wasm"))]
+        {
+            use rinf::externs::backtrace;
+            std::panic::set_hook(Box::new(|panic_info| {
+                let mut frames_filtered = Vec::new();
+                backtrace::trace(|frame| {
+                    // Filter some backtrace frames
+                    // as those from infrastructure functions are not needed.
+                    let mut should_keep_tracing = true;
+                    backtrace::resolve_frame(frame, |symbol| {
+                        if let Some(symbol_name) = symbol.name() {
+                            let name = symbol_name.to_string();
+                            let name_trimmed = name.trim_start_matches('_');
+                            if name_trimmed.starts_with("rust_begin_unwind") {
+                                frames_filtered.clear();
+                                return;
+                            }
+                            if name_trimmed.starts_with("rust_try") {
+                                should_keep_tracing = false;
+                                return;
+                            }
+                        }
+                        let backtrace_frame = backtrace::BacktraceFrame::from(frame.to_owned());
+                        frames_filtered.push(backtrace_frame);
+                    });
+                    should_keep_tracing
+                });
+                let mut backtrace_filtered = backtrace::Backtrace::from(frames_filtered);
+                backtrace_filtered.resolve();
+                crate::debug_print!(
+                    "A panic occurred in Rust.\n{}\n{:?}",
+                    panic_info,
+                    backtrace_filtered
+                );
+            }));
+        }
+        #[cfg(target_family = "wasm")]
+        {
+            std::panic::set_hook(Box::new(|panic_info| {
+                crate::debug_print!("A panic occurred in Rust.\n{panic_info}");
+            }));
+        }
+    }
+
+    // Prepare channels in Rust.
     let (request_sender, request_receiver) = channel(1024);
     REQUEST_SENDER.with(move |inner| {
         inner.replace(Some(request_sender));
     });
     let cell = REQUST_RECEIVER_SHARED.lock().unwrap();
     cell.replace(Some(request_receiver));
-}
 
-/// Start the main function of Rust.
-pub fn start_rust_logic() {
+    // Run the main function.
     #[cfg(not(target_family = "wasm"))]
     {
-        use rinf::externs::backtrace;
-        #[cfg(debug_assertions)]
-        std::panic::set_hook(Box::new(|panic_info| {
-            let mut frames_filtered = Vec::new();
-            backtrace::trace(|frame| {
-                // Filter some backtrace frames
-                // as those from infrastructure functions are not needed.
-                let mut should_keep_tracing = true;
-                backtrace::resolve_frame(frame, |symbol| {
-                    if let Some(symbol_name) = symbol.name() {
-                        let name = symbol_name.to_string();
-                        let name_trimmed = name.trim_start_matches('_');
-                        if name_trimmed.starts_with("rust_begin_unwind") {
-                            frames_filtered.clear();
-                            return;
-                        }
-                        if name_trimmed.starts_with("rust_try") {
-                            should_keep_tracing = false;
-                            return;
-                        }
-                    }
-                    let backtrace_frame = backtrace::BacktraceFrame::from(frame.to_owned());
-                    frames_filtered.push(backtrace_frame);
-                });
-                should_keep_tracing
-            });
-            let mut backtrace_filtered = backtrace::Backtrace::from(frames_filtered);
-            backtrace_filtered.resolve();
-            crate::debug_print!(
-                "A panic occurred in Rust.\n{}\n{:?}",
-                panic_info,
-                backtrace_filtered
-            );
-        }));
         TOKIO_RUNTIME.with(move |inner| {
             let tokio_runtime = tokio::runtime::Builder::new_multi_thread()
                 .enable_all()
@@ -148,10 +160,6 @@ pub fn start_rust_logic() {
     #[cfg(target_family = "wasm")]
     {
         tokio::spawn(crate::main());
-        #[cfg(debug_assertions)]
-        std::panic::set_hook(Box::new(|panic_info| {
-            crate::debug_print!("A panic occurred in Rust.\n{panic_info}");
-        }));
     }
 }
 

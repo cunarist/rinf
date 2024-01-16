@@ -1,6 +1,6 @@
 [package]
 name = "rinf"
-version = "5.3.0"
+version = "5.4.0"
 edition = "2021"
 license = "MIT"
 description = "Rust for native business logic, Flutter for flexible and beautiful GUI"
@@ -10,6 +10,8 @@ documentation = "https://rinf.cunarist.com"
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 os-thread-local = "0.1.3"
 backtrace = "0.3.69"
+protoc-prebuilt = "0.2.0"
+home = "0.5.9"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3.65"
