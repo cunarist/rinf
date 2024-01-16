@@ -118,7 +118,7 @@ Future<void> generateMessageCode({bool silent = false}) async {
       }
     }
     if (subPath == "") {
-      modRsLines.add("pub mod receive;");
+      modRsLines.add("pub mod handle;");
     }
     final modRsContent = modRsLines.join('\n');
     await File('$rustOutputPath$subPath/mod.rs').writeAsString(modRsContent);
@@ -294,7 +294,7 @@ pub fn ${snakeName}_send(message: $messageName, blob: Option<Vec<u8>>) {
 use prost::Message;
 use crate::bridge::*;
 
-pub fn receive_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Vec<u8>>) {
+pub fn handle_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Vec<u8>>) {
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -308,7 +308,7 @@ pub fn receive_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Vec<
           var modulePath = subpath.replaceAll("/", "::");
           rustReceiveScript += '''
 if message_id == ${markedMessage.id} {
-    use crate::messages$modulePath::$filename::*;
+    use super$modulePath::$filename::*;
     let decoded = ${markedMessage.name}::decode(message_bytes.as_slice()).unwrap();     
     let signal = DartSignal {
         message: decoded,
@@ -327,7 +327,7 @@ if message_id == ${markedMessage.id} {
   rustReceiveScript += '''
 }
 ''';
-  await File('$rustOutputPath/receive.rs').writeAsString(rustReceiveScript);
+  await File('$rustOutputPath/handle.rs').writeAsString(rustReceiveScript);
 
   // Get ready to receive messages in Dart.
   var dartReceiveScript = "";
@@ -335,7 +335,7 @@ if message_id == ${markedMessage.id} {
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
 
-void receiveSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
+void handleSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -371,7 +371,7 @@ if (messageId == ${markedMessage.id}) {
   dartReceiveScript += '''
 }
 ''';
-  await File('$dartOutputPath/receive.dart').writeAsString(dartReceiveScript);
+  await File('$dartOutputPath/handle.dart').writeAsString(dartReceiveScript);
 
   // Notify that it's done
   if (!silent) {
@@ -554,7 +554,7 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> parseProtoFiles(
       final statements = contentWithoutBlocks.split(";");
       for (final statementRaw in statements) {
         final statement = statementRaw.trim();
-        if (statement.startsWith("// FROM:DART")) {
+        if (statement.startsWith("// [RINF:DART-SIGNAL]")) {
           final lines = statement.split('\n');
           for (final line in lines) {
             final trimmed = line.trim();
@@ -568,7 +568,7 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> parseProtoFiles(
               messageId += 1;
             }
           }
-        } else if (statement.startsWith("// FROM:RUST")) {
+        } else if (statement.startsWith("// [RINF:RUST-SIGNAL]")) {
           final lines = statement.split('\n');
           for (final line in lines) {
             final trimmed = line.trim();

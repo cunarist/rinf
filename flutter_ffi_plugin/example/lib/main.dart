@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:rinf/rinf.dart';
 import './messages/counter_number.pb.dart';
 import './messages/fractal.pb.dart';
-import './messages/receive.dart';
+import './messages/handle.dart';
 
 void main() async {
   // Wait for Rust initialization to be completed first.
-  await Rinf.ensureInitialized(receiveSignal);
+  await Rinf.initialize(handleSignal);
   runApp(const MyApp());
 }
 
@@ -22,7 +22,7 @@ class _MyAppState extends State<MyApp> {
   final _appLifecycleListener = AppLifecycleListener(
     onExitRequested: () async {
       // Terminate Rust tasks before closing the Flutter app.
-      await Rinf.ensureFinalized();
+      await Rinf.finalize();
       return AppExitResponse.exit;
     },
   );
@@ -54,13 +54,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
   void _incrementCounter() async {
     numberInputSend(
       NumberInput(
           letter: "HELLO FROM DART!",
-          beforeNumber: _counter,
           dummyOne: 25,
           dummyTwo: SampleSchema(
             sampleFieldOne: true,
@@ -132,8 +129,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 if (rustSignal == null) {
                   return Text('Initial value 0');
                 }
-                _counter = rustSignal.message.afterNumber;
-                return Text('Current value is $_counter');
+                final currentNumber = rustSignal.message.currentNumber;
+                return Text('Current value is $currentNumber');
               },
             ),
           ],

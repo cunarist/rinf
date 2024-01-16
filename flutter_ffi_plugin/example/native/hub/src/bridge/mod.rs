@@ -5,7 +5,7 @@
 
 #![allow(dead_code)]
 
-pub mod interface;
+mod interface;
 pub use interface::*;
 
 #[cfg(not(target_family = "wasm"))]

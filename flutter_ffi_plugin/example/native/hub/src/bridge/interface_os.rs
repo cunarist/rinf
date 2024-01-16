@@ -10,22 +10,14 @@ type Cell<T> = RefCell<Option<T>>;
 type SharedCell<T> = Arc<Mutex<Cell<T>>>;
 
 lazy_static! {
-    pub static ref SIGNAL_ISOLATE: SharedCell<Isolate> = Arc::new(Mutex::new(RefCell::new(None)));
-    pub static ref REPORT_ISOLATE: SharedCell<Isolate> = Arc::new(Mutex::new(RefCell::new(None)));
+    pub static ref ISOLATE_SIGNAL: SharedCell<Isolate> = Arc::new(Mutex::new(RefCell::new(None)));
 }
 
 #[no_mangle]
-pub extern "C" fn prepare_isolates_extern(port_message: i64, port_report: i64) {
-    let isolate = Isolate::new(port_message);
-    let cell = SIGNAL_ISOLATE.lock().unwrap();
+pub extern "C" fn prepare_isolates_extern(port_signal: i64) {
+    let isolate = Isolate::new(port_signal);
+    let cell = ISOLATE_SIGNAL.lock().unwrap();
     cell.replace(Some(isolate));
-
-    #[cfg(debug_assertions)]
-    {
-        let isolate = Isolate::new(port_report);
-        let cell = REPORT_ISOLATE.lock().unwrap();
-        cell.replace(Some(isolate));
-    }
 }
 
 #[no_mangle]
@@ -60,7 +52,7 @@ pub extern "C" fn send_dart_signal_extern(
     } else {
         None
     };
-    crate::messages::receive::receive_signal(message_id as i32, message_bytes, blob);
+    crate::messages::handle::handle_signal(message_id as i32, message_bytes, blob);
 }
 
 pub fn send_rust_signal_extern(
@@ -69,7 +61,7 @@ pub fn send_rust_signal_extern(
     blob_valid: bool,
     blob_bytes: Vec<u8>,
 ) {
-    let cell = SIGNAL_ISOLATE.lock().unwrap();
+    let cell = ISOLATE_SIGNAL.lock().unwrap();
     let dart_isolate = cell.borrow().unwrap();
     dart_isolate.post(
         vec![
@@ -80,11 +72,4 @@ pub fn send_rust_signal_extern(
         ]
         .into_dart(),
     );
-}
-
-#[cfg(debug_assertions)]
-pub fn send_rust_report_extern(rust_report: String) {
-    let cell = REPORT_ISOLATE.lock().unwrap();
-    let dart_isolate = cell.borrow().unwrap();
-    dart_isolate.post(rust_report);
 }

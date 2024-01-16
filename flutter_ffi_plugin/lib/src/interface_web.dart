@@ -4,8 +4,9 @@ import 'dart:typed_data';
 import 'package:universal_html/js.dart' as js;
 import 'interface.dart';
 import 'dart:async';
+import 'dart:convert';
 
-Future<void> prepareNativeBridge(ReceiveSignal receiveSignal) async {
+Future<void> prepareNativeBridge(ReceiveSignal handleSignal) async {
   final isAlreadyPrepared = await loadJsFile();
 
   if (isAlreadyPrepared) {
@@ -19,16 +20,18 @@ Future<void> prepareNativeBridge(ReceiveSignal receiveSignal) async {
     bool blobValid,
     Uint8List blobBytes,
   ) {
+    if (messageId == -1) {
+      // -1 is a special message ID for Rust reports.
+      String rustReport = utf8.decode(blobBytes);
+      print(rustReport);
+    }
     Uint8List? blob;
     if (blobValid) {
       blob = blobBytes;
     } else {
       blob = null;
     }
-    receiveSignal(messageId, messageBytes, blob);
-  };
-  js.context['rinf_send_rust_report_extern'] = (String rustReport) {
-    print(rustReport);
+    handleSignal(messageId, messageBytes, blob);
   };
 
   startRustLogicExtern();

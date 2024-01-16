@@ -7,22 +7,27 @@ use crate::tokio;
 
 const SHOULD_DEMONSTRATE: bool = true; // Disabled when applied as template
 
-pub async fn handle_number(received: counter_number::NumberInput) {
-    // Decode raw bytes into a Rust message object.
-    let letter = received.letter;
-    crate::debug_print!("{letter}");
+pub async fn tell_numbers() {
+    let mut receiver = counter_number::number_input_receiver();
+    let mut current_number = 0;
+    while let Some(dart_signal) = receiver.recv().await {
+        // Decode raw bytes into a Rust message object.
+        let number_input = dart_signal.message;
+        let letter = number_input.letter;
+        crate::debug_print!("{letter}");
 
-    // Perform a simple calculation.
-    let after_value: i32 = sample_crate::add_seven(received.before_number);
+        // Perform a simple calculation.
+        current_number = sample_crate::add_seven(current_number);
 
-    // Return the message that will be sent to Dart.
-    let message = counter_number::NumberOutput {
-        after_number: after_value,
-        dummy_one: received.dummy_one,
-        dummy_two: received.dummy_two,
-        dummy_three: received.dummy_three,
-    };
-    counter_number::number_output_send(message, None);
+        // Return the message that will be sent to Dart.
+        let number_output = counter_number::NumberOutput {
+            current_number,
+            dummy_one: number_input.dummy_one,
+            dummy_two: number_input.dummy_two,
+            dummy_three: number_input.dummy_three,
+        };
+        counter_number::number_output_send(number_output, None);
+    }
 }
 
 pub async fn stream_fractal() {
@@ -32,14 +37,14 @@ pub async fn stream_fractal() {
 
     let mut scale: f64 = 1.0;
 
-    let (frame_sender, mut frame_receiver) = tokio::sync::mpsc::channel(5);
+    let (sender, mut receiver) = tokio::sync::mpsc::channel(5);
 
     // Send frame join handles in order.
     tokio::spawn(async move {
         loop {
             // Wait for 40 milliseconds on each frame
             tokio::time::sleep(std::time::Duration::from_millis(40)).await;
-            if frame_sender.capacity() == 0 {
+            if sender.capacity() == 0 {
                 continue;
             }
 
@@ -51,16 +56,16 @@ pub async fn stream_fractal() {
             // Calculate the fractal image
             // parallelly in a separate thread pool.
             let join_handle = tokio::task::spawn_blocking(move || sample_crate::fractal(scale));
-            let _ = frame_sender.send(join_handle).await;
+            let _ = sender.send(join_handle).await;
         }
     });
 
     // Receive frame join handles in order.
     tokio::spawn(async move {
         loop {
-            let join_handle = frame_receiver.recv().await.unwrap();
+            let join_handle = receiver.recv().await.unwrap();
             let received_frame = join_handle.await.unwrap();
-            if let Some(fractal) = received_frame {
+            if let Some(fractal_image) = received_frame {
                 // Stream the image data to Dart.
                 fractal::fractal_scale_send(
                     fractal::FractalScale {
@@ -70,7 +75,7 @@ pub async fn stream_fractal() {
                             sample_field_two: false,
                         }),
                     },
-                    Some(fractal),
+                    Some(fractal_image),
                 );
             };
         }

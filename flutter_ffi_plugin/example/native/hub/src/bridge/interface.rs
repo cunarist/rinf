@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 use crate::tokio;
+use rinf::externs::lazy_static::lazy_static;
 use std::cell::RefCell;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -19,10 +20,10 @@ type Cell<T> = RefCell<Option<T>>;
 type SharedCell<T> = Arc<Mutex<Cell<T>>>;
 
 #[cfg(not(target_family = "wasm"))]
-rinf::externs::lazy_static::lazy_static!(
-pub static ref TOKIO_RUNTIME: rinf::externs::os_thread_local::ThreadLocal<Cell<tokio::runtime::Runtime>> =
-    rinf::externs::os_thread_local::ThreadLocal::new(|| RefCell::new(None));
-);
+lazy_static! {
+    pub static ref TOKIO_RUNTIME: rinf::externs::os_thread_local::ThreadLocal<Cell<tokio::runtime::Runtime>> =
+        rinf::externs::os_thread_local::ThreadLocal::new(|| RefCell::new(None));
+}
 
 /// Start the main function of Rust.
 pub fn start_rust_logic() {
@@ -103,7 +104,7 @@ pub fn stop_rust_logic() {
     });
 }
 
-/// Send a message signal to Dart.
+/// Send a signal to Dart.
 pub fn send_rust_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Vec<u8>>) {
     send_rust_signal_extern(
         message_id,
@@ -118,5 +119,10 @@ pub fn send_rust_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Ve
 /// Use `debug_print!` macro instead.
 #[cfg(debug_assertions)]
 pub fn send_rust_report(rust_report: String) {
-    send_rust_report_extern(rust_report);
+    send_rust_signal_extern(
+        -1, // This is a special message ID for Rust reports
+        Vec::new(),
+        true,
+        rust_report.into_bytes(),
+    );
 }

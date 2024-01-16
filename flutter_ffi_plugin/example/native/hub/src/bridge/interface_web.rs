@@ -20,14 +20,12 @@ pub fn send_dart_signal_extern(
     blob_bytes: &[u8],
 ) {
     let message_bytes = message_bytes.to_vec();
-
     let blob = if blob_valid {
         Some(blob_bytes.to_vec())
     } else {
         None
     };
-
-    crate::messages::receive::receive_signal(message_id, message_bytes, blob);
+    crate::messages::handle::handle_signal(message_id as i32, message_bytes, blob);
 }
 
 #[wasm_bindgen]
@@ -39,9 +37,6 @@ extern "C" {
         blob_valid: bool,
         blob_bytes: Uint8Array,
     );
-    #[cfg(debug_assertions)]
-    #[wasm_bindgen(js_name = rinf_send_rust_report_extern)]
-    pub fn send_rust_report_extern(rust_report: String);
 }
 
 pub fn send_rust_signal_extern(

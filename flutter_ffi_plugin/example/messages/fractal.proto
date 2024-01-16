@@ -3,7 +3,7 @@ package fractal;
 
 import "counter_number.proto";
 
-// FROM:RUST
+// [RINF:RUST-SIGNAL]
 // You can add your custom comments like this.
 // Protobuf's import statement also works well.
 message FractalScale {
