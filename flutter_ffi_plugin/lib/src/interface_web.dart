@@ -5,7 +5,7 @@ import 'package:universal_html/js.dart' as js;
 import 'interface.dart';
 import 'dart:async';
 
-Future<void> prepareNativeBridge(ReceiveSignal receiveSignal) async {
+Future<void> prepareNativeBridge(ReceiveSignal handleSignal) async {
   final isAlreadyPrepared = await loadJsFile();
 
   if (isAlreadyPrepared) {
@@ -25,7 +25,7 @@ Future<void> prepareNativeBridge(ReceiveSignal receiveSignal) async {
     } else {
       blob = null;
     }
-    receiveSignal(messageId, messageBytes, blob);
+    handleSignal(messageId, messageBytes, blob);
   };
   js.context['rinf_send_rust_report_extern'] = (String rustReport) {
     print(rustReport);

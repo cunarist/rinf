@@ -12,7 +12,7 @@ typedef StoreDartPostCObject = Pointer Function(
 
 /// This should be called once at startup
 /// to enable `allo_isolate` to send data from the Rust side.
-Future<void> prepareNativeBridge(ReceiveSignal receiveSignal) async {
+Future<void> prepareNativeBridge(ReceiveSignal handleSignal) async {
   // Look up the Rust function
   final rustFunction =
       rustLibrary.lookupFunction<StoreDartPostCObject, StoreDartPostCObject>(
@@ -37,7 +37,7 @@ Future<void> prepareNativeBridge(ReceiveSignal receiveSignal) async {
       String rustReport = utf8.decode(rustSignalRaw[3]);
       print(rustReport);
     }
-    receiveSignal(
+    handleSignal(
       rustSignalRaw[0],
       rustSignalRaw[1],
       blob,

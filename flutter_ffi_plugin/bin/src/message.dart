@@ -118,7 +118,7 @@ Future<void> generateMessageCode({bool silent = false}) async {
       }
     }
     if (subPath == "") {
-      modRsLines.add("pub mod receive;");
+      modRsLines.add("pub mod handle;");
     }
     final modRsContent = modRsLines.join('\n');
     await File('$rustOutputPath$subPath/mod.rs').writeAsString(modRsContent);
@@ -294,7 +294,7 @@ pub fn ${snakeName}_send(message: $messageName, blob: Option<Vec<u8>>) {
 use prost::Message;
 use crate::bridge::*;
 
-pub fn receive_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Vec<u8>>) {
+pub fn handle_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Vec<u8>>) {
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -327,7 +327,7 @@ if message_id == ${markedMessage.id} {
   rustReceiveScript += '''
 }
 ''';
-  await File('$rustOutputPath/receive.rs').writeAsString(rustReceiveScript);
+  await File('$rustOutputPath/handle.rs').writeAsString(rustReceiveScript);
 
   // Get ready to receive messages in Dart.
   var dartReceiveScript = "";
@@ -335,7 +335,7 @@ if message_id == ${markedMessage.id} {
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
 
-void receiveSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
+void handleSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -371,7 +371,7 @@ if (messageId == ${markedMessage.id}) {
   dartReceiveScript += '''
 }
 ''';
-  await File('$dartOutputPath/receive.dart').writeAsString(dartReceiveScript);
+  await File('$dartOutputPath/handle.dart').writeAsString(dartReceiveScript);
 
   // Notify that it's done
   if (!silent) {

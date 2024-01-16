@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 use crate::tokio;
+use rinf::externs::lazy_static::lazy_static;
 use std::cell::RefCell;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -18,11 +19,13 @@ pub struct DartSignal<T> {
 type Cell<T> = RefCell<Option<T>>;
 type SharedCell<T> = Arc<Mutex<Cell<T>>>;
 
-#[cfg(not(target_family = "wasm"))]
-rinf::externs::lazy_static::lazy_static!(
-pub static ref TOKIO_RUNTIME: rinf::externs::os_thread_local::ThreadLocal<Cell<tokio::runtime::Runtime>> =
-    rinf::externs::os_thread_local::ThreadLocal::new(|| RefCell::new(None));
-);
+lazy_static! {
+    pub static ref SIGNAL_HANDLER: SharedCell<Box<dyn Fn(i32, Vec<u8>, Option<Vec<u8>>) + Send + 'static>> =
+        Arc::new(Mutex::new(RefCell::new(None)));
+    #[cfg(not(target_family = "wasm"))]
+    pub static ref TOKIO_RUNTIME: rinf::externs::os_thread_local::ThreadLocal<Cell<tokio::runtime::Runtime>> =
+        rinf::externs::os_thread_local::ThreadLocal::new(|| RefCell::new(None));
+}
 
 /// Start the main function of Rust.
 pub fn start_rust_logic() {
@@ -124,4 +127,13 @@ pub fn send_rust_report(rust_report: String) {
         true,
         rust_report.into_bytes(),
     );
+}
+
+/// Register the generated function
+/// that will handle Dart signals.
+pub fn register_signal_handler(
+    callable: Box<dyn Fn(i32, Vec<u8>, Option<Vec<u8>>) + Send + 'static>,
+) {
+    let cell = SIGNAL_HANDLER.lock().unwrap();
+    cell.replace(Some(callable));
 }

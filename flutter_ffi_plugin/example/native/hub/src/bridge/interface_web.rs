@@ -20,14 +20,15 @@ pub fn send_dart_signal_extern(
     blob_bytes: &[u8],
 ) {
     let message_bytes = message_bytes.to_vec();
-
     let blob = if blob_valid {
         Some(blob_bytes.to_vec())
     } else {
         None
     };
-
-    crate::messages::receive::receive_signal(message_id, message_bytes, blob);
+    let cell = SIGNAL_HANDLER.lock().unwrap();
+    let borrowed = cell.borrow();
+    let callable = borrowed.as_ref().unwrap();
+    callable(message_id as i32, message_bytes, blob);
 }
 
 #[wasm_bindgen]
