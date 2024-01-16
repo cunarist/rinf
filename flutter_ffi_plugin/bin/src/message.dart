@@ -308,7 +308,7 @@ pub fn receive_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Vec<
           var modulePath = subpath.replaceAll("/", "::");
           rustReceiveScript += '''
 if message_id == ${markedMessage.id} {
-    use crate::messages$modulePath::$filename::*;
+    use super$modulePath::$filename::*;
     let decoded = ${markedMessage.name}::decode(message_bytes.as_slice()).unwrap();     
     let signal = DartSignal {
         message: decoded,
