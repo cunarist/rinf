@@ -8,7 +8,7 @@ First of all, add this framework to your Flutter project.
 flutter pub add rinf
 ```
 
-Now install the shorthand command tool to easily execute Rinf commands in the CLI.
+Now install the command executable to easily run Rinf commands in the CLI.
 
 ```bash
 cargo install rinf
@@ -33,7 +33,7 @@ After running the command, you'll have new files and folders as your starter Rus
 +   ├── messages/
 +   │   ├── sample_folder/
 +   │   ├── counter_number.proto
-+   │   ├── fractal.proto
++   │   ├── fractal_art.proto
 +   │   └── README.md
 +   ├── native/
 +   │   ├── hub/
