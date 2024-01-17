@@ -1,5 +1,6 @@
 use super::interface::*;
 use rinf::externs::js_sys::Uint8Array;
+use std::panic::catch_unwind;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
