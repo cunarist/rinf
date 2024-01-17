@@ -184,11 +184,13 @@ Future<void> generateMessageCode({
     }
   }
 
-  // Get ready to prepare channels between Dart and Rust.
-  final markedMessagesAll = await parseProtoFiles(
+  // Analyze marked messages in `.proto` files.
+  final markedMessagesAll = await analyzeMarkedMessages(
     protoPath,
     resourcesInFolders,
   );
+
+  // Prepare communication channels between Dart and Rust.
   for (final entry in markedMessagesAll.entries) {
     final subPath = entry.key;
     final filesAndMarks = entry.value;
@@ -293,7 +295,7 @@ pub fn ${snakeName}_send(message: $messageName, blob: Option<Vec<u8>>) {
     }
   }
 
-  // Get ready to receive messages in Rust.
+  // Get ready to handle received signals in Rust.
   var rustReceiveScript = "";
   rustReceiveScript += '''
 #![allow(clippy::needless_return)]
@@ -342,7 +344,7 @@ if message_id == ${markedMessage.id} {
 ''';
   await File('$rustOutputPath/handle.rs').writeAsString(rustReceiveScript);
 
-  // Get ready to receive messages in Dart.
+  // Get ready to handle received signals in Dart.
   var dartReceiveScript = "";
   dartReceiveScript += '''
 import 'dart:typed_data';
@@ -542,7 +544,7 @@ Future<void> insertTextToFile(
   await file.writeAsString(fileContent);
 }
 
-Future<Map<String, Map<String, List<MarkedMessage>>>> parseProtoFiles(
+Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
   String protoPath,
   Map<String, List<String>> resourcesInFolders,
 ) async {
