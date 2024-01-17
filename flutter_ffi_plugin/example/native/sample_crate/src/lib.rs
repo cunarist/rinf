@@ -1,7 +1,7 @@
 //! This crate is only for demonstration purposes.
 //! You might want to remove this crate in production.
 
-pub use fractal::fractal;
+pub use fractal::draw_fractal_image;
 
 mod fractal;
 

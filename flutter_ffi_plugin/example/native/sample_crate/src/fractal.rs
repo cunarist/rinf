@@ -11,7 +11,7 @@ const NB_SAMPLES: u32 = 1;
 const SIZE: f64 = 0.000000001;
 const MAX_ITER: u32 = 1000;
 
-pub fn fractal(scale: f64) -> Option<Vec<u8>> {
+pub fn draw_fractal_image(scale: f64) -> Option<Vec<u8>> {
     let point_x: f64 = -0.5557506;
     let point_y: f64 = -0.55560;
     let mut buffer: Vec<u8> = vec![0; BUF_SIZE as usize];

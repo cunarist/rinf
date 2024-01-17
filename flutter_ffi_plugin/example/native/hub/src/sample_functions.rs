@@ -1,14 +1,13 @@
 //! This module is only for demonstration purposes.
 //! You might want to remove this module in production.
 
-use crate::messages::counter_number;
-use crate::messages::fractal;
+use crate::messages;
 use crate::tokio;
 
 const SHOULD_DEMONSTRATE: bool = true; // Disabled when applied as template
 
 pub async fn tell_numbers() {
-    let mut receiver = counter_number::number_input_receiver();
+    let mut receiver = messages::counter_number::number_input_receiver();
     let mut current_number = 0;
     while let Some(dart_signal) = receiver.recv().await {
         // Decode raw bytes into a Rust message object.
@@ -20,13 +19,13 @@ pub async fn tell_numbers() {
         current_number = sample_crate::add_seven(current_number);
 
         // Return the message that will be sent to Dart.
-        let number_output = counter_number::NumberOutput {
+        let number_output = messages::counter_number::NumberOutput {
             current_number,
             dummy_one: number_input.dummy_one,
             dummy_two: number_input.dummy_two,
             dummy_three: number_input.dummy_three,
         };
-        counter_number::number_output_send(number_output, None);
+        messages::counter_number::number_output_send(number_output, None);
     }
 }
 
@@ -35,7 +34,7 @@ pub async fn stream_fractal() {
         return;
     }
 
-    let mut scale: f64 = 1.0;
+    let mut current_scale: f64 = 1.0;
 
     let (sender, mut receiver) = tokio::sync::mpsc::channel(5);
 
@@ -48,14 +47,16 @@ pub async fn stream_fractal() {
                 continue;
             }
 
-            scale *= 1.02;
-            if scale > 1e+7 {
-                scale = 1.0
+            current_scale *= 1.02;
+            if current_scale > 1e+7 {
+                current_scale = 1.0
             };
 
             // Calculate the fractal image
             // parallelly in a separate thread pool.
-            let join_handle = tokio::task::spawn_blocking(move || sample_crate::fractal(scale));
+            let join_handle = tokio::task::spawn_blocking(move || {
+                sample_crate::draw_fractal_image(current_scale)
+            });
             let _ = sender.send(join_handle).await;
         }
     });
@@ -67,10 +68,10 @@ pub async fn stream_fractal() {
             let received_frame = join_handle.await.unwrap();
             if let Some(fractal_image) = received_frame {
                 // Stream the image data to Dart.
-                fractal::fractal_scale_send(
-                    fractal::FractalScale {
-                        current_scale: scale,
-                        dummy: Some(counter_number::SampleSchema {
+                messages::fractal::fractal_scale_send(
+                    messages::fractal::FractalScale {
+                        current_scale,
+                        dummy: Some(messages::counter_number::SampleSchema {
                             sample_field_one: true,
                             sample_field_two: false,
                         }),
