@@ -2,7 +2,7 @@
 fn main() {
     use std::env;
     use std::fs;
-    use std::process::Command;
+    use std::process;
 
     // Install and remember Protobuf compiler's path
     let home_path = home::home_dir().unwrap();
@@ -22,11 +22,9 @@ fn main() {
 
     // Build the command to run the Dart script
     #[cfg(target_family = "windows")]
-    let mut command = Command::new("dart.bat");
+    let mut command = process::Command::new("dart.bat");
     #[cfg(target_family = "unix")]
-    let mut command = Command::new("dart");
-    #[cfg(target_family = "wasm")]
-    let mut command = Command::new("exit");
+    let mut command = process::Command::new("dart");
     command.args(["run", "rinf"]);
     command.args(&dart_command_args);
 

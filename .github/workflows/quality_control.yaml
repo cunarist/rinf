@@ -1,3 +1,5 @@
+# Confirm that the code and configuration files
+# are correctly formatted and analyzed.
 name: quality-control
 
 on:
