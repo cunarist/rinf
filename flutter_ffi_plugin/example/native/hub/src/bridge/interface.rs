@@ -17,7 +17,7 @@ pub struct DartSignal<T> {
 }
 
 type Cell<T> = RefCell<Option<T>>;
-type SharedCell<T> = Arc<Mutex<Cell<T>>>;
+pub type SharedCell<T> = Arc<Mutex<Cell<T>>>;
 
 #[cfg(not(target_family = "wasm"))]
 lazy_static! {

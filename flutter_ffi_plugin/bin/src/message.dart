@@ -253,7 +253,7 @@ void ${camelName}Send($messageName message, [Uint8List? blob]) {
           await insertTextToFile(
             rustPath,
             '''
-type ${messageName}Cell = Arc<Mutex<RefCell<Option<Sender<DartSignal<$messageName>>>>>>;
+type ${messageName}Cell = SharedCell<Sender<DartSignal<$messageName>>>;
 lazy_static! {
     pub static ref ${snakeName.toUpperCase()}_SENDER: ${messageName}Cell =
         Arc::new(Mutex::new(RefCell::new(None)));
@@ -301,7 +301,11 @@ pub fn ${snakeName}_send(message: $messageName, blob: Option<Vec<u8>>) {
 use prost::Message;
 use crate::bridge::*;
 
-pub fn handle_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Vec<u8>>) {
+pub fn handle_signal(
+    message_id: i32,
+    message_bytes: Vec<u8>,
+    blob: Option<Vec<u8>>
+) {
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -316,7 +320,9 @@ pub fn handle_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Vec<u
           rustReceiveScript += '''
 if message_id == ${markedMessage.id} {
     use super$modulePath::$filename::*;
-    let message = ${markedMessage.name}::decode(message_bytes.as_slice()).unwrap();     
+    let message = ${markedMessage.name}::decode(
+        message_bytes.as_slice()
+    ).unwrap();
     let signal = DartSignal {
         message,
         blob,

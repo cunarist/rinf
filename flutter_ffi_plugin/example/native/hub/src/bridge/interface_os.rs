@@ -6,9 +6,6 @@ use std::cell::RefCell;
 use std::sync::Arc;
 use std::sync::Mutex;
 
-type Cell<T> = RefCell<Option<T>>;
-type SharedCell<T> = Arc<Mutex<Cell<T>>>;
-
 lazy_static! {
     pub static ref ISOLATE_SIGNAL: SharedCell<Isolate> = Arc::new(Mutex::new(RefCell::new(None)));
 }
