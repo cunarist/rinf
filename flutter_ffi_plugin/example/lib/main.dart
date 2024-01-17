@@ -114,7 +114,7 @@ class MyHomePage extends StatelessWidget {
           ],
         ),
       ),
-      // This is a button that calls the increment method.
+      // This is a button that calls the generated function.
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           // This function is generated from a marked Protobuf message.
