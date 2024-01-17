@@ -30,7 +30,18 @@ jobs:
     strategy:
       fail-fast: false # Important
       matrix:
-        runner: [ubuntu-latest, windows-latest, macos-latest, ubuntu-latest, windows-latest, macos-latest, ubuntu-latest, windows-latest, macos-latest]
+        runner:
+          [
+            ubuntu-latest,
+            windows-latest,
+            macos-latest,
+            ubuntu-latest,
+            windows-latest,
+            macos-latest,
+            ubuntu-latest,
+            windows-latest,
+            macos-latest,
+          ]
         target: [android, web] # On all platforms
         include:
           # Specify targets for each platform
@@ -81,7 +92,7 @@ jobs:
 
       - name: Create a Flutter app for testing
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For `protoc_prebuilt`
         run: python automate create-test-app
 
       - name: Build the example app
