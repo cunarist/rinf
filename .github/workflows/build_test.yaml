@@ -30,18 +30,7 @@ jobs:
     strategy:
       fail-fast: false # Important
       matrix:
-        runner:
-          [
-            ubuntu-latest,
-            windows-latest,
-            macos-latest,
-            ubuntu-latest,
-            windows-latest,
-            macos-latest,
-            ubuntu-latest,
-            windows-latest,
-            macos-latest,
-          ]
+        runner: [ubuntu-latest, windows-latest, macos-latest]
         target: [android, web] # On all platforms
         include:
           # Specify targets for each platform
