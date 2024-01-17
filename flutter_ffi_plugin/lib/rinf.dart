@@ -1,6 +1,4 @@
 /// This module supports communication with Rust.
-/// More specifically, sending requests to Rust and
-/// receiving stream signals from Rust are possible.
 
 import 'dart:async';
 import 'dart:typed_data';
