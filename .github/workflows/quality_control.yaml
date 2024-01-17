@@ -48,6 +48,8 @@ jobs:
 
       - name: Generate message files
         working-directory: flutter_ffi_plugin/example/
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For `protoc_prebuilt`
         run: rinf message
 
       - name: Check for any errors
