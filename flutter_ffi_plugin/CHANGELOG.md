@@ -1,3 +1,7 @@
+## 6.0.0-alpha
+
+- This is an alpha version.
+
 ## 5.4.0
 
 - Now users do not have to manually install `protoc` binary executable anymore. Protobuf compiler is now automatically installed. Note that you need to run `cargo install rinf` again to use this new version.
