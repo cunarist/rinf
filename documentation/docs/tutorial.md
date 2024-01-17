@@ -4,7 +4,7 @@
 
 To grasp the core concepts, it's beneficial to follow a step-by-step tutorial. Detailed explanations will be provided in the upcoming sections, while the basics can be understood here.
 
-Before we start, create a `Column` somewhere in your widget tree. This will contain our tutorial widgets.
+Before we start, make sure that there's a `Column` somewhere in your widget tree. This will contain our tutorial widgets.
 
 ```dart
 // lib/main.dart
@@ -70,18 +70,18 @@ Let's listen to this message in Rust. This simple function will add one to each 
 ...
 use crate::messages;
 ...
-pub async fn listen_to_dart() {
+pub async fn calculate_things() {
     use messages::tutorial_resource::my_number_input_receiver; // GENERATED
     let mut receiver = my_number_input_receiver();
     while let Some(dart_signal) = receiver.recv().await {
-        let my_input_number = dart_signal.message;
+        let my_number_input = dart_signal.message;
 
-        let new_numbers: Vec<i32> = my_input_number
+        let new_numbers: Vec<i32> = my_number_input
             .input_numbers
             .into_iter()
             .map(|x| x + 1)
             .collect();
-        let new_string = my_input_number.input_string.to_uppercase();
+        let new_string = my_number_input.input_string.to_uppercase();
 
         crate::debug_print!("{new_numbers:?}");
         crate::debug_print!("{new_string}");
@@ -90,14 +90,14 @@ pub async fn listen_to_dart() {
 ...
 ```
 
-Make sure that this function is properly spawned.
+Spawn the async function.
 
 ```rust
 // native/hub/src/lib.rs
 ...
 async fn main() {
 ...
-    tokio::spawn(sample_functions::listen_to_dart());
+    tokio::spawn(sample_functions::calculate_things());
 }
 ```
 
@@ -154,7 +154,7 @@ pub async fn stream_increasing_number() {
 ...
 ```
 
-Spawn the async function in Rust.
+Spawn the async function.
 
 ```rust
 // native/hub/src/lib.rs
