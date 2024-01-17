@@ -7,7 +7,9 @@ use crate::tokio;
 const SHOULD_DEMONSTRATE: bool = true; // Disabled when applied as template
 
 pub async fn tell_numbers() {
-    let mut receiver = messages::counter_number::number_input_receiver();
+    use messages::counter_number::*;
+
+    let mut receiver = number_input_receiver();
     let mut current_number = 0;
     while let Some(dart_signal) = receiver.recv().await {
         // Extract values from the message received from Dart.
@@ -21,17 +23,20 @@ pub async fn tell_numbers() {
 
         // Respond to Dart with a new message.
         // This type is also declared in its Protobuf file.
-        let number_output = messages::counter_number::NumberOutput {
+        let number_output = NumberOutput {
             current_number,
             dummy_one: number_input.dummy_one,
             dummy_two: number_input.dummy_two,
             dummy_three: number_input.dummy_three,
         };
-        messages::counter_number::number_output_send(number_output, None);
+        number_output_send(number_output, None);
     }
 }
 
 pub async fn stream_fractal() {
+    use messages::counter_number::*;
+    use messages::fractal_art::*;
+
     if !SHOULD_DEMONSTRATE {
         return;
     }
@@ -70,10 +75,10 @@ pub async fn stream_fractal() {
             let received_frame = join_handle.await.unwrap();
             if let Some(fractal_image) = received_frame {
                 // Stream the image data to Dart.
-                messages::fractal_art::fractal_scale_send(
-                    messages::fractal_art::FractalScale {
+                fractal_scale_send(
+                    FractalScale {
                         current_scale,
-                        dummy: Some(messages::counter_number::SampleSchema {
+                        dummy: Some(SampleSchema {
                             sample_field_one: true,
                             sample_field_two: false,
                         }),
