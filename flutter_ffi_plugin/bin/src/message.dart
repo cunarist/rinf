@@ -1,6 +1,6 @@
+import 'dart:io';
 import 'package:path/path.dart';
 import 'package:watcher/watcher.dart';
-import 'dart:io';
 import 'config.dart';
 
 enum MarkType {
