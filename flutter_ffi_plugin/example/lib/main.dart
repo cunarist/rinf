@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:rinf/rinf.dart';
-import './messages/counter_number.pb.dart';
-import './messages/fractal.pb.dart';
-import './messages/handle.dart';
+import 'package:example_app/messages/counter_number.pb.dart';
+import 'package:example_app/messages/fractal.pb.dart';
+import 'package:example_app/messages/handle.dart';
 
 void main() async {
   // Wait for Rust initialization to be completed first.
