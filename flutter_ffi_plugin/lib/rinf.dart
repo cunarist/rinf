@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'src/common.dart';
 import 'src/exports.dart';
 
-export 'src/common.dart' show RustSignal;
+export 'src/common.dart';
 
 /// This contains basic functionalities of this framework.
 class Rinf {
