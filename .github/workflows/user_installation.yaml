@@ -8,16 +8,6 @@ on:
   schedule:
     - cron: "*/30 * * * *"
 
-concurrency:
-  # Cancels the workflow
-  # when another event in the same context happens.
-  # If it's a PR, context is the pull request number.
-  # Otherwise, it uses the Git reference(branch or tag name).
-  group: >
-    ${{ github.workflow }}
-    ${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 jobs:
   build:
     name: ${{ matrix.runner }} / ${{ matrix.target }}
