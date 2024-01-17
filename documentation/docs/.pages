@@ -3,7 +3,7 @@ nav:
   - installing-components.md
   - applying-template.md
   - running-and-building.md
-  - rust-resource-api.md
+  - tutorial.md
   - writing-code.md
   - frequently-asked-questions.md
   - contribution.md
