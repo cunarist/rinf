@@ -4,13 +4,13 @@ import 'load_os.dart';
 import 'package:ffi/ffi.dart';
 import 'dart:async';
 import 'dart:isolate';
-import 'interface.dart';
+import 'common.dart';
 import 'dart:convert';
 
 typedef StoreDartPostCObject = Pointer Function(
     Pointer<NativeFunction<Int8 Function(Int64, Pointer<Dart_CObject>)>>);
 
-Future<void> prepareNativeBridge(ReceiveSignal handleSignal) async {
+Future<void> prepareNativeBridge(HandleSignal handleSignal) async {
   /// This should be called once at startup
   /// to enable `allo_isolate` to send data from the Rust side.
   final rustFunction =

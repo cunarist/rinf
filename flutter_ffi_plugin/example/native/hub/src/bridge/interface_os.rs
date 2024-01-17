@@ -2,6 +2,7 @@ use super::interface::*;
 use allo_isolate::IntoDart;
 use allo_isolate::Isolate;
 use rinf::externs::lazy_static::lazy_static;
+use rinf::SharedCell;
 use std::cell::RefCell;
 use std::sync::Arc;
 use std::sync::Mutex;

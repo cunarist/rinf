@@ -221,10 +221,11 @@ import 'package:rinf/rinf.dart';
           '''
 #![allow(unused_imports)]
 
-use crate::bridge::*;
 use crate::tokio;
 use prost::Message;
 use rinf::externs::lazy_static::lazy_static;
+use rinf::DartSignal;
+use rinf::SharedCell;
 use std::cell::RefCell;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -301,7 +302,7 @@ pub fn ${snakeName}_send(message: $messageName, blob: Option<Vec<u8>>) {
 #![allow(clippy::needless_return)]
 
 use prost::Message;
-use crate::bridge::*;
+use rinf::DartSignal;
 
 pub fn handle_signal(
     message_id: i32,

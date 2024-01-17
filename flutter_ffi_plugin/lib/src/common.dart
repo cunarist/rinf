@@ -1,6 +1,9 @@
 import 'dart:typed_data';
 
-typedef ReceiveSignal = void Function(int, Uint8List, Uint8List?);
+/// This type represents a function
+/// that can accept raw signal data from Rust
+/// and handle it accordingly.
+typedef HandleSignal = void Function(int, Uint8List, Uint8List?);
 
 /// This contains a message from Rust.
 /// Optionally, a custom binary called `blob` can also be included.

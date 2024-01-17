@@ -3,16 +3,17 @@
 /// receiving stream signals from Rust are possible.
 
 import 'dart:async';
-import 'src/exports.dart';
 import 'dart:typed_data';
+import 'src/common.dart';
+import 'src/exports.dart';
 
-export 'src/exports.dart' show RustSignal;
+export 'src/common.dart' show RustSignal;
 
 /// This contains basic functionalities of this framework.
 class Rinf {
   /// Make sure that the Rust side is ready.
   /// Don't forget to call this function in the `main` function of Dart.
-  static Future<void> initialize(ReceiveSignal handleSignal) async {
+  static Future<void> initialize(HandleSignal handleSignal) async {
     await prepareNativeBridge(handleSignal);
   }
 
