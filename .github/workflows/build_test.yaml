@@ -83,7 +83,7 @@ jobs:
 
       - name: Create a Flutter app for testing
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For `protoc_prebuilt`
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }} # For `protoc_prebuilt`
         run: python automate create-test-app
 
       - name: Build the example app
