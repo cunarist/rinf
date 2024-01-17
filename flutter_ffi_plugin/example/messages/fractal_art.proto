@@ -1,5 +1,5 @@
 syntax = "proto3";
-package fractal;
+package fractal_art;
 
 import "counter_number.proto";
 

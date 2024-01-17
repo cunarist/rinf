@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:rinf/rinf.dart';
-import 'package:example_app/messages/counter_number.pb.dart';
-import 'package:example_app/messages/fractal.pb.dart';
 import 'package:example_app/messages/handle.dart';
+import 'package:example_app/messages/counter_number.pb.dart';
+import 'package:example_app/messages/fractal_art.pb.dart';
 
 void main() async {
   // Wait for Rust initialization to be completed first.
@@ -36,37 +36,20 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Rinf Example',
+      title: 'Rinf Demo',
       theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blueGrey,
+          brightness: MediaQuery.platformBrightnessOf(context),
+        ),
         useMaterial3: true,
-        brightness: MediaQuery.platformBrightnessOf(context),
       ),
       home: MyHomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  void _incrementCounter() async {
-    numberInputSend(
-      NumberInput(
-          letter: "HELLO FROM DART!",
-          dummyOne: 25,
-          dummyTwo: SampleSchema(
-            sampleFieldOne: true,
-            sampleFieldTwo: false,
-          ),
-          dummyThree: [4, 5, 6]),
-    );
-  }
-
+class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,21 +60,11 @@ class _MyHomePageState extends State<MyHomePage> {
             // `StreamBuilder` listens to a stream
             // and rebuilds the widget accordingly.
             StreamBuilder<RustSignal<FractalScale>>(
-                // Receive signals from Rust
-                // with `rustBroadcaster` from `rinf.dart`,
-                // For better performance, filter signals
-                // by checking the `resource` field with the `where` method.
-                // This approach allows the builder to rebuild its widget
-                // only when there are signals
-                // related to a specific Rust resource it is interested in.
+                // This stream is generated from a marked Protobuf message.
                 stream: fractalScaleStream,
                 builder: (context, snapshot) {
-                  // If the app has just started and widget is built
-                  // without receiving a Rust signal,
-                  // the snapshot's data will be null.
                   final rustSignal = snapshot.data;
                   if (rustSignal == null) {
-                    // Return a black container if the received data is null.
                     return Container(
                       margin: const EdgeInsets.all(20),
                       width: 256,
@@ -102,7 +75,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     );
                   }
-                  // Return an image container if some data is received.
                   final imageData = rustSignal.blob!;
                   return Container(
                     margin: const EdgeInsets.all(20),
@@ -123,10 +95,16 @@ class _MyHomePageState extends State<MyHomePage> {
                   );
                 }),
             StreamBuilder<RustSignal<NumberOutput>>(
+              // This stream is generated from a marked Protobuf message.
               stream: numberOutputStream,
               builder: (context, snapshot) {
                 final rustSignal = snapshot.data;
+                // If the app has just started and widget is built
+                // without receiving a Rust signal,
+                // the snapshot data will be null.
+                // It's when the widget is being built for the first time.
                 if (rustSignal == null) {
+                  // Return the initial widget if the snapshot data is null.
                   return Text('Initial value 0');
                 }
                 final currentNumber = rustSignal.message.currentNumber;
@@ -138,7 +116,19 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       // This is a button that calls the increment method.
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () async {
+          // This function is generated from a marked Protobuf message.
+          numberInputSend(
+            NumberInput(
+                letter: "HELLO FROM DART!",
+                dummyOne: 25,
+                dummyTwo: SampleSchema(
+                  sampleFieldOne: true,
+                  sampleFieldTwo: false,
+                ),
+                dummyThree: [4, 5, 6]),
+          );
+        },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),

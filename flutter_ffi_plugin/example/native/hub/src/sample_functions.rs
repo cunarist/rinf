@@ -10,7 +10,8 @@ pub async fn tell_numbers() {
     let mut receiver = messages::counter_number::number_input_receiver();
     let mut current_number = 0;
     while let Some(dart_signal) = receiver.recv().await {
-        // Decode raw bytes into a Rust message object.
+        // Extract values from the received message.
+        // This message is a type that's declared in its Protobuf file.
         let number_input = dart_signal.message;
         let letter = number_input.letter;
         crate::debug_print!("{letter}");
@@ -18,7 +19,7 @@ pub async fn tell_numbers() {
         // Perform a simple calculation.
         current_number = sample_crate::add_seven(current_number);
 
-        // Return the message that will be sent to Dart.
+        // Respond to Dart with a new message.
         let number_output = messages::counter_number::NumberOutput {
             current_number,
             dummy_one: number_input.dummy_one,
@@ -68,8 +69,8 @@ pub async fn stream_fractal() {
             let received_frame = join_handle.await.unwrap();
             if let Some(fractal_image) = received_frame {
                 // Stream the image data to Dart.
-                messages::fractal::fractal_scale_send(
-                    messages::fractal::FractalScale {
+                messages::fractal_art::fractal_scale_send(
+                    messages::fractal_art::FractalScale {
                         current_scale,
                         dummy: Some(messages::counter_number::SampleSchema {
                             sample_field_one: true,
