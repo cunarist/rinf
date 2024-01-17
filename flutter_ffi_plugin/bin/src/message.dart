@@ -314,9 +314,9 @@ pub fn handle_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Vec<u
           rustReceiveScript += '''
 if message_id == ${markedMessage.id} {
     use super$modulePath::$filename::*;
-    let decoded = ${markedMessage.name}::decode(message_bytes.as_slice()).unwrap();     
+    let message = ${markedMessage.name}::decode(message_bytes.as_slice()).unwrap();     
     let signal = DartSignal {
-        message: decoded,
+        message,
         blob,
     };
     let cell = ${snakeName.toUpperCase()}_SENDER.lock().unwrap();
@@ -360,9 +360,9 @@ import '.$importPath' as $filename;
           }
           dartReceiveScript += '''
 if (messageId == ${markedMessage.id}) {
-  final decoded = $filename.${markedMessage.name}.fromBuffer(messageBytes);
+  final message = $filename.${markedMessage.name}.fromBuffer(messageBytes);
   final bridgeSignal = RustSignal(
-    decoded,
+    message,
     blob,
   );
   $filename.${camelName}Controller.add(bridgeSignal);
