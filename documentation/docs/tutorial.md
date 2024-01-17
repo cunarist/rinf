@@ -41,7 +41,7 @@ Next, generate Dart and Rust message code from `.proto` files.
 rinf message
 ```
 
-Create a button widget in Dart that accepts the user input. `myNumberInputSend` and `MyNumberInput` is generated from the Protobuf file.
+Create a button widget in Dart that accepts the user input.
 
 ```dart
 // lib/main.dart
@@ -53,7 +53,7 @@ child: Column(
   children: [
     ElevatedButton(
       onPressed: () async {
-      myNumberInputSend(MyNumberInput(
+      myNumberInputSend(MyNumberInput( // GENERATED
           inputNumbers: [3, 4, 5],
           inputString: 'Zero-cost abstraction',
         ));
@@ -63,7 +63,7 @@ child: Column(
 ...
 ```
 
-Let's listen to this message in Rust. This simple function will add one to each element in the array, capitalize all letters in the string, and return them. `my_number_input_receiver` is generated from the Protobuf file.
+Let's listen to this message in Rust. This simple function will add one to each element in the array, capitalize all letters in the string, and return them.
 
 ```rust
 // native/hub/src/sample_functions.rs
@@ -71,7 +71,7 @@ Let's listen to this message in Rust. This simple function will add one to each 
 use crate::messages;
 ...
 pub async fn listen_to_dart() {
-    use messages::tutorial_resource::my_number_input_receiver;
+    use messages::tutorial_resource::my_number_input_receiver; // GENERATED
     let mut receiver = my_number_input_receiver();
     while let Some(dart_signal) = receiver.recv().await {
         let my_input_number = dart_signal.message;
@@ -131,7 +131,7 @@ Generate Dart and Rust message code from `.proto` files.
 rinf message
 ```
 
-Define an async Rust function that runs forever, sending numbers to Dart every second. `MyIncreasingNumber` and `my_increasing_number_send` is generated from the Protobuf file.
+Define an async Rust function that runs forever, sending numbers to Dart every second.
 
 ```rust
 // native/hub/src/sample_functions.rs
@@ -143,10 +143,10 @@ pub async fn stream_increasing_number() {
     loop {
         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 
-        use messages::tutorial_resource::MyIncreasingNumber;
+        use messages::tutorial_resource::MyIncreasingNumber; // GENERATED
         let my_increasing_number = MyIncreasingNumber { current_number };
 
-        use messages::tutorial_resource::my_increasing_number_send;
+        use messages::tutorial_resource::my_increasing_number_send; // GENERATED
         my_increasing_number_send(my_increasing_number, None);
 
         current_number += 1;
@@ -167,7 +167,7 @@ async fn main() {
 ...
 ```
 
-Finally, receive the signals in Dart with `StreamBuilder` and rebuild the widget accordingly. `myIncreasingNumberStream` is generated from the Protobuf file.
+Finally, receive the signals in Dart with `StreamBuilder` and rebuild the widget accordingly.
 
 ```dart
 // lib/main.dart
@@ -178,7 +178,7 @@ import 'package:example_app/messages/increasing_number.pb.dart'
 ...
 children: [
   StreamBuilder<RustSignal>(
-    stream: myIncreasingNumberStream,
+    stream: myIncreasingNumberStream, // GENERATED
     builder: (context, snapshot) {
       final rustSignal = snapshot.data;
       if (rustSignal == null) {
@@ -191,8 +191,6 @@ children: [
   ),
 ...
 ```
-
-We rebuild the widget with the received data here, but the streamed data can also be used to update Dart states in real apps.
 
 ## 🤝 Back and Forth
 
