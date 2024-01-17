@@ -296,6 +296,8 @@ pub fn ${snakeName}_send(message: $messageName, blob: Option<Vec<u8>>) {
   // Get ready to receive messages in Rust.
   var rustReceiveScript = "";
   rustReceiveScript += '''
+#![allow(clippy::needless_return)]
+
 use prost::Message;
 use crate::bridge::*;
 
