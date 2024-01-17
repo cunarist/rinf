@@ -134,17 +134,17 @@ pub async fn run_debug_tests() {
     let mut count = 0u64;
     let mut steps_finished = 0;
     loop {
-        count += 1;
-        if count % 10000 == 0 {
-            tokio::task::yield_now().await;
-            let time_passed = sample_crate::get_current_time() - last_time;
-            if time_passed.num_milliseconds() > 1000 {
-                crate::debug_print!("Counted to {count}, yielding regularly.");
-                last_time = sample_crate::get_current_time();
-                steps_finished += 1;
-                if steps_finished == 10 {
-                    break;
-                }
+        for _ in 0..1000000 {
+            count += 1;
+        }
+        tokio::task::yield_now().await;
+        let time_passed = sample_crate::get_current_time() - last_time;
+        if time_passed.num_milliseconds() > 1000 {
+            crate::debug_print!("Counted to {count}, yielding regularly.");
+            last_time = sample_crate::get_current_time();
+            steps_finished += 1;
+            if steps_finished == 10 {
+                break;
             }
         }
     }

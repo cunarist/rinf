@@ -7,7 +7,6 @@ use image::{self, ImageEncoder};
 const WIDTH: u32 = 384;
 const HEIGHT: u32 = 384;
 const BUF_SIZE: u32 = WIDTH * HEIGHT * 3;
-const NB_SAMPLES: u32 = 1;
 const SIZE: f64 = 0.000000001;
 const MAX_ITER: u32 = 1000;
 
@@ -52,23 +51,17 @@ fn render_line(line_number: u32, px: f64, py: f64, scale: f64) -> (Vec<u8>, u32)
         let center_offset_x = (x as f64 - WIDTH as f64 / 2.0) / (WIDTH as f64 / 2.0);
         let center_offset_y = (line_number as f64 - HEIGHT as f64 / 2.0) / (HEIGHT as f64 / 2.0);
 
-        let sampled_colours = (0..NB_SAMPLES)
-            .map(|_| {
-                let nx = SIZE * center_offset_x * scale + px;
-                let ny = SIZE * center_offset_y * scale + py;
-                let (m_res, m_iter) = fractal_iter(nx, ny);
-                paint(m_res, m_iter)
-            })
-            .map(|(r, g, b)| (r as i32, g as i32, b as i32));
+        let (nx, ny) = (
+            SIZE * center_offset_x * scale + px,
+            SIZE * center_offset_y * scale + py,
+        );
 
-        let (r, g, b): (i32, i32, i32) = sampled_colours
-            .fold((0, 0, 0), |(cr, cg, cb), (r, g, b)| {
-                (cr + r, cg + g, cb + b)
-            });
+        let (m_res, m_iter) = fractal_iter(nx, ny);
+        let (r, g, b) = paint(m_res, m_iter);
 
-        line[(x * 3) as usize] = ((r as f64) / (NB_SAMPLES as f64)) as u8;
-        line[((x * 3) + 1) as usize] = ((g as f64) / (NB_SAMPLES as f64)) as u8;
-        line[((x * 3) + 2) as usize] = ((b as f64) / (NB_SAMPLES as f64)) as u8;
+        line[(x * 3) as usize] = (r as f64) as u8;
+        line[((x * 3) + 1) as usize] = (g as f64) as u8;
+        line[((x * 3) + 2) as usize] = (b as f64) as u8;
     }
 
     (line, line_number)
