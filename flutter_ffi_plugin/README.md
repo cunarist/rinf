@@ -1,4 +1,4 @@
-> Currently, Rinf is in version 6 alpha, which introduces a new system making communication between Dart and Rust much easier and simpler. If you'd like to try out this new version, please run `flutter pub add rinf:'6.0.0-alpha'` and `rinf template`.
+> Currently, Rinf is in version 6 alpha, introducing a new system that makes communication between Dart and Rust much easier and simpler. If you'd like to try out this new version, please run `flutter pub add rinf:'6.0.0-alpha'` and `rinf template`.
 
 # Rinf: Rust in Flutter
 
