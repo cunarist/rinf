@@ -4,11 +4,23 @@
 
 To grasp the core concepts, it's beneficial to follow a step-by-step tutorial. Detailed explanations will be provided in the upcoming sections, while the basics can be understood here.
 
+Before we start, create a `Column` somewhere in your widget tree. This will contain our tutorial widgets.
+
+```dart
+// lib/main.dart
+...
+child: Column(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [],
+)
+...
+```
+
 ## 🚨 From Dart to Rust
 
 Let's say you want to create a new button in Dart that sends an array of numbers and a string to Rust. This signal is intended to notify that a user event has occurred, and it triggers Rust to perform some calculations on the data.
 
-Write a new `.proto` file in the `./messages` directory representing the new Rust resource. Note that the message should have the comment `[RINF:DART-SIGNAL]` above it.
+Write a new `.proto` file in the `./messages` directory with a new message. Note that the message should have the comment `[RINF:DART-SIGNAL]` above it.
 
 ```proto
 // messages/tutorial_resource.proto
@@ -21,18 +33,6 @@ message MyNumberInput {
   repeated int32 input_numbers = 1;
   string input_string = 2;
 }
-```
-
-Create a `Column` somewhere in your widget tree. This will contain our tutorial widgets.
-
-```dart
-// lib/main.dart
-...
-child: Column(
-  mainAxisAlignment: MainAxisAlignment.center,
-  children: [],
-)
-...
 ```
 
 Next, generate Dart and Rust message code from `.proto` files.
@@ -53,17 +53,17 @@ child: Column(
   children: [
     ElevatedButton(
       onPressed: () async {
-      myNumberInputSend(MyNumberInput( // GENERATED
-          inputNumbers: [3, 4, 5],
-          inputString: 'Zero-cost abstraction',
-        ));
-      },
+        myNumberInputSend(MyNumberInput( // GENERATED
+            inputNumbers: [3, 4, 5],
+            inputString: 'Zero-cost abstraction',
+          ));
+        },
       child: Text("Send a Signal from Dart to Rust"),
     ),
 ...
 ```
 
-Let's listen to this message in Rust. This simple function will add one to each element in the array, capitalize all letters in the string, and return them.
+Let's listen to this message in Rust. This simple function will add one to each element in the array and capitalize all letters in the string.
 
 ```rust
 // native/hub/src/sample_functions.rs
@@ -99,7 +99,6 @@ async fn main() {
 ...
     tokio::spawn(sample_functions::listen_to_dart());
 }
-...
 ```
 
 Now we can see the printed output in the command-line when clicking the button!
@@ -164,7 +163,6 @@ async fn main() {
 ...
     tokio::spawn(sample_functions::stream_increasing_number());
 }
-...
 ```
 
 Finally, receive the signals in Dart with `StreamBuilder` and rebuild the widget accordingly.
@@ -177,7 +175,7 @@ import 'package:example_app/messages/increasing_number.pb.dart'
     as increasingNumbers;
 ...
 children: [
-  StreamBuilder<RustSignal>(
+  StreamBuilder(
     stream: myIncreasingNumberStream, // GENERATED
     builder: (context, snapshot) {
       final rustSignal = snapshot.data;
@@ -194,4 +192,42 @@ children: [
 
 ## 🤝 Back and Forth
 
-Combine
+You can easily achieve something like a request-response pattern easily by combining those two ways of message passing.
+
+```proto
+// messages/tutorial_resource.proto
+
+syntax = "proto3";
+package tutorial_resource;
+...
+// [RINF:DART-SIGNAL]
+message MyValueRequest {}
+
+// [RINF:RUST-SIGNAL]
+message MyValueResponse { int32 value_output = 1; }
+```
+
+```dart
+// lib/main.dart
+...
+children: [
+  StreamBuilder(
+    stream: myValueResponseStream, // GENERATED
+    builder: (context, snapshot) {
+      final rustSignal = snapshot.data;
+      if (rustSignal == null) {
+        return Text('No value yet');
+      }
+      final currentNumber = rustSignal.message.valueOutput;
+      return Text('Response value is $currentNumber');
+    },
+  ),
+  ElevatedButton(
+    onPressed: () {
+      myValueRequestSend(MyValueRequest()); // GENERATED
+    },
+    child: Text('Make a request'),
+  ),
+],
+...
+```

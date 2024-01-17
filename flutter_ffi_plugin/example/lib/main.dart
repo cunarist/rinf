@@ -59,7 +59,7 @@ class MyHomePage extends StatelessWidget {
           children: [
             // `StreamBuilder` listens to a stream
             // and rebuilds the widget accordingly.
-            StreamBuilder<RustSignal<FractalScale>>(
+            StreamBuilder(
                 // This stream is generated from a marked Protobuf message.
                 stream: fractalScaleStream,
                 builder: (context, snapshot) {
@@ -94,7 +94,7 @@ class MyHomePage extends StatelessWidget {
                     ),
                   );
                 }),
-            StreamBuilder<RustSignal<NumberOutput>>(
+            StreamBuilder(
               // This stream is generated from a marked Protobuf message.
               stream: numberOutputStream,
               builder: (context, snapshot) {
