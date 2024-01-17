@@ -4,6 +4,7 @@ use allo_isolate::Isolate;
 use rinf::externs::lazy_static::lazy_static;
 use rinf::SharedCell;
 use std::cell::RefCell;
+use std::panic::catch_unwind;
 use std::sync::Arc;
 use std::sync::Mutex;
 
@@ -13,19 +14,25 @@ lazy_static! {
 
 #[no_mangle]
 pub extern "C" fn prepare_isolate_extern(port: i64) {
-    let dart_isolate = Isolate::new(port);
-    let cell = DART_ISOLATE.lock().unwrap();
-    cell.replace(Some(dart_isolate));
+    let _ = catch_unwind(|| {
+        let dart_isolate = Isolate::new(port);
+        let cell = DART_ISOLATE.lock().unwrap();
+        cell.replace(Some(dart_isolate));
+    });
 }
 
 #[no_mangle]
 pub extern "C" fn start_rust_logic_extern() {
-    start_rust_logic();
+    let _ = catch_unwind(|| {
+        start_rust_logic();
+    });
 }
 
 #[no_mangle]
 pub extern "C" fn stop_rust_logic_extern() {
-    stop_rust_logic();
+    let _ = catch_unwind(|| {
+        stop_rust_logic();
+    });
 }
 
 #[no_mangle]
@@ -50,7 +57,9 @@ pub extern "C" fn send_dart_signal_extern(
     } else {
         None
     };
-    crate::messages::generated::handle_signal(message_id as i32, message_bytes, blob);
+    let _ = catch_unwind(|| {
+        crate::messages::generated::handle_signal(message_id as i32, message_bytes, blob);
+    });
 }
 
 pub fn send_rust_signal_extern(

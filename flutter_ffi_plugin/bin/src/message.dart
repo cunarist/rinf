@@ -331,7 +331,10 @@ if message_id == ${markedMessage.id} {
         blob,
     };
     let cell = ${snakeName.toUpperCase()}_SENDER.lock().unwrap();
-    let sender = cell.clone().replace(None).unwrap();
+    let sender = cell.clone().replace(None).expect(concat!(
+        "Looks like the channel is not created yet.",
+        "\\nTry calling `${snakeName}_receiver()` first."
+    ));
     let _ = sender.try_send(signal);
     return;
 }

@@ -4,12 +4,16 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub fn start_rust_logic_extern() {
-    start_rust_logic();
+    let _ = catch_unwind(|| {
+        start_rust_logic();
+    });
 }
 
 #[wasm_bindgen]
 pub fn stop_rust_logic_extern() {
-    stop_rust_logic();
+    let _ = catch_unwind(|| {
+        stop_rust_logic();
+    });
 }
 
 #[wasm_bindgen]
@@ -25,7 +29,9 @@ pub fn send_dart_signal_extern(
     } else {
         None
     };
-    crate::messages::generated::handle_signal(message_id as i32, message_bytes, blob);
+    let _ = catch_unwind(|| {
+        crate::messages::generated::handle_signal(message_id as i32, message_bytes, blob);
+    });
 }
 
 #[wasm_bindgen]
