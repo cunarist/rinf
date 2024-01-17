@@ -42,7 +42,7 @@ elif sys.argv[1] == "create-test-app":
         # Retry the command in case of failure,
         # possibly due to GitHub API rate limiting
         # associated with the 'protoc_prebuilt' crate.
-        time.sleep(10)
+        time.sleep(60)
 
     os.remove("Cargo.toml")
 
@@ -78,7 +78,7 @@ elif sys.argv[1] == "create-user-app":
         # Retry the command in case of failure,
         # possibly due to GitHub API rate limiting
         # associated with the 'protoc_prebuilt' crate.
-        time.sleep(10)
+        time.sleep(60)
 
     os.chdir("../")
 
