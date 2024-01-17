@@ -1,3 +1,5 @@
+# Verify that the app build works as intended
+# when utilizing the code inside the repository.
 name: build-test
 
 on:

@@ -1,3 +1,6 @@
+# Publish packages online.
+# This is performed only when a new Git tag
+# with version information is added.
 name: publication
 
 # With default Git settings, Unix-like systems use LF (`\n`) for new lines,
