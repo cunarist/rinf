@@ -53,6 +53,36 @@ elif sys.argv[1] == "create-test-app":
     with open(filepath, mode="w", encoding="utf8") as file:
         file.write(content)
 
+elif sys.argv[1] == "create-user-app":
+    filepath = ".gitignore"
+    with open(filepath, mode="r", encoding="utf8") as file:
+        content: str = file.read()
+    content += "\n/user_app/"
+    with open(filepath, mode="w", encoding="utf8") as file:
+        file.write(content)
+
+    command = "flutter create user_app"
+    os.system(command)
+
+    os.chdir("./user_app/")
+
+    command = "flutter pub add rinf"
+    os.system(command)
+    command = "rinf template"
+    os.system(command)
+
+    os.chdir("../")
+
+    filepath = "Cargo.toml"
+    with open(filepath, mode="r", encoding="utf8") as file:
+        content: str = file.read()
+    content = content.replace(
+        "flutter_ffi_plugin/example/native/*",
+        "user_app/native/*",
+    )
+    with open(filepath, mode="w", encoding="utf8") as file:
+        file.write(content)
+
 elif sys.argv[1] == "--help" or sys.argv[1] == "-h":
     print("Usage: python automate [arguments]")
     print("Arguments:")
