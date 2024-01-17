@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 
 
 def exit():
@@ -37,7 +38,11 @@ elif sys.argv[1] == "create-test-app":
     command = "dart pub add \"rinf:{'path':'../flutter_ffi_plugin'}\""
     os.system(command)
     command = "rinf template"
-    os.system(command)
+    while os.system(command) != 0:
+        # Retry the command in case of failure,
+        # possibly due to GitHub API rate limiting
+        # associated with the 'protoc_prebuilt' crate.
+        time.sleep(10)
 
     os.remove("Cargo.toml")
 
@@ -69,7 +74,11 @@ elif sys.argv[1] == "create-user-app":
     command = "flutter pub add rinf"
     os.system(command)
     command = "rinf template"
-    os.system(command)
+    while os.system(command) != 0:
+        # Retry the command in case of failure,
+        # possibly due to GitHub API rate limiting
+        # associated with the 'protoc_prebuilt' crate.
+        time.sleep(10)
 
     os.chdir("../")
 
