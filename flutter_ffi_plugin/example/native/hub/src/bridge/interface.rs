@@ -2,26 +2,17 @@
 
 use crate::tokio;
 use rinf::externs::lazy_static::lazy_static;
+use rinf::SimpleCell;
 use std::cell::RefCell;
-use std::sync::Arc;
-use std::sync::Mutex;
 
 #[cfg(not(target_family = "wasm"))]
 pub use super::interface_os::*;
 #[cfg(target_family = "wasm")]
 pub use super::interface_web::*;
 
-pub struct DartSignal<T> {
-    pub message: T,
-    pub blob: Option<Vec<u8>>,
-}
-
-type Cell<T> = RefCell<Option<T>>;
-type SharedCell<T> = Arc<Mutex<Cell<T>>>;
-
 #[cfg(not(target_family = "wasm"))]
 lazy_static! {
-    pub static ref TOKIO_RUNTIME: rinf::externs::os_thread_local::ThreadLocal<Cell<tokio::runtime::Runtime>> =
+    pub static ref TOKIO_RUNTIME: rinf::externs::os_thread_local::ThreadLocal<SimpleCell<tokio::runtime::Runtime>> =
         rinf::externs::os_thread_local::ThreadLocal::new(|| RefCell::new(None));
 }
 

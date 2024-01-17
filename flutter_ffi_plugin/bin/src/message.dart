@@ -1,6 +1,6 @@
+import 'dart:io';
 import 'package:path/path.dart';
 import 'package:watcher/watcher.dart';
-import 'dart:io';
 import 'config.dart';
 
 enum MarkType {
@@ -123,7 +123,7 @@ Future<void> generateMessageCode({
       }
     }
     if (subPath == "") {
-      modRsLines.add("pub mod handle;");
+      modRsLines.add("pub mod generated;");
     }
     final modRsContent = modRsLines.join('\n');
     await File('$rustOutputPath$subPath/mod.rs').writeAsString(modRsContent);
@@ -184,11 +184,13 @@ Future<void> generateMessageCode({
     }
   }
 
-  // Get ready to prepare channels between Dart and Rust.
-  final markedMessagesAll = await parseProtoFiles(
+  // Analyze marked messages in `.proto` files.
+  final markedMessagesAll = await analyzeMarkedMessages(
     protoPath,
     resourcesInFolders,
   );
+
+  // Prepare communication channels between Dart and Rust.
   for (final entry in markedMessagesAll.entries) {
     final subPath = entry.key;
     final filesAndMarks = entry.value;
@@ -219,10 +221,11 @@ import 'package:rinf/rinf.dart';
           '''
 #![allow(unused_imports)]
 
-use crate::bridge::*;
 use crate::tokio;
 use prost::Message;
 use rinf::externs::lazy_static::lazy_static;
+use rinf::DartSignal;
+use rinf::SharedCell;
 use std::cell::RefCell;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -253,7 +256,7 @@ void ${camelName}Send($messageName message, [Uint8List? blob]) {
           await insertTextToFile(
             rustPath,
             '''
-type ${messageName}Cell = Arc<Mutex<RefCell<Option<Sender<DartSignal<$messageName>>>>>>;
+type ${messageName}Cell = SharedCell<Sender<DartSignal<$messageName>>>;
 lazy_static! {
     pub static ref ${snakeName.toUpperCase()}_SENDER: ${messageName}Cell =
         Arc::new(Mutex::new(RefCell::new(None)));
@@ -293,15 +296,19 @@ pub fn ${snakeName}_send(message: $messageName, blob: Option<Vec<u8>>) {
     }
   }
 
-  // Get ready to receive messages in Rust.
+  // Get ready to handle received signals in Rust.
   var rustReceiveScript = "";
   rustReceiveScript += '''
 #![allow(clippy::needless_return)]
 
 use prost::Message;
-use crate::bridge::*;
+use rinf::DartSignal;
 
-pub fn handle_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Vec<u8>>) {
+pub fn handle_signal(
+    message_id: i32,
+    message_bytes: Vec<u8>,
+    blob: Option<Vec<u8>>
+) {
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -316,13 +323,18 @@ pub fn handle_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Vec<u
           rustReceiveScript += '''
 if message_id == ${markedMessage.id} {
     use super$modulePath::$filename::*;
-    let message = ${markedMessage.name}::decode(message_bytes.as_slice()).unwrap();     
+    let message = ${markedMessage.name}::decode(
+        message_bytes.as_slice()
+    ).unwrap();
     let signal = DartSignal {
         message,
         blob,
     };
     let cell = ${snakeName.toUpperCase()}_SENDER.lock().unwrap();
-    let sender = cell.clone().replace(None).unwrap();
+    let sender = cell.clone().replace(None).expect(concat!(
+        "Looks like the channel is not created yet.",
+        "\\nTry listening to a receiver from `${snakeName}_receiver()`."
+    ));
     let _ = sender.try_send(signal);
     return;
 }
@@ -334,9 +346,9 @@ if message_id == ${markedMessage.id} {
   rustReceiveScript += '''
 }
 ''';
-  await File('$rustOutputPath/handle.rs').writeAsString(rustReceiveScript);
+  await File('$rustOutputPath/generated.rs').writeAsString(rustReceiveScript);
 
-  // Get ready to receive messages in Dart.
+  // Get ready to handle received signals in Dart.
   var dartReceiveScript = "";
   dartReceiveScript += '''
 import 'dart:typed_data';
@@ -378,7 +390,7 @@ if (messageId == ${markedMessage.id}) {
   dartReceiveScript += '''
 }
 ''';
-  await File('$dartOutputPath/handle.dart').writeAsString(dartReceiveScript);
+  await File('$dartOutputPath/generated.dart').writeAsString(dartReceiveScript);
 
   // Notify that it's done
   if (!silent) {
@@ -536,7 +548,7 @@ Future<void> insertTextToFile(
   await file.writeAsString(fileContent);
 }
 
-Future<Map<String, Map<String, List<MarkedMessage>>>> parseProtoFiles(
+Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
   String protoPath,
   Map<String, List<String>> resourcesInFolders,
 ) async {

@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:package_config/package_config.dart';
-import 'message.dart';
 import 'config.dart';
+import 'message.dart';
 
 /// Creates new folders and files to an existing Flutter project folder.
 Future<void> applyRustTemplate({
@@ -171,7 +171,7 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
     );
     lines.insert(
       lastImportIndex + 1,
-      "import './messages/handle.dart';",
+      "import './messages/generated.dart';",
     );
     mainText = lines.join("\n");
   }

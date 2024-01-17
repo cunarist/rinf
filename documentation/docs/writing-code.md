@@ -1,318 +1,75 @@
-# How to Write Code
+# Writing Code
 
-## 📡 Tutorial
+> If you are using Rinf version 5 or earlier, please refer to the [historical docs](https://github.com/cunarist/rinf/blob/v5.4.0/documentation/docs/writing-code.md). With the introduction of Rinf version 6, a simpler way for communication between Dart and Rust has been implemented, and the system has undergone significant changes.
 
-### Request from Dart, Response from Rust
+## 🏷️ Signal Details
 
-Let's say that you want to make a new button that sends an array of numbers and a string from Dart to Rust to perform some calculation on it. You can follow these steps to understand how to send a request and wait for the response.
+### Code Generation
 
-First, create a `Column` somewhere in your widget tree. This will contain our tutorial widgets.
+As you've seen in the tutorial, special comments inside `.proto` files allow Rinf's code generator invoked by `rinf message` to create appropriate channels for communication between Dart and Rust.
 
-```dart
-// lib/main.dart
-...
-child: Column(
-  mainAxisAlignment: MainAxisAlignment.center,
-  children: [],
-)
-...
-```
-
-Create a new `.proto` file in `./messages` that represents the new Rust resource.
+`[RINF:DART-SIGNAL]` generates a channel from Dart to Rust.
 
 ```proto
-// messages/tutorial_resource.proto
+// Protobuf
 
-syntax = "proto3";
-package tutorial_resource;
-
-message ReadRequest {
-  repeated int32 input_numbers = 1;
-  string input_string = 2;
-}
-
-message ReadResponse {
-  repeated int32 output_numbers = 1;
-  string output_string = 2;
-}
+// [RINF:DART-SIGNAL]
+message MyDataInput { ... }
 ```
-
-Next, generate Dart and Rust message code from `.proto` files.
-
-```bash
-rinf message
-```
-
-Create a button widget in Dart that accepts the user input.
 
 ```dart
-// lib/main.dart
-...
-child: Column(
-  mainAxisAlignment: MainAxisAlignment.center,
-  children: [
-    ElevatedButton(
-      onPressed: () async {},
-      child: Text("Request to Rust"),
-    ),
-...
+// Dart
+
+myDataInputSend(MyDataInput( ... ), null);
 ```
 
-`onPressed` function should send a request to Rust. Let's create a `RustRequest` object.
+```rust
+// Rust
+
+let receiver = my_data_input_receiver();
+while let Some(my_data_input) = receiver.recv().await {
+    // Custom Rust logic here
+}
+```
+
+`[RINF:RUST-SIGNAL]` generates a channel from Rust to Dart.
+
+```proto
+// Protobuf
+
+// [RINF:RUST-SIGNAL]
+message MyDataOutput { ... }
+```
 
 ```dart
-// lib/main.dart
-...
-import 'package:rinf/rinf.dart';
-import 'package:example_app/messages/tutorial_resource.pb.dart'
-    as tutorialResource;
-...
-ElevatedButton(
-  onPressed: () async {
-    final requestMessage = tutorialResource.ReadRequest(
-      inputNumbers: [3, 4, 5],
-      inputString: 'Zero-cost abstraction',
-    );
-    final rustRequest = RustRequest(
-      resource: tutorialResource.ID,
-      operation: RustOperation.Read,
-      message: requestMessage.writeToBuffer(),
-    );
-    final rustResponse = await requestToRust(rustRequest);
-  },
-  child: Text("Request to Rust"),
-),
-...
-```
+// Dart
 
-`requestToRust` function sends the request to Rust, returning a `RustResponse` object.
-
-Now, write our new endpoint Rust function `sample_functions::handle_tutorial_resource`. This simple API endpoint will add one to each element in the array, capitalize all letters in the string, and return them.
-
-```rust
-// native/hub/src/sample_functions.rs
-...
-use crate::bridge::{RustOperation, RustRequest, RustResponse, RustSignal};
-...
-pub async fn handle_tutorial_resource(rust_request: RustRequest) -> Option<RustResponse> {
-    use crate::messages::tutorial_resource::{ReadRequest, ReadResponse};
-
-    match rust_request.operation {
-        RustOperation::Create => None,
-        RustOperation::Read => {
-            let message_bytes = rust_request.message.unwrap();
-            let request_message = ReadRequest::decode(message_bytes.as_slice()).unwrap();
-
-            let new_numbers: Vec<i32> = request_message
-                .input_numbers
-                .into_iter()
-                .map(|x| x + 1)
-                .collect();
-            let new_string = request_message.input_string.to_uppercase();
-
-            let response_message = ReadResponse {
-                output_numbers: new_numbers,
-                output_string: new_string,
-            };
-            Some(RustResponse {
-                message: Some(response_message.encode_to_vec()),
-                blob: None,
-            })
-        }
-        RustOperation::Update => None,
-        RustOperation::Delete => None,
-    }
-}
-...
-```
-
-The name of the new Rust resource was `tutorial_resource`. Make sure that the request handler function in Rust accepts this.
-
-```rust
-// native/hub/src/with_request.rs
-...
-use crate::bridge::{RustRequestUnique, RustResponse, RustResponseUnique};
-use crate::messages;
-use crate::sample_functions;
-...
-let rust_resource = rust_request.resource;
-let operation_result = tokio::spawn(async move {
-    match rust_resource {
-        messages::counter_number::ID => {
-            sample_functions::handle_counter_number(rust_request).await
-        }
-        messages::sample_folder::sample_resource::ID => {
-            sample_functions::handle_sample_resource(rust_request).await
-        }
-        messages::sample_folder::deeper_folder::deeper_resource::ID => {
-            sample_functions::handle_deeper_resource(rust_request).await
-        }
-        messages::tutorial_resource::ID => {
-            sample_functions::handle_tutorial_resource(rust_request).await // ADD THIS BLOCK
-        }
-        _ => None,
-    }
+myDataOutputStream.listen((myDataOutput) {
+    // Custom Dart logic here
 })
-.await;
-...
 ```
-
-Finally, when you receive a response from Rust in Dart, you can do anything with the bytes data in it.
-
-```dart
-// lib/main.dart
-...
-import 'package:rinf/rinf.dart';
-import 'package:example_app/messages/tutorial_resource.pb.dart'
-    as tutorialResource;
-...
-    final rustResponse = await requestToRust(rustRequest);
-    if (rustResponse == null){
-      return;
-    }
-    final responseMessage =
-        tutorialResource.ReadResponse.fromBuffer(
-      rustResponse.message!,
-    );
-    print(responseMessage.outputNumbers);
-    print(responseMessage.outputString);
-  },
-  child: Text("Request to Rust"),
-),
-...
-```
-
-And we can see the printed output in the command-line!
-
-```
-flutter: [4, 5, 6]
-flutter: ZERO-COST ABSTRACTION
-```
-
-We just simply print the message here, but the response data will be used for rebuilding Flutter widgets and updating states in real apps.
-
-You can extend this RESTful API pattern and create hundreds and thousands of endpoints as you need. If you have a web background, this system might look familiar.
-
-### Streaming from Rust to Dart
-
-Let's say that you want to send increasing numbers every second from Rust to Dart. In this case, it would be inefficient for Dart to send requests repeatedly. This is where streaming is needed.
-
-Let's start from our [default example](https://github.com/cunarist/rinf/tree/main/flutter_ffi_plugin/example).
-
-Define the Rust resource and message schema.
-
-```proto
-// messages/increasing_number.proto
-
-syntax = "proto3";
-package increasing_number;
-
-message StateSignal { int32 current_number = 1; }
-```
-
-Generate Dart and Rust message code from `.proto` files.
-
-```bash
-rinf message
-```
-
-Define an async Rust function that runs forever, sending numbers to Dart every second.
 
 ```rust
-// native/hub/src/sample_functions.rs
-...
-use crate::bridge::{RustOperation, RustRequest, RustResponse, RustSignal};
-use crate::bridge::send_rust_signal;
-...
-pub async fn stream_increasing_number() {
-    use crate::messages::increasing_number::{StateSignal, ID};
+// Rust
 
-    let mut current_number: i32 = 1;
-    loop {
-        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-
-        let signal_message = StateSignal { current_number };
-        let rust_signal = RustSignal {
-            resource: ID,
-            message: Some(signal_message.encode_to_vec()),
-            blob: None,
-        };
-        send_rust_signal(rust_signal);
-
-        current_number += 1;
-    }
-}
-...
+my_data_output_send(MyDataOutput{ ... }, None);
 ```
 
-Spawn the async function in Rust.
-
-```rust
-// native/hub/src/lib.rs
-...
-mod sample_functions;
-...
-tokio::spawn(sample_functions::stream_fractal());
-tokio::spawn(sample_functions::stream_increasing_number()); // ADD THIS LINE
-while let Some(request_unique) = request_receiver.recv().await {
-...
-```
-
-Finally, receive the signals in Dart with `StreamBuilder`, filter them by resource with the `where` method, and rebuild the widget.
-
-```dart
-// lib/main.dart
-...
-import 'package:rinf/rinf.dart';
-import 'package:example_app/messages/increasing_number.pb.dart'
-    as increasingNumbers;
-...
-children: [
-  StreamBuilder<RustSignal>(
-    stream: rustBroadcaster.stream.where((rustSignal) {
-      return rustSignal.resource == increasingNumbers.ID;
-    }),
-    builder: (context, snapshot) {
-      final rustSignal = snapshot.data;
-      if (rustSignal == null) {
-        return Text("Nothing received yet");
-      } else {
-        final singal = increasingNumbers.StateSignal.fromBuffer(
-          rustSignal.message!,
-        );
-        final currentNumber = singal.currentNumber;
-        return Text(currentNumber.toString());
-      }
-    },
-  ),
-...
-```
-
-We rebuild the widget with the received data here, but the streamed data can also be used to update Dart states in real apps.
-
-## 🏷️ Message Details
+You can also provide binary data as the second argument of those `[]Send()` or `[]_send()` functions generated by Rinf. Its type should be `Uint8List?` in Dart and `Option<Vec<u8>>` in Rust. Passing binary data with this separate field is recommend over embedding it inside the Protobuf message, because it's more performant.
 
 ### Meanings of Each Field
 
-We've seen how to pass `RustRequest`, `RustResponse`, and `RustSignal` between Dart and Rust in this tutorial. Now let's go over to what exactly each field means.
+We've covered how to pass signals between Dart and Rust in the previous tutorial section. Now, let's delve into the meaning of each field.
 
-- Field `resource`: This is an integer pointing to a virtual Rust resource that suits your app's design. Always provide `ID` of some message module generated by `rinf message`.
+- **Field `message`:** It represents a message of a type defined by Protobuf. It's important to note that creating Protobuf messages larger than a few megabytes is not recommended. For large data, split them into multiple messages, or use `blob` instead. This field is mandatory.
 
-- Field `operation`: This accepts an enum value of `RustOperation` and can be one of create, read, update, and delete, since this system follows the definition of RESTful API.
+- **Field `blob`:** This is a bytes array designed to handle large data, potentially up to a few gigabytes. You can send any kind of binary data you wish, such as a high-resolution image or file data. This field is optional and can be set to `null` or `None`.
 
-- Field `message`: This is a bytes array created by Protobuf serialization. Note that it is not recommended to create Protobuf messages that are bigger than a few megabytes. To send large data, use `blob` instead. Sending bytes array is a zero-copy operation, though Protobuf serialization and deserialization process does involve memory copy. This field is optional and can be `null` or `None`.
-
-- Field `blob`: This is also a bytes array intended to contain large data, possibly up to a few gigabytes. You can send any kind of binary as you wish such as a high-resolution image or some kind of file data. Sending a blob from Rust to Dart is a zero-copy operation, meaning there's no memory copy involved. In contrast, sending a blob from Dart to Rust is a copy operation. This field is optional and can be `null` or `None`.
-
-### When Rust Fails to Respond
-
-When the handler function in Rust panics, the `requestToRust` Dart function will simply return `null`. Flutter will not receive any information about errors, so it is highly recommended to consume panic information within Rust for logging purposes, etc.
-
-> In Rinf 4.20 and earlier versions, a `timeout` parameter could be provided to `requestToRust` Dart function. However, starting from Rinf 4.21, the `timeout` parameter has been removed because Dart will consistently receive a response, regardless of whether Rust handled the request successfully or not.
+Sending a serialized message or blob data is a zero-copy operation from Rust to Dart, while it involves a copy operation from Dart to Rust in memory. Keep in mind that the Protobuf serialization and deserialization process does involve memory copy.
 
 ### Efficiency
 
-While Rinf's API system may resemble that of web development, it relies only on native FFI for communication. It does NOT use any web protocols, hidden threads, and unnecessary memory copying to prevent any performance overhead.
+Rinf relies solely on native FFI for communication, avoiding the use of web protocols or hidden threads. The goal is to minimize performance overhead as much as possible.
 
 ## 📦 Message Code Generation
 

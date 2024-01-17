@@ -1,4 +1,4 @@
-//! This module is only for demonstration purposes.
+//! This module is only for Rinf demonstrations.
 //! You might want to remove this module in production.
 
 use crate::messages;
@@ -10,7 +10,7 @@ pub async fn tell_numbers() {
     let mut receiver = messages::counter_number::number_input_receiver();
     let mut current_number = 0;
     while let Some(dart_signal) = receiver.recv().await {
-        // Extract values from the received message.
+        // Extract values from the message received from Dart.
         // This message is a type that's declared in its Protobuf file.
         let number_input = dart_signal.message;
         let letter = number_input.letter;
@@ -20,6 +20,7 @@ pub async fn tell_numbers() {
         current_number = sample_crate::add_seven(current_number);
 
         // Respond to Dart with a new message.
+        // This type is also declared in its Protobuf file.
         let number_output = messages::counter_number::NumberOutput {
             current_number,
             dummy_one: number_input.dummy_one,

@@ -2,32 +2,37 @@ use super::interface::*;
 use allo_isolate::IntoDart;
 use allo_isolate::Isolate;
 use rinf::externs::lazy_static::lazy_static;
+use rinf::SharedCell;
 use std::cell::RefCell;
+use std::panic::catch_unwind;
 use std::sync::Arc;
 use std::sync::Mutex;
 
-type Cell<T> = RefCell<Option<T>>;
-type SharedCell<T> = Arc<Mutex<Cell<T>>>;
-
 lazy_static! {
-    pub static ref ISOLATE_SIGNAL: SharedCell<Isolate> = Arc::new(Mutex::new(RefCell::new(None)));
+    pub static ref DART_ISOLATE: SharedCell<Isolate> = Arc::new(Mutex::new(RefCell::new(None)));
 }
 
 #[no_mangle]
-pub extern "C" fn prepare_isolates_extern(port_signal: i64) {
-    let isolate = Isolate::new(port_signal);
-    let cell = ISOLATE_SIGNAL.lock().unwrap();
-    cell.replace(Some(isolate));
+pub extern "C" fn prepare_isolate_extern(port: i64) {
+    let _ = catch_unwind(|| {
+        let dart_isolate = Isolate::new(port);
+        let cell = DART_ISOLATE.lock().unwrap();
+        cell.replace(Some(dart_isolate));
+    });
 }
 
 #[no_mangle]
 pub extern "C" fn start_rust_logic_extern() {
-    start_rust_logic();
+    let _ = catch_unwind(|| {
+        start_rust_logic();
+    });
 }
 
 #[no_mangle]
 pub extern "C" fn stop_rust_logic_extern() {
-    stop_rust_logic();
+    let _ = catch_unwind(|| {
+        stop_rust_logic();
+    });
 }
 
 #[no_mangle]
@@ -52,7 +57,9 @@ pub extern "C" fn send_dart_signal_extern(
     } else {
         None
     };
-    crate::messages::handle::handle_signal(message_id as i32, message_bytes, blob);
+    let _ = catch_unwind(|| {
+        crate::messages::generated::handle_signal(message_id as i32, message_bytes, blob);
+    });
 }
 
 pub fn send_rust_signal_extern(
@@ -61,7 +68,7 @@ pub fn send_rust_signal_extern(
     blob_valid: bool,
     blob_bytes: Vec<u8>,
 ) {
-    let cell = ISOLATE_SIGNAL.lock().unwrap();
+    let cell = DART_ISOLATE.lock().unwrap();
     let dart_isolate = cell.borrow().unwrap();
     dart_isolate.post(
         vec![

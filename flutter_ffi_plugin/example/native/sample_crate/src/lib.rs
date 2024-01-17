@@ -1,4 +1,4 @@
-//! This crate is only for demonstration purposes.
+//! This crate is only for Rinf demonstrations.
 //! You might want to remove this crate in production.
 
 pub use fractal::draw_fractal_image;

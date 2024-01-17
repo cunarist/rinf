@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:rinf/rinf.dart';
-import 'package:example_app/messages/handle.dart';
+import 'package:example_app/messages/generated.dart';
 import 'package:example_app/messages/counter_number.pb.dart';
 import 'package:example_app/messages/fractal_art.pb.dart';
 
@@ -59,7 +59,7 @@ class MyHomePage extends StatelessWidget {
           children: [
             // `StreamBuilder` listens to a stream
             // and rebuilds the widget accordingly.
-            StreamBuilder<RustSignal<FractalScale>>(
+            StreamBuilder(
                 // This stream is generated from a marked Protobuf message.
                 stream: fractalScaleStream,
                 builder: (context, snapshot) {
@@ -94,7 +94,7 @@ class MyHomePage extends StatelessWidget {
                     ),
                   );
                 }),
-            StreamBuilder<RustSignal<NumberOutput>>(
+            StreamBuilder(
               // This stream is generated from a marked Protobuf message.
               stream: numberOutputStream,
               builder: (context, snapshot) {
@@ -114,7 +114,7 @@ class MyHomePage extends StatelessWidget {
           ],
         ),
       ),
-      // This is a button that calls the increment method.
+      // This is a button that calls the generated function.
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           // This function is generated from a marked Protobuf message.

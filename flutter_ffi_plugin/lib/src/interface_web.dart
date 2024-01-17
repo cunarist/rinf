@@ -2,11 +2,11 @@ import 'load_web.dart';
 import 'package:js/js.dart';
 import 'dart:typed_data';
 import 'package:universal_html/js.dart' as js;
-import 'interface.dart';
+import 'common.dart';
 import 'dart:async';
 import 'dart:convert';
 
-Future<void> prepareNativeBridge(ReceiveSignal handleSignal) async {
+Future<void> prepareNativeBridge(HandleSignal handleSignal) async {
   final isAlreadyPrepared = await loadJsFile();
 
   if (isAlreadyPrepared) {

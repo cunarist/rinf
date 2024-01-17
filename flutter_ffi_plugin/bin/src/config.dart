@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:yaml/yaml.dart';
 
 class RinfConfigMessage {
@@ -7,14 +6,14 @@ class RinfConfigMessage {
   final String rustOutputDir;
   final String dartOutputDir;
 
-  RinfConfigMessage._({
+  RinfConfigMessage({
     required this.inputDir,
     required this.rustOutputDir,
     required this.dartOutputDir,
   });
 
   factory RinfConfigMessage.defaultConfig() {
-    return RinfConfigMessage._(
+    return RinfConfigMessage(
       inputDir: DEFAULT_INPUT_DIR,
       rustOutputDir: DEFAULT_RUST_OUTPUT_DIR,
       dartOutputDir: DEFAULT_DART_OUTPUT_DIR,
@@ -30,7 +29,7 @@ class RinfConfigMessage {
         );
       }
     }
-    return RinfConfigMessage._(
+    return RinfConfigMessage(
       inputDir: yaml[KEY_INPUT_DIR] ?? DEFAULT_INPUT_DIR,
       rustOutputDir: yaml[KEY_RUST_OUTPUT_DIR] ?? DEFAULT_RUST_OUTPUT_DIR,
       dartOutputDir: yaml[KEY_DART_OUTPUT_DIR] ?? DEFAULT_DART_OUTPUT_DIR,
@@ -63,10 +62,10 @@ class RinfConfigMessage {
 class RinfConfig {
   final RinfConfigMessage message;
 
-  RinfConfig._({required this.message});
+  RinfConfig({required this.message});
 
   factory RinfConfig.defaultConfig() {
-    return RinfConfig._(message: RinfConfigMessage.defaultConfig());
+    return RinfConfig(message: RinfConfigMessage.defaultConfig());
   }
 
   factory RinfConfig.fromYaml(YamlMap yaml) {
@@ -83,13 +82,14 @@ class RinfConfig {
         ? RinfConfigMessage.defaultConfig()
         : RinfConfigMessage.from(messageYaml);
 
-    return RinfConfig._(message: message);
+    return RinfConfig(message: message);
   }
 
   @override
   String toString() {
-    return '''rinf:
-  $KEY_MESSAGE: $message''';
+    return '''
+rinf:
+  $message''';
   }
 
   static const KEY_MESSAGE = "message";
