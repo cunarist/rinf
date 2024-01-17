@@ -171,7 +171,7 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
     );
     lines.insert(
       lastImportIndex + 1,
-      "import './messages/handle.dart';",
+      "import './messages/generated.dart';",
     );
     mainText = lines.join("\n");
   }

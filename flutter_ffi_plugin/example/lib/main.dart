@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:rinf/rinf.dart';
-import 'package:example_app/messages/handle.dart';
+import 'package:example_app/messages/generated.dart';
 import 'package:example_app/messages/counter_number.pb.dart';
 import 'package:example_app/messages/fractal_art.pb.dart';
 

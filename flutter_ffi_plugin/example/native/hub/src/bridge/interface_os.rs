@@ -49,7 +49,7 @@ pub extern "C" fn send_dart_signal_extern(
     } else {
         None
     };
-    crate::messages::handle::handle_signal(message_id as i32, message_bytes, blob);
+    crate::messages::generated::handle_signal(message_id as i32, message_bytes, blob);
 }
 
 pub fn send_rust_signal_extern(

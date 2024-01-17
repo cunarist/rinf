@@ -123,7 +123,7 @@ Future<void> generateMessageCode({
       }
     }
     if (subPath == "") {
-      modRsLines.add("pub mod handle;");
+      modRsLines.add("pub mod generated;");
     }
     final modRsContent = modRsLines.join('\n');
     await File('$rustOutputPath$subPath/mod.rs').writeAsString(modRsContent);
@@ -342,7 +342,7 @@ if message_id == ${markedMessage.id} {
   rustReceiveScript += '''
 }
 ''';
-  await File('$rustOutputPath/handle.rs').writeAsString(rustReceiveScript);
+  await File('$rustOutputPath/generated.rs').writeAsString(rustReceiveScript);
 
   // Get ready to handle received signals in Dart.
   var dartReceiveScript = "";
@@ -386,7 +386,7 @@ if (messageId == ${markedMessage.id}) {
   dartReceiveScript += '''
 }
 ''';
-  await File('$dartOutputPath/handle.dart').writeAsString(dartReceiveScript);
+  await File('$dartOutputPath/generated.dart').writeAsString(dartReceiveScript);
 
   // Notify that it's done
   if (!silent) {
