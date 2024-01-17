@@ -62,7 +62,7 @@ jobs:
 
       - name: Install the CLI tool
         working-directory: rust_crate/
-        run: cargo install --path ./
+        run: cargo install rinf
 
       - name: Create a Flutter app for testing
         run: python automate create-user-app
