@@ -1,6 +1,6 @@
 //! Code for drawing fractal for performance tests and examples.
 //! Copied and modified from
-//! https://github.com/abour/fractal
+//! https://github.com/abour/fractal repository.
 
 use image::{self, ImageEncoder};
 

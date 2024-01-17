@@ -1,4 +1,4 @@
-//! This module is only for demonstration purposes.
+//! This module is only for Rinf demonstrations.
 //! You might want to remove this module in production.
 
 use crate::messages;
