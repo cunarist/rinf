@@ -1,6 +1,8 @@
 # Tutorial
 
-> If you are using Rinf version 5 or earlier, please refer to the [old tutorial](https://github.com/cunarist/rinf/blob/v5.4.0/documentation/docs/writing-code.md). With the introduction of Rinf version 6, a simpler way for communication between Dart and Rust has been implemented, and the system has undergone significant changes.
+> If you are using Rinf version 5 or earlier, please refer to the [historical docs](https://github.com/cunarist/rinf/blob/v5.4.0/documentation/docs/writing-code.md). With the introduction of Rinf version 6, a simpler way for communication between Dart and Rust has been implemented, and the system has undergone significant changes.
+
+To grasp the core concepts, it's beneficial to follow a step-by-step tutorial. Detailed explanations will be provided in the upcoming sections, while the basics can be understood here.
 
 ## 🚨 From Dart to Rust
 
@@ -60,7 +62,8 @@ child: Column(
     ),
 ...
 ```
-Let's listen to this message in Rust. This simple function will add one to each element in the array, capitalize all letters in the string, and return them.
+
+Let's listen to this message in Rust. This simple function will add one to each element in the array, capitalize all letters in the string, and return them. `my_number_input_receiver` is generated from the Protobuf file.
 
 ```rust
 // native/hub/src/sample_functions.rs
@@ -110,7 +113,7 @@ flutter: ZERO-COST ABSTRACTION
 
 Let's say that you want to send increasing numbers every second from Rust to Dart.
 
-Define the message.  Note that the message should have the comment `[RINF:RUST-SIGNAL]` above it.
+Define the message. Note that the message should have the comment `[RINF:RUST-SIGNAL]` above it.
 
 ```proto
 // messages/tutorial_resource.proto
@@ -128,7 +131,7 @@ Generate Dart and Rust message code from `.proto` files.
 rinf message
 ```
 
-Define an async Rust function that runs forever, sending numbers to Dart every second.
+Define an async Rust function that runs forever, sending numbers to Dart every second. `MyIncreasingNumber` and `my_increasing_number_send` is generated from the Protobuf file.
 
 ```rust
 // native/hub/src/sample_functions.rs
@@ -142,7 +145,7 @@ pub async fn stream_increasing_number() {
 
         use messages::tutorial_resource::MyIncreasingNumber;
         let my_increasing_number = MyIncreasingNumber { current_number };
-        
+
         use messages::tutorial_resource::my_increasing_number_send;
         my_increasing_number_send(my_increasing_number, None);
 
@@ -164,7 +167,7 @@ async fn main() {
 ...
 ```
 
-Finally, receive the signals in Dart with `StreamBuilder` and rebuild the widget accordingly.
+Finally, receive the signals in Dart with `StreamBuilder` and rebuild the widget accordingly. `myIncreasingNumberStream` is generated from the Protobuf file.
 
 ```dart
 // lib/main.dart
@@ -180,7 +183,7 @@ children: [
       final rustSignal = snapshot.data;
       if (rustSignal == null) {
         return Text("Nothing received yet");
-      } 
+      }
       final message = rustSignal.message!;
       final currentNumber = message.currentNumber;
       return Text(currentNumber.toString());
@@ -190,7 +193,6 @@ children: [
 ```
 
 We rebuild the widget with the received data here, but the streamed data can also be used to update Dart states in real apps.
-
 
 ## 🤝 Back and Forth
 
