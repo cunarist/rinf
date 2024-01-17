@@ -7,14 +7,14 @@ use std::sync::Arc;
 use std::sync::Mutex;
 
 lazy_static! {
-    pub static ref ISOLATE_SIGNAL: SharedCell<Isolate> = Arc::new(Mutex::new(RefCell::new(None)));
+    pub static ref DART_ISOLATE: SharedCell<Isolate> = Arc::new(Mutex::new(RefCell::new(None)));
 }
 
 #[no_mangle]
-pub extern "C" fn prepare_isolates_extern(port_signal: i64) {
-    let isolate = Isolate::new(port_signal);
-    let cell = ISOLATE_SIGNAL.lock().unwrap();
-    cell.replace(Some(isolate));
+pub extern "C" fn prepare_isolate_extern(port: i64) {
+    let dart_isolate = Isolate::new(port);
+    let cell = DART_ISOLATE.lock().unwrap();
+    cell.replace(Some(dart_isolate));
 }
 
 #[no_mangle]
@@ -58,7 +58,7 @@ pub fn send_rust_signal_extern(
     blob_valid: bool,
     blob_bytes: Vec<u8>,
 ) {
-    let cell = ISOLATE_SIGNAL.lock().unwrap();
+    let cell = DART_ISOLATE.lock().unwrap();
     let dart_isolate = cell.borrow().unwrap();
     dart_isolate.post(
         vec![

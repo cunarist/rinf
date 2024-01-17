@@ -43,7 +43,7 @@ Future<void> prepareNativeBridge(ReceiveSignal handleSignal) async {
   });
 
   // Make Rust prepare its isolate to send data to Dart.
-  prepareIsolatesExtern(rustSignalPort.sendPort.nativePort);
+  prepareIsolateExtern(rustSignalPort.sendPort.nativePort);
   startRustLogicExtern();
 }
 
@@ -96,9 +96,9 @@ Future<void> sendDartSignalExtern(
   // when `Vec<u8>` is dropped.
 }
 
-void prepareIsolatesExtern(int portSignal) {
+void prepareIsolateExtern(int port) {
   final rustFunction =
       rustLibrary.lookupFunction<Void Function(IntPtr), void Function(int)>(
-          'prepare_isolates_extern');
-  rustFunction(portSignal);
+          'prepare_isolate_extern');
+  rustFunction(port);
 }
