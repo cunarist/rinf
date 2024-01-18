@@ -3,13 +3,6 @@ import sys
 import time
 
 
-def exit():
-    print("")
-    sys.exit()
-
-
-print("")
-
 if len(sys.argv) == 1:
     print("Automation option is not provided.")
     print("Use `python automate --help` to see all available operations.")
@@ -92,15 +85,5 @@ elif sys.argv[1] == "create-user-app":
     with open(filepath, mode="w", encoding="utf8") as file:
         file.write(content)
 
-elif sys.argv[1] == "--help" or sys.argv[1] == "-h":
-    print("Usage: python automate [arguments]")
-    print("Arguments:")
-    print("  -h, --help        Shows this usage information.")
-    print("  cargokit-update   Updates CargoKit.")
-    print("  create-test-app   Creates a temporary test app.")
-
 else:
     print("No such option for automation is available.")
-    print("Use `python automate --help` to see all available operations.")
-
-exit()
