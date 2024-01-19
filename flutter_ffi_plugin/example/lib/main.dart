@@ -7,7 +7,7 @@ import 'package:example_app/messages/fractal_art.pb.dart';
 
 void main() async {
   // Wait for Rust initialization to be completed first.
-  await Rinf.initialize(handleSignal);
+  await Rinf.initialize(handleRustSignal);
   runApp(const MyApp());
 }
 

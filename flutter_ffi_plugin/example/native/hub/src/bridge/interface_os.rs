@@ -58,7 +58,7 @@ pub extern "C" fn send_dart_signal_extern(
         None
     };
     let _ = catch_unwind(|| {
-        crate::messages::generated::handle_signal(message_id as i32, message_bytes, blob);
+        crate::messages::generated::handle_dart_signal(message_id as i32, message_bytes, blob);
     });
 }
 

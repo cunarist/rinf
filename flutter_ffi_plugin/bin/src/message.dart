@@ -309,7 +309,7 @@ impl $messageName {
 use prost::Message;
 use rinf::DartSignal;
 
-pub fn handle_signal(
+pub fn handle_dart_signal(
     message_id: i32,
     message_bytes: Vec<u8>,
     blob: Option<Vec<u8>>
@@ -360,7 +360,7 @@ if message_id == ${markedMessage.id} {
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
 
-void handleSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
+void handleRustSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
