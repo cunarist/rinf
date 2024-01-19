@@ -241,11 +241,12 @@ use tokio::sync::mpsc::Sender;
       final markedMessages = entry.value;
       for (final markedMessage in markedMessages) {
         final messageName = markedMessage.name;
+        final camelName = pascalToCamel(messageName);
         final snakeName = pascalToSnake(messageName);
         if (markedMessage.markType == MarkType.fromDart) {
           await insertTextToFile(
-              dartPath,
-              '''
+            dartPath,
+            '''
 void sendSignalToRust(Uint8List? blob) {
   sendDartSignal(
     ${markedMessage.id},
@@ -254,7 +255,8 @@ void sendSignalToRust(Uint8List? blob) {
   );
 }
 ''',
-              after: "class $messageName extends \$pb.GeneratedMessage {");
+            after: "class $messageName extends \$pb.GeneratedMessage {",
+          );
           await insertTextToFile(
             rustPath,
             '''
@@ -278,14 +280,19 @@ impl ${normalizePascal(messageName)} {
         }
         if (markedMessage.markType == MarkType.fromRust) {
           await insertTextToFile(
-              dartPath,
-              '''
-  static StreamController<RustSignal<$messageName>> rustSignalController =
-      StreamController();
-  static Stream<RustSignal<$messageName>> rustSignalStream =
-      rustSignalController.stream;
+            dartPath,
+            '''
+static Stream<RustSignal<$messageName>> rustSignalStream =
+    ${camelName}Controller.stream;
 ''',
-              after: "class $messageName extends \$pb.GeneratedMessage {");
+            after: "class $messageName extends \$pb.GeneratedMessage {",
+          );
+          await insertTextToFile(
+            dartPath,
+            '''
+final ${camelName}Controller = StreamController<RustSignal<$messageName>>();
+''',
+          );
           await insertTextToFile(
             rustPath,
             '''
@@ -345,7 +352,7 @@ if message_id == ${markedMessage.id} {
     let cell = ${snakeName.toUpperCase()}_SENDER.lock().unwrap();
     let sender = cell.clone().replace(None).expect(concat!(
         "Looks like the channel is not created yet.",
-        "\\nTry using `${messageName}.get_dart_signal_receiver()`."
+        "\\nTry using `$messageName.get_dart_signal_receiver()`."
     ));
     let _ = sender.try_send(signal);
     return;
@@ -379,6 +386,7 @@ void handleRustSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
       for (final markedMessage in markedMessages) {
         if (markedMessage.markType == MarkType.fromRust) {
           final messageName = markedMessage.name;
+          final camelName = pascalToCamel(messageName);
           final importPath = '$subpath/$filename.pb.dart';
           if (!dartReceiveScript.contains(importPath)) {
             dartReceiveScript = '''
@@ -388,12 +396,12 @@ import '.$importPath' as $filename;
           }
           dartReceiveScript += '''
 if (messageId == ${markedMessage.id}) {
-  final message = $filename.${messageName}.fromBuffer(messageBytes);
+  final message = $filename.$messageName.fromBuffer(messageBytes);
   final bridgeSignal = RustSignal(
     message,
     blob,
   );
-  $filename.${messageName}.rustSignalController.add(bridgeSignal);
+  $filename.${camelName}Controller.add(bridgeSignal);
   return;
 }
 ''';
@@ -543,7 +551,7 @@ Future<void> insertTextToFile(
   String filePath,
   String textToAppend, {
   bool atFront = false,
-  String? after = null,
+  String? after,
 }) async {
   // Read the existing content of the file
   final file = File(filePath);
