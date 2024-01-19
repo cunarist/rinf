@@ -305,6 +305,8 @@ impl $messageName {
   var rustReceiveScript = "";
   rustReceiveScript += '''
 #![allow(clippy::needless_return)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
 
 use prost::Message;
 use rinf::DartSignal;
@@ -357,6 +359,8 @@ if message_id == ${markedMessage.id} {
   // Get ready to handle received signals in Dart.
   var dartReceiveScript = "";
   dartReceiveScript += '''
+// ignore_for_file: unused_import
+
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
 
