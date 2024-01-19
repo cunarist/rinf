@@ -6,48 +6,6 @@ use crate::tokio;
 
 const SHOULD_DEMONSTRATE: bool = true; // Disabled when applied as template
 
-pub async fn calculate_precious_data() {
-    use messages::tutorial_resource::*;
-
-    let mut receiver = MyPreciousData::get_dart_signal_receiver(); // GENERATED
-    while let Some(dart_signal) = receiver.recv().await {
-        let my_precious_data = dart_signal.message;
-
-        let new_numbers: Vec<i32> = my_precious_data
-            .input_numbers
-            .into_iter()
-            .map(|x| x + 1)
-            .collect();
-        let new_string = my_precious_data.input_string.to_uppercase();
-
-        crate::debug_print!("{new_numbers:?}");
-        crate::debug_print!("{new_string}");
-    }
-}
-
-pub async fn tell_treasure() {
-    use messages::tutorial_resource::*;
-
-    let mut current_value: i32 = 1;
-    let mut receiver = MyTreasureInput::get_dart_signal_receiver(); // GENERATED
-    while let Some(dart_signal) = receiver.recv().await {
-        let _ = dart_signal.message;
-        MyTreasureOutput { current_value }.send_signal_to_dart(None); // GENERATED
-        current_value += 1;
-    }
-}
-
-pub async fn stream_amazing_number() {
-    use messages::tutorial_resource::*;
-
-    let mut current_number: i32 = 1;
-    loop {
-        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-        MyAmazingNumber { current_number }.send_signal_to_dart(None); // GENERATED
-        current_number += 1;
-    }
-}
-
 pub async fn tell_numbers() {
     use messages::counter_number::*;
 
