@@ -258,13 +258,14 @@ void sendSignalToRust(Uint8List? blob) {
           await insertTextToFile(
             rustPath,
             '''
-type ${messageName}Cell = SharedCell<Sender<DartSignal<$messageName>>>;
+type ${messageName}Cell =
+    SharedCell<Sender<DartSignal<${normalizePascal(messageName)}>>>;
 lazy_static! {
     pub static ref ${snakeName.toUpperCase()}_SENDER: ${messageName}Cell =
         Arc::new(Mutex::new(RefCell::new(None)));
 }
 
-impl $messageName {
+impl ${normalizePascal(messageName)} {
     pub fn get_dart_signal_receiver() -> Receiver<DartSignal<Self>> {
         let (sender, receiver) = tokio::sync::mpsc::channel(1024);
         let cell = ${snakeName.toUpperCase()}_SENDER.lock().unwrap();
@@ -288,7 +289,7 @@ impl $messageName {
           await insertTextToFile(
             rustPath,
             '''
-impl $messageName {
+impl ${normalizePascal(messageName)} {
     pub fn send_signal_to_dart(&self, blob: Option<Vec<u8>>) {
         crate::bridge::send_rust_signal(
             ${markedMessage.id},
@@ -334,7 +335,7 @@ pub fn handle_dart_signal(
           rustReceiveScript += '''
 if message_id == ${markedMessage.id} {
     use super$modulePath::$filename::*;
-    let message = ${messageName}::decode(
+    let message = ${normalizePascal(messageName)}::decode(
         message_bytes.as_slice()
     ).unwrap();
     let signal = DartSignal {
@@ -629,7 +630,6 @@ String pascalToCamel(String input) {
   if (input.isEmpty) {
     return input;
   }
-
   return input[0].toLowerCase() + input.substring(1);
 }
 
@@ -637,21 +637,58 @@ String pascalToSnake(String input) {
   if (input.isEmpty) {
     return input;
   }
-
   final camelCase = pascalToCamel(input);
   String snakeCase = camelCase.replaceAllMapped(
       RegExp(r'[A-Z]'), (Match match) => '_${match.group(0)?.toLowerCase()}');
-
   return snakeCase;
 }
 
 String snakeToCamel(String input) {
   List<String> parts = input.split('_');
   String camelCase = parts[0];
-
   for (int i = 1; i < parts.length; i++) {
     camelCase += parts[i][0].toUpperCase() + parts[i].substring(1);
   }
-
   return camelCase;
+}
+
+/// Converts a string `HeLLLLLLLo` to `HeLlllllLo`,
+/// just like `protoc-gen-prost` does.
+String normalizePascal(String input) {
+  var upperStreak = "";
+  var result = "";
+  for (final character in input.split('')) {
+    if (character.toUpperCase() == character) {
+      upperStreak += character;
+    } else {
+      final fixedUpperStreak = lowerBetween(upperStreak);
+      upperStreak = "";
+      result += fixedUpperStreak;
+      result += character;
+    }
+  }
+  result += lowerExceptFirst(upperStreak);
+  return result;
+}
+
+String lowerBetween(String input) {
+  if (input.isEmpty) {
+    return input;
+  }
+  if (input.length == 1) {
+    return input.toUpperCase(); // Keep the single character in uppercase
+  }
+  String firstChar = input.substring(0, 1);
+  String lastChar = input.substring(input.length - 1);
+  String middleChars = input.substring(1, input.length - 1).toLowerCase();
+  return '$firstChar$middleChars$lastChar';
+}
+
+String lowerExceptFirst(String input) {
+  if (input.isEmpty) {
+    return input;
+  }
+  String firstChar = input.substring(0, 1);
+  String restOfString = input.substring(1).toLowerCase();
+  return '$firstChar$restOfString';
 }
