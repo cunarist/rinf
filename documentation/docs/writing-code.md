@@ -14,7 +14,7 @@ We've covered how to pass signals between Dart and Rust in the previous tutorial
 
 Rinf relies solely on native FFI for communication, avoiding the use of web protocols or hidden threads. The goal is to minimize performance overhead as much as possible.
 
-Sending a serialized message or blob data is a zero-copy operation from Rust to Dart, while it involves a copy operation from Dart to Rust in memory. Keep in mind that the Protobuf serialization and deserialization process does involve memory copy.
+Sending a serialized message or blob data is a zero-copy operation from Rust to Dart, while it involves a copy operation from Dart to Rust in memory. Keep in mind that Protobuf's serialization and deserialization does involve memory copy.
 
 ## 📦 Message Details
 
