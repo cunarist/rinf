@@ -4,6 +4,7 @@ import 'package:rinf/rinf.dart';
 import 'package:example_app/messages/generated.dart';
 import 'package:example_app/messages/counter_number.pb.dart';
 import 'package:example_app/messages/fractal_art.pb.dart';
+import 'package:example_app/messages/tutorial_resource.pb.dart';
 
 void main() async {
   // Wait for Rust initialization to be completed first.
@@ -57,6 +58,44 @@ class MyHomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            StreamBuilder(
+              stream: MyTreasureOutput.rustSignalStream, // GENERATED
+              builder: (context, snapshot) {
+                final rustSignal = snapshot.data;
+                if (rustSignal == null) {
+                  return Text('No value yet');
+                }
+                final currentNumber = rustSignal.message.currentValue;
+                return Text('Output value is $currentNumber');
+              },
+            ),
+            ElevatedButton(
+              onPressed: () {
+                MyTreasureInput().sendSignalToRust(null); // GENERATED
+              },
+              child: Text('Send the input'),
+            ),
+            StreamBuilder(
+              stream: MyAmazingNumber.rustSignalStream, // GENERATED
+              builder: (context, snapshot) {
+                final rustSignal = snapshot.data;
+                if (rustSignal == null) {
+                  return Text("Nothing received yet");
+                }
+                final message = rustSignal.message;
+                final currentNumber = message.currentNumber;
+                return Text(currentNumber.toString());
+              },
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                MyPreciousData(
+                  inputNumbers: [3, 4, 5],
+                  inputString: 'Zero-cost abstraction',
+                ).sendSignalToRust(null); // GENERATED
+              },
+              child: Text("Send a Signal from Dart to Rust"),
+            ),
             // `StreamBuilder` listens to a stream
             // and rebuilds the widget accordingly.
             StreamBuilder(
