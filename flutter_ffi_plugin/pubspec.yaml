@@ -1,6 +1,6 @@
 name: rinf
 description: Rust for native business logic, Flutter for flexible and beautiful GUI
-version: 6.0.0-alpha
+version: 6.0.0-beta
 repository: https://github.com/cunarist/rinf
 
 environment:
