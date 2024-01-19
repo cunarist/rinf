@@ -79,7 +79,7 @@ You can provide binary data to `sendSignalToRust()` or `send_signal_to_dart()` m
 
 If a message doesn't need a channel, then it is totally fine not to mark it with a special comment at all. In that case, the message will still be generated without the ability to send signals. In general, they would be nested inside other messages.
 
-### Message Comments
+### Comments
 
 It is possible to add comments like this.
 
