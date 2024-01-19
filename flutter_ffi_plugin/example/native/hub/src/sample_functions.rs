@@ -11,7 +11,8 @@ pub async fn tell_numbers() {
 
     let mut current_number = 0;
 
-    let mut receiver = NumberInput::get_dart_signal_receiver();
+    // Stream getter is generated from a marked Protobuf message.
+    let mut receiver = SampleNumberInput::get_dart_signal_receiver();
     while let Some(dart_signal) = receiver.recv().await {
         // Extract values from the message received from Dart.
         // This message is a type that's declared in its Protobuf file.
@@ -22,9 +23,8 @@ pub async fn tell_numbers() {
         // Perform a simple calculation.
         current_number = sample_crate::add_seven(current_number);
 
-        // Respond to Dart with a new message.
-        // This type is also declared in its Protobuf file.
-        NumberOutput {
+        // Method is generated from a marked Protobuf message.
+        SampleNumberOutput {
             current_number,
             dummy_one: number_input.dummy_one,
             dummy_two: number_input.dummy_two,
@@ -76,7 +76,7 @@ pub async fn stream_fractal() {
             let received_frame = join_handle.await.unwrap();
             if let Some(fractal_image) = received_frame {
                 // Stream the image data to Dart.
-                FractalScale {
+                SampleFractal {
                     current_scale,
                     dummy: Some(SampleSchema {
                         sample_field_one: true,

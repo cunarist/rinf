@@ -6,7 +6,7 @@ import "counter_number.proto";
 // [RINF:RUST-SIGNAL]
 // You can add your custom comments like this.
 // Protobuf's import statement also works well.
-message FractalScale {
+message SampleFractal {
   double current_scale = 1;
   counter_number.SampleSchema dummy = 2;
 }
