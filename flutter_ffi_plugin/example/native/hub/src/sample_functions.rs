@@ -7,8 +7,12 @@ use crate::tokio;
 const SHOULD_DEMONSTRATE: bool = true; // Disabled when applied as template
 
 pub async fn tell_numbers() {
-    let mut receiver = messages::counter_number::number_input_receiver();
+    use messages::counter_number::*;
+
     let mut current_number = 0;
+
+    // Stream getter is generated from a marked Protobuf message.
+    let mut receiver = SampleNumberInput::get_dart_signal_receiver();
     while let Some(dart_signal) = receiver.recv().await {
         // Extract values from the message received from Dart.
         // This message is a type that's declared in its Protobuf file.
@@ -19,19 +23,21 @@ pub async fn tell_numbers() {
         // Perform a simple calculation.
         current_number = sample_crate::add_seven(current_number);
 
-        // Respond to Dart with a new message.
-        // This type is also declared in its Protobuf file.
-        let number_output = messages::counter_number::NumberOutput {
+        // Method is generated from a marked Protobuf message.
+        SampleNumberOutput {
             current_number,
             dummy_one: number_input.dummy_one,
             dummy_two: number_input.dummy_two,
             dummy_three: number_input.dummy_three,
-        };
-        messages::counter_number::number_output_send(number_output, None);
+        }
+        .send_signal_to_dart(None);
     }
 }
 
 pub async fn stream_fractal() {
+    use messages::counter_number::*;
+    use messages::fractal_art::*;
+
     if !SHOULD_DEMONSTRATE {
         return;
     }
@@ -70,16 +76,14 @@ pub async fn stream_fractal() {
             let received_frame = join_handle.await.unwrap();
             if let Some(fractal_image) = received_frame {
                 // Stream the image data to Dart.
-                messages::fractal_art::fractal_scale_send(
-                    messages::fractal_art::FractalScale {
-                        current_scale,
-                        dummy: Some(messages::counter_number::SampleSchema {
-                            sample_field_one: true,
-                            sample_field_two: false,
-                        }),
-                    },
-                    Some(fractal_image),
-                );
+                SampleFractal {
+                    current_scale,
+                    dummy: Some(SampleSchema {
+                        sample_field_one: true,
+                        sample_field_two: false,
+                    }),
+                }
+                .send_signal_to_dart(Some(fractal_image));
             };
         }
     });

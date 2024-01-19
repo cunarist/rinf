@@ -195,6 +195,9 @@ Future<void> generateMessageCode({
     final subPath = entry.key;
     final filesAndMarks = entry.value;
     for (final entry in filesAndMarks.entries) {
+      if (entry.value.length == 0) {
+        continue;
+      }
       final filename = entry.key;
       final dartPath = '$dartOutputPath$subPath/$filename.pb.dart';
       final dartFile = File(dartPath);
@@ -244,29 +247,33 @@ use tokio::sync::mpsc::Sender;
           await insertTextToFile(
             dartPath,
             '''
-void ${camelName}Send($messageName message, [Uint8List? blob]) {
-    sendDartSignal(
-        ${markedMessage.id},
-        message.writeToBuffer(),
-        blob,
-    );
+void sendSignalToRust(Uint8List? blob) {
+  sendDartSignal(
+    ${markedMessage.id},
+    this.writeToBuffer(),
+    blob,
+  );
 }
 ''',
+            after: "class $messageName extends \$pb.GeneratedMessage {",
           );
           await insertTextToFile(
             rustPath,
             '''
-type ${messageName}Cell = SharedCell<Sender<DartSignal<$messageName>>>;
+type ${messageName}Cell =
+    SharedCell<Sender<DartSignal<${normalizePascal(messageName)}>>>;
 lazy_static! {
     pub static ref ${snakeName.toUpperCase()}_SENDER: ${messageName}Cell =
         Arc::new(Mutex::new(RefCell::new(None)));
 }
 
-pub fn ${snakeName}_receiver() -> Receiver<DartSignal<$messageName>> {
-    let (sender, receiver) = tokio::sync::mpsc::channel(1024);
-    let cell = ${snakeName.toUpperCase()}_SENDER.lock().unwrap();
-    cell.replace(Some(sender));
-    receiver
+impl ${normalizePascal(messageName)} {
+    pub fn get_dart_signal_receiver() -> Receiver<DartSignal<Self>> {
+        let (sender, receiver) = tokio::sync::mpsc::channel(1024);
+        let cell = ${snakeName.toUpperCase()}_SENDER.lock().unwrap();
+        cell.replace(Some(sender));
+        receiver
+    }
 }
 ''',
           );
@@ -275,19 +282,28 @@ pub fn ${snakeName}_receiver() -> Receiver<DartSignal<$messageName>> {
           await insertTextToFile(
             dartPath,
             '''
+static Stream<RustSignal<$messageName>> rustSignalStream =
+    ${camelName}Controller.stream;
+''',
+            after: "class $messageName extends \$pb.GeneratedMessage {",
+          );
+          await insertTextToFile(
+            dartPath,
+            '''
 final ${camelName}Controller = StreamController<RustSignal<$messageName>>();
-final ${camelName}Stream = ${camelName}Controller.stream;
 ''',
           );
           await insertTextToFile(
             rustPath,
             '''
-pub fn ${snakeName}_send(message: $messageName, blob: Option<Vec<u8>>) {
-    crate::bridge::send_rust_signal(
-        ${markedMessage.id},
-        message.encode_to_vec(),
-        blob,
-    );
+impl ${normalizePascal(messageName)} {
+    pub fn send_signal_to_dart(&self, blob: Option<Vec<u8>>) {
+        crate::bridge::send_rust_signal(
+            ${markedMessage.id},
+            self.encode_to_vec(),
+            blob
+        );
+    }
 }
 ''',
           );
@@ -300,11 +316,13 @@ pub fn ${snakeName}_send(message: $messageName, blob: Option<Vec<u8>>) {
   var rustReceiveScript = "";
   rustReceiveScript += '''
 #![allow(clippy::needless_return)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
 
 use prost::Message;
 use rinf::DartSignal;
 
-pub fn handle_signal(
+pub fn handle_dart_signal(
     message_id: i32,
     message_bytes: Vec<u8>,
     blob: Option<Vec<u8>>
@@ -318,12 +336,13 @@ pub fn handle_signal(
       final markedMessages = entry.value;
       for (final markedMessage in markedMessages) {
         if (markedMessage.markType == MarkType.fromDart) {
-          final snakeName = pascalToSnake(markedMessage.name);
+          final messageName = markedMessage.name;
+          final snakeName = pascalToSnake(messageName);
           var modulePath = subpath.replaceAll("/", "::");
           rustReceiveScript += '''
 if message_id == ${markedMessage.id} {
     use super$modulePath::$filename::*;
-    let message = ${markedMessage.name}::decode(
+    let message = ${normalizePascal(messageName)}::decode(
         message_bytes.as_slice()
     ).unwrap();
     let signal = DartSignal {
@@ -333,7 +352,7 @@ if message_id == ${markedMessage.id} {
     let cell = ${snakeName.toUpperCase()}_SENDER.lock().unwrap();
     let sender = cell.clone().replace(None).expect(concat!(
         "Looks like the channel is not created yet.",
-        "\\nTry listening to a receiver from `${snakeName}_receiver()`."
+        "\\nTry using `$messageName.get_dart_signal_receiver()`."
     ));
     let _ = sender.try_send(signal);
     return;
@@ -351,10 +370,12 @@ if message_id == ${markedMessage.id} {
   // Get ready to handle received signals in Dart.
   var dartReceiveScript = "";
   dartReceiveScript += '''
+// ignore_for_file: unused_import
+
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
 
-void handleSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
+void handleRustSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -364,7 +385,8 @@ void handleSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
       final markedMessages = entry.value;
       for (final markedMessage in markedMessages) {
         if (markedMessage.markType == MarkType.fromRust) {
-          final camelName = pascalToCamel(markedMessage.name);
+          final messageName = markedMessage.name;
+          final camelName = pascalToCamel(messageName);
           final importPath = '$subpath/$filename.pb.dart';
           if (!dartReceiveScript.contains(importPath)) {
             dartReceiveScript = '''
@@ -374,7 +396,7 @@ import '.$importPath' as $filename;
           }
           dartReceiveScript += '''
 if (messageId == ${markedMessage.id}) {
-  final message = $filename.${markedMessage.name}.fromBuffer(messageBytes);
+  final message = $filename.$messageName.fromBuffer(messageBytes);
   final bridgeSignal = RustSignal(
     message,
     blob,
@@ -529,6 +551,7 @@ Future<void> insertTextToFile(
   String filePath,
   String textToAppend, {
   bool atFront = false,
+  String? after,
 }) async {
   // Read the existing content of the file
   final file = File(filePath);
@@ -540,6 +563,8 @@ Future<void> insertTextToFile(
   // Append the new text to the existing content
   if (atFront) {
     fileContent = textToAppend + '\n' + fileContent;
+  } else if (after != null) {
+    fileContent = fileContent.replaceFirst(after, after + textToAppend);
   } else {
     fileContent = fileContent + '\n' + textToAppend;
   }
@@ -613,7 +638,6 @@ String pascalToCamel(String input) {
   if (input.isEmpty) {
     return input;
   }
-
   return input[0].toLowerCase() + input.substring(1);
 }
 
@@ -621,21 +645,58 @@ String pascalToSnake(String input) {
   if (input.isEmpty) {
     return input;
   }
-
   final camelCase = pascalToCamel(input);
   String snakeCase = camelCase.replaceAllMapped(
       RegExp(r'[A-Z]'), (Match match) => '_${match.group(0)?.toLowerCase()}');
-
   return snakeCase;
 }
 
 String snakeToCamel(String input) {
   List<String> parts = input.split('_');
   String camelCase = parts[0];
-
   for (int i = 1; i < parts.length; i++) {
     camelCase += parts[i][0].toUpperCase() + parts[i].substring(1);
   }
-
   return camelCase;
+}
+
+/// Converts a string `HeLLLLLLLo` to `HeLlllllLo`,
+/// just like `protoc-gen-prost` does.
+String normalizePascal(String input) {
+  var upperStreak = "";
+  var result = "";
+  for (final character in input.split('')) {
+    if (character.toUpperCase() == character) {
+      upperStreak += character;
+    } else {
+      final fixedUpperStreak = lowerBetween(upperStreak);
+      upperStreak = "";
+      result += fixedUpperStreak;
+      result += character;
+    }
+  }
+  result += lowerExceptFirst(upperStreak);
+  return result;
+}
+
+String lowerBetween(String input) {
+  if (input.isEmpty) {
+    return input;
+  }
+  if (input.length == 1) {
+    return input.toUpperCase(); // Keep the single character in uppercase
+  }
+  String firstChar = input.substring(0, 1);
+  String lastChar = input.substring(input.length - 1);
+  String middleChars = input.substring(1, input.length - 1).toLowerCase();
+  return '$firstChar$middleChars$lastChar';
+}
+
+String lowerExceptFirst(String input) {
+  if (input.isEmpty) {
+    return input;
+  }
+  String firstChar = input.substring(0, 1);
+  String restOfString = input.substring(1).toLowerCase();
+  return '$firstChar$restOfString';
 }

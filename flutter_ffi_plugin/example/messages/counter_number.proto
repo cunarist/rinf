@@ -2,7 +2,7 @@ syntax = "proto3";
 package counter_number;
 
 // [RINF:DART-SIGNAL]
-message NumberInput {
+message SampleNumberInput {
   string letter = 1;
   uint32 dummy_one = 2;
   SampleSchema dummy_two = 3;
@@ -10,7 +10,7 @@ message NumberInput {
 }
 
 // [RINF:RUST-SIGNAL]
-message NumberOutput {
+message SampleNumberOutput {
   int32 current_number = 1;
   uint32 dummy_one = 2;
   SampleSchema dummy_two = 3;

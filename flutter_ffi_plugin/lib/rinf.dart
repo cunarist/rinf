@@ -11,8 +11,8 @@ export 'src/common.dart';
 class Rinf {
   /// Make sure that the Rust side is ready.
   /// Don't forget to call this function in the `main` function of Dart.
-  static Future<void> initialize(HandleSignal handleSignal) async {
-    await prepareNativeBridge(handleSignal);
+  static Future<void> initialize(HandleRustSignal handleRustSignal) async {
+    await prepareNativeBridge(handleRustSignal);
   }
 
   /// Ensure that all Rust tasks are terminated

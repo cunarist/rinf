@@ -4,25 +4,25 @@
 
 First of all, add this framework to your Flutter project.
 
-```bash
+```bash title="CLI"
 flutter pub add rinf
 ```
 
 Now install the command executable to easily run Rinf commands in the CLI.
 
-```bash
+```bash title="CLI"
 cargo install rinf
 ```
 
 Then, simply run this in the command-line from your Flutter project's directory.
 
-```bash
+```bash title="CLI"
 rinf template
 ```
 
 After running the command, you'll have new files and folders as your starter Rust template.
 
-```diff
+```diff title="Folder Tree"
     my_flutter_project/
     ├── android/
     ├── ios/

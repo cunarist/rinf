@@ -22,9 +22,7 @@ For Android apps, you should be using Rust 1.68 or higher due to [this issue](ht
 
 Also, The NDK version that your project expects is specified in `./android/app/build.gradle` file as `ndkVersion` variable inside `android` block. The value of this `ndkVersion` should be `flutter.ndkVersion` and you should be using Flutter SDK [3.10 or higher](https://docs.flutter.dev/release/release-notes/release-notes-3.10.0). However, `ndkVersion` can be absent if you've created your Flutter project with Flutter SDK 3.7 and earlier. If `ndkVersion` is not defined in your `./android/app/build.gradle` file, go ahead and write one yourself.
 
-Add that line to `./android/app/build.gradle` file:
-
-```gradle
+```gradle title="android/app/build.gradle"
 ..
 android {
     namespace "com.cunarist.rinf_example"
@@ -60,9 +58,7 @@ On native platforms, Dart's hot restart makes the Rust logic restart, in other w
 
 In order to use nightly Rust, you need to add a cargokit configuration file. Cargokit is the build connector between Dart and Rust used by this framework.
 
-Create that `./native/hub/cargokit.yaml` file:
-
-```yaml
+```yaml title="native/hub/cargokit.yaml"
 cargo:
   release:
     toolchain: nightly
@@ -82,7 +78,7 @@ If you still need to use well-known Protobuf types like `Timestamp` in your Dart
 
 Start by creating a `.proto` descriptor file that contains the definition of the well-known type you want to use. For example, if you want to use the `Timestamp` type, your proto file might look like this:
 
-```protobuf
+```protobuf title="Protobuf"
 syntax = "proto3";
 package my_resource_name;
 
@@ -97,7 +93,7 @@ Ensure that you import the necessary well-known type(s) at the beginning of your
 
 Open your terminal and navigate to the root directory of your Dart project. Then, use the `protoc` command to compile the well-known type to Dart. For example, to compile the `Timestamp` type, you can run the following command:
 
-```shell
+```bash title="CLI"
 protoc --dart_out=./lib/messages google/protobuf/timestamp.proto
 ```
 
@@ -107,7 +103,7 @@ Be sure to compile to `./lib/messages` because `rinf message` compiles everythin
 
 After running the `protoc` command, you'll find the generated Dart files in the specified output directory. You can now integrate these generated files into your Dart project like any other Dart module.
 
-```dart
+```dart title="Dart"
 // In your Dart code, you can import and use the well-known type:
 import 'package:my_app/messages/google/protobuf/timestamp.pb.dart';
 ```
@@ -133,7 +129,7 @@ A Rust panic doesn't crash the app; it simply cancels the spawned async task. Yo
 
 There might be various Rust codes with these attribute above:
 
-```rust
+```rust title="Rust"
 #[cfg(target_family = "wasm")]
 ...
 #[cfg(not(target_family = "wasm"))]
@@ -142,9 +138,9 @@ There might be various Rust codes with these attribute above:
 
 Since the environments of the web and native platforms are so different, there are times when you need to use these attributes to include and exclude parts of the code depending on whether they are targeting web or not.
 
-By default, Rust-analyzer runs in native mode. To make it run in webassembly mode, create that `.cargo/config.toml` file:
+By default, Rust-analyzer runs in native mode. To make it run in webassembly mode, create the configuration file:
 
-```toml
+```toml title=".cargo/config.toml"
 [build]
 # Uncomment the line below to switch Rust-analyzer to perform
 # type checking and linting in webassembly mode, for the web target.
@@ -154,7 +150,7 @@ target = "wasm32-unknown-unknown"
 
 ### CMake cache is broken after I moved the app folder
 
-```
+```title="Output"
 CMake Error: The current CMakeCache.txt directory C:/.../CMakeCache.txt is different than the directory C:/... where CMakeCache.txt was created. This may result in binaries being created in the wrong place. If you are not sure, reedit the CMakeCache.txt
 CMake Error: The source "C:/.../CMakeLists.txt" does not match the source "C:/.../CMakeLists.txt" used to generate cache.  Re-run cmake with a different source directory.
 Building Windows application...                                     80ms
@@ -163,7 +159,7 @@ Exception: Unable to generate build files
 
 This error can simply be fixed with the command below.
 
-```
+```bash title="CLI"
 flutter clean
 cargo clean
 ```
@@ -174,7 +170,7 @@ If you are using older Android versions, you may encounter errors due to issues 
 
 To address this, you can modify `AndroidManifest.xml` files under `./android/app/src/` as follows.
 
-```xml
+```xml title="android/app/src/**/AndroidManifest.xml"
 ...
 <application
     android:extractNativeLibs="true"

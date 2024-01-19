@@ -6,7 +6,7 @@ import 'common.dart';
 import 'dart:async';
 import 'dart:convert';
 
-Future<void> prepareNativeBridge(HandleSignal handleSignal) async {
+Future<void> prepareNativeBridge(HandleRustSignal handleRustSignal) async {
   final isAlreadyPrepared = await loadJsFile();
 
   if (isAlreadyPrepared) {
@@ -31,7 +31,7 @@ Future<void> prepareNativeBridge(HandleSignal handleSignal) async {
     } else {
       blob = null;
     }
-    handleSignal(messageId, messageBytes, blob);
+    handleRustSignal(messageId, messageBytes, blob);
   };
 
   startRustLogicExtern();

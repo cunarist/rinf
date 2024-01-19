@@ -9,7 +9,7 @@ fn main() {
     let out_path = home_path.join(".local").join("bin");
     fs::create_dir_all(&out_path).unwrap();
     env::set_var("OUT_DIR", out_path.to_str().unwrap());
-    let (protoc_path, _) = protoc_prebuilt::init("22.0").unwrap();
+    let (protoc_path, _) = protoc_prebuilt::init("25.2").unwrap();
     let mut path_var = match env::var_os("PATH") {
         Some(val) => env::split_paths(&val).collect::<Vec<_>>(),
         None => Vec::new(),

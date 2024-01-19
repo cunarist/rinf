@@ -7,7 +7,7 @@ import 'package:example_app/messages/fractal_art.pb.dart';
 
 void main() async {
   // Wait for Rust initialization to be completed first.
-  await Rinf.initialize(handleSignal);
+  await Rinf.initialize(handleRustSignal);
   runApp(const MyApp());
 }
 
@@ -60,8 +60,7 @@ class MyHomePage extends StatelessWidget {
             // `StreamBuilder` listens to a stream
             // and rebuilds the widget accordingly.
             StreamBuilder(
-                // This stream is generated from a marked Protobuf message.
-                stream: fractalScaleStream,
+                stream: SampleFractal.rustSignalStream,
                 builder: (context, snapshot) {
                   final rustSignal = snapshot.data;
                   if (rustSignal == null) {
@@ -96,7 +95,7 @@ class MyHomePage extends StatelessWidget {
                 }),
             StreamBuilder(
               // This stream is generated from a marked Protobuf message.
-              stream: numberOutputStream,
+              stream: SampleNumberOutput.rustSignalStream,
               builder: (context, snapshot) {
                 final rustSignal = snapshot.data;
                 // If the app has just started and widget is built
@@ -107,7 +106,8 @@ class MyHomePage extends StatelessWidget {
                   // Return the initial widget if the snapshot data is null.
                   return Text('Initial value 0');
                 }
-                final currentNumber = rustSignal.message.currentNumber;
+                final sampleNumberOutput = rustSignal.message;
+                final currentNumber = sampleNumberOutput.currentNumber;
                 return Text('Current value is $currentNumber');
               },
             ),
@@ -117,17 +117,16 @@ class MyHomePage extends StatelessWidget {
       // This is a button that calls the generated function.
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // This function is generated from a marked Protobuf message.
-          numberInputSend(
-            NumberInput(
-                letter: "HELLO FROM DART!",
-                dummyOne: 25,
-                dummyTwo: SampleSchema(
-                  sampleFieldOne: true,
-                  sampleFieldTwo: false,
-                ),
-                dummyThree: [4, 5, 6]),
-          );
+          // The method is generated from a marked Protobuf message.
+          SampleNumberInput(
+            letter: "HELLO FROM DART!",
+            dummyOne: 25,
+            dummyTwo: SampleSchema(
+              sampleFieldOne: true,
+              sampleFieldTwo: false,
+            ),
+            dummyThree: [4, 5, 6],
+          ).sendSignalToRust(null);
         },
         tooltip: 'Increment',
         child: const Icon(Icons.add),

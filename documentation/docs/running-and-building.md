@@ -6,13 +6,13 @@ The following commands are just enough to run and build apps for native platform
 
 To run the app:
 
-```bash
+```bash title="CLI"
 flutter run
 ```
 
 To build the app for a specific platform:
 
-```bash
+```bash title="CLI"
 flutter build [platform] # Replace it with a platform name
 ```
 
@@ -22,14 +22,14 @@ You need to manually build webassembly module from Rust before running or buildi
 
 To serve the web application:
 
-```bash
+```bash title="CLI"
 rinf wasm --release
 flutter run --release  # Choose a browser
 ```
 
 To build the optimized release version of the web application:
 
-```bash
+```bash title="CLI"
 rinf wasm --release
 flutter build web
 ```

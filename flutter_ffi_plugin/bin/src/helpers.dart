@@ -181,10 +181,10 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
       'main() async {',
     );
   }
-  if (!mainText.contains('Rinf.initialize(handleSignal)')) {
+  if (!mainText.contains('Rinf.initialize(handleRustSignal)')) {
     mainText = mainText.replaceFirst(
       'main() async {',
-      'main() async { await Rinf.initialize(handleSignal);',
+      'main() async { await Rinf.initialize(handleRustSignal);',
     );
   }
   await mainFile.writeAsString(mainText);
