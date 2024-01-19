@@ -34,7 +34,7 @@ If you add the optional argument `-w` or `--watch` to the `rinf message` command
 rinf message --watch
 ```
 
-### Code Generation
+### Special Marks
 
 As explained in the previous tutorial, special comments inside `.proto` files allow Rinf's code generator invoked by `rinf message` to create appropriate channels for communication between Dart and Rust.
 
