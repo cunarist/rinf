@@ -238,21 +238,20 @@ use tokio::sync::mpsc::Sender;
       final markedMessages = entry.value;
       for (final markedMessage in markedMessages) {
         final messageName = markedMessage.name;
-        final camelName = pascalToCamel(messageName);
         final snakeName = pascalToSnake(messageName);
         if (markedMessage.markType == MarkType.fromDart) {
           await insertTextToFile(
-            dartPath,
-            '''
-void ${camelName}Send($messageName message, [Uint8List? blob]) {
-    sendDartSignal(
-        ${markedMessage.id},
-        message.writeToBuffer(),
-        blob,
-    );
+              dartPath,
+              '''
+void sendSignalToRust(Uint8List? blob) {
+  sendDartSignal(
+    ${markedMessage.id},
+    this.writeToBuffer(),
+    blob,
+  );
 }
 ''',
-          );
+              after: "class $messageName extends \$pb.GeneratedMessage {");
           await insertTextToFile(
             rustPath,
             '''
@@ -262,32 +261,38 @@ lazy_static! {
         Arc::new(Mutex::new(RefCell::new(None)));
 }
 
-pub fn ${snakeName}_receiver() -> Receiver<DartSignal<$messageName>> {
-    let (sender, receiver) = tokio::sync::mpsc::channel(1024);
-    let cell = ${snakeName.toUpperCase()}_SENDER.lock().unwrap();
-    cell.replace(Some(sender));
-    receiver
+impl $messageName {
+    pub fn get_dart_signal_receiver() -> Receiver<DartSignal<Self>> {
+        let (sender, receiver) = tokio::sync::mpsc::channel(1024);
+        let cell = ${snakeName.toUpperCase()}_SENDER.lock().unwrap();
+        cell.replace(Some(sender));
+        receiver
+    }
 }
 ''',
           );
         }
         if (markedMessage.markType == MarkType.fromRust) {
           await insertTextToFile(
-            dartPath,
-            '''
-final ${camelName}Controller = StreamController<RustSignal<$messageName>>();
-final ${camelName}Stream = ${camelName}Controller.stream;
+              dartPath,
+              '''
+  static StreamController<RustSignal<$messageName>> rustSignalController =
+      StreamController();
+  static Stream<RustSignal<$messageName>> rustSignalStream =
+      rustSignalController.stream;
 ''',
-          );
+              after: "class $messageName extends \$pb.GeneratedMessage {");
           await insertTextToFile(
             rustPath,
             '''
-pub fn ${snakeName}_send(message: $messageName, blob: Option<Vec<u8>>) {
-    crate::bridge::send_rust_signal(
-        ${markedMessage.id},
-        message.encode_to_vec(),
-        blob,
-    );
+impl $messageName {
+    pub fn send_signal_to_dart(&self, blob: Option<Vec<u8>>) {
+        crate::bridge::send_rust_signal(
+            ${markedMessage.id},
+            self.encode_to_vec(),
+            blob
+        );
+    }
 }
 ''',
           );
@@ -318,12 +323,13 @@ pub fn handle_signal(
       final markedMessages = entry.value;
       for (final markedMessage in markedMessages) {
         if (markedMessage.markType == MarkType.fromDart) {
-          final snakeName = pascalToSnake(markedMessage.name);
+          final messageName = markedMessage.name;
+          final snakeName = pascalToSnake(messageName);
           var modulePath = subpath.replaceAll("/", "::");
           rustReceiveScript += '''
 if message_id == ${markedMessage.id} {
     use super$modulePath::$filename::*;
-    let message = ${markedMessage.name}::decode(
+    let message = ${messageName}::decode(
         message_bytes.as_slice()
     ).unwrap();
     let signal = DartSignal {
@@ -333,7 +339,7 @@ if message_id == ${markedMessage.id} {
     let cell = ${snakeName.toUpperCase()}_SENDER.lock().unwrap();
     let sender = cell.clone().replace(None).expect(concat!(
         "Looks like the channel is not created yet.",
-        "\\nTry listening to a receiver from `${snakeName}_receiver()`."
+        "\\nTry using `${messageName}.get_dart_signal_receiver()`."
     ));
     let _ = sender.try_send(signal);
     return;
@@ -364,7 +370,7 @@ void handleSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
       final markedMessages = entry.value;
       for (final markedMessage in markedMessages) {
         if (markedMessage.markType == MarkType.fromRust) {
-          final camelName = pascalToCamel(markedMessage.name);
+          final messageName = markedMessage.name;
           final importPath = '$subpath/$filename.pb.dart';
           if (!dartReceiveScript.contains(importPath)) {
             dartReceiveScript = '''
@@ -374,12 +380,12 @@ import '.$importPath' as $filename;
           }
           dartReceiveScript += '''
 if (messageId == ${markedMessage.id}) {
-  final message = $filename.${markedMessage.name}.fromBuffer(messageBytes);
+  final message = $filename.${messageName}.fromBuffer(messageBytes);
   final bridgeSignal = RustSignal(
     message,
     blob,
   );
-  $filename.${camelName}Controller.add(bridgeSignal);
+  $filename.${messageName}.rustSignalController.add(bridgeSignal);
   return;
 }
 ''';
@@ -529,6 +535,7 @@ Future<void> insertTextToFile(
   String filePath,
   String textToAppend, {
   bool atFront = false,
+  String? after = null,
 }) async {
   // Read the existing content of the file
   final file = File(filePath);
@@ -540,6 +547,8 @@ Future<void> insertTextToFile(
   // Append the new text to the existing content
   if (atFront) {
     fileContent = textToAppend + '\n' + fileContent;
+  } else if (after != null) {
+    fileContent = fileContent.replaceFirst(after, after + textToAppend);
   } else {
     fileContent = fileContent + '\n' + textToAppend;
   }

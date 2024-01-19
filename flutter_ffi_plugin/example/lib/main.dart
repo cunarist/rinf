@@ -61,7 +61,7 @@ class MyHomePage extends StatelessWidget {
             // and rebuilds the widget accordingly.
             StreamBuilder(
                 // This stream is generated from a marked Protobuf message.
-                stream: fractalScaleStream,
+                stream: FractalScale.rustSignalStream,
                 builder: (context, snapshot) {
                   final rustSignal = snapshot.data;
                   if (rustSignal == null) {
@@ -96,7 +96,7 @@ class MyHomePage extends StatelessWidget {
                 }),
             StreamBuilder(
               // This stream is generated from a marked Protobuf message.
-              stream: numberOutputStream,
+              stream: NumberOutput.rustSignalStream,
               builder: (context, snapshot) {
                 final rustSignal = snapshot.data;
                 // If the app has just started and widget is built
@@ -118,16 +118,15 @@ class MyHomePage extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           // This function is generated from a marked Protobuf message.
-          numberInputSend(
-            NumberInput(
-                letter: "HELLO FROM DART!",
-                dummyOne: 25,
-                dummyTwo: SampleSchema(
-                  sampleFieldOne: true,
-                  sampleFieldTwo: false,
-                ),
-                dummyThree: [4, 5, 6]),
-          );
+          NumberInput(
+            letter: "HELLO FROM DART!",
+            dummyOne: 25,
+            dummyTwo: SampleSchema(
+              sampleFieldOne: true,
+              sampleFieldTwo: false,
+            ),
+            dummyThree: [4, 5, 6],
+          ).sendSignalToRust(null);
         },
         tooltip: 'Increment',
         child: const Icon(Icons.add),

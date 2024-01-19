@@ -9,8 +9,9 @@ const SHOULD_DEMONSTRATE: bool = true; // Disabled when applied as template
 pub async fn tell_numbers() {
     use messages::counter_number::*;
 
-    let mut receiver = number_input_receiver();
     let mut current_number = 0;
+
+    let mut receiver = NumberInput::get_dart_signal_receiver();
     while let Some(dart_signal) = receiver.recv().await {
         // Extract values from the message received from Dart.
         // This message is a type that's declared in its Protobuf file.
@@ -23,13 +24,13 @@ pub async fn tell_numbers() {
 
         // Respond to Dart with a new message.
         // This type is also declared in its Protobuf file.
-        let number_output = NumberOutput {
+        NumberOutput {
             current_number,
             dummy_one: number_input.dummy_one,
             dummy_two: number_input.dummy_two,
             dummy_three: number_input.dummy_three,
-        };
-        number_output_send(number_output, None);
+        }
+        .send_signal_to_dart(None);
     }
 }
 
@@ -75,16 +76,14 @@ pub async fn stream_fractal() {
             let received_frame = join_handle.await.unwrap();
             if let Some(fractal_image) = received_frame {
                 // Stream the image data to Dart.
-                fractal_scale_send(
-                    FractalScale {
-                        current_scale,
-                        dummy: Some(SampleSchema {
-                            sample_field_one: true,
-                            sample_field_two: false,
-                        }),
-                    },
-                    Some(fractal_image),
-                );
+                FractalScale {
+                    current_scale,
+                    dummy: Some(SampleSchema {
+                        sample_field_one: true,
+                        sample_field_two: false,
+                    }),
+                }
+                .send_signal_to_dart(Some(fractal_image));
             };
         }
     });
