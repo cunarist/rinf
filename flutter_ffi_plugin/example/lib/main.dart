@@ -106,7 +106,8 @@ class MyHomePage extends StatelessWidget {
                   // Return the initial widget if the snapshot data is null.
                   return Text('Initial value 0');
                 }
-                final currentNumber = rustSignal.message.currentNumber;
+                final sampleNumberOutput = rustSignal.message;
+                final currentNumber = sampleNumberOutput.currentNumber;
                 return Text('Current value is $currentNumber');
               },
             ),
