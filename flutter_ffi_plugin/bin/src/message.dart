@@ -195,6 +195,9 @@ Future<void> generateMessageCode({
     final subPath = entry.key;
     final filesAndMarks = entry.value;
     for (final entry in filesAndMarks.entries) {
+      if (entry.value.length == 0) {
+        continue;
+      }
       final filename = entry.key;
       final dartPath = '$dartOutputPath$subPath/$filename.pb.dart';
       final dartFile = File(dartPath);
