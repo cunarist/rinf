@@ -1,9 +1,6 @@
 #![allow(dead_code)]
 
 use crate::tokio;
-use rinf::externs::lazy_static::lazy_static;
-use rinf::SimpleCell;
-use std::cell::RefCell;
 
 #[cfg(not(target_family = "wasm"))]
 pub use super::interface_os::*;
@@ -11,9 +8,9 @@ pub use super::interface_os::*;
 pub use super::interface_web::*;
 
 #[cfg(not(target_family = "wasm"))]
-lazy_static! {
-    pub static ref TOKIO_RUNTIME: rinf::externs::os_thread_local::ThreadLocal<SimpleCell<tokio::runtime::Runtime>> =
-        rinf::externs::os_thread_local::ThreadLocal::new(|| RefCell::new(None));
+rinf::externs::lazy_static::lazy_static! {
+    pub static ref TOKIO_RUNTIME: rinf::externs::os_thread_local::ThreadLocal<rinf::SimpleCell<tokio::runtime::Runtime>> =
+        rinf::externs::os_thread_local::ThreadLocal::new(|| std::cell::RefCell::new(None));
 }
 
 /// Start the main function of Rust.
