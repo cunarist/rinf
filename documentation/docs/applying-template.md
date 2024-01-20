@@ -5,7 +5,7 @@
 First of all, add this framework to your Flutter project.
 
 ```bash title="CLI"
-flutter pub add rinf
+flutter pub add rinf:'6.0.0-beta'
 ```
 
 Now install the command executable to easily run Rinf commands in the CLI.
