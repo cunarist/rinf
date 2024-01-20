@@ -36,47 +36,6 @@ If you add the optional argument `-w` or `--watch` to the `rinf message` command
 rinf message --watch
 ```
 
-### Special Marks
-
-As explained in the previous tutorial, special comments inside `.proto` files allow Rinf's code generator invoked by `rinf message` to create appropriate channels for communication between Dart and Rust.
-
-`[RINF:DART-SIGNAL]` generates a channel from Dart to Rust.
-
-```proto title="Protobuf"
-// [RINF:DART-SIGNAL]
-message MyDataInput { ... }
-```
-
-```dart title="Dart"
-MyDataInput( ... ).sendSignalToRust(null);
-```
-
-```rust title="Rust"
-let receiver = MyDataInput::get_dart_signal_receiver();
-while let Some(dart_signal) = receiver.recv().await {
-    // Custom Rust logic here
-}
-```
-
-`[RINF:RUST-SIGNAL]` generates a channel from Rust to Dart.
-
-```proto title="Protobuf"
-// [RINF:RUST-SIGNAL]
-message MyDataOutput { ... }
-```
-
-```dart title="Dart"
-MyDataOutput.rustSignalStream.listen((rustSignal) {
-    // Custom Dart logic here
-})
-```
-
-```rust title="Rust"
-MyDataOutput { ... }.send_signal_to_dart(None);
-```
-
-You can provide binary data as an argument to the `sendSignalToRust()` or `send_signal_to_dart()` method. Its type should be `Uint8List?` in Dart and `Option<Vec<u8>>` in Rust. Passing binary data separately is recommended over embedding it inside the Protobuf message for better performance, as it avoids the overhead of serialization.
-
 ### Normal Messages
 
 If a message doesn't need a channel, then it is totally fine not to mark it with a special comment at all. In that case, the message will still be generated without the ability to send signals. In general, they would be nested inside other messages.
