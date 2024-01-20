@@ -75,7 +75,7 @@ MyDataOutput.rustSignalStream.listen((rustSignal) {
 MyDataOutput { ... }.send_signal_to_dart(None);
 ```
 
-You can provide binary data to `sendSignalToRust()` or `send_signal_to_dart()` method as an argument. Its type should be `Uint8List?` in Dart and `Option<Vec<u8>>` in Rust. Passing binary data with this separate field is recommend over embedding it inside the Protobuf message, because it's more performant.
+You can provide binary data as an argument to the `sendSignalToRust()` or `send_signal_to_dart()` method. Its type should be `Uint8List?` in Dart and `Option<Vec<u8>>` in Rust. Passing binary data separately is recommended over embedding it inside the Protobuf message for better performance, as it avoids the overhead of serialization.
 
 ### Normal Messages
 
