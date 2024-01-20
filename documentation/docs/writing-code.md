@@ -6,9 +6,11 @@
 
 We've covered how to pass signals between Dart and Rust in the previous tutorial section. Now Let's delve into the meaning of each field of a signal.
 
-- **Field `message`:** It represents a message of a type defined by Protobuf. It's important to note that creating Protobuf messages larger than a few megabytes is not recommended. For large data, split them into multiple signals, or use `blob` instead. This field is mandatory.
+- **Field `message`:** It represents a message of a type defined by Protobuf. This field is mandatory.
 
-- **Field `blob`:** This is a bytes array designed to handle large data, potentially up to a few gigabytes. You can send any kind of binary data you wish, such as a high-resolution image or file data. This field is optional and can be set to `null` or `None`.
+- **Field `blob`:** This is a field designed to handle large binary data, potentially up to a few gigabytes. You can send any kind of binary data you wish, such as a high-resolution image or file data. This field is optional and can be set to `null` or `None`.
+
+It's important to note that creating a Protobuf `message` larger than a few megabytes is not recommended. For large data, split them into multiple signals, or use `blob` instead.
 
 ### Efficiency
 
