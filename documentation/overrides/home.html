@@ -209,21 +209,16 @@
         <h3>Dart with Widgets</h3>
         <div>
           <pre>
-<code>ElevatedButton(
-  onPressed: () async {
-    final requestMessage = tutorialResource.ReadRequest(
-      inputNumbers: [3, 4, 5],
-      inputString: 'Zero-cost abstraction',
-    );
-    final rustRequest = RustRequest(
-      resource: tutorialResource.ID,
-      operation: RustOperation.Read,
-      message: requestMessage.writeToBuffer(),
-    );
-    final rustResponse = await requestToRust(rustRequest);
-  },
-  child: Text("Request to Rust"),
-)</code>
+<code>MySchemaInput(
+  fieldOne: 1,
+  fieldTwo: 2,
+  fieldThree: 3,
+).sendSignalToRust(null)
+
+final stream = MySchemaOutput.rustSignalStream;
+stream.listen((rustSignal) {
+  // Custom Dart logic
+})</code>
           </pre>
         </div>
       </div>
@@ -231,32 +226,15 @@
         <h3>Rust with Business Logic</h3>
         <div>
           <pre>
-<code>pub async fn do(rust_request: RustRequest) -> Option&lt;RustResponse&gt; {
-  use crate::messages::tutorial_resource::{
-    ReadRequest,
-    ReadResponse,
-  };
+<code>MySchemaOutput {
+    field_four: 4,
+    field_five: 5,
+    field_six: 6,
+}.send_signal_to_dart(None)
 
-  match rust_request.operation {
-    RustOperation::Create => None,
-    RustOperation::Read => {
-      let message_bytes = rust_request.message.unwrap();
-      let request_message = ReadRequest::decode(
-        message_bytes.as_slice()
-      ).unwrap();
-
-      let response_message = ReadResponse {
-        output_numbers: vec![1, 2, 3],
-        output_string: String::from("HI"),
-      };
-      Some(RustResponse {
-        message: Some(response_message.encode_to_vec()),
-        blob: None,
-      })
-    }
-    RustOperation::Update => None,
-    RustOperation::Delete => None,
-  }
+let receiver = MySchemaInput.get_dart_signal_receiver();
+while let Some(dart_signal) = receiver.recv().await {
+    // Custom Rust logic
 }</code>
           </pre>
         </div>
