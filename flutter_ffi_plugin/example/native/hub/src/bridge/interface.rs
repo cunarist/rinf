@@ -1,7 +1,5 @@
 #![allow(dead_code)]
 
-use crate::tokio;
-use std::cell::Cell;
 use std::cell::RefCell;
 use std::sync::Mutex;
 use std::sync::OnceLock;
@@ -23,94 +21,6 @@ pub struct DartSignal<T> {
 /// This is a mutable cell type that can be shared across threads.
 pub type SharedCell<T> = OnceLock<Mutex<RefCell<Option<T>>>>;
 
-#[cfg(not(target_family = "wasm"))]
-static TOKIO_RUNTIME: OnceLock<Mutex<Cell<Option<tokio::runtime::Runtime>>>> = OnceLock::new();
-
-/// Start the main function of Rust.
-pub fn start_rust_logic() {
-    // Enable backtrace output for panics.
-    #[cfg(debug_assertions)]
-    {
-        #[cfg(not(target_family = "wasm"))]
-        {
-            use rinf::externs::backtrace;
-            std::panic::set_hook(Box::new(|panic_info| {
-                let mut frames_filtered = Vec::new();
-                backtrace::trace(|frame| {
-                    // Filter some backtrace frames
-                    // as those from infrastructure functions are not needed.
-                    let mut should_keep_tracing = true;
-                    backtrace::resolve_frame(frame, |symbol| {
-                        if let Some(symbol_name) = symbol.name() {
-                            let name = symbol_name.to_string();
-                            let name_trimmed = name.trim_start_matches('_');
-                            if name_trimmed.starts_with("rust_begin_unwind") {
-                                frames_filtered.clear();
-                                return;
-                            }
-                            if name_trimmed.starts_with("rust_try") {
-                                should_keep_tracing = false;
-                                return;
-                            }
-                        }
-                        let backtrace_frame = backtrace::BacktraceFrame::from(frame.to_owned());
-                        frames_filtered.push(backtrace_frame);
-                    });
-                    should_keep_tracing
-                });
-                let mut backtrace_filtered = backtrace::Backtrace::from(frames_filtered);
-                backtrace_filtered.resolve();
-                crate::debug_print!(
-                    "A panic occurred in Rust.\n{}\n{:?}",
-                    panic_info,
-                    backtrace_filtered
-                );
-            }));
-        }
-        #[cfg(target_family = "wasm")]
-        {
-            std::panic::set_hook(Box::new(|panic_info| {
-                crate::debug_print!("A panic occurred in Rust.\n{panic_info}");
-            }));
-        }
-    }
-
-    // Run the main function.
-    #[cfg(not(target_family = "wasm"))]
-    {
-        let tokio_runtime = tokio::runtime::Builder::new_multi_thread()
-            .enable_all()
-            .build()
-            .unwrap();
-        tokio_runtime.spawn(crate::main());
-        let cell = TOKIO_RUNTIME
-            .get_or_init(|| Mutex::new(Cell::new(None)))
-            .lock()
-            .unwrap();
-        // If there was already a tokio runtime previously,
-        // most likely due to Dart's hot restart,
-        // its tasks as well as itself will be terminated,
-        // being replaced with the new one.
-        cell.replace(Some(tokio_runtime));
-    }
-    #[cfg(target_family = "wasm")]
-    {
-        tokio::spawn(crate::main());
-    }
-}
-
-/// Stop and terminate all Rust tasks.
-pub fn stop_rust_logic() {
-    #[cfg(not(target_family = "wasm"))]
-    {
-        let cell = TOKIO_RUNTIME
-            .get_or_init(|| Mutex::new(Cell::new(None)))
-            .lock()
-            .unwrap();
-        cell.replace(None);
-    }
-}
-
 /// Send a signal to Dart.
 pub fn send_rust_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Vec<u8>>) {
     send_rust_signal_extern(
@@ -121,15 +31,23 @@ pub fn send_rust_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Ve
     );
 }
 
-/// Send a string to Dart that should be printed in the CLI.
-/// Do NOT use this function directly in the code.
-/// Use `debug_print!` macro instead.
-#[cfg(debug_assertions)]
-pub fn send_rust_report(rust_report: String) {
-    send_rust_signal_extern(
-        -1, // This is a special message ID for Rust reports
-        Vec::new(),
-        true,
-        rust_report.into_bytes(),
-    );
+/// Delegates the printing operation to Flutter,
+/// which excels at handling various platforms
+/// including web and mobile emulators.
+/// When debugging, using this macro is recommended over `println!()`,
+/// as it seamlessly adapts to different environments.
+/// Note that this macro does nothing in release mode.
+#[macro_export]
+macro_rules! debug_print {
+    ( $( $t:tt )* ) => {
+        let rust_report = format!( $( $t )* );
+        #[cfg(debug_assertions)]
+        $crate::bridge::send_rust_signal(
+            -1, // This is a special message ID for Rust reports
+            Vec::new(),
+            Some(rust_report.into_bytes()),
+        );
+        #[cfg(not(debug_assertions))]
+        let _ = rust_report;
+    }
 }

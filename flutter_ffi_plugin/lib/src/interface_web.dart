@@ -40,8 +40,9 @@ Future<void> prepareNativeBridge(HandleRustSignal handleRustSignal) async {
 @JS('wasm_bindgen.start_rust_logic_extern')
 external void startRustLogicExtern();
 
-@JS('wasm_bindgen.stop_rust_logic_extern')
-external void stopRustLogicExtern();
+void stopRustLogicExtern() {
+  // Dummy function to match that of the OS module.
+}
 
 @JS('wasm_bindgen.send_dart_signal_extern')
 external void sendDartSignalExtern(

@@ -1,12 +1,15 @@
 use super::interface::*;
+use crate::tokio;
 use allo_isolate::IntoDart;
 use allo_isolate::Isolate;
+use rinf::externs::backtrace::Backtrace;
 use std::cell::RefCell;
 use std::panic::catch_unwind;
 use std::sync::Mutex;
 use std::sync::OnceLock;
 
 static DART_ISOLATE: SharedCell<Isolate> = OnceLock::new();
+static TOKIO_RUNTIME: SharedCell<tokio::runtime::Runtime> = OnceLock::new();
 
 #[no_mangle]
 pub extern "C" fn prepare_isolate_extern(port: i64) {
@@ -23,14 +26,41 @@ pub extern "C" fn prepare_isolate_extern(port: i64) {
 #[no_mangle]
 pub extern "C" fn start_rust_logic_extern() {
     let _ = catch_unwind(|| {
-        start_rust_logic();
+        // Enable backtrace output for panics.
+        #[cfg(debug_assertions)]
+        {
+            std::panic::set_hook(Box::new(|panic_info| {
+                let backtrace = Backtrace::new();
+                crate::debug_print!("A panic occurred in Rust.\n{panic_info}\n{backtrace:?}");
+            }));
+        }
+
+        // Run the main function.
+        let tokio_runtime = tokio::runtime::Builder::new_multi_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        tokio_runtime.spawn(crate::main());
+        let cell = TOKIO_RUNTIME
+            .get_or_init(|| Mutex::new(RefCell::new(None)))
+            .lock()
+            .unwrap();
+        // If there was already a tokio runtime previously,
+        // most likely due to Dart's hot restart,
+        // its tasks as well as itself will be terminated,
+        // being replaced with the new one.
+        cell.replace(Some(tokio_runtime));
     });
 }
 
 #[no_mangle]
 pub extern "C" fn stop_rust_logic_extern() {
     let _ = catch_unwind(|| {
-        stop_rust_logic();
+        let cell = TOKIO_RUNTIME
+            .get_or_init(|| Mutex::new(RefCell::new(None)))
+            .lock()
+            .unwrap();
+        cell.replace(None);
     });
 }
 

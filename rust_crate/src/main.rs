@@ -34,5 +34,5 @@ fn main() {
 
 #[cfg(target_family = "wasm")]
 fn main() {
-    // Separate dummy function to make the linter happy
+    // Dummy function to make the linter happy
 }
