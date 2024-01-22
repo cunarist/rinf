@@ -93,7 +93,7 @@ BEGIN
             VALUE "FileDescription", "example_app" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "example_app" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2023 com.cunarist. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2024 com.cunarist. All rights reserved." "\0"
             VALUE "OriginalFilename", "example_app.exe" "\0"
             VALUE "ProductName", "example_app" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
