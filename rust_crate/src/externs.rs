@@ -5,5 +5,3 @@ pub use os_thread_local;
 
 #[cfg(target_family = "wasm")]
 pub use js_sys;
-
-pub use lazy_static;

@@ -226,12 +226,11 @@ import 'package:rinf/rinf.dart';
 
 use crate::tokio;
 use prost::Message;
-use rinf::externs::lazy_static::lazy_static;
 use rinf::DartSignal;
 use rinf::SharedCell;
 use std::cell::RefCell;
-use std::sync::Arc;
 use std::sync::Mutex;
+use std::sync::OnceLock;
 use tokio::sync::mpsc::Receiver;
 use tokio::sync::mpsc::Sender;
 ''',
@@ -262,15 +261,16 @@ void sendSignalToRust(Uint8List? blob) {
             '''
 type ${messageName}Cell =
     SharedCell<Sender<DartSignal<${normalizePascal(messageName)}>>>;
-lazy_static! {
-    pub static ref ${snakeName.toUpperCase()}_SENDER: ${messageName}Cell =
-        Arc::new(Mutex::new(RefCell::new(None)));
-}
+pub static ${snakeName.toUpperCase()}_SENDER: ${messageName}Cell =
+    OnceLock::new();
 
 impl ${normalizePascal(messageName)} {
     pub fn get_dart_signal_receiver() -> Receiver<DartSignal<Self>> {
         let (sender, receiver) = tokio::sync::mpsc::channel(1024);
-        let cell = ${snakeName.toUpperCase()}_SENDER.lock().unwrap();
+        let cell = ${snakeName.toUpperCase()}_SENDER
+            .get_or_init(|| Mutex::new(RefCell::new(None)))
+            .lock()
+            .unwrap();
         cell.replace(Some(sender));
         receiver
     }
@@ -321,6 +321,8 @@ impl ${normalizePascal(messageName)} {
 
 use prost::Message;
 use rinf::DartSignal;
+use std::cell::RefCell;
+use std::sync::Mutex;
 
 pub fn handle_dart_signal(
     message_id: i32,
@@ -349,7 +351,7 @@ if message_id == ${markedMessage.id} {
         message,
         blob,
     };
-    let cell = ${snakeName.toUpperCase()}_SENDER.lock().unwrap();
+    let cell = ${snakeName.toUpperCase()}_SENDER.get().unwrap().lock().unwrap();
     let sender = cell.clone().replace(None).expect(concat!(
         "Looks like the channel is not created yet.",
         "\\nTry using `$messageName.get_dart_signal_receiver()`."

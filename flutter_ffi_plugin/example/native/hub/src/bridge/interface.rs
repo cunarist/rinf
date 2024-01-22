@@ -1,6 +1,9 @@
 #![allow(dead_code)]
 
 use crate::tokio;
+use std::cell::Cell;
+use std::sync::Mutex;
+use std::sync::OnceLock;
 
 #[cfg(not(target_family = "wasm"))]
 pub use super::interface_os::*;
@@ -8,10 +11,7 @@ pub use super::interface_os::*;
 pub use super::interface_web::*;
 
 #[cfg(not(target_family = "wasm"))]
-rinf::externs::lazy_static::lazy_static! {
-    pub static ref TOKIO_RUNTIME: rinf::externs::os_thread_local::ThreadLocal<rinf::SimpleCell<tokio::runtime::Runtime>> =
-        rinf::externs::os_thread_local::ThreadLocal::new(|| std::cell::RefCell::new(None));
-}
+static TOKIO_RUNTIME: OnceLock<Mutex<Cell<Option<tokio::runtime::Runtime>>>> = OnceLock::new();
 
 /// Start the main function of Rust.
 pub fn start_rust_logic() {
@@ -65,18 +65,20 @@ pub fn start_rust_logic() {
     // Run the main function.
     #[cfg(not(target_family = "wasm"))]
     {
-        TOKIO_RUNTIME.with(move |inner| {
-            let tokio_runtime = tokio::runtime::Builder::new_multi_thread()
-                .enable_all()
-                .build()
-                .unwrap();
-            tokio_runtime.spawn(crate::main());
-            // If there was already a tokio runtime previously,
-            // most likely due to Dart's hot restart,
-            // its tasks as well as itself will be terminated,
-            // being replaced with the new one.
-            inner.replace(Some(tokio_runtime));
-        });
+        let tokio_runtime = tokio::runtime::Builder::new_multi_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        tokio_runtime.spawn(crate::main());
+        let cell = TOKIO_RUNTIME
+            .get_or_init(|| Mutex::new(Cell::new(None)))
+            .lock()
+            .unwrap();
+        // If there was already a tokio runtime previously,
+        // most likely due to Dart's hot restart,
+        // its tasks as well as itself will be terminated,
+        // being replaced with the new one.
+        cell.replace(Some(tokio_runtime));
     }
     #[cfg(target_family = "wasm")]
     {
@@ -87,9 +89,13 @@ pub fn start_rust_logic() {
 /// Stop and terminate all Rust tasks.
 pub fn stop_rust_logic() {
     #[cfg(not(target_family = "wasm"))]
-    TOKIO_RUNTIME.with(move |ref_cell| {
-        ref_cell.replace(None);
-    });
+    {
+        let cell = TOKIO_RUNTIME
+            .get_or_init(|| Mutex::new(Cell::new(None)))
+            .lock()
+            .unwrap();
+        cell.replace(None);
+    }
 }
 
 /// Send a signal to Dart.
