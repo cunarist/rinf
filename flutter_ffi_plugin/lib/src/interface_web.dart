@@ -1,8 +1,10 @@
+// ignore_for_file: avoid_web_libraries_in_flutter
+
 import 'load_web.dart';
 import 'package:js/js.dart';
 import 'dart:typed_data';
-import 'package:universal_html/js.dart' as js;
-import 'common.dart';
+import 'dart:js' as js;
+import 'interface.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -40,8 +42,9 @@ Future<void> prepareNativeBridge(HandleRustSignal handleRustSignal) async {
 @JS('wasm_bindgen.start_rust_logic_extern')
 external void startRustLogicExtern();
 
-@JS('wasm_bindgen.stop_rust_logic_extern')
-external void stopRustLogicExtern();
+void stopRustLogicExtern() {
+  // Dummy function to match that of the OS module.
+}
 
 @JS('wasm_bindgen.send_dart_signal_extern')
 external void sendDartSignalExtern(

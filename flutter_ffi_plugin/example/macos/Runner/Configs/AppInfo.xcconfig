@@ -11,4 +11,4 @@ PRODUCT_NAME = example_app
 PRODUCT_BUNDLE_IDENTIFIER = com.cunarist.rustInFlutterExample
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2023 com.cunarist. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2024 com.cunarist. All rights reserved.

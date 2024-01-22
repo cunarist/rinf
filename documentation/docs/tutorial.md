@@ -61,6 +61,7 @@ Let's listen to this message in Rust. This simple function will add one to each 
 
 ```rust title="native/hub/src/sample_functions.rs"
 ...
+use crate::debug_print;
 use crate::messages;
 ...
 pub async fn calculate_precious_data() {
@@ -77,8 +78,8 @@ pub async fn calculate_precious_data() {
             .collect();
         let new_string = my_precious_data.input_string.to_uppercase();
 
-        crate::debug_print!("{new_numbers:?}");
-        crate::debug_print!("{new_string}");
+        debug_print!("{new_numbers:?}");
+        debug_print!("{new_string}");
     }
 }
 ...

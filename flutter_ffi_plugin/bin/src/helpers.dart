@@ -160,14 +160,10 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
   // Modify `./lib/main.dart`
   await Process.run('dart', ['format', './lib/main.dart']);
   var mainText = await mainFile.readAsString();
-  if (!mainText.contains('package:rinf/rinf.dart')) {
+  if (!mainText.contains('messages/generated.dart')) {
     final lines = mainText.split("\n");
     final lastImportIndex = lines.lastIndexWhere(
       (line) => line.startsWith('import '),
-    );
-    lines.insert(
-      lastImportIndex + 1,
-      "import 'package:rinf/rinf.dart';",
     );
     lines.insert(
       lastImportIndex + 1,
@@ -181,10 +177,10 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
       'main() async {',
     );
   }
-  if (!mainText.contains('Rinf.initialize(handleRustSignal)')) {
+  if (!mainText.contains('Rinf.initialize()')) {
     mainText = mainText.replaceFirst(
       'main() async {',
-      'main() async { await Rinf.initialize(handleRustSignal);',
+      'main() async { await Rinf.initialize();',
     );
   }
   await mainFile.writeAsString(mainText);
@@ -240,6 +236,7 @@ Future<void> buildWebassembly({bool isReleaseMode = false}) async {
   await Process.run("cargo", ["install", "wasm-bindgen-cli"]);
 
   // Verify Flutter SDK web server's response headers.
+  print("Patching Flutter SDK's web server with CORS HTTP headers.");
   await verifyServerHeaders();
 
   // Prepare the webassembly output path.

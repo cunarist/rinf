@@ -68,7 +68,8 @@ You might be used to `println!` macro in Rust. However, using that macro isn't a
 When writing Rust code in the `hub` crate, you can simply print your debug message with the `debug_print!` macro provided by this framework like below. Once you use this macro, Flutter will take care of the rest.
 
 ```rust title="Rust"
-crate::debug_print!("My object is {my_object:?}");
+use crate::debug_print;
+debug_print!("My object is {my_object:?}");
 ```
 
 `debug_print!` is also better than `println!` because it only works in debug mode, resulting in a smaller and cleaner release binary.
@@ -80,7 +81,7 @@ When the Flutter app is closed, the whole `tokio` runtime on the Rust side will 
 ```dart title="lib/main.dart"
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:rinf/rinf.dart';
+import './messages/generated.dart';
 ...
 class MyApp extends StatefulWidget {
   const MyApp({super.key});

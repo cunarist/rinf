@@ -144,20 +144,6 @@ Future<void> generateMessageCode({
     print(pubGlobalActivateCommand.stderr.toString().trim());
     throw Exception('Cannot globally install `protoc_plugin` Dart package');
   }
-  final newEnvironment = Map<String, String>.from(Platform.environment);
-  final currentPathVariable = newEnvironment['PATH'];
-  var pubCacheBinPath = Platform.isWindows
-      ? '${Platform.environment['LOCALAPPDATA']}\\Pub\\Cache\\bin'
-      : '${Platform.environment['HOME']}/.pub-cache/bin';
-  if (Platform.environment["PUB_CACHE"] != null) {
-    final binPath = Platform.isWindows ? '\\bin' : '/bin';
-    pubCacheBinPath = '${Platform.environment["PUB_CACHE"]}$binPath';
-  }
-  final separator = Platform.isWindows ? ';' : ':';
-  final newPathVariable = currentPathVariable != null
-      ? '$currentPathVariable$separator$pubCacheBinPath'
-      : pubCacheBinPath;
-  newEnvironment['PATH'] = newPathVariable;
   for (final entry in resourcesInFolders.entries) {
     final subPath = entry.key;
     final resourceNames = entry.value;
@@ -176,7 +162,6 @@ Future<void> generateMessageCode({
         '--dart_out=$dartOutputPath$subPath',
         ...resourceNames.map((name) => '$name.proto'),
       ],
-      environment: newEnvironment,
     );
     if (protocDartResult.exitCode != 0) {
       print(protocDartResult.stderr.toString().trim());
@@ -224,14 +209,12 @@ import 'package:rinf/rinf.dart';
           '''
 #![allow(unused_imports)]
 
+use crate::bridge::*;
 use crate::tokio;
 use prost::Message;
-use rinf::externs::lazy_static::lazy_static;
-use rinf::DartSignal;
-use rinf::SharedCell;
 use std::cell::RefCell;
-use std::sync::Arc;
 use std::sync::Mutex;
+use std::sync::OnceLock;
 use tokio::sync::mpsc::Receiver;
 use tokio::sync::mpsc::Sender;
 ''',
@@ -262,15 +245,16 @@ void sendSignalToRust(Uint8List? blob) {
             '''
 type ${messageName}Cell =
     SharedCell<Sender<DartSignal<${normalizePascal(messageName)}>>>;
-lazy_static! {
-    pub static ref ${snakeName.toUpperCase()}_SENDER: ${messageName}Cell =
-        Arc::new(Mutex::new(RefCell::new(None)));
-}
+pub static ${snakeName.toUpperCase()}_SENDER: ${messageName}Cell =
+    OnceLock::new();
 
 impl ${normalizePascal(messageName)} {
     pub fn get_dart_signal_receiver() -> Receiver<DartSignal<Self>> {
         let (sender, receiver) = tokio::sync::mpsc::channel(1024);
-        let cell = ${snakeName.toUpperCase()}_SENDER.lock().unwrap();
+        let cell = ${snakeName.toUpperCase()}_SENDER
+            .get_or_init(|| Mutex::new(RefCell::new(None)))
+            .lock()
+            .unwrap();
         cell.replace(Some(sender));
         receiver
     }
@@ -298,7 +282,7 @@ final ${camelName}Controller = StreamController<RustSignal<$messageName>>();
             '''
 impl ${normalizePascal(messageName)} {
     pub fn send_signal_to_dart(&self, blob: Option<Vec<u8>>) {
-        crate::bridge::send_rust_signal(
+        send_rust_signal(
             ${markedMessage.id},
             self.encode_to_vec(),
             blob
@@ -319,8 +303,10 @@ impl ${normalizePascal(messageName)} {
 #![allow(unused_imports)]
 #![allow(unused_variables)]
 
+use crate::bridge::*;
 use prost::Message;
-use rinf::DartSignal;
+use std::cell::RefCell;
+use std::sync::Mutex;
 
 pub fn handle_dart_signal(
     message_id: i32,
@@ -349,7 +335,10 @@ if message_id == ${markedMessage.id} {
         message,
         blob,
     };
-    let cell = ${snakeName.toUpperCase()}_SENDER.lock().unwrap();
+    let cell = ${snakeName.toUpperCase()}_SENDER
+        .get_or_init(|| Mutex::new(RefCell::new(None)))
+        .lock()
+        .unwrap();
     let sender = cell.clone().replace(None).expect(concat!(
         "Looks like the channel is not created yet.",
         "\\nTry using `$messageName.get_dart_signal_receiver()`."
@@ -374,6 +363,16 @@ if message_id == ${markedMessage.id} {
 
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
+
+class Rinf {
+  static Future<void> initialize() async {
+    await initializeRinf(handleRustSignal);
+  }
+
+  static Future<void> finalize() async {
+    await finalizeRinf();
+  }
+}
 
 void handleRustSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
 ''';
@@ -476,11 +475,24 @@ Future<void> watchAndGenerateMessageCode(
   final messagesPath = join(currentDirectory.path, "messages");
   final messagesDirectory = Directory(messagesPath);
 
+  // Listen to keystrokes in the CLI.
+  var shouldQuit = false;
+  stdin.echoMode = false;
+  stdin.lineMode = false;
+  stdin.listen((keyCodes) {
+    for (final keyCode in keyCodes) {
+      final key = String.fromCharCode(keyCode);
+      if (key.toLowerCase() == 'q') {
+        shouldQuit = true;
+      }
+    }
+  });
+
+  // Watch `.proto` files.
   final watcher = PollingDirectoryWatcher(messagesDirectory.path);
   var generated = true;
-
-  print("Started watching `.proto` files...\n${messagesDirectory.path}");
-
+  print("Started watching `.proto` files.");
+  print("Press `q` to stop watching.");
   watcher.events.listen((event) {
     if (event.path.endsWith(".proto") && generated) {
       var eventType = event.type.toString();
@@ -490,13 +502,15 @@ Future<void> watchAndGenerateMessageCode(
       generated = false;
     }
   });
-
   while (true) {
     await Future.delayed(Duration(seconds: 1));
+    if (shouldQuit) {
+      exit(0);
+    }
     if (!generated) {
       try {
         await generateMessageCode(silent: true, messageConfig: messageConfig);
-        print("Message code generated");
+        print("Message code generated.");
       } catch (error) {
         // When message code generation has failed
       }

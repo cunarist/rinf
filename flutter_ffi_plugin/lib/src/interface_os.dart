@@ -4,7 +4,7 @@ import 'load_os.dart';
 import 'package:ffi/ffi.dart';
 import 'dart:async';
 import 'dart:isolate';
-import 'common.dart';
+import 'interface.dart';
 import 'dart:convert';
 
 typedef StoreDartPostCObject = Pointer Function(

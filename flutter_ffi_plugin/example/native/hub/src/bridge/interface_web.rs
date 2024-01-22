@@ -1,4 +1,5 @@
-use super::interface::*;
+use crate::debug_print;
+use crate::tokio;
 use rinf::externs::js_sys::Uint8Array;
 use std::panic::catch_unwind;
 use wasm_bindgen::prelude::*;
@@ -6,14 +7,16 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 pub fn start_rust_logic_extern() {
     let _ = catch_unwind(|| {
-        start_rust_logic();
-    });
-}
+        // Add kind description for panics.
+        #[cfg(debug_assertions)]
+        {
+            std::panic::set_hook(Box::new(|panic_info| {
+                debug_print!("A panic occurred in Rust.\n{panic_info}");
+            }));
+        }
 
-#[wasm_bindgen]
-pub fn stop_rust_logic_extern() {
-    let _ = catch_unwind(|| {
-        stop_rust_logic();
+        // Run the main function.
+        tokio::spawn(crate::main());
     });
 }
 
