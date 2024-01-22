@@ -233,7 +233,7 @@ stream.listen((rustSignal) {
     field_six: 6,
 }.send_signal_to_dart(None)
 
-let receiver = MySchemaInput.get_dart_signal_receiver();
+let receiver = MySchemaInput::get_dart_signal_receiver();
 while let Some(dart_signal) = receiver.recv().await {
     // Custom Rust logic
 }</code>
