@@ -297,7 +297,7 @@ final ${camelName}Controller = StreamController<RustSignal<$messageName>>();
             '''
 impl ${normalizePascal(messageName)} {
     pub fn send_signal_to_dart(&self, blob: Option<Vec<u8>>) {
-        crate::bridge::send_rust_signal(
+        send_rust_signal(
             ${markedMessage.id},
             self.encode_to_vec(),
             blob

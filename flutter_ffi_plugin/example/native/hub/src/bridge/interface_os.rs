@@ -1,4 +1,4 @@
-use super::interface::*;
+use super::SharedCell;
 use crate::debug_print;
 use crate::tokio;
 use allo_isolate::IntoDart;
