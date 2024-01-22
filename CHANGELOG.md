@@ -1,3 +1,12 @@
+## 6.0.0
+
+- You need to run `rinf template`, `cargo install rinf` again to use this new version.
+- Now the communication between Dart and Rust is much simpler. You can mark messages in `.proto` files so that Rinf's code generator can generate channels in-between. This new system is not compatible with older Rinf versions, so please check the docs before you upgrade.
+- Added the ability to customize Rinf's behaviors by writing fields inside `pubspec.yaml` file. Thanks @thlorenz!
+- Allowed users to check when the documentation page was made and edited. Thanks @VictorieeMan!
+- Now it's possible to quit `rinf message --watch` by pressing `q` on your keyboard.
+- Internal code has been organized.
+
 ## 6.0.0-beta
 
 - This is a beta version.
