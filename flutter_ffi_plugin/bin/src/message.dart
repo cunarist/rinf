@@ -350,7 +350,10 @@ if message_id == ${markedMessage.id} {
         message,
         blob,
     };
-    let cell = ${snakeName.toUpperCase()}_SENDER.get().unwrap().lock().unwrap();
+    let cell = ${snakeName.toUpperCase()}_SENDER
+        .get_or_init(|| Mutex::new(RefCell::new(None)))
+        .lock()
+        .unwrap();
     let sender = cell.clone().replace(None).expect(concat!(
         "Looks like the channel is not created yet.",
         "\\nTry using `$messageName.get_dart_signal_receiver()`."
