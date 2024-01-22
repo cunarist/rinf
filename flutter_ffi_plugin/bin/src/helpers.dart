@@ -240,6 +240,7 @@ Future<void> buildWebassembly({bool isReleaseMode = false}) async {
   await Process.run("cargo", ["install", "wasm-bindgen-cli"]);
 
   // Verify Flutter SDK web server's response headers.
+  print("Patching Flutter SDK's web server with CORS HTTP headers.");
   await verifyServerHeaders();
 
   // Prepare the webassembly output path.
