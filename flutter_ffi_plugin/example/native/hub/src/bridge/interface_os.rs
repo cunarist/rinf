@@ -3,6 +3,7 @@ use crate::debug_print;
 use crate::tokio;
 use allo_isolate::IntoDart;
 use allo_isolate::Isolate;
+use allo_isolate::ZeroCopyBuffer;
 use rinf::externs::backtrace::Backtrace;
 use std::cell::RefCell;
 use std::panic::catch_unwind;
@@ -103,9 +104,9 @@ pub fn send_rust_signal_extern(
     dart_isolate.post(
         vec![
             message_id.into_dart(),
-            message_bytes.into_dart(),
+            ZeroCopyBuffer(message_bytes).into_dart(),
             blob_valid.into_dart(),
-            blob_bytes.into_dart(),
+            ZeroCopyBuffer(blob_bytes).into_dart(),
         ]
         .into_dart(),
     );
