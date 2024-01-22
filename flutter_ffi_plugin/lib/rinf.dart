@@ -4,25 +4,22 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'src/exports.dart';
 
-export 'src/interface.dart';
+export 'src/interface.dart' show RustSignal;
 
-/// This contains basic functionalities of this framework.
-class Rinf {
-  /// Make sure that the Rust side is ready.
-  /// Don't forget to call this function in the `main` function of Dart.
-  static Future<void> initialize(HandleRustSignal handleRustSignal) async {
-    await prepareNativeBridge(handleRustSignal);
-  }
+/// Makes sure that the Rust side is ready.
+/// Don't forget to call this function in the `main` function of Dart.
+Future<void> initializeRinf(HandleRustSignal handleRustSignal) async {
+  await prepareNativeBridge(handleRustSignal);
+}
 
-  /// Ensure that all Rust tasks are terminated
-  /// by calling this function before closing the Flutter app.
-  /// Doing so can prevent potential memory errors that may occur
-  /// when Rust attempts to send data after the Dart VM has been turned off.
-  /// Please note that on the web, this function does not have any effect,
-  /// as tasks are managed by the JavaScript runtime, not Rust.
-  static Future<void> finalize() async {
-    stopRustLogicExtern();
-  }
+/// Ensure that all Rust tasks are terminated
+/// by calling this function before closing the Flutter app.
+/// Doing so can prevent potential memory errors that may occur
+/// when Rust attempts to send data after the Dart VM has been turned off.
+/// Please note that on the web, this function does not have any effect,
+/// as tasks are managed by the JavaScript runtime, not Rust.
+Future<void> finalizeRinf() async {
+  stopRustLogicExtern();
 }
 
 /// Send a signal to Rust.

@@ -81,7 +81,7 @@ When the Flutter app is closed, the whole `tokio` runtime on the Rust side will 
 ```dart title="lib/main.dart"
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:rinf/rinf.dart';
+import './messages/generated.dart';
 ...
 class MyApp extends StatefulWidget {
   const MyApp({super.key});

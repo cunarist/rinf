@@ -364,6 +364,16 @@ if message_id == ${markedMessage.id} {
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
 
+class Rinf {
+  static Future<void> initialize() async {
+    await initializeRinf(handleRustSignal);
+  }
+
+  static Future<void> finalize() async {
+    await finalizeRinf();
+  }
+}
+
 void handleRustSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
 ''';
   for (final entry in markedMessagesAll.entries) {
