@@ -1,7 +1,6 @@
 use super::interface::*;
 use allo_isolate::IntoDart;
 use allo_isolate::Isolate;
-use rinf::SharedCell;
 use std::cell::RefCell;
 use std::panic::catch_unwind;
 use std::sync::Mutex;

@@ -224,10 +224,9 @@ import 'package:rinf/rinf.dart';
           '''
 #![allow(unused_imports)]
 
+use crate::bridge::*;
 use crate::tokio;
 use prost::Message;
-use rinf::DartSignal;
-use rinf::SharedCell;
 use std::cell::RefCell;
 use std::sync::Mutex;
 use std::sync::OnceLock;
@@ -319,8 +318,8 @@ impl ${normalizePascal(messageName)} {
 #![allow(unused_imports)]
 #![allow(unused_variables)]
 
+use crate::bridge::*;
 use prost::Message;
-use rinf::DartSignal;
 use std::cell::RefCell;
 use std::sync::Mutex;
 

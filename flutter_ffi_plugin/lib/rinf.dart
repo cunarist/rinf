@@ -2,10 +2,9 @@
 
 import 'dart:async';
 import 'dart:typed_data';
-import 'src/common.dart';
 import 'src/exports.dart';
 
-export 'src/common.dart';
+export 'src/interface.dart';
 
 /// This contains basic functionalities of this framework.
 class Rinf {

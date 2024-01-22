@@ -2,6 +2,7 @@
 
 use crate::tokio;
 use std::cell::Cell;
+use std::cell::RefCell;
 use std::sync::Mutex;
 use std::sync::OnceLock;
 
@@ -9,6 +10,18 @@ use std::sync::OnceLock;
 pub use super::interface_os::*;
 #[cfg(target_family = "wasm")]
 pub use super::interface_web::*;
+
+/// This contains a message from Dart.
+/// Optionally, a custom binary called `blob` can also be included.
+/// This type is generic, and the message
+/// can be of any type declared in Protobuf.
+pub struct DartSignal<T> {
+    pub message: T,
+    pub blob: Option<Vec<u8>>,
+}
+
+/// This is a mutable cell type that can be shared across threads.
+pub type SharedCell<T> = OnceLock<Mutex<RefCell<Option<T>>>>;
 
 #[cfg(not(target_family = "wasm"))]
 static TOKIO_RUNTIME: OnceLock<Mutex<Cell<Option<tokio::runtime::Runtime>>>> = OnceLock::new();
