@@ -10,9 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  plugin_platform_interface: ^2.0.2
   package_config: ^2.1.0
-  js: ">=0.6.4 <0.8.0"
+  js: "^0.7.0"
   universal_html: ^2.2.4
   path: ^1.8.3
   watcher: ^1.1.0

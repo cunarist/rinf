@@ -1,17 +1,18 @@
 use super::SharedCell;
 use crate::debug_print;
-use crate::tokio;
+use crate::tokio::runtime::Builder;
+use crate::tokio::runtime::Runtime;
 use allo_isolate::IntoDart;
 use allo_isolate::Isolate;
 use allo_isolate::ZeroCopyBuffer;
 use rinf::externs::backtrace::Backtrace;
+use rinf::externs::os_thread_local::ThreadLocal;
 use std::cell::RefCell;
 use std::panic::catch_unwind;
 use std::sync::Mutex;
 use std::sync::OnceLock;
 
 static DART_ISOLATE: SharedCell<Isolate> = OnceLock::new();
-static TOKIO_RUNTIME: SharedCell<tokio::runtime::Runtime> = OnceLock::new();
 
 #[no_mangle]
 pub extern "C" fn prepare_isolate_extern(port: i64) {
@@ -24,6 +25,12 @@ pub extern "C" fn prepare_isolate_extern(port: i64) {
         cell.replace(Some(dart_isolate));
     });
 }
+
+// We use `os_thread_local` so that when the program fails
+// and the main thread exits unexpectedly,
+// the whole async tokio runtime can disappear as well.
+type TokioRuntime = OnceLock<ThreadLocal<RefCell<Option<Runtime>>>>;
+static TOKIO_RUNTIME: TokioRuntime = OnceLock::new();
 
 #[no_mangle]
 pub extern "C" fn start_rust_logic_extern() {
@@ -38,31 +45,30 @@ pub extern "C" fn start_rust_logic_extern() {
         }
 
         // Run the main function.
-        let tokio_runtime = tokio::runtime::Builder::new_multi_thread()
-            .enable_all()
-            .build()
-            .unwrap();
+        let tokio_runtime = Builder::new_multi_thread().enable_all().build().unwrap();
         tokio_runtime.spawn(crate::main());
-        let cell = TOKIO_RUNTIME
-            .get_or_init(|| Mutex::new(RefCell::new(None)))
-            .lock()
-            .unwrap();
-        // If there was already a tokio runtime previously,
-        // most likely due to Dart's hot restart,
-        // its tasks as well as itself will be terminated,
-        // being replaced with the new one.
-        cell.replace(Some(tokio_runtime));
+        let os_cell = TOKIO_RUNTIME.get_or_init(|| ThreadLocal::new(|| RefCell::new(None)));
+        os_cell.with(move |cell| {
+            // If there was already a tokio runtime previously,
+            // most likely due to Dart's hot restart,
+            // its tasks as well as itself will be terminated,
+            // being replaced with the new one.
+            cell.replace(Some(tokio_runtime));
+        });
     });
 }
 
 #[no_mangle]
 pub extern "C" fn stop_rust_logic_extern() {
     let _ = catch_unwind(|| {
-        let cell = TOKIO_RUNTIME
-            .get_or_init(|| Mutex::new(RefCell::new(None)))
-            .lock()
-            .unwrap();
-        cell.replace(None);
+        let os_cell = TOKIO_RUNTIME.get_or_init(|| ThreadLocal::new(|| RefCell::new(None)));
+        os_cell.with(move |cell| {
+            // If there was already a tokio runtime previously,
+            // most likely due to Dart's hot restart,
+            // its tasks as well as itself will be terminated,
+            // being replaced with the new one.
+            cell.replace(None);
+        });
     });
 }
 

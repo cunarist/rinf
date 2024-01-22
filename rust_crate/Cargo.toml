@@ -15,4 +15,4 @@ protoc-prebuilt = "0.2.0"
 home = "0.5.9"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-js-sys = "0.3.65"
+js-sys = "0.3.67"
