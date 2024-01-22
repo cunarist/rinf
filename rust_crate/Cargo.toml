@@ -6,6 +6,7 @@ license = "MIT"
 description = "Rust for native business logic, Flutter for flexible and beautiful GUI"
 repository = "https://github.com/cunarist/rinf"
 documentation = "https://rinf.cunarist.com"
+rust-version = "1.70"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 os-thread-local = "0.1.3"
