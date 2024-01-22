@@ -1,6 +1,7 @@
 //! This module is only for Rinf demonstrations.
 //! You might want to remove this module in production.
 
+use crate::debug_print;
 use crate::messages;
 use crate::tokio;
 
@@ -18,7 +19,7 @@ pub async fn tell_numbers() {
         // This message is a type that's declared in its Protobuf file.
         let number_input = dart_signal.message;
         let letter = number_input.letter;
-        crate::debug_print!("{letter}");
+        debug_print!("{letter}");
 
         // Perform a simple calculation.
         current_number = sample_crate::add_seven(current_number);
@@ -100,37 +101,37 @@ pub async fn run_debug_tests() {
     }
 
     tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-    crate::debug_print!("Starting debug tests.");
+    debug_print!("Starting debug tests.");
 
     // Get the current time.
     let current_time = sample_crate::get_current_time();
-    crate::debug_print!("System time: {current_time}");
+    debug_print!("System time: {current_time}");
 
     // Fetch data from a web API.
     let url = "http://jsonplaceholder.typicode.com/todos/1";
     let web_response = sample_crate::fetch_from_web_api(url).await;
-    crate::debug_print!("Response from a web API: {web_response}");
+    debug_print!("Response from a web API: {web_response}");
 
     // Use a crate that accesses operating system APIs.
     let option = sample_crate::get_hardward_id();
     if let Some(hwid) = option {
-        crate::debug_print!("Hardware ID: {hwid}");
+        debug_print!("Hardware ID: {hwid}");
     } else {
-        crate::debug_print!("Hardware ID is not available on this platform.");
+        debug_print!("Hardware ID is not available on this platform.");
     }
 
     // Test `tokio::join!` for futures.
     let join_first = async {
         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-        crate::debug_print!("First future finished.");
+        debug_print!("First future finished.");
     };
     let join_second = async {
         tokio::time::sleep(std::time::Duration::from_secs(2)).await;
-        crate::debug_print!("Second future finished.");
+        debug_print!("Second future finished.");
     };
     let join_third = async {
         tokio::time::sleep(std::time::Duration::from_secs(3)).await;
-        crate::debug_print!("Third future finished.");
+        debug_print!("Third future finished.");
     };
     tokio::join!(join_first, join_second, join_third);
 
@@ -145,7 +146,7 @@ pub async fn run_debug_tests() {
         tokio::task::yield_now().await;
         let time_passed = sample_crate::get_current_time() - last_time;
         if time_passed.num_milliseconds() > 1000 {
-            crate::debug_print!("Counted to {count}, yielding regularly.");
+            debug_print!("Counted to {count}, yielding regularly.");
             last_time = sample_crate::get_current_time();
             steps_finished += 1;
             if steps_finished == 10 {
@@ -187,9 +188,9 @@ pub async fn run_debug_tests() {
     }
     for join_handle in join_handles {
         let text = join_handle.await.unwrap();
-        crate::debug_print!("{text}");
+        debug_print!("{text}");
     }
 
-    crate::debug_print!("Debug tests completed!");
+    debug_print!("Debug tests completed!");
     panic!("INTENTIONAL DEBUG PANIC");
 }

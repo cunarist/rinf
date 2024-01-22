@@ -1,4 +1,5 @@
 use super::interface::*;
+use crate::debug_print;
 use crate::tokio;
 use allo_isolate::IntoDart;
 use allo_isolate::Isolate;
@@ -31,7 +32,7 @@ pub extern "C" fn start_rust_logic_extern() {
         {
             std::panic::set_hook(Box::new(|panic_info| {
                 let backtrace = Backtrace::new();
-                crate::debug_print!("A panic occurred in Rust.\n{panic_info}\n{backtrace:?}");
+                debug_print!("A panic occurred in Rust.\n{panic_info}\n{backtrace:?}");
             }));
         }
 
