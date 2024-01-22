@@ -144,20 +144,6 @@ Future<void> generateMessageCode({
     print(pubGlobalActivateCommand.stderr.toString().trim());
     throw Exception('Cannot globally install `protoc_plugin` Dart package');
   }
-  final newEnvironment = Map<String, String>.from(Platform.environment);
-  final currentPathVariable = newEnvironment['PATH'];
-  var pubCacheBinPath = Platform.isWindows
-      ? '${Platform.environment['LOCALAPPDATA']}\\Pub\\Cache\\bin'
-      : '${Platform.environment['HOME']}/.pub-cache/bin';
-  if (Platform.environment["PUB_CACHE"] != null) {
-    final binPath = Platform.isWindows ? '\\bin' : '/bin';
-    pubCacheBinPath = '${Platform.environment["PUB_CACHE"]}$binPath';
-  }
-  final separator = Platform.isWindows ? ';' : ':';
-  final newPathVariable = currentPathVariable != null
-      ? '$currentPathVariable$separator$pubCacheBinPath'
-      : pubCacheBinPath;
-  newEnvironment['PATH'] = newPathVariable;
   for (final entry in resourcesInFolders.entries) {
     final subPath = entry.key;
     final resourceNames = entry.value;
@@ -176,7 +162,6 @@ Future<void> generateMessageCode({
         '--dart_out=$dartOutputPath$subPath',
         ...resourceNames.map((name) => '$name.proto'),
       ],
-      environment: newEnvironment,
     );
     if (protocDartResult.exitCode != 0) {
       print(protocDartResult.stderr.toString().trim());
