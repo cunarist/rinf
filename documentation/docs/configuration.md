@@ -10,7 +10,7 @@ rinf:
     dart_output_dir: lib/messages
 ```
 
-You can check the current configuration status by running the command below in the CLI
+You can check the current configuration status by running the command below in the CLI.
 
 ```bash title="CLI"
 rinf config
