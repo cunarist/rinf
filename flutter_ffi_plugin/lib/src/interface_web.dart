@@ -1,7 +1,9 @@
+// ignore_for_file: avoid_web_libraries_in_flutter
+
 import 'load_web.dart';
 import 'package:js/js.dart';
 import 'dart:typed_data';
-import 'package:universal_html/js.dart' as js;
+import 'dart:js' as js;
 import 'interface.dart';
 import 'dart:async';
 import 'dart:convert';
