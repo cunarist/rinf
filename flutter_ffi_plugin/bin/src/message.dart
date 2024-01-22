@@ -475,11 +475,24 @@ Future<void> watchAndGenerateMessageCode(
   final messagesPath = join(currentDirectory.path, "messages");
   final messagesDirectory = Directory(messagesPath);
 
+  // Listen to keystrokes in the CLI.
+  var shouldQuit = false;
+  stdin.echoMode = false;
+  stdin.lineMode = false;
+  stdin.listen((keyCodes) {
+    for (final keyCode in keyCodes) {
+      final key = String.fromCharCode(keyCode);
+      if (key.toLowerCase() == 'q') {
+        shouldQuit = true;
+      }
+    }
+  });
+
+  // Watch `.proto` files.
   final watcher = PollingDirectoryWatcher(messagesDirectory.path);
   var generated = true;
-
-  print("Started watching `.proto` files...\n${messagesDirectory.path}");
-
+  print("Started watching `.proto` files.");
+  print("Press `q` to stop watching.");
   watcher.events.listen((event) {
     if (event.path.endsWith(".proto") && generated) {
       var eventType = event.type.toString();
@@ -489,13 +502,15 @@ Future<void> watchAndGenerateMessageCode(
       generated = false;
     }
   });
-
   while (true) {
     await Future.delayed(Duration(seconds: 1));
+    if (shouldQuit) {
+      exit(0);
+    }
     if (!generated) {
       try {
         await generateMessageCode(silent: true, messageConfig: messageConfig);
-        print("Message code generated");
+        print("Message code generated.");
       } catch (error) {
         // When message code generation has failed
       }
