@@ -16,7 +16,7 @@ MyDataInput( ... ).sendSignalToRust(null);
 ```
 
 ```rust title="Rust"
-let receiver = MyDataInput::get_dart_signal_receiver();
+let mut receiver = MyDataInput::get_dart_signal_receiver();
 while let Some(dart_signal) = receiver.recv().await {
     // Custom Rust logic here
 }
