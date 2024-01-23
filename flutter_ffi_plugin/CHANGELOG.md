@@ -1,3 +1,8 @@
+## 6.0.1
+
+- Improved CLI output texts.
+- `js` Dart package was removed.
+
 ## 6.0.0
 
 - You need to run `rinf template`, `cargo install rinf` again to use this new version.
