@@ -491,7 +491,7 @@ Future<void> watchAndGenerateMessageCode(
   // Watch `.proto` files.
   final watcher = PollingDirectoryWatcher(messagesDirectory.path);
   var generated = true;
-  print("Started watching `.proto` files.");
+  print("Watching `.proto` files...");
   print("Press `q` to stop watching.");
   watcher.events.listen((event) {
     if (event.path.endsWith(".proto") && generated) {

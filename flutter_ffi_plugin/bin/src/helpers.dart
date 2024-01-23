@@ -245,7 +245,7 @@ Future<void> buildWebassembly({bool isReleaseMode = false}) async {
   final outputPath = flutterProjectPath.uri.resolve(subPath).toFilePath();
 
   // Build the webassembly module.
-  print("Compiling Rust with `wasm-pack`...");
+  print("Compiling Rust with `wasm-pack` to `web` target...");
   final compileCommand = await Process.run(
     'wasm-pack',
     [
