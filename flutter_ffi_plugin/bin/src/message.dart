@@ -274,7 +274,7 @@ static Stream<RustSignal<$messageName>> rustSignalStream =
           await insertTextToFile(
             dartPath,
             '''
-final ${camelName}Controller = StreamController<RustSignal<$messageName>>();
+final ${camelName}Controller = StreamController<RustSignal<$messageName>>.broadcast();
 ''',
           );
           await insertTextToFile(
