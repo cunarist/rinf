@@ -1,3 +1,7 @@
+## 6.1.0
+
+- Now `rustSignalStream`s `listen` can be called multiple times. Thanks @rabbitson87!
+
 ## 6.0.1
 
 - Improved CLI output texts.
