@@ -44,7 +44,7 @@ stream.listen((rustSignal) {
 })
 ```
 
-```dart
+```rust
 MySchemaOutput {
     field_four: 4,
     field_five: 5,
