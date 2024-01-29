@@ -246,7 +246,9 @@ async fn main() {
 
 ## ↩️ Awaiting a Response
 
-You can easily achieve something like a request-response pattern by providing a unique ID.
+If you want to store some state in Dart, you can implement something like a request-response pattern by providing a unique ID.
+
+Please note that you don't need this technique if you're storing state in Rust.
 
 ```proto title="messages/tutorial_resource.proto"
 syntax = "proto3";
