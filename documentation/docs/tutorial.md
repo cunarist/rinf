@@ -175,7 +175,7 @@ children: [
 
 ## 🤝 Back and Forth
 
-You can easily show the updated content on the screen by combining those two ways of message passing.
+You can easily show the updated state on the screen by combining those two ways of message passing.
 
 ```proto title="messages/tutorial_resource.proto"
 syntax = "proto3";
@@ -241,85 +241,5 @@ mod sample_functions;
 async fn main() {
 ...
     tokio::spawn(sample_functions::tell_treasure());
-}
-```
-
-## ↩️ Awaiting a Response
-
-If you want to store some state in Dart, you can implement something like a request-response pattern by providing a unique ID.
-
-Please note that you don't need this technique if you're storing state in Rust.
-
-```proto title="messages/tutorial_resource.proto"
-syntax = "proto3";
-package tutorial_resource;
-...
-// [RINF:DART-SIGNAL]
-message MyUniqueInput {
-  string uid = 1;
-  int32 before_number = 2;
-}
-
-// [RINF:RUST-SIGNAL]
-message MyUniqueOutput {
-  string uid = 1;
-  int32 before_number = 2;
-}
-```
-
-```bash title="CLI"
-rinf message
-```
-
-```dart title="lib/main.dart"
-...
-import 'package:uuid/uuid.dart';
-import 'package:example_app/messages/tutorial_resource.pb.dart';
-...
-children: [
-  ElevatedButton(
-    onPressed: () async {
-      final uid = Uuid().v4();
-      MyUniqueInput(
-        uid: uid,
-        beforeNumber: 3,
-      ).sendSignalToRust(null); // GENERATED
-      final stream = MyUniqueOutput.rustSignalStream; // GENERATED
-      final rustSignal = await stream.firstWhere((rustSignal) {
-        return rustSignal.message.uid == uid;
-      });
-      print(rustSignal.message.afterNumber);
-    },
-    child: Text('Get the response'),
-  ),
-...
-```
-
-```rust title="native/hub/src/sample_functions.rs"
-...
-use crate::messages;
-...
-pub async fn respond_with_id() {
-    use messages::tutorial_resource::*;
-
-    let mut receiver = MyUniqueInput::get_dart_signal_receiver(); // GENERATED
-    while let Some(dart_signal) = receiver.recv().await {
-        let message = dart_signal.message;
-        MyUniqueOutput {
-            uid: message.uid,
-            after_number: message.before_number + 3,
-        }
-        .send_signal_to_dart(None); // GENERATED
-    }
-}
-```
-
-```rust title="native/hub/src/lib.rs"
-...
-mod sample_functions;
-...
-async fn main() {
-...
-    tokio::spawn(sample_functions::respond_with_id());
 }
 ```
