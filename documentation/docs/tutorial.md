@@ -283,8 +283,8 @@ children: [
       MyUniqueInput(
         uid: uid,
         beforeNumber: 3,
-      ).sendSignalToRust(null);
-      final stream = MyUniqueOutput.rustSignalStream;
+      ).sendSignalToRust(null); // GENERATED
+      final stream = MyUniqueOutput.rustSignalStream; // GENERATED
       final rustSignal = await stream.firstWhere((rustSignal) {
         return rustSignal.message.uid == uid;
       });
