@@ -1,6 +1,7 @@
 use clap::Parser;
 
 #[derive(Parser, Debug)]
+#[command(ignore_errors = true)]
 struct Args {
     dart_args: Vec<String>,
     #[arg(short, long)]
