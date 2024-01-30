@@ -11,4 +11,4 @@ flutter doctor
 
 > If you're working on Linux, do not install Flutter from `snap`. Flutter from `snap` comes with its own binary linker called `ld`, which is fundamentally incompatible with Rust. Instead, follow the manual installation method as written in the Flutter docs.
 
-> By default, Rinf automatically prepares `protoc`, the Protobuf compiler. If you encounter issues with this automated installation, possibly due to GitHub API access restrictions, you can [manually install](https://grpc.io/docs/protoc-installation/) `protoc` on your machine and add it to PATH. In this scenario, verify the installation by running the command `protoc --version` to ensure that the Protobuf compiler is ready on your machine.
+> If you've encountered issues with the automated `protoc` installation for any reason, you can [manually install it](https://grpc.io/docs/protoc-installation/) on your machine and add it to PATH. In this scenario, verify the installation by running the command `protoc --version` to ensure that the Protobuf compiler is ready on your machine.
