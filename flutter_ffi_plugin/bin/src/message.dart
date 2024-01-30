@@ -310,9 +310,9 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 use std::sync::OnceLock;
 
-static SIGNAL_HANDLERS: OnceLock<
-    Mutex<HashMap<i32, Box<dyn Fn(Vec<u8>, Option<Vec<u8>>) + Send>>>,
-> = OnceLock::new();
+type SignalHandlers =
+    OnceLock<Mutex<HashMap<i32, Box<dyn Fn(Vec<u8>, Option<Vec<u8>>) + Send>>>>;
+static SIGNAL_HANDLERS: SignalHandlers = OnceLock::new();
 
 pub fn handle_dart_signal(
     message_id: i32,
