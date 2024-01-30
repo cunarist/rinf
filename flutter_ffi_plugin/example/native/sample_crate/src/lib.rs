@@ -44,3 +44,7 @@ pub async fn fetch_from_web_api(url: &str) -> String {
         .await
         .expect("Could not read body from the web response.")
 }
+
+pub fn use_rodio() {
+    let _ = rodio::Sink::new_idle();
+}

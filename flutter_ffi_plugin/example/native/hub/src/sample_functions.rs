@@ -120,6 +120,9 @@ pub async fn run_debug_tests() {
         debug_print!("Hardware ID is not available on this platform.");
     }
 
+    // Use a crate that depends on `libc++`.
+    sample_crate::use_rodio();
+
     // Test `tokio::join!` for futures.
     let join_first = async {
         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
