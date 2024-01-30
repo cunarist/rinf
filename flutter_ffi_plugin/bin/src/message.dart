@@ -306,13 +306,24 @@ impl ${normalizePascal(messageName)} {
 use crate::bridge::*;
 use prost::Message;
 use std::cell::RefCell;
+use std::collections::HashMap;
 use std::sync::Mutex;
+use std::sync::OnceLock;
+
+static SIGNAL_HANDLERS: OnceLock<
+    Mutex<HashMap<i32, Box<dyn Fn(Vec<u8>, Option<Vec<u8>>) + Send>>>,
+> = OnceLock::new();
 
 pub fn handle_dart_signal(
     message_id: i32,
     message_bytes: Vec<u8>,
     blob: Option<Vec<u8>>
-) {
+) {    
+    let mutex = SIGNAL_HANDLERS.get_or_init(|| {
+        let mut hash_map =
+            HashMap
+            ::<i32, Box<dyn Fn(Vec<u8>, Option<Vec<u8>>) + Send + 'static>>
+            ::new();
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -326,32 +337,40 @@ pub fn handle_dart_signal(
           final snakeName = pascalToSnake(messageName);
           var modulePath = subpath.replaceAll("/", "::");
           rustReceiveScript += '''
-if message_id == ${markedMessage.id} {
-    use super$modulePath::$filename::*;
-    let message = ${normalizePascal(messageName)}::decode(
-        message_bytes.as_slice()
-    ).unwrap();
-    let signal = DartSignal {
-        message,
-        blob,
-    };
-    let cell = ${snakeName.toUpperCase()}_SENDER
-        .get_or_init(|| Mutex::new(RefCell::new(None)))
-        .lock()
-        .unwrap();
-    let sender = cell.clone().replace(None).expect(concat!(
-        "Looks like the channel is not created yet.",
-        "\\nTry using `$messageName.get_dart_signal_receiver()`."
-    ));
-    let _ = sender.try_send(signal);
-    return;
-}
+hash_map.insert(
+    ${markedMessage.id},
+    Box::new(|message_bytes: Vec<u8>, blob: Option<Vec<u8>>| {
+        use super$modulePath::$filename::*;
+        let message = ${normalizePascal(messageName)}::decode(
+            message_bytes.as_slice()
+        ).unwrap();
+        let signal = DartSignal {
+            message,
+            blob,
+        };
+        let cell = ${snakeName.toUpperCase()}_SENDER
+            .get_or_init(|| Mutex::new(RefCell::new(None)))
+            .lock()
+            .unwrap();
+        let sender = cell.clone().replace(None).expect(concat!(
+            "Looks like the channel is not created yet.",
+            "\\nTry using `$messageName.get_dart_signal_receiver()`."
+        ));
+        let _ = sender.try_send(signal);
+    }),
+);
 ''';
         }
       }
     }
   }
   rustReceiveScript += '''
+        Mutex::new(hash_map)
+    });
+
+    let guard = mutex.lock().unwrap();
+    let signal_handler = guard.get(&message_id).unwrap();
+    signal_handler(message_bytes, blob);
 }
 ''';
   await File('$rustOutputPath/generated.rs').writeAsString(rustReceiveScript);
