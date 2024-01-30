@@ -354,7 +354,7 @@ hash_map.insert(
             .unwrap();
         let sender = cell.clone().replace(None).expect(concat!(
             "Looks like the channel is not created yet.",
-            "\\nTry using `$messageName.get_dart_signal_receiver()`."
+            "\\nTry using `$messageName::get_dart_signal_receiver()`."
         ));
         let _ = sender.try_send(signal);
     }),
