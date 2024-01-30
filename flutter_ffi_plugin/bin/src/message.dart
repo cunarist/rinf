@@ -361,6 +361,7 @@ if message_id == ${markedMessage.id} {
   dartReceiveScript += '''
 // ignore_for_file: unused_import
 
+import 'dart:async';
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
 
@@ -374,7 +375,7 @@ class Rinf {
   }
 }
 
-void handleRustSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
+final signalHandlers = {
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -394,21 +395,24 @@ import '.$importPath' as $filename;
                 dartReceiveScript;
           }
           dartReceiveScript += '''
-if (messageId == ${markedMessage.id}) {
+${markedMessage.id}: (Uint8List messageBytes, Uint8List? blob) {
   final message = $filename.$messageName.fromBuffer(messageBytes);
   final bridgeSignal = RustSignal(
     message,
     blob,
   );
   $filename.${camelName}Controller.add(bridgeSignal);
-  return;
-}
+},
 ''';
         }
       }
     }
   }
   dartReceiveScript += '''
+};
+
+void handleRustSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
+  signalHandlers[messageId]!(messageBytes, blob);
 }
 ''';
   await File('$dartOutputPath/generated.dart').writeAsString(dartReceiveScript);
