@@ -9,13 +9,13 @@ documentation = "https://rinf.cunarist.com"
 rust-version = "1.70"
 
 [dependencies]
-which = "6.0.0"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 os-thread-local = "0.1.3"
 backtrace = "0.3.69"
 protoc-prebuilt = "0.2.0"
 home = "0.5.9"
+which = "6.0.0"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3.67"
