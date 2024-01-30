@@ -34,6 +34,7 @@ Future<void> prepareNativeBridge(HandleRustSignal handleRustSignal) async {
       // -1 is a special message ID for Rust reports.
       String rustReport = utf8.decode(rustSignalRaw[3]);
       print(rustReport);
+      return;
     }
     handleRustSignal(
       rustSignalRaw[0],
