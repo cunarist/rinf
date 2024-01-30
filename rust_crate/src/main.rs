@@ -5,13 +5,18 @@ fn main() {
     use std::path;
     use std::process;
 
-    // Install Protobuf compiler and get the path.
-    let home_path = home::home_dir().unwrap();
-    let out_path = home_path.join(".local").join("bin");
-    fs::create_dir_all(&out_path).unwrap();
-    env::set_var("OUT_DIR", out_path.to_str().unwrap());
-    let (protoc_binary_path, _) = protoc_prebuilt::init("25.2").unwrap();
-    let protoc_path = protoc_binary_path.parent().unwrap().to_path_buf();
+    let protoc_path;
+    if let Ok(installed) = which::which("protoc") {
+        protoc_path = installed.parent().unwrap().to_path_buf();
+    } else {
+        // Install Protobuf compiler and get the path.
+        let home_path = home::home_dir().unwrap();
+        let out_path = home_path.join(".local").join("bin");
+        fs::create_dir_all(&out_path).unwrap();
+        env::set_var("OUT_DIR", out_path.to_str().unwrap());
+        let (protoc_binary_path, _) = protoc_prebuilt::init("25.2").unwrap();
+        protoc_path = protoc_binary_path.parent().unwrap().to_path_buf();
+    }
 
     // Find the path where Dart executables are located.
     #[cfg(target_family = "windows")]
