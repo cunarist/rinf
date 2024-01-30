@@ -36,6 +36,8 @@ flutter build web
 
 > Note that Flutter apps in debug mode are known to be quite slow on the web. We recommend using release mode when testing on a web browser. You can use debug mode if you need to analyze the code deeper, without the `--release` argument.
 
+> Internally, Rinf uses `wasm-bindgen` and `wasm-pack` with the `web` [target](https://rustwasm.github.io/docs/wasm-pack/commands/build.html#target).
+
 ### Deploying On a Web Server
 
 When deploying your web app, ensure that your web server is configured to include cross-origin-related HTTP headers in its responses. These headers enable web browsers using your website to gain access to `SharedArrayBuffer` web API, which is something similar to shared memory on the web.
