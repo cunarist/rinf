@@ -13,6 +13,7 @@ os-thread-local = "0.1.3"
 backtrace = "0.3.69"
 protoc-prebuilt = "0.2.0"
 home = "0.5.9"
+clap = { version = "4", features = ["derive"] }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3.67"
