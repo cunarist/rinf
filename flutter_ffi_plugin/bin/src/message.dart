@@ -442,7 +442,7 @@ void handleRustSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
   }
 }
 
-Future<void> verifyServerHeaders() async {
+Future<void> patchServerHeaders() async {
   // Get the Flutter SDK's path.
   String flutterPath;
   if (Platform.isWindows) {

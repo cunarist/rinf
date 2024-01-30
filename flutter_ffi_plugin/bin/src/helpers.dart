@@ -237,7 +237,7 @@ Future<void> buildWebassembly({bool isReleaseMode = false}) async {
 
   // Verify Flutter SDK web server's response headers.
   print("Patching Flutter SDK's web server with CORS HTTP headers.");
-  await verifyServerHeaders();
+  await patchServerHeaders();
 
   // Prepare the webassembly output path.
   final flutterProjectPath = Directory.current;
