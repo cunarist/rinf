@@ -23,6 +23,12 @@ fn main() {
 
     if let Some(p) = args.protoc_path {
         let provided = PathBuf::from_str(&p).unwrap();
+        if !provided.exists() {
+            panic!(
+                "The provided protoc path {} doesn't exist.",
+                provided.display()
+            );
+        }
         protoc_path = provided;
     } else {
         // Install Protobuf compiler and get the path.
