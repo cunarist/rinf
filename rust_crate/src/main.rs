@@ -5,11 +5,15 @@ fn main() {
     use std::path;
     use std::process;
 
+    // Verify Protobuf compiler.
     let protoc_path;
     if let Ok(installed) = which::which("protoc") {
+        // Get the path of Protobuf compiler that's already installed.
+        println!("Detected `protoc`, skipping auto installation.");
         protoc_path = installed.parent().unwrap().to_path_buf();
     } else {
         // Install Protobuf compiler and get the path.
+        println!("Preparing `protoc`...");
         let home_path = home::home_dir().unwrap();
         let out_path = home_path.join(".local").join("bin");
         fs::create_dir_all(&out_path).unwrap();
