@@ -1,6 +1,8 @@
 # Applying Rust Template
 
-> This section assumes that you've already created a Flutter project with `flutter create [my_app_name]`. You can get further guidance from [this awesome Flutter tutorial](https://docs.flutter.dev/get-started/codelab).
+!!! note
+
+    This section assumes that you've already created a Flutter project with `flutter create [my_app_name]`. You can get further guidance from [this awesome Flutter tutorial](https://docs.flutter.dev/get-started/codelab).
 
 First of all, add this framework to your Flutter project.
 
@@ -8,7 +10,9 @@ First of all, add this framework to your Flutter project.
 flutter pub add rinf
 ```
 
-Now install the command executable to easily run Rinf commands in the CLI.
+Now install the command executable to easily run Rinf commands in the CLI.[^1]
+
+[^1]: If you're curious about all the available commands, use `rinf --help`.
 
 ```bash title="CLI"
 cargo install rinf
@@ -57,5 +61,3 @@ Various comments are written in the actual code to help you understand the whole
 If you already have a Rust crate that you want to use here, just put it inside `./native` and set it as a dependency of the `hub` crate.
 
 Now by heading over to `./native/hub/src/lib.rs`, you can start writing Rust!
-
-> If you're curious about all the available commands, use `rinf --help`.

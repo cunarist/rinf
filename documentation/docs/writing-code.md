@@ -2,21 +2,16 @@
 
 ## 🏷️ Signal Details
 
-### Meanings of Each Field
-
-We've covered how to pass signals between Dart and Rust in the previous tutorial section. Now Let's delve into the meaning of each field of a signal.
+We've covered how to pass signals[^1] between Dart and Rust in the previous tutorial section. Now Let's delve into the meaning of each field of a signal.
 
 - **Field `message`:** It represents a message of a type defined by Protobuf. This field is mandatory.
 
 - **Field `blob`:** This is a field designed to handle large binary data, potentially up to a few gigabytes. You can send any kind of binary data you wish, such as a high-resolution image or file data. This field is optional and can be set to `null` or `None`.
 
-It's important to note that creating a Protobuf `message` larger than a few megabytes is not recommended. For large data, split them into multiple signals, or use `blob` instead.
+It's important to note that creating a Protobuf `message` larger than a few megabytes is not recommended. For large data, split them into multiple signals, or use `blob` instead.[^2]
 
-### Efficiency
-
-Rinf relies solely on native FFI for communication, avoiding the use of web protocols or hidden threads. The goal is to minimize performance overhead as much as possible.
-
-Sending a serialized message or blob data is a zero-copy operation from Rust to Dart, while it involves a copy operation from Dart to Rust in memory. Keep in mind that Protobuf's serialization and deserialization does involve memory copy.
+[^1]: Rinf relies solely on native FFI for communication, avoiding the use of web protocols or hidden threads. The goal is to minimize performance overhead as much as possible.
+[^2]: Sending a serialized message or blob data is a zero-copy operation from Rust to Dart, while it involves a copy operation from Dart to Rust in memory. Keep in mind that Protobuf's serialization and deserialization does involve memory copy.
 
 ## 📦 Message Details
 
@@ -36,13 +31,9 @@ If you add the optional argument `-w` or `--watch` to the `rinf message` command
 rinf message --watch
 ```
 
-### Normal Messages
-
-If a message doesn't need a channel, then it is totally fine not to mark it with a special comment at all. In that case, the message will still be generated without the ability to send signals. In general, they would be nested inside other messages.
-
 ### Comments
 
-It is possible to add comments like this.
+It is possible to add comments like this.[^3]
 
 ```proto title="Protobuf"
 // This is a video data sample of...
@@ -50,6 +41,8 @@ It is possible to add comments like this.
 // responsible for...
 message SomeData { ... }
 ```
+
+[^3]: If a message doesn't need a channel, it is entirely fine not to mark it with a special comment. In such instances, the message will still be generated without the ability to send signals. Generally, these messages are intended to be nested inside other messages.
 
 This applies same to marked Protobuf messages.
 

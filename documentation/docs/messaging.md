@@ -1,6 +1,8 @@
 # Messaging
 
-> If you are using Rinf version 5 or earlier, please refer to the [historical docs](https://github.com/cunarist/rinf/blob/v5.4.0/documentation/docs/writing-code.md). With the introduction of Rinf version 6, a simpler way for communication between Dart and Rust has been implemented, and the system has undergone significant changes.
+!!! warning
+
+    If you are using Rinf version 5 or earlier, please refer to the [historical documentation](https://github.com/cunarist/rinf/blob/v5.4.0/documentation/docs/writing-code.md). With the introduction of Rinf version 6, a simpler way for communication between Dart and Rust has been implemented, and the system has undergone significant changes.
 
 There are 2 types of special comments that you can mark messages with.
 
