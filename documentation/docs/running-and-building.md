@@ -4,7 +4,7 @@
 
 The following commands are just enough to run and build apps for native platforms. It's that simple.[^1]
 
-[^1]: Rinf takes care of building the native library and linking to the Flutter app, with the power of [Cargokit](https://github.com/irondash/cargokit).
+[^1]: Rinf takes care of building the native library and linking it to the Flutter app, leveraging the power of [Cargokit](https://github.com/irondash/cargokit).
 
 To run the app:
 
@@ -26,7 +26,7 @@ You need to manually build webassembly module from Rust before running or buildi
 
 To serve[^3] the web application:
 
-[^3]: Note that Flutter apps in debug mode are known to be quite slow on the web. We recommend using release mode when testing on a web browser. You can use debug mode if you need to analyze the code deeper, without the `--release` argument.
+[^3]: Note that Flutter apps in debug mode are known to be quite slow on the web. It is recommended to use release mode when testing on a web browser. Debug mode can be used if you need to analyze the code more deeply, without the `--release` argument.
 
 ```bash title="CLI"
 rinf wasm --release
