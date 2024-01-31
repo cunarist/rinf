@@ -164,7 +164,7 @@ flutter clean
 cargo clean
 ```
 
-### I encounter an error related to loading native libraries on older Android versions.
+### I encountered an error related to loading native libraries on older Android versions.
 
 If you are using older Android versions, you may encounter errors due to issues with native library loading.
 
@@ -179,7 +179,7 @@ To address this, you can modify `AndroidManifest.xml` files under `./android/app
 ...
 ```
 
-### How can I await a Response?
+### How can I await a response?
 
 Please note that it's recommended to use Flutter only to show widgets on the screen with `rustSignalStream`.
 
