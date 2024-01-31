@@ -29,7 +29,7 @@ All platforms available with Flutter are [tested](https://github.com/cunarist/ri
 
 ## 📞 Communication
 
-Below is Dart code with Widgets, and following that is Rust code with business logic.
+Below is Dart code with widgets, and following that is Rust code with business logic.
 
 ```dart
 MySchemaInput(
