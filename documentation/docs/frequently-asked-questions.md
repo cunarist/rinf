@@ -178,3 +178,44 @@ To address this, you can modify `AndroidManifest.xml` files under `./android/app
 >
 ...
 ```
+
+### How can I await a Response?
+
+Please note that it's recommended to use Flutter only to show widgets on the screen with `rustSignalStream`.
+
+However, if you do need to store some state in a Flutter widget, you can implement something like a request-response pattern by providing a unique ID.
+
+```proto title="messages/tutorial_resource.proto"
+syntax = "proto3";
+package tutorial_resource;
+...
+// [RINF:DART-SIGNAL]
+message MyUniqueInput {
+  string uid = 1;
+  int32 before_number = 2;
+}
+
+// [RINF:RUST-SIGNAL]
+message MyUniqueOutput {
+  string uid = 1;
+  int32 before_number = 2;
+}
+```
+
+```dart title="lib/main.dart"
+...
+import 'package:uuid/uuid.dart';
+import 'package:example_app/messages/tutorial_resource.pb.dart';
+...
+final uid = Uuid().v4();
+MyUniqueInput(
+  uid: uid,
+  beforeNumber: 3,
+).sendSignalToRust(null);
+final stream = MyUniqueOutput.rustSignalStream;
+final rustSignal = await stream.firstWhere((rustSignal) {
+  return rustSignal.message.uid == uid;
+});
+print(rustSignal.message.afterNumber);
+...
+```
