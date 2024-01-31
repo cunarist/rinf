@@ -4,7 +4,7 @@
 
 The following commands are just enough to run and build apps for native platforms. It's that simple.[^1]
 
-[^1]: Rinf takes care of building the native library and linking it to the Flutter app, leveraging the power of [Cargokit](https://github.com/irondash/cargokit).
+[^1]: Rinf builds the native Rust library and links it to the Flutter app using [Cargokit](https://github.com/irondash/cargokit).
 
 To run the app:
 
