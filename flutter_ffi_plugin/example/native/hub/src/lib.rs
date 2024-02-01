@@ -11,8 +11,8 @@ mod sample_functions;
 
 rinf::write_interface!();
 
-/// Always use non-blocking async functions
-/// such as `tokio::fs::File::open`.
+// Always use non-blocking async functions
+// such as `tokio::fs::File::open`.
 async fn main() {
     // Repeat `tokio::spawn` anywhere in your code
     // if more concurrent tasks are needed.
