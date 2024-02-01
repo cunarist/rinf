@@ -13,7 +13,6 @@ fn main() {
         protoc_path = installed.parent().unwrap().to_path_buf();
     } else {
         // Install Protobuf compiler and get the path.
-        println!("Preparing `protoc`...");
         let home_path = home::home_dir().unwrap();
         let out_path = home_path.join(".local").join("bin");
         fs::create_dir_all(&out_path).unwrap();
