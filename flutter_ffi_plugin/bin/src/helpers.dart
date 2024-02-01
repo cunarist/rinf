@@ -163,6 +163,10 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
       'main() {',
       'main() { initializeRust();',
     );
+    mainText = mainText.replaceFirst(
+      'main() async {',
+      'main() async { initializeRust();',
+    );
   }
   await mainFile.writeAsString(mainText);
   await Process.run('dart', ['format', './lib/main.dart']);
