@@ -5,7 +5,6 @@ import 'message.dart';
 
 /// Creates new folders and files to an existing Flutter project folder.
 Future<void> applyRustTemplate({
-  bool onlyBridge = false,
   required RinfConfigMessage messageConfig,
 }) async {
   // Get the path of the current project directory
@@ -27,18 +26,6 @@ Future<void> applyRustTemplate({
   final isFlutterProject = await mainFile.exists();
   if (!isFlutterProject) {
     print("\nThis folder doesn't look like a Flutter project. Aborting...\n");
-    return;
-  }
-
-  // Only copy the bridge module inside the `hub crate if wanted.
-  if (onlyBridge) {
-    final source = Directory('$packagePath/example/native/hub/src/bridge');
-    final destination = Directory('$flutterProjectPath/native/hub/src/bridge');
-    if (await destination.exists()) {
-      await destination.delete(recursive: true);
-    }
-    await copyDirectory(source, destination);
-    print("🎉 Rust bridge module is now ready! 🎉");
     return;
   }
 
