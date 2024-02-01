@@ -3,9 +3,9 @@ use std::sync::Mutex;
 use std::sync::OnceLock;
 
 #[cfg(not(target_family = "wasm"))]
-pub use super::interface_os::*;
+use super::interface_os::*;
 #[cfg(target_family = "wasm")]
-pub use super::interface_web::*;
+use super::interface_web::*;
 
 /// This is a mutable cell type that can be shared across threads.
 pub type SharedCell<T> = OnceLock<Mutex<RefCell<Option<T>>>>;
