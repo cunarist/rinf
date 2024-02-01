@@ -7,7 +7,9 @@ import 'interface.dart';
 import 'dart:async';
 import 'dart:convert';
 
-Future<void> prepareNativeBridge(HandleRustSignal handleRustSignal) async {
+Future<void> prepareInterfaceExtern(
+  HandleRustSignal handleRustSignal,
+) async {
   final isAlreadyPrepared = await loadJsFile();
 
   if (isAlreadyPrepared) {

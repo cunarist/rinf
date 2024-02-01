@@ -13,12 +13,16 @@ fn main() {
         protoc_path = installed.parent().unwrap().to_path_buf();
     } else {
         // Install Protobuf compiler and get the path.
-        println!("Preparing `protoc`...");
         let home_path = home::home_dir().unwrap();
         let out_path = home_path.join(".local").join("bin");
         fs::create_dir_all(&out_path).unwrap();
         env::set_var("OUT_DIR", out_path.to_str().unwrap());
-        let (protoc_binary_path, _) = protoc_prebuilt::init("25.2").unwrap();
+        let install_result = protoc_prebuilt::init("25.2");
+        if install_result.is_err() {
+            println!("Automatic installation of `protoc` failed.");
+            println!("Try installing `protoc` manually and adding it to PATH.");
+        }
+        let (protoc_binary_path, _) = install_result.unwrap();
         protoc_path = protoc_binary_path.parent().unwrap().to_path_buf();
     }
 

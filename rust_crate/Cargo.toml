@@ -1,6 +1,6 @@
 [package]
 name = "rinf"
-version = "6.1.0"
+version = "6.3.1"
 edition = "2021"
 license = "MIT"
 description = "Rust for native business logic, Flutter for flexible and beautiful GUI"
@@ -14,6 +14,8 @@ backtrace = "0.3.69"
 protoc-prebuilt = "0.2.0"
 home = "0.5.9"
 which = "6.0.0"
+allo-isolate = "0.1.24"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3.67"
+wasm-bindgen = "0.2.90"

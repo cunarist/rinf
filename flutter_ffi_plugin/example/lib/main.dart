@@ -4,9 +4,9 @@ import 'package:example_app/messages/generated.dart';
 import 'package:example_app/messages/counter_number.pb.dart';
 import 'package:example_app/messages/fractal_art.pb.dart';
 
-void main() async {
+void main() {
   // Wait for Rust initialization to be completed first.
-  await Rinf.initialize();
+  initializeRust();
   runApp(const MyApp());
 }
 
@@ -21,7 +21,7 @@ class _MyAppState extends State<MyApp> {
   final _appLifecycleListener = AppLifecycleListener(
     onExitRequested: () async {
       // Terminate Rust tasks before closing the Flutter app.
-      await Rinf.finalize();
+      finalizeRust();
       return AppExitResponse.exit;
     },
   );

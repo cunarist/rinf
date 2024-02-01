@@ -43,6 +43,10 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+  - footnotes
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
 
 extra:
   generator: false

@@ -1,3 +1,16 @@
+## 6.3.1
+
+- Fixed a small glitch with codegen.
+
+## 6.3.0
+
+- The interface code has been organized. Now the `bridge` Rust module is gone and the API makes more sense. Please refer to the example code to upgrade.
+
+## 6.2.0
+
+- Now custom installation of `protoc` works. This is useful when you don't have full access to GitHub APIs, which is needed for automatic `protoc` installation. Thanks @TENX-S!
+- Signal handling has become more efficient.
+
 ## 6.1.0
 
 - Now `rustSignalStream`s `listen` can be called multiple times. Thanks @rabbitson87!

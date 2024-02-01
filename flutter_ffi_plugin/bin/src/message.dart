@@ -209,9 +209,11 @@ import 'package:rinf/rinf.dart';
           '''
 #![allow(unused_imports)]
 
-use crate::bridge::*;
 use crate::tokio;
 use prost::Message;
+use rinf::send_rust_signal;
+use rinf::DartSignal;
+use rinf::SharedCell;
 use std::cell::RefCell;
 use std::sync::Mutex;
 use std::sync::OnceLock;
@@ -302,9 +304,10 @@ impl ${normalizePascal(messageName)} {
 #![allow(clippy::needless_return)]
 #![allow(unused_imports)]
 #![allow(unused_variables)]
+#![allow(unused_mut)]
 
-use crate::bridge::*;
 use prost::Message;
+use rinf::DartSignal;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::sync::Mutex;
@@ -384,14 +387,13 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
 
-class Rinf {
-  static Future<void> initialize() async {
-    await initializeRinf(handleRustSignal);
-  }
+void initializeRust() async {
+  prepareInterface(handleRustSignal);
+  startRustLogic();
+}
 
-  static Future<void> finalize() async {
-    await finalizeRinf();
-  }
+void finalizeRust() async {
+  stopRustLogic();
 }
 
 final signalHandlers = {
