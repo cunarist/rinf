@@ -1,5 +1,4 @@
 pub use interface::*;
-pub use macros::*;
 
 pub mod externs;
 mod interface;
