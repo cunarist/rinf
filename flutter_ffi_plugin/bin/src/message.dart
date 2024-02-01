@@ -386,14 +386,13 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
 
-class Rinf {
-  static Future<void> initialize() async {
-    await initializeRinf(handleRustSignal);
-  }
+void initializeRust() async {
+  prepareInterface(handleRustSignal);
+  startRustLogic();
+}
 
-  static Future<void> finalize() async {
-    await finalizeRinf();
-  }
+void finalizeRust() async {
+  stopRustLogic();
 }
 
 final signalHandlers = {

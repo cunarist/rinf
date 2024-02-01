@@ -158,16 +158,10 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
     );
     mainText = lines.join("\n");
   }
-  if (mainText.contains('main() {')) {
+  if (!mainText.contains('initializeRust()')) {
     mainText = mainText.replaceFirst(
       'main() {',
-      'main() async {',
-    );
-  }
-  if (!mainText.contains('Rinf.initialize()')) {
-    mainText = mainText.replaceFirst(
-      'main() async {',
-      'main() async { await Rinf.initialize();',
+      'main() { initializeRust();',
     );
   }
   await mainFile.writeAsString(mainText);
