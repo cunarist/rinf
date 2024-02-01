@@ -1,8 +1,10 @@
+// This `tokio` will be used by Rinf.
 use tokio_with_wasm::tokio;
 
-mod bridge;
 mod messages;
 mod sample_functions;
+
+rinf::write_interface!();
 
 /// This `hub` crate is the entry point for the Rust logic.
 /// Always use non-blocking async functions such as `tokio::fs::File::open`.

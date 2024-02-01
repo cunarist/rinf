@@ -61,8 +61,8 @@ Let's listen to this message in Rust. This simple function will add one to each 
 
 ```rust title="native/hub/src/sample_functions.rs"
 ...
-use crate::debug_print;
 use crate::messages;
+use rinf::debug_print;
 ...
 pub async fn calculate_precious_data() {
     use messages::tutorial_resource::*;

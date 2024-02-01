@@ -1,9 +1,9 @@
 //! This module is only for Rinf demonstrations.
 //! You might want to remove this module in production.
 
-use crate::debug_print;
 use crate::messages;
 use crate::tokio;
+use rinf::debug_print;
 
 const SHOULD_DEMONSTRATE: bool = true; // Disabled when applied as template
 
