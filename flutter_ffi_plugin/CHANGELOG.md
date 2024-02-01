@@ -1,3 +1,7 @@
+## 6.3.1
+
+- Fixed a small glitch with codegen.
+
 ## 6.3.0
 
 - The interface code has been organized. Now the `bridge` Rust module is gone and the API makes more sense. Please refer to the example code to upgrade.
