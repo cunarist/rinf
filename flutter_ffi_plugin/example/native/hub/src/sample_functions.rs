@@ -5,6 +5,11 @@ use crate::messages;
 use crate::tokio;
 use rinf::debug_print;
 
+#[cfg(debug_assertions)]
+const IS_DEBUG_MODE: bool = true;
+#[cfg(not(debug_assertions))]
+const IS_DEBUG_MODE: bool = false;
+
 const SHOULD_DEMONSTRATE: bool = true; // Disabled when applied as template
 
 pub async fn tell_numbers() {
@@ -91,11 +96,6 @@ pub async fn stream_fractal() {
 }
 
 pub async fn run_debug_tests() {
-    #[cfg(debug_assertions)]
-    const IS_DEBUG_MODE: bool = true;
-    #[cfg(not(debug_assertions))]
-    const IS_DEBUG_MODE: bool = false;
-
     if !SHOULD_DEMONSTRATE || !IS_DEBUG_MODE {
         return;
     }
