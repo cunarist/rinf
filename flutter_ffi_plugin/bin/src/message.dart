@@ -304,6 +304,7 @@ impl ${normalizePascal(messageName)} {
 #![allow(clippy::needless_return)]
 #![allow(unused_imports)]
 #![allow(unused_variables)]
+#![allow(unused_mut)]
 
 use prost::Message;
 use rinf::DartSignal;
