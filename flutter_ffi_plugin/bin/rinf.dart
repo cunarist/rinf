@@ -16,14 +16,7 @@ Future<void> main(List<String> args) async {
       print(rinfConfig);
       break;
     case "template":
-      if (args.contains("--bridge") || args.contains("-b")) {
-        await applyRustTemplate(
-          onlyBridge: true,
-          messageConfig: rinfConfig.message,
-        );
-      } else {
-        await applyRustTemplate(messageConfig: rinfConfig.message);
-      }
+      await applyRustTemplate(messageConfig: rinfConfig.message);
       break;
     case "message":
       if (args.contains("--watch") || args.contains("-w")) {
@@ -47,8 +40,8 @@ Future<void> main(List<String> args) async {
       print("  config            Shows current Rinf configuration"
           "\n                    resolved from `pubspec.yaml`"
           "\n                    with defaults applied.");
-      print("  template          Applies Rust template to current project.");
-      print("    -b, --bridge    Only applies `bridge` Rust module.");
+      print("  template          Applies Rust template"
+          "\n                    to current Flutter project.");
       print("  message           Generates message code from `.proto` files.");
       print("    -w, --watch     Continuously watches `.proto` files.");
       print("  wasm              Builds webassembly module.");

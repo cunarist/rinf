@@ -10,7 +10,9 @@ import 'dart:convert';
 typedef StoreDartPostCObject = Pointer Function(
     Pointer<NativeFunction<Int8 Function(Int64, Pointer<Dart_CObject>)>>);
 
-Future<void> prepareNativeBridge(HandleRustSignal handleRustSignal) async {
+Future<void> prepareInterfaceExtern(
+  HandleRustSignal handleRustSignal,
+) async {
   /// This should be called once at startup
   /// to enable `allo_isolate` to send data from the Rust side.
   final rustFunction =

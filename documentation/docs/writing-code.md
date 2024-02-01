@@ -61,7 +61,7 @@ You might be used to `println!` macro in Rust. However, using that macro isn't a
 When writing Rust code in the `hub` crate, you can simply print your debug message with the `debug_print!` macro provided by this framework like below. Once you use this macro, Flutter will take care of the rest.
 
 ```rust title="Rust"
-use crate::debug_print;
+use rinf::debug_print;
 debug_print!("My object is {my_object:?}");
 ```
 
@@ -69,7 +69,7 @@ debug_print!("My object is {my_object:?}");
 
 ## 🌅 Closing the App Gracefully
 
-When the Flutter app is closed, the whole `tokio` runtime on the Rust side will be terminated automatically. However, some error messages can appear in the console if the Rust side sends messages to the Dart side even after the Dart VM has stopped. To prevent this, you can call `Rinf.finalize()` in Dart to terminate all Rust tasks before closing the Flutter app.
+When the Flutter app is closed, the whole `tokio` runtime on the Rust side will be terminated automatically. However, some error messages can appear in the console if the Rust side sends messages to the Dart side even after the Dart VM has stopped. To prevent this, you can call `finalizeRust()` in Dart to terminate all Rust tasks before closing the Flutter app.
 
 ```dart title="lib/main.dart"
 import 'dart:ui';
@@ -87,7 +87,7 @@ class _MyAppState extends State<MyApp> {
   final _appLifecycleListener = AppLifecycleListener(
     onExitRequested: () async {
       // Terminate Rust tasks before closing the Flutter app.
-      await Rinf.finalize();
+      finalizeRust();
       return AppExitResponse.exit;
     },
   );
