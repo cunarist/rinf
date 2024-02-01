@@ -1,4 +1,3 @@
-use crate::debug_print;
 use crate::tokio;
 use rinf::externs::js_sys::Uint8Array;
 use std::panic::catch_unwind;
@@ -10,6 +9,7 @@ pub fn start_rust_logic_extern() {
         // Add kind description for panics.
         #[cfg(debug_assertions)]
         {
+            use crate::debug_print;
             std::panic::set_hook(Box::new(|panic_info| {
                 debug_print!("A panic occurred in Rust.\n{panic_info}");
             }));

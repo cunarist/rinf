@@ -1,11 +1,9 @@
 use super::SharedCell;
-use crate::debug_print;
 use crate::tokio::runtime::Builder;
 use crate::tokio::runtime::Runtime;
 use allo_isolate::IntoDart;
 use allo_isolate::Isolate;
 use allo_isolate::ZeroCopyBuffer;
-use rinf::externs::backtrace::Backtrace;
 use rinf::externs::os_thread_local::ThreadLocal;
 use std::cell::RefCell;
 use std::panic::catch_unwind;
@@ -38,6 +36,8 @@ pub extern "C" fn start_rust_logic_extern() {
         // Enable backtrace output for panics.
         #[cfg(debug_assertions)]
         {
+            use crate::debug_print;
+            use rinf::externs::backtrace::Backtrace;
             std::panic::set_hook(Box::new(|panic_info| {
                 let backtrace = Backtrace::new();
                 debug_print!("A panic occurred in Rust.\n{panic_info}\n{backtrace:?}");
