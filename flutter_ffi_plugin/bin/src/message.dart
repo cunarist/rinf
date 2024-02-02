@@ -301,9 +301,7 @@ impl ${normalizePascal(messageName)} {
   // Get ready to handle received signals in Rust.
   var rustReceiveScript = "";
   rustReceiveScript += '''
-#![allow(clippy::needless_return)]
 #![allow(unused_imports)]
-#![allow(unused_variables)]
 #![allow(unused_mut)]
 
 use prost::Message;
@@ -383,7 +381,6 @@ hash_map.insert(
   dartReceiveScript += '''
 // ignore_for_file: unused_import
 
-import 'dart:async';
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
 
