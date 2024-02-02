@@ -7,8 +7,8 @@ export 'src/interface.dart' show RustSignal;
 
 /// Prepares the native interface
 /// needed to communicate with Rust.
-void prepareInterface(HandleRustSignal handleRustSignal) async {
-  prepareInterfaceExtern(handleRustSignal);
+Future<void> prepareInterface(HandleRustSignal handleRustSignal) async {
+  await prepareInterfaceExtern(handleRustSignal);
 }
 
 /// Starts the `main` function in Rust.

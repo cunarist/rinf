@@ -45,7 +45,6 @@ Future<void> prepareInterfaceExtern(
 
   // Make Rust prepare its isolate to send data to Dart.
   prepareIsolateExtern(rustSignalPort.sendPort.nativePort);
-  startRustLogicExtern();
 }
 
 void startRustLogicExtern() {

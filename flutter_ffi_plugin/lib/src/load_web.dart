@@ -4,19 +4,22 @@ import 'dart:js' as js;
 import 'dart:html';
 import 'dart:async';
 
-Future<bool> loadJsFile() async {
-  final completer = Completer<void>();
-  js.context['rinf_load_completer'] = () {
-    completer.complete();
-  };
+var isAlreadyPrepared = false;
 
-  final isAlreadyStarted = js.context.hasProperty("wasm_bindgen");
-  if (isAlreadyStarted) {
+Future<void> loadJsFile() async {
+  if (js.context.hasProperty("rinf")) {
     // When Dart performs hot restart,
-    // the `wasm_bindgen` object is already defined
+    // the `rinf` object is already defined
     // as a global JavaScript variable.
-    return true;
+    isAlreadyPrepared = true;
+    return;
   }
+
+  final jsObject = js.JsObject.jsify({});
+  js.context['rinf'] = jsObject;
+
+  final loadCompleter = Completer<void>();
+  jsObject['loadComplete'] = loadCompleter.complete;
 
   final scriptElement = ScriptElement();
   scriptElement.type = "module";
@@ -24,10 +27,9 @@ Future<bool> loadJsFile() async {
 import init, * as wasm_bindgen from "/pkg/hub.js";
 await init();
 window.wasm_bindgen = wasm_bindgen;
-rinf_load_completer();
+rinf.loadComplete();
 ''';
   document.head!.append(scriptElement);
 
-  await completer.future;
-  return false;
+  await loadCompleter.future;
 }

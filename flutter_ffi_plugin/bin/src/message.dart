@@ -384,13 +384,14 @@ hash_map.insert(
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
 
-void initializeRust() async {
-  prepareInterface(handleRustSignal);
+Future<void> initializeRust() async {
+  await prepareInterface(handleRustSignal);
   startRustLogic();
 }
 
-void finalizeRust() async {
+Future<void> finalizeRust() async {
   stopRustLogic();
+  await Future.delayed(Duration(milliseconds: 100));
 }
 
 final signalHandlers = <int, void Function(Uint8List, Uint8List?)>{
