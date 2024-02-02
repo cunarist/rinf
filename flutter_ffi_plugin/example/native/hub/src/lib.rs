@@ -13,6 +13,8 @@ rinf::write_interface!();
 
 // Always use non-blocking async functions
 // such as `tokio::fs::File::open`.
+// If you really need to use blocking code,
+// use `tokio::task::spawn_blocking`.
 async fn main() {
     // Repeat `tokio::spawn` anywhere in your code
     // if more concurrent tasks are needed.
