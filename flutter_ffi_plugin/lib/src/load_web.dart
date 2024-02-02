@@ -19,15 +19,16 @@ Future<void> loadJsFile() async {
   js.context['rinf'] = jsObject;
 
   final loadCompleter = Completer<void>();
-  jsObject['loadComplete'] = loadCompleter.complete;
+  jsObject['load_complete'] = loadCompleter.complete;
 
   final scriptElement = ScriptElement();
   scriptElement.type = "module";
   scriptElement.innerHtml = '''
-import init, * as wasm_bindgen from "/pkg/hub.js";
+import init, * as wasm from "/pkg/hub.js";
 await init();
-window.wasm_bindgen = wasm_bindgen;
-rinf.loadComplete();
+window.rinf = { ...rinf, ...wasm };
+rinf.load_complete();
+delete rinf.load_complete;
 ''';
   document.head!.append(scriptElement);
 

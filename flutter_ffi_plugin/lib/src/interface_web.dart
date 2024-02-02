@@ -44,7 +44,7 @@ void startRustLogicExtern() {
   if (isAlreadyPrepared) {
     return;
   }
-  final jsObject = js.context['wasm_bindgen'] as js.JsObject;
+  final jsObject = js.context['rinf'] as js.JsObject;
   jsObject.callMethod('start_rust_logic_extern', []);
 }
 
@@ -58,7 +58,7 @@ void sendDartSignalExtern(
   bool blobValid,
   Uint8List blobBytes,
 ) {
-  final jsObject = js.context['wasm_bindgen'] as js.JsObject;
+  final jsObject = js.context['rinf'] as js.JsObject;
   jsObject.callMethod('send_dart_signal_extern', [
     messageId,
     messageBytes,
