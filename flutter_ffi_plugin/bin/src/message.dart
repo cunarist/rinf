@@ -393,7 +393,7 @@ void finalizeRust() async {
   stopRustLogic();
 }
 
-final signalHandlers = <int, Null Function(Uint8List, Uint8List?)>{
+final signalHandlers = <int, void Function(Uint8List, Uint8List?)>{
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
