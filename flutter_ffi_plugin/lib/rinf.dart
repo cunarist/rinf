@@ -12,7 +12,6 @@ void prepareInterface(HandleRustSignal handleRustSignal) async {
 }
 
 /// Starts the `main` function in Rust.
-/// Don't forget to call this function in the `main` function of Dart.
 void startRustLogic() async {
   startRustLogicExtern();
 }
