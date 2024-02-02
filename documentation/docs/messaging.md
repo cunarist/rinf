@@ -38,9 +38,10 @@ message MyDataOutput { ... }
 ```
 
 ```dart title="Dart"
-MyDataOutput.rustSignalStream.listen((rustSignal) {
+fianl stream = MyDataOutput.rustSignalStream;
+await for (final rustSignal in stream) {
     // Custom Dart logic here
-})
+}
 ```
 
 ```rust title="Rust"

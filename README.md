@@ -39,9 +39,9 @@ MySchemaInput(
 ).sendSignalToRust(null)
 
 final stream = MySchemaOutput.rustSignalStream;
-stream.listen((rustSignal) {
+await for (final rustSignal in stream) {
   // Custom Dart logic
-})
+}
 ```
 
 ```rust
