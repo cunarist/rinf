@@ -1,7 +1,7 @@
 import 'dart:io' as io;
 import 'dart:ffi';
 
-final DynamicLibrary rustLibrary = loadRustLibrary();
+final rustLibrary = loadRustLibrary();
 
 DynamicLibrary loadRustLibrary() {
   if (io.Platform.isLinux) {
