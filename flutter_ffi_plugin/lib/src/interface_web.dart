@@ -12,10 +12,6 @@ Future<void> prepareInterfaceExtern(
 ) async {
   await loadJsFile();
 
-  if (isAlreadyPrepared) {
-    return;
-  }
-
   // Listen to Rust via JavaScript
   final jsObject = js.context['rinf'] as js.JsObject;
   jsObject['send_rust_signal_extern'] = (
@@ -41,7 +37,7 @@ Future<void> prepareInterfaceExtern(
 }
 
 void startRustLogicExtern() {
-  if (isAlreadyPrepared) {
+  if (wasAlreadyLoaded) {
     return;
   }
   final jsObject = js.context['rinf'] as js.JsObject;

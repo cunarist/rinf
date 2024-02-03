@@ -4,31 +4,28 @@ import 'dart:js' as js;
 import 'dart:html';
 import 'dart:async';
 
-var isAlreadyPrepared = false;
+var wasAlreadyLoaded = false;
 
 Future<void> loadJsFile() async {
   if (js.context.hasProperty("rinf")) {
     // When Dart performs hot restart,
     // the `rinf` object is already defined
     // as a global JavaScript variable.
-    isAlreadyPrepared = true;
+    wasAlreadyLoaded = true;
     return;
   }
 
-  final jsObject = js.JsObject.jsify({});
-  js.context['rinf'] = jsObject;
-
   final loadCompleter = Completer<void>();
-  jsObject['load_complete'] = loadCompleter.complete;
+  js.context['completeRinfLoad'] = loadCompleter.complete;
 
   final scriptElement = ScriptElement();
   scriptElement.type = "module";
   scriptElement.innerHtml = '''
-import init, * as wasm from "/pkg/hub.js";
+import init, * as wasmBindings from "/pkg/hub.js";
 await init();
-window.rinf = { ...rinf, ...wasm };
-rinf.load_complete();
-delete rinf.load_complete;
+window.rinf = { ...wasmBindings };
+completeRinfLoad();
+delete window.completeRinfLoad;
 ''';
   document.head!.append(scriptElement);
 
