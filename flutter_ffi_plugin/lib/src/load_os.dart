@@ -1,9 +1,9 @@
 import 'dart:io' as io;
 import 'dart:ffi';
 
-final DynamicLibrary rustLibrary = loadNativeLibrary();
+final DynamicLibrary rustLibrary = loadRustLibrary();
 
-DynamicLibrary loadNativeLibrary() {
+DynamicLibrary loadRustLibrary() {
   if (io.Platform.isLinux) {
     return DynamicLibrary.open('libhub.so'); // Dynamic library
   } else if (io.Platform.isAndroid) {
