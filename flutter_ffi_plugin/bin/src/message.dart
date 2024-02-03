@@ -391,7 +391,7 @@ Future<void> initializeRust() async {
 
 Future<void> finalizeRust() async {
   stopRustLogic();
-  await Future.delayed(Duration(milliseconds: 100));
+  await Future.delayed(Duration(milliseconds: 10));
 }
 
 final signalHandlers = <int, void Function(Uint8List, Uint8List?)>{
