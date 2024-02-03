@@ -7,7 +7,7 @@ import 'dart:async';
 // When Dart performs hot restart,
 // the `rinf` object is already defined
 // as a global JavaScript variable.
-var wasAlreadyLoaded = js.context.hasProperty("rinf");
+final wasAlreadyLoaded = js.context.hasProperty("rinf");
 
 Future<void> loadJsFile() async {
   if (wasAlreadyLoaded) {
