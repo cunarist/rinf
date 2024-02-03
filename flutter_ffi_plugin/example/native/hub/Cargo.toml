@@ -12,7 +12,7 @@ edition = "2021"
 crate-type = ["lib", "cdylib", "staticlib"]
 
 [dependencies]
-rinf = "6.3.1"
+rinf = "6.4.0"
 prost = "0.12.3"
 wasm-bindgen = "0.2.90"
 tokio_with_wasm = "0.4.0"
