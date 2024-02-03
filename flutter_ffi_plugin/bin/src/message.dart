@@ -345,7 +345,7 @@ hash_map.insert(
         let message = ${normalizePascal(messageName)}::decode(
             message_bytes.as_slice()
         ).unwrap();
-        let signal = DartSignal {
+        let dart_signal = DartSignal {
             message,
             blob,
         };
@@ -357,7 +357,7 @@ hash_map.insert(
             "Looks like the channel is not created yet.",
             "\\nTry using `$messageName::get_dart_signal_receiver()`."
         ));
-        let _ = sender.try_send(signal);
+        let _ = sender.try_send(dart_signal);
     }),
 );
 ''';
@@ -384,16 +384,17 @@ hash_map.insert(
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
 
-void initializeRust() async {
-  prepareInterface(handleRustSignal);
+Future<void> initializeRust() async {
+  await prepareInterface(handleRustSignal);
   startRustLogic();
 }
 
-void finalizeRust() async {
+Future<void> finalizeRust() async {
   stopRustLogic();
+  await Future.delayed(Duration(milliseconds: 10));
 }
 
-final signalHandlers = {
+final signalHandlers = <int, void Function(Uint8List, Uint8List?)>{
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -415,11 +416,11 @@ import '.$importPath' as $filename;
           dartReceiveScript += '''
 ${markedMessage.id}: (Uint8List messageBytes, Uint8List? blob) {
   final message = $filename.$messageName.fromBuffer(messageBytes);
-  final bridgeSignal = RustSignal(
+  final rustSignal = RustSignal(
     message,
     blob,
   );
-  $filename.${camelName}Controller.add(bridgeSignal);
+  $filename.${camelName}Controller.add(rustSignal);
 },
 ''';
         }

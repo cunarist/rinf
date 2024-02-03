@@ -7,18 +7,18 @@ import 'dart:isolate';
 import 'interface.dart';
 import 'dart:convert';
 
-typedef StoreDartPostCObject = Pointer Function(
-    Pointer<NativeFunction<Int8 Function(Int64, Pointer<Dart_CObject>)>>);
-
 Future<void> prepareInterfaceExtern(
   HandleRustSignal handleRustSignal,
 ) async {
   /// This should be called once at startup
   /// to enable `allo_isolate` to send data from the Rust side.
-  final rustFunction =
-      rustLibrary.lookupFunction<StoreDartPostCObject, StoreDartPostCObject>(
-    'store_dart_post_cobject',
-  );
+  final rustFunction = rustLibrary.lookupFunction<
+      Pointer Function(
+        Pointer<NativeFunction<Int8 Function(Int64, Pointer<Dart_CObject>)>>,
+      ),
+      Pointer Function(
+        Pointer<NativeFunction<Int8 Function(Int64, Pointer<Dart_CObject>)>>,
+      )>('store_dart_post_cobject');
   rustFunction(NativeApi.postCObject);
 
   // Prepare ports for communication over isolates.
@@ -38,29 +38,28 @@ Future<void> prepareInterfaceExtern(
       print(rustReport);
       return;
     }
-    handleRustSignal(
-      rustSignalRaw[0],
-      rustSignalRaw[1],
-      blob,
-    );
+    final messageId = rustSignalRaw[0];
+    final messageBytes = rustSignalRaw[1];
+    handleRustSignal(messageId, messageBytes, blob);
   });
 
   // Make Rust prepare its isolate to send data to Dart.
   prepareIsolateExtern(rustSignalPort.sendPort.nativePort);
-  startRustLogicExtern();
 }
 
 void startRustLogicExtern() {
   final rustFunction =
       rustLibrary.lookupFunction<Void Function(), void Function()>(
-          'start_rust_logic_extern');
+    'start_rust_logic_extern',
+  );
   rustFunction();
 }
 
 void stopRustLogicExtern() {
   final rustFunction =
       rustLibrary.lookupFunction<Void Function(), void Function()>(
-          'stop_rust_logic_extern');
+    'stop_rust_logic_extern',
+  );
   rustFunction();
 }
 
@@ -79,9 +78,21 @@ Future<void> sendDartSignalExtern(
 
   final rustFunction = rustLibrary.lookupFunction<
       Void Function(
-          IntPtr, Pointer<Uint8>, IntPtr, Bool, Pointer<Uint8>, IntPtr),
-      void Function(int, Pointer<Uint8>, int, bool, Pointer<Uint8>,
-          int)>('send_dart_signal_extern');
+        IntPtr,
+        Pointer<Uint8>,
+        IntPtr,
+        Bool,
+        Pointer<Uint8>,
+        IntPtr,
+      ),
+      void Function(
+        int,
+        Pointer<Uint8>,
+        int,
+        bool,
+        Pointer<Uint8>,
+        int,
+      )>('send_dart_signal_extern');
 
   rustFunction(
     messageId,
@@ -100,8 +111,12 @@ Future<void> sendDartSignalExtern(
 }
 
 void prepareIsolateExtern(int port) {
-  final rustFunction =
-      rustLibrary.lookupFunction<Void Function(IntPtr), void Function(int)>(
-          'prepare_isolate_extern');
+  final rustFunction = rustLibrary.lookupFunction<
+      Void Function(
+        IntPtr,
+      ),
+      void Function(
+        int,
+      )>('prepare_isolate_extern');
   rustFunction(port);
 }

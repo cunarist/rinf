@@ -3,7 +3,7 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(js_name = rinf_send_rust_signal_extern)]
+    #[wasm_bindgen(js_namespace = rinf, js_name = send_rust_signal_extern)]
     pub fn send_rust_signal_extern_raw(
         resource: i32,
         message_bytes: Uint8Array,
