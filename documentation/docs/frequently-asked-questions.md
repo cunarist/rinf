@@ -225,3 +225,38 @@ Here are the current constraints of the `wasm32-unknown-unknown` target:
 - `std::thread::spawn` doesn't work. Consider using `tokio_with_wasm::tokio::task::spawn_blocking` instead.
 - Several features of `std::time::Instant` are unimplemented. Consider using `chrono` as an alternative. `chrono` supports `wasm32-unknown-unknown` and relies on JavaScript to obtain system time.
 - In case of a panic in an asynchronous Rust task, it aborts and throws a JavaScript `RuntimeError` [which Rust cannot catch](https://stackoverflow.com/questions/59426545/rust-paniccatch-unwind-no-use-in-webassembly). A recommended practice is to replace `.unwrap` with `.expect` or handle errors with `Err` instances.
+
+### My app failed to load dynamic library.
+
+```title="Output"
+Exception has occurred.
+ArgumentError (Invalid argument(s): Failed to load dynamic library 'libhub.so': dlopen failed: cannot locate symbol "..." referenced by ...
+```
+
+This happens when one or some of your Rust dependencies expect to have C or C++ libraries linked to the `hub` crate. Not all Rust crates on `crates.io` are written in pure Rust, and some depends on C code with `libc++`, `libstdc++`, etc.
+
+To make `cargo` link those C or C++ libraries to your native library, create your `build.rs` file like below.
+
+```rust title="native/hub/build.rs"
+use std::env;
+
+fn main() {
+    let target_os = env::var("CARGO_CFG_TARGET_OS");
+    match target_os.as_ref().map(|x| &**x) {
+        Ok("android") => {
+            println!("cargo:rustc-link-lib=dylib=stdc++");
+            println!("cargo:rustc-link-lib=c++_shared");
+        },
+        _ => {}
+    }
+}
+```
+
+The code above describes how to link `libc++` to your Android app. You can modify this code to adapt to certain scenarios.
+
+These links might be a help:
+
+- https://github.com/cunarist/rinf/issues/280
+- https://kazlauskas.me/entries/writing-proper-buildrs-scripts
+- https://github.com/RustAudio/rodio/issues/404
+- https://github.com/breez/c-breez/issues/553
