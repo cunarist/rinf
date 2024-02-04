@@ -213,3 +213,15 @@ final rustSignal = await stream.firstWhere((rustSignal) {
 print(rustSignal.message.afterNumber);
 ...
 ```
+
+### Some of the standard library modules don't work on the web
+
+As of February 2024, Rinf utilizes the `wasm32-unknown-unknown` Rust target for web development. However, this target has certain limitations, particularly in terms of system IO capabilities. The hope is to [transition](https://github.com/cunarist/rinf/issues/204) to `wasm32-wasi` in the future pending the stabilization of the [WebAssembly component proposal](https://github.com/WebAssembly/proposals).
+
+Here are the current constraints of the `wasm32-unknown-unknown` target:
+
+- Numerous functionalities within `std::fs` remain unimplemented.
+- Various features of `std::net` are not available.
+- `std::thread::spawn` doesn't work. Consider using `tokio_with_wasm::task::spawn_blocking` instead.
+- Several features of `std::time::Instant` are unimplemented. Consider using `chrono` as an alternative. `chrono` supports `wasm32-unknown-unknown` and relies on JavaScript to obtain system time.
+- In case of a panic in an asynchronous Rust task, it aborts and throws a JavaScript `RuntimeError` [which Rust cannot catch](https://stackoverflow.com/questions/59426545/rust-paniccatch-unwind-no-use-in-webassembly). A recommended practice is to replace `.unwrap` with `.expect` or handle errors with `Err` instances.
