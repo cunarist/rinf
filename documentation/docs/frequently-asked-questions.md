@@ -44,7 +44,9 @@ android {
 
 ### How does concurrency work under the hood?
 
-On native platforms, Dart runs in a single thread as usual, while Rust utilizes the async `tokio` runtime to take advantage of all cores on the computer, allowing async tasks to run efficiently within that runtime. On the web, Dart and Rust both run inside JavaScript's async event loop in the main thread, with Rust `Future`s being converted into JavaScript `Promise`s internally. This is a necessary constraint because web workers do not share memory.
+On native platforms, Dart runs in a single thread as usual, while Rust utilizes the async `tokio` runtime to take advantage of all cores on the computer, allowing async tasks to run efficiently within that runtime.
+
+On the web, Dart and Rust both run inside JavaScript's async event loop in the main thread, with Rust `Future`s being converted into JavaScript `Promise`s internally. This is a necessary constraint because [webassembly component proposal](https://github.com/WebAssembly/proposals) is not stabilized as of February 2024.
 
 ### Will changes made to Rust code take effect upon Dart's hot restart?
 
