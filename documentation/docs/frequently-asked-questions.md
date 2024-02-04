@@ -18,9 +18,7 @@ All build settings of Rinf ensures that all library files compiled from Rust cra
 
 ### Android app build has failed. What should I do?
 
-For Android apps, you should be using Rust 1.68 or higher due to [this issue](https://github.com/rust-lang/rust/pull/85806).
-
-Also, The NDK version that your project expects is specified in `./android/app/build.gradle` file as `ndkVersion` variable inside `android` block. The value of this `ndkVersion` should be `flutter.ndkVersion` and you should be using Flutter SDK [3.10 or higher](https://docs.flutter.dev/release/release-notes/release-notes-3.10.0). However, `ndkVersion` can be absent if you've created your Flutter project with Flutter SDK 3.7 and earlier. If `ndkVersion` is not defined in your `./android/app/build.gradle` file, go ahead and write one yourself.
+The NDK version that your project expects is specified in `./android/app/build.gradle` file as `ndkVersion` variable inside `android` block. The value of this `ndkVersion` should be `flutter.ndkVersion` and you should be using Flutter SDK [3.10 or higher](https://docs.flutter.dev/release/release-notes/release-notes-3.10.0). However, `ndkVersion` can be absent if you've created your Flutter project with Flutter SDK 3.7 and earlier. If `ndkVersion` is not defined in your `./android/app/build.gradle` file, go ahead and write one yourself.
 
 ```gradle title="android/app/build.gradle"
 ..
