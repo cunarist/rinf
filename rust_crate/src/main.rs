@@ -50,10 +50,8 @@ fn main() {
     let dart_command_args: Vec<String> = env::args().skip(1).collect();
 
     // Build the command to run the Dart script.
-    #[cfg(target_family = "windows")]
-    let mut command = process::Command::new("dart.bat");
-    #[cfg(target_family = "unix")]
-    let mut command = process::Command::new("dart");
+    let dart_path = which::which("dart").expect("Couldn't find Dart executable");
+    let mut command = process::Command::new(dart_path);
     command.args(["run", "rinf"]);
     command.args(&dart_command_args);
 
