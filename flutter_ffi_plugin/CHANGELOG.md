@@ -1,6 +1,6 @@
 ## 6.5.0
 
-- Now native library are loaded as dynamic library, not static library, on iOS and macOS, like other platforms. This reduces the possibility of potential conflicts of native symbols.
+- Now the native library file is loaded as dynamic library, not static library, on iOS and macOS, like other platforms. This reduces the possibility of potential conflicts of native symbols.
 - Now `rinf template` checks `pubspec.yaml` instead of `lib/main.dart` to ensure that the current folder is a Flutter project.
 
 ## 6.4.0
