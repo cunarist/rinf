@@ -87,7 +87,7 @@ class _MyAppState extends State<MyApp> {
   final _appLifecycleListener = AppLifecycleListener(
     onExitRequested: () async {
       // Terminate Rust tasks before closing the Flutter app.
-      finalizeRust();
+      await finalizeRust();
       return AppExitResponse.exit;
     },
   );

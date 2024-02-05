@@ -18,9 +18,7 @@ All build settings of Rinf ensures that all library files compiled from Rust cra
 
 ### Android app build has failed. What should I do?
 
-For Android apps, you should be using Rust 1.68 or higher due to [this issue](https://github.com/rust-lang/rust/pull/85806).
-
-Also, The NDK version that your project expects is specified in `./android/app/build.gradle` file as `ndkVersion` variable inside `android` block. The value of this `ndkVersion` should be `flutter.ndkVersion` and you should be using Flutter SDK [3.10 or higher](https://docs.flutter.dev/release/release-notes/release-notes-3.10.0). However, `ndkVersion` can be absent if you've created your Flutter project with Flutter SDK 3.7 and earlier. If `ndkVersion` is not defined in your `./android/app/build.gradle` file, go ahead and write one yourself.
+The NDK version that your project expects is specified in `./android/app/build.gradle` file as `ndkVersion` variable inside `android` block. The value of this `ndkVersion` should be `flutter.ndkVersion` and you should be using Flutter SDK [3.10 or higher](https://docs.flutter.dev/release/release-notes/release-notes-3.10.0). However, `ndkVersion` can be absent if you've created your Flutter project with Flutter SDK 3.7 and earlier. If `ndkVersion` is not defined in your `./android/app/build.gradle` file, go ahead and write one yourself.
 
 ```gradle title="android/app/build.gradle"
 ..
@@ -46,7 +44,9 @@ android {
 
 ### How does concurrency work under the hood?
 
-On native platforms, Dart runs in a single thread as usual, while Rust utilizes the async `tokio` runtime to take advantage of all cores on the computer, allowing async tasks to run efficiently within that runtime. On the web, Dart and Rust both run inside JavaScript's async event loop in the main thread, with Rust `Future`s being converted into JavaScript `Promise`s internally. This is a necessary constraint because web workers do not share memory.
+On native platforms, Dart runs in a single thread as usual, while Rust utilizes the async `tokio` runtime to take advantage of all cores on the computer, allowing async tasks to run efficiently within that runtime.
+
+On the web, Dart and Rust both run inside JavaScript's async event loop in the main thread, with Rust `Future`s being converted into JavaScript `Promise`s internally. This is a necessary constraint because [webassembly component proposal](https://github.com/WebAssembly/proposals) is not stabilized as of February 2024.
 
 ### Will changes made to Rust code take effect upon Dart's hot restart?
 
@@ -213,3 +213,50 @@ final rustSignal = await stream.firstWhere((rustSignal) {
 print(rustSignal.message.afterNumber);
 ...
 ```
+
+### Some of the standard library modules don't work on the web
+
+As of February 2024, Rinf utilizes the `wasm32-unknown-unknown` Rust target for web development. However, this target has certain limitations, particularly in terms of system IO capabilities. The hope is to [transition](https://github.com/cunarist/rinf/issues/204) to `wasm32-wasi` in the future pending the stabilization of the [WebAssembly component proposal](https://github.com/WebAssembly/proposals).
+
+Here are the current constraints of the `wasm32-unknown-unknown` target:
+
+- Numerous functionalities within `std::fs` remain unimplemented.
+- Various features of `std::net` are not available. Consider using `reqwest` crate instead. `reqwest` supports `wasm32-unknown-unknown` and relies on JavaScript to perform network communications.
+- `std::thread::spawn` doesn't work. Consider using `tokio_with_wasm::tokio::task::spawn_blocking` instead.
+- Several features of `std::time::Instant` are unimplemented. Consider using `chrono` as an alternative. `chrono` supports `wasm32-unknown-unknown` and relies on JavaScript to obtain system time.
+- In case of a panic in an asynchronous Rust task, it aborts and throws a JavaScript `RuntimeError` [which Rust cannot catch](https://stackoverflow.com/questions/59426545/rust-paniccatch-unwind-no-use-in-webassembly). A recommended practice is to replace `.unwrap` with `.expect` or handle errors with `Err` instances.
+
+### My app failed to load dynamic library
+
+```title="Output"
+Exception has occurred.
+ArgumentError (Invalid argument(s): Failed to load dynamic library 'libhub.so': dlopen failed: cannot locate symbol "..." referenced by ...
+```
+
+This happens when one or some of your Rust dependencies expect to have C or C++ libraries linked to the `hub` crate. Not all Rust crates on `crates.io` are written in pure Rust, and some depends on C code with `libc++`, `libstdc++`, etc.
+
+To make `cargo` link those C or C++ libraries to your native library, create your `build.rs` file like below.
+
+```rust title="native/hub/build.rs"
+use std::env;
+
+fn main() {
+    let target_os = env::var("CARGO_CFG_TARGET_OS");
+    match target_os.as_ref().map(|x| &**x) {
+        Ok("android") => {
+            println!("cargo:rustc-link-lib=dylib=stdc++");
+            println!("cargo:rustc-link-lib=c++_shared");
+        },
+        _ => {}
+    }
+}
+```
+
+The code above describes how to link `libc++` to your Android app. You can modify this code to adapt to certain scenarios.
+
+These links might be a help:
+
+- https://github.com/cunarist/rinf/issues/280
+- https://kazlauskas.me/entries/writing-proper-buildrs-scripts
+- https://github.com/RustAudio/rodio/issues/404
+- https://github.com/breez/c-breez/issues/553

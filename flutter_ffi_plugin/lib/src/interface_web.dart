@@ -10,14 +10,11 @@ import 'dart:convert';
 Future<void> prepareInterfaceExtern(
   HandleRustSignal handleRustSignal,
 ) async {
-  final isAlreadyPrepared = await loadJsFile();
-
-  if (isAlreadyPrepared) {
-    return;
-  }
+  await loadJsFile();
 
   // Listen to Rust via JavaScript
-  js.context['rinf_send_rust_signal_extern'] = (
+  final jsObject = js.context['rinf'] as js.JsObject;
+  jsObject['send_rust_signal_extern'] = (
     int messageId,
     Uint8List messageBytes,
     bool blobValid,
@@ -37,12 +34,13 @@ Future<void> prepareInterfaceExtern(
     }
     handleRustSignal(messageId, messageBytes, blob);
   };
-
-  startRustLogicExtern();
 }
 
 void startRustLogicExtern() {
-  final jsObject = js.context['wasm_bindgen'] as js.JsObject;
+  if (wasAlreadyLoaded) {
+    return;
+  }
+  final jsObject = js.context['rinf'] as js.JsObject;
   jsObject.callMethod('start_rust_logic_extern', []);
 }
 
@@ -56,7 +54,7 @@ void sendDartSignalExtern(
   bool blobValid,
   Uint8List blobBytes,
 ) {
-  final jsObject = js.context['wasm_bindgen'] as js.JsObject;
+  final jsObject = js.context['rinf'] as js.JsObject;
   jsObject.callMethod('send_dart_signal_extern', [
     messageId,
     messageBytes,

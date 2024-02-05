@@ -1,3 +1,7 @@
+## 6.4.0
+
+- The start and stop mechanism of Rust has become more stable.
+
 ## 6.3.1
 
 - Fixed a small glitch with codegen.

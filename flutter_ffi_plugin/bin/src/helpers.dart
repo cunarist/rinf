@@ -161,11 +161,11 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
   if (!mainText.contains('initializeRust()')) {
     mainText = mainText.replaceFirst(
       'main() {',
-      'main() { initializeRust();',
+      'main() async {',
     );
     mainText = mainText.replaceFirst(
       'main() async {',
-      'main() async { initializeRust();',
+      'main() async { await initializeRust();',
     );
   }
   await mainFile.writeAsString(mainText);
