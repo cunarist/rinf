@@ -5,15 +5,15 @@ final rustLibrary = loadRustLibrary();
 
 DynamicLibrary loadRustLibrary() {
   if (io.Platform.isLinux) {
-    return DynamicLibrary.open('libhub.so'); // Dynamic library
+    return DynamicLibrary.open('libhub.so');
   } else if (io.Platform.isAndroid) {
-    return DynamicLibrary.open('libhub.so'); // Dynamic library
+    return DynamicLibrary.open('libhub.so');
   } else if (io.Platform.isWindows) {
-    return DynamicLibrary.open('hub.dll'); // Dynamic library
+    return DynamicLibrary.open('hub.dll');
   } else if (io.Platform.isIOS) {
-    return DynamicLibrary.executable(); // Static library
+    return DynamicLibrary.open('rinf.framework/rinf');
   } else if (io.Platform.isMacOS) {
-    return DynamicLibrary.executable(); // Static library
+    return DynamicLibrary.open('rinf.framework/rinf');
   } else {
     throw UnsupportedError('The operating system is not supported.');
   }
