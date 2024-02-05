@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:package_config/package_config.dart';
 import 'config.dart';
 import 'message.dart';
+import 'package:yaml/yaml.dart';
 
 /// Creates new folders and files to an existing Flutter project folder.
 Future<void> applyRustTemplate({
@@ -21,11 +22,17 @@ Future<void> applyRustTemplate({
   );
   final packagePath = package.root.toFilePath();
 
-  // Check if current folder is a Flutter project.
-  final mainFile = File('$flutterProjectPath/lib/main.dart');
-  final isFlutterProject = await mainFile.exists();
+  // Check if current folder is a Flutter app project.
+  final specFile = File('$flutterProjectPath/pubspec.yaml');
+  final isFlutterProject = await specFile.exists();
   if (!isFlutterProject) {
-    print("\nThis folder doesn't look like a Flutter project. Aborting...\n");
+    print("This folder doesn't look like a Flutter project.");
+    return;
+  }
+  final pubspec = loadYaml(await specFile.readAsString());
+  final String? publishTo = pubspec['publish_to'];
+  if (publishTo != "none") {
+    print("Flutter package development is not supported by Rinf.");
     return;
   }
 
@@ -145,31 +152,34 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
   await Process.run('dart', ['pub', 'add', 'protobuf']);
 
   // Modify `./lib/main.dart`
-  await Process.run('dart', ['format', './lib/main.dart']);
-  var mainText = await mainFile.readAsString();
-  if (!mainText.contains('messages/generated.dart')) {
-    final lines = mainText.split("\n");
-    final lastImportIndex = lines.lastIndexWhere(
-      (line) => line.startsWith('import '),
-    );
-    lines.insert(
-      lastImportIndex + 1,
-      "import './messages/generated.dart';",
-    );
-    mainText = lines.join("\n");
+  final mainFile = File('$flutterProjectPath/lib/main.dart');
+  if (await mainFile.exists()) {
+    await Process.run('dart', ['format', './lib/main.dart']);
+    var mainText = await mainFile.readAsString();
+    if (!mainText.contains('messages/generated.dart')) {
+      final lines = mainText.split("\n");
+      final lastImportIndex = lines.lastIndexWhere(
+        (line) => line.startsWith('import '),
+      );
+      lines.insert(
+        lastImportIndex + 1,
+        "import './messages/generated.dart';",
+      );
+      mainText = lines.join("\n");
+    }
+    if (!mainText.contains('initializeRust()')) {
+      mainText = mainText.replaceFirst(
+        'main() {',
+        'main() async {',
+      );
+      mainText = mainText.replaceFirst(
+        'main() async {',
+        'main() async { await initializeRust();',
+      );
+    }
+    await mainFile.writeAsString(mainText);
+    await Process.run('dart', ['format', './lib/main.dart']);
   }
-  if (!mainText.contains('initializeRust()')) {
-    mainText = mainText.replaceFirst(
-      'main() {',
-      'main() async {',
-    );
-    mainText = mainText.replaceFirst(
-      'main() async {',
-      'main() async { await initializeRust();',
-    );
-  }
-  await mainFile.writeAsString(mainText);
-  await Process.run('dart', ['format', './lib/main.dart']);
 
   await generateMessageCode(silent: true, messageConfig: messageConfig);
 
