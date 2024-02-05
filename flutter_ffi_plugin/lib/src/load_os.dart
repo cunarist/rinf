@@ -15,6 +15,6 @@ DynamicLibrary loadRustLibrary() {
   } else if (io.Platform.isMacOS) {
     return DynamicLibrary.open('rinf.framework/rinf');
   } else {
-    throw UnsupportedError('The operating system is not supported.');
+    throw UnsupportedError('This operating system is not supported.');
   }
 }
