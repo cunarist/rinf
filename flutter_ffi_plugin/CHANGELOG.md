@@ -1,3 +1,7 @@
+## 6.6.0
+
+- Now early Rust signals on startup works properly, even if the widgets are not built yet. `rustSignalStream` will remember Rust signals that were received before widgets were built, and give them to the first listener.
+
 ## 6.5.0
 
 - Now the native library file is loaded as dynamic library, not static library, on iOS and macOS, like other platforms. This reduces the possibility of potential conflicts of native symbols.
