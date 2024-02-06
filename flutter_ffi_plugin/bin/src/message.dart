@@ -269,14 +269,14 @@ impl ${normalizePascal(messageName)} {
             dartPath,
             '''
 static Stream<RustSignal<$messageName>> rustSignalStream =
-    ${camelName}Controller.stream;
+    ${camelName}Controller.stream.asBroadcastStream();
 ''',
             after: "class $messageName extends \$pb.GeneratedMessage {",
           );
           await insertTextToFile(
             dartPath,
             '''
-final ${camelName}Controller = StreamController<RustSignal<$messageName>>.broadcast();
+final ${camelName}Controller = StreamController<RustSignal<$messageName>>();
 ''',
           );
           await insertTextToFile(
