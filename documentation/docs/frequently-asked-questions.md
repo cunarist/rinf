@@ -175,9 +175,9 @@ To address this, you can modify `AndroidManifest.xml` files under `./android/app
 
 ### How can I await a response?
 
-Please note that it's recommended to use Flutter only to show widgets on the screen with `rustSignalStream`, while storing the state in Rust.
+Please note that it's recommended to use Flutter only to show widgets on the screen with `rustSignalStream`.
 
-However, if you really need to store some state in a Flutter widget, you can achieve something like a request-response pattern by providing a unique ID.
+However, if you do need to store some state in a Flutter widget, you can implement something like a request-response pattern by providing a unique ID.
 
 ```proto title="messages/tutorial_resource.proto"
 syntax = "proto3";
@@ -185,75 +185,33 @@ package tutorial_resource;
 ...
 // [RINF:DART-SIGNAL]
 message MyUniqueInput {
-  int32 interaction_id = 1;
+  string uid = 1;
   int32 before_number = 2;
 }
 
 // [RINF:RUST-SIGNAL]
 message MyUniqueOutput {
-  int32 interaction_id = 1;
-  int32 after_number = 2;
+  string uid = 1;
+  int32 before_number = 2;
 }
 ```
 
 ```dart title="lib/main.dart"
 ...
-import 'dart:async';
-import 'package:example_app/messages/tutorial_resource.pb.dart';
-
-var currentInteractionId = 0;
-final myUniqueOutputs = Map<int, Completer<MyUniqueOutput>>();
-
-void main() async {
-  ...
-  MyUniqueOutput.rustSignalStream.listen((rustSignal) {
-    final myUniqueInput = rustSignal.message;
-    myUniqueOutputs[myUniqueInput.interactionId]!.complete(myUniqueInput);
-  });
-  ...
-}
-...
-```
-
-```dart title="lib/main.dart"
-...
-import 'dart:async';
+import 'package:uuid/uuid.dart';
 import 'package:example_app/messages/tutorial_resource.pb.dart';
 ...
-onPressed: () async {
-  final completer = Completer<MyUniqueOutput>();
-  myUniqueOutputs[currentInteractionId] = completer;
-  MyUniqueInput(
-    beforeNumber: 3,
-    interactionId: currentInteractionId,
-  ).sendSignalToRust(null);
-  currentInteractionId += 1;
-  final myUniqueOutput = await completer.future;
-},
+final uid = Uuid().v4();
+MyUniqueInput(
+  uid: uid,
+  beforeNumber: 3,
+).sendSignalToRust(null);
+final stream = MyUniqueOutput.rustSignalStream;
+final rustSignal = await stream.firstWhere((rustSignal) {
+  return rustSignal.message.uid == uid;
+});
+print(rustSignal.message.afterNumber);
 ...
-```
-
-```rust title="native/hub/src/sample_functions.rs"
-pub async fn respond() {
-    use messages::tutorial_resource::*;
-
-    let mut receiver = MyUniqueInput::get_dart_signal_receiver();
-    while let Some(dart_signal) = receiver.recv().await {
-        let my_unique_input = dart_signal.message;
-        MyUniqueOutput {
-            interaction_id: my_unique_input.interaction_id,
-            after_number: my_unique_input.before_number + 4,
-        }
-        .send_signal_to_dart(None);
-    }
-}
-```
-
-```rust title="native/hub/src/lib.rs"
-async fn main() {
-    ...
-    tokio::spawn(sample_functions::respond());
-}
 ```
 
 ### Some of the standard library modules don't work on the web

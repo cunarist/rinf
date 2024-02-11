@@ -12,20 +12,6 @@ const IS_DEBUG_MODE: bool = false;
 
 const SHOULD_DEMONSTRATE: bool = true; // Disabled when applied as template
 
-pub async fn respond() {
-    use messages::tutorial_resource::*;
-
-    let mut receiver = MyUniqueInput::get_dart_signal_receiver();
-    while let Some(dart_signal) = receiver.recv().await {
-        let my_unique_input = dart_signal.message;
-        MyUniqueOutput {
-            current_id: my_unique_input.current_id,
-            after_number: my_unique_input.before_number + 4,
-        }
-        .send_signal_to_dart(None);
-    }
-}
-
 pub async fn tell_numbers() {
     use messages::counter_number::*;
 
