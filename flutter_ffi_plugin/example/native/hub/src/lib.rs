@@ -21,4 +21,5 @@ async fn main() {
     tokio::spawn(sample_functions::tell_numbers());
     tokio::spawn(sample_functions::stream_fractal());
     tokio::spawn(sample_functions::run_debug_tests());
+    tokio::spawn(sample_functions::respond());
 }

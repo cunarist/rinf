@@ -3,10 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:example_app/messages/generated.dart';
 import 'package:example_app/messages/counter_number.pb.dart';
 import 'package:example_app/messages/fractal_art.pb.dart';
+import 'package:example_app/messages/tutorial_resource.pb.dart';
+import 'dart:async';
+
+var currentId = 0;
+final myUniqueOutputs = Map<int, Completer<MyUniqueOutput>>();
 
 void main() async {
   // Wait for Rust initialization to be completed first.
   await initializeRust();
+  MyUniqueOutput.rustSignalStream.listen((rustSignal) {
+    final myUniqueInput = rustSignal.message;
+    myUniqueOutputs[myUniqueInput.currentId]!.complete(myUniqueInput);
+  });
   runApp(const MyApp());
 }
 
@@ -126,6 +135,15 @@ class MyHomePage extends StatelessWidget {
             ),
             dummyThree: [4, 5, 6],
           ).sendSignalToRust(null);
+          final completer = Completer<MyUniqueOutput>();
+          myUniqueOutputs[currentId] = completer;
+          MyUniqueInput(
+            beforeNumber: 3,
+            currentId: currentId,
+          ).sendSignalToRust(null);
+          currentId += 1;
+          final myUniqueOutput = await completer.future;
+          print(myUniqueOutput.afterNumber);
         },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
