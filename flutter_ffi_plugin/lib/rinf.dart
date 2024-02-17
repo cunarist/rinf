@@ -1,4 +1,5 @@
 /// This module supports communication with Rust.
+library;
 
 import 'dart:typed_data';
 import 'src/exports.dart';

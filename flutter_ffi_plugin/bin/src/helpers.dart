@@ -231,8 +231,16 @@ Future<void> buildWebassembly({bool isReleaseMode = false}) async {
   await Process.run("cargo", ["install", "wasm-bindgen-cli"]);
 
   // Verify Flutter SDK web server's response headers.
-  print("Patching Flutter SDK's web server with CORS HTTP headers.");
-  await patchServerHeaders();
+  try {
+    await patchServerHeaders();
+    print("Patched Flutter SDK's web server with CORS HTTP headers.");
+  } catch (error) {
+    print("Failed patching Flutter's web server with CORS HTTP headers.");
+    print("Try using the command below.");
+    print('flutter run' +
+        ' --web-header=Cross-Origin-Opener-Policy=same-origin' +
+        ' --web-header=Cross-Origin-Embedder-Policy=require-corp');
+  }
 
   // Prepare the webassembly output path.
   final flutterProjectPath = Directory.current;

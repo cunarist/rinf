@@ -88,7 +88,7 @@ Future<void> generateMessageCode({
     final subPath = entry.key;
     final resourceNames = entry.value;
     await Directory('$rustOutputPath$subPath').create(recursive: true);
-    if (resourceNames.length == 0) {
+    if (resourceNames.isEmpty) {
       continue;
     }
     final protoPaths = <String>[];
@@ -148,7 +148,7 @@ Future<void> generateMessageCode({
     final subPath = entry.key;
     final resourceNames = entry.value;
     await Directory('$dartOutputPath$subPath').create(recursive: true);
-    if (resourceNames.length == 0) {
+    if (resourceNames.isEmpty) {
       continue;
     }
     final protoPaths = <String>[];
@@ -180,7 +180,7 @@ Future<void> generateMessageCode({
     final subPath = entry.key;
     final filesAndMarks = entry.value;
     for (final entry in filesAndMarks.entries) {
-      if (entry.value.length == 0) {
+      if (entry.value.isEmpty) {
         continue;
       }
       final filename = entry.key;
@@ -464,7 +464,7 @@ Future<void> patchServerHeaders() async {
   var serverFileContent = await serverFile.readAsString();
 
   // Check if the server already includes cross-origin HTTP headers.
-  if (serverFileContent.contains('cross-origin-opener-policy')) {
+  if (serverFileContent.contains('Cross-Origin-Opener-Policy')) {
     return;
   }
 
@@ -475,11 +475,11 @@ Future<void> patchServerHeaders() async {
   );
   lines.insert(serverDeclaredIndex + 1, """
 httpServer.defaultResponseHeaders.add(
-  'cross-origin-opener-policy',
+  'Cross-Origin-Opener-Policy',
   'same-origin',
 );
 httpServer.defaultResponseHeaders.add(
-  'cross-origin-embedder-policy',
+  'Cross-Origin-Embedder-Policy',
   'require-corp',
 );""");
   serverFileContent = lines.join("\n");
