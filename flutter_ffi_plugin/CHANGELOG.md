@@ -1,3 +1,10 @@
+## 6.6.1
+
+- Added support for some Linux distributions where patching Flutter SDK is not possible.
+- Fixed a problem with the web sector not working. To use this new version, it's recommended to discard all Git changes in Flutter SDK's directory, or simply run `flutter upgrade --force`.
+- Fixed a problem with `cd` error on Windows. Thanks @H2Sxxa!
+- Fixed `pub.dev` package score.
+
 ## 6.6.0
 
 - Now early Rust signals on startup works properly, even if the widgets are not built yet. `rustSignalStream` will remember Rust signals that were received before widgets were built, and give them to the first listener.
