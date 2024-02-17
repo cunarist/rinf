@@ -464,7 +464,7 @@ Future<void> patchServerHeaders() async {
   var serverFileContent = await serverFile.readAsString();
 
   // Check if the server already includes cross-origin HTTP headers.
-  if (serverFileContent.contains('cross-origin-opener-policy')) {
+  if (serverFileContent.contains('Cross-Origin-Opener-Policy')) {
     return;
   }
 
@@ -475,11 +475,11 @@ Future<void> patchServerHeaders() async {
   );
   lines.insert(serverDeclaredIndex + 1, """
 httpServer.defaultResponseHeaders.add(
-  'cross-origin-opener-policy',
+  'Cross-Origin-Opener-Policy',
   'same-origin',
 );
 httpServer.defaultResponseHeaders.add(
-  'cross-origin-embedder-policy',
+  'Cross-Origin-Embedder-Policy',
   'require-corp',
 );""");
   serverFileContent = lines.join("\n");
