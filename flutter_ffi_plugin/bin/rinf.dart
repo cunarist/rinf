@@ -3,7 +3,7 @@ import 'src/helpers.dart';
 import 'src/message.dart';
 
 Future<void> main(List<String> args) async {
-  if (args.length == 0) {
+  if (args.isEmpty) {
     print("No operation is provided.");
     print("Use `rinf --help` to see all available operations.");
     return;
