@@ -5,12 +5,6 @@ pub use fractal::draw_fractal_image;
 
 mod fractal;
 
-// This is just a simple Rust function.
-
-pub fn add_seven(before: i32) -> i32 {
-    before + 7
-}
-
 // `machineid_rs` only supports desktop platforms.
 
 #[cfg(any(target_os = "windows", target_os = "macos", target_os = "linux"))]

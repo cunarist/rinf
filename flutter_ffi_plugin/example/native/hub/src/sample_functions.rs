@@ -4,18 +4,24 @@
 use crate::messages;
 use crate::tokio;
 use rinf::debug_print;
+use tokio::sync::RwLock;
 
+// Disabled when applied as Rinf template.
+const SHOULD_DEMONSTRATE: bool = true;
+
+// Using the `cfg` macro enables conditional statement.
 #[cfg(debug_assertions)]
 const IS_DEBUG_MODE: bool = true;
 #[cfg(not(debug_assertions))]
 const IS_DEBUG_MODE: bool = false;
 
-const SHOULD_DEMONSTRATE: bool = true; // Disabled when applied as template
+// This is one of the best ways to keep a global mutable state in Rust.
+// You can also use `tokio::sync::OnceCell`.
+static VECTOR: RwLock<Vec<bool>> = RwLock::const_new(Vec::new());
 
+// Business logic for the counter widget.
 pub async fn tell_numbers() {
     use messages::counter_number::*;
-
-    let mut current_number = 0;
 
     // Stream getter is generated from a marked Protobuf message.
     let mut receiver = SampleNumberInput::get_dart_signal_receiver();
@@ -26,8 +32,10 @@ pub async fn tell_numbers() {
         let letter = number_input.letter;
         debug_print!("{letter}");
 
-        // Perform a simple calculation.
-        current_number = sample_crate::add_seven(current_number);
+        // Use the global state and perform a simple calculation.
+        let mut vector = VECTOR.write().await;
+        vector.push(true);
+        let current_number = (vector.len() as i32) * 7;
 
         // Method is generated from a marked Protobuf message.
         SampleNumberOutput {
@@ -40,6 +48,7 @@ pub async fn tell_numbers() {
     }
 }
 
+// Business logic for the fractal image.
 pub async fn stream_fractal() {
     use messages::counter_number::*;
     use messages::fractal_art::*;
@@ -95,6 +104,7 @@ pub async fn stream_fractal() {
     });
 }
 
+// Business logic for testing various crates.
 pub async fn run_debug_tests() {
     if !SHOULD_DEMONSTRATE || !IS_DEBUG_MODE {
         return;

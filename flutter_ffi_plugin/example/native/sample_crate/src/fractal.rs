@@ -2,7 +2,7 @@
 //! Copied and modified from
 //! https://github.com/abour/fractal repository.
 
-use image::{self, ImageEncoder};
+use image::ImageEncoder;
 
 const WIDTH: u32 = 384;
 const HEIGHT: u32 = 384;
