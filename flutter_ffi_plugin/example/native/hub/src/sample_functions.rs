@@ -33,9 +33,9 @@ pub async fn tell_numbers() {
         debug_print!("{letter}");
 
         // Use the global state and perform a simple calculation.
-        let mut write_guard = VECTOR.write().await;
-        write_guard.push(true);
-        let current_number = (write_guard.len() as i32) * 7;
+        let mut vector = VECTOR.write().await;
+        vector.push(true);
+        let current_number = (vector.len() as i32) * 7;
 
         // Method is generated from a marked Protobuf message.
         SampleNumberOutput {
