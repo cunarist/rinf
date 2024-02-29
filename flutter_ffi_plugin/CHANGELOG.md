@@ -1,3 +1,8 @@
+## 6.6.2
+
+- Updated `tokio_with_wasm` to a newer version that addresses performance issues with `spawn_blocking`.
+- Added example code that shows how to use global state in `sample_functions.rs` file.
+
 ## 6.6.1
 
 - Added support for some Linux distributions where patching Flutter SDK is not possible.
