@@ -37,7 +37,7 @@ pub async fn tell_numbers() {
         vector.push(true);
         let current_number = (vector.len() as i32) * 7;
 
-        // Method is generated from a marked Protobuf message.
+        // The send method is generated from a marked Protobuf message.
         SampleNumberOutput {
             current_number,
             dummy_one: number_input.dummy_one,
