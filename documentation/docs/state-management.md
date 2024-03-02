@@ -28,8 +28,9 @@ After that, the latest state can be streamed to a Flutter widget to show it on t
 
 ```rust title="Rust"
 pub async fn do_something_with_state() {
+    ...
     MyMessage {
-       someLatestState: vector.len() as i32,
+       some_latest_state: vector.len() as i32,
     }
     .send_signal_to_dart(None);
 }
