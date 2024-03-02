@@ -16,7 +16,7 @@ const IS_DEBUG_MODE: bool = true;
 const IS_DEBUG_MODE: bool = false;
 
 // This is one of the best ways to keep a global mutable state in Rust.
-// You can also use `tokio::sync::OnceCell`.
+// You can also use `tokio::sync::RwLock` or `tokio::sync::OnceCell`.
 static VECTOR: Mutex<Vec<bool>> = Mutex::const_new(Vec::new());
 
 // Business logic for the counter widget.
