@@ -2,7 +2,7 @@
 
 This section is not an introduction to a specific Rinf feature, but rather a general guide about how you can smoothly manage the application state while using Rinf.
 
-Rinf works best when the application logic is entirely written in Rust, while Flutter is only being used for GUI. Given that, there are situations where you want to store the global application state in Rust.
+Rinf works best when the application logic is entirely written in Rust, while Flutter is only being used for GUI. Given that, there are situations where you want to store the application state in Rust.
 
 You can set a simple mutable global state variable like this that only involves constant `new` function call. Note that `tokio::sync::RwLock` can be a better option when there are multiple concurrent readers.
 
@@ -10,6 +10,7 @@ You can set a simple mutable global state variable like this that only involves 
 use rinf::debug_print;
 use tokio::sync::Mutex;
 
+// `Mutex` prevents race conditions between threads.
 static VECTOR: Mutex<Vec<bool>> = Mutex::const_new(Vec::new());
 
 pub async fn do_something_with_state() {
@@ -49,13 +50,14 @@ StreamBuilder(
 ),
 ```
 
-If there's an initialization logic needed for filling in the initial value, you can use the singleton getter pattern just like below. This might be useful when the app involves some IO operations, which means that the initial resource size is not known at compile time.
+If initialization logic is required to fill in the global state, you can use the singleton getter pattern just like below. This might be useful when the app involves some IO operations, which means that the initial resource size is not known at compile time.
 
 ```rust title="Rust"
 use rinf::debug_print;
 use sqlx::{sqlite::SqlitePoolOptions, Pool, Sqlite};
 use tokio::sync::OnceCell;
 
+// `OnceCell` can be assigned a value only once.
 static DB_POOL: OnceCell<Pool<Sqlite>> = OnceCell::const_new();
 
 async fn get_db_pool<'a>() -> &'a Pool<Sqlite> {
