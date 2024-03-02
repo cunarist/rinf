@@ -6,6 +6,7 @@ nav:
   - messaging.md
   - tutorial.md
   - writing-code.md
+  - state-management.md
   - configuration.md
   - frequently-asked-questions.md
   - contribution.md
