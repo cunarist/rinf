@@ -24,7 +24,7 @@ pub async fn do_something_with_state() {
 }
 ```
 
-After that, the latest state can be streamed to a Flutter widget to show it on the screen.
+After that, the latest state can be streamed to a Flutter widget to be shown on the screen.
 
 ```rust title="Rust"
 pub async fn do_something_with_state() {
