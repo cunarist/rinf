@@ -63,3 +63,7 @@ Various comments are written in the actual code to help you understand the whole
 If you already have a Rust crate that you want to use here, just put it inside `./native` and set it as a dependency of the `hub` crate.
 
 Now by heading over to `./native/hub/src/lib.rs`, you can start writing Rust!
+
+!!! info
+
+    Rinf expects that the application's main logic is written in Rust, with Flutter solely serving the purpose of managing the GUI

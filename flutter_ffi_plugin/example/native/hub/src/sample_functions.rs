@@ -4,7 +4,7 @@
 use crate::messages;
 use crate::tokio;
 use rinf::debug_print;
-use tokio::sync::RwLock;
+use tokio::sync::Mutex;
 
 // Disabled when applied as Rinf template.
 const SHOULD_DEMONSTRATE: bool = true;
@@ -16,8 +16,8 @@ const IS_DEBUG_MODE: bool = true;
 const IS_DEBUG_MODE: bool = false;
 
 // This is one of the best ways to keep a global mutable state in Rust.
-// You can also use `tokio::sync::OnceCell`.
-static VECTOR: RwLock<Vec<bool>> = RwLock::const_new(Vec::new());
+// You can also use `tokio::sync::RwLock` or `tokio::sync::OnceCell`.
+static VECTOR: Mutex<Vec<bool>> = Mutex::const_new(Vec::new());
 
 // Business logic for the counter widget.
 pub async fn tell_numbers() {
@@ -33,7 +33,7 @@ pub async fn tell_numbers() {
         debug_print!("{letter}");
 
         // Use the global state and perform a simple calculation.
-        let mut vector = VECTOR.write().await;
+        let mut vector = VECTOR.lock().await;
         vector.push(true);
         let current_number = (vector.len() as i32) * 7;
 
