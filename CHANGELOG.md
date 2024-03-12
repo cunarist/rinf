@@ -1,3 +1,7 @@
+## 6.6.3
+
+- Fixed a linting issue. Thanks @romanseo1!
+
 ## 6.6.2
 
 - Updated `tokio_with_wasm` to a newer version that addresses performance issues with `spawn_blocking`.
