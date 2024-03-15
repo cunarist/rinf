@@ -1,3 +1,7 @@
+## 6.7.0
+
+- Allowed `enum` and `oneof` statements to work in Protobuf message files. Thanks @yeoupooh!
+
 ## 6.6.3
 
 - Fixed a linting issue. Thanks @romanseo1!
