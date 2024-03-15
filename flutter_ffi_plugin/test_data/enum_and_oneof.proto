@@ -16,7 +16,7 @@ message SampleInput {
 }
 
 // [RINF:RUST-SIGNAL]
-message SampleNumberOutput {
+message SampleOutput {
     Kind kind = 1;
     oneof oneof_input { 
         string name = 2;

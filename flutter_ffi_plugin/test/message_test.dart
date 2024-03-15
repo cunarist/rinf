@@ -20,7 +20,7 @@ void main() {
       // Assert
       final file = File('build/test_out/rust/enum_and_oneof.rs');
       final linesToFind = [
-        'impl SampleNumberOutput {',
+        'impl SampleOutput {',
         '    pub fn send_signal_to_dart(&self, blob: Option<Vec<u8>>) {',
       ];
       final fileContents = file.readAsStringSync();
