@@ -19,7 +19,12 @@ pub fn draw_fractal_image(scale: f64) -> Option<Vec<u8>> {
 
     let mut image_data: Vec<u8> = Vec::new();
     let encoder = image::codecs::png::PngEncoder::new(&mut image_data);
-    let result = encoder.write_image(buffer.as_slice(), WIDTH, HEIGHT, image::ColorType::Rgb8);
+    let result = encoder.write_image(
+        buffer.as_slice(),
+        WIDTH,
+        HEIGHT,
+        image::ExtendedColorType::Rgb8,
+    );
 
     match result {
         Ok(_) => Some(image_data),
