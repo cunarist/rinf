@@ -104,6 +104,18 @@ pub async fn stream_fractal() {
     });
 }
 
+// A dummy function that uses sample messages to eliminate warnings.
+#[allow(dead_code)]
+async fn use_messages() {
+    use messages::sample_folder::enum_and_oneof::*;
+    _ = SampleInput::get_dart_signal_receiver();
+    SampleOutput {
+        kind: 3,
+        oneof_input: Some(sample_output::OneofInput::Age(25)),
+    }
+    .send_signal_to_dart(None)
+}
+
 // Business logic for testing various crates.
 pub async fn run_debug_tests() {
     if !SHOULD_DEMONSTRATE || !IS_DEBUG_MODE {
