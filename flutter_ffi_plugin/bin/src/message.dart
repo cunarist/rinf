@@ -650,7 +650,8 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
               messageId += 1;
             }
           }
-        } else if (statement.startsWith("// [RINF:RUST-SIGNAL]")) {
+          // NOTE To find "}\n\n// [RINF:RUST-SIGNAL]", contains used instead of startsWith
+        } else if (statement.contains("// [RINF:RUST-SIGNAL]")) {
           final lines = statement.split('\n');
           for (final line in lines) {
             final trimmed = line.trim();
