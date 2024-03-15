@@ -1,0 +1,25 @@
+syntax = "proto3";
+package enum_and_oneof;
+
+enum Kind {
+  one = 0;
+  two = 1;
+}
+
+// [RINF:DART-SIGNAL]
+message SampleInput {
+  Kind kind = 1;
+  oneof oneof_input {
+    string name = 2;
+    int32 age = 3;
+  }
+}
+
+// [RINF:RUST-SIGNAL]
+message SampleOutput {
+  Kind kind = 1;
+  oneof oneof_input {
+    string name = 2;
+    int32 age = 3;
+  }
+}
