@@ -18,6 +18,7 @@ void main() {
       await generateMessageCode(messageConfig: messageConfig);
 
       // Assert
+      // Verify issue #306
       final file = File('build/test_out/rust/enum_and_oneof.rs');
       final linesToFind = [
         'impl SampleOutput {',
