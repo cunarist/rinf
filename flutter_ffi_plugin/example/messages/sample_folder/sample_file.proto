@@ -1,4 +1,0 @@
-syntax = "proto3";
-package sample_file;
-
-message SampleDummy {}
