@@ -77,14 +77,14 @@ void stopRustLogicExtern() {
 Future<void> sendDartSignalExtern(
   int messageId,
   Uint8List messageBytes,
-  bool blobValid,
-  Uint8List blobBytes,
+  bool binaryIncluded,
+  Uint8List binaryBytes,
 ) async {
   final Pointer<Uint8> messageMemory = malloc.allocate(messageBytes.length);
   messageMemory.asTypedList(messageBytes.length).setAll(0, messageBytes);
 
-  final Pointer<Uint8> blobMemory = malloc.allocate(blobBytes.length);
-  blobMemory.asTypedList(blobBytes.length).setAll(0, blobBytes);
+  final Pointer<Uint8> binaryMemory = malloc.allocate(binaryBytes.length);
+  binaryMemory.asTypedList(binaryBytes.length).setAll(0, binaryBytes);
 
   final rustFunction = rustLibrary.lookupFunction<
       Void Function(
@@ -108,9 +108,9 @@ Future<void> sendDartSignalExtern(
     messageId,
     messageMemory.cast(),
     messageBytes.length,
-    blobValid,
-    blobMemory.cast(),
-    blobBytes.length,
+    binaryIncluded,
+    binaryMemory.cast(),
+    binaryBytes.length,
   );
 
   // Note that we do not free memory here with `malloc.free()`,

@@ -7,8 +7,8 @@ extern "C" {
     pub fn send_rust_signal_extern_raw(
         resource: i32,
         message_bytes: Uint8Array,
-        blob_valid: bool,
-        blob_bytes: Uint8Array,
+        binary_included: bool,
+        binary_bytes: Uint8Array,
     );
 }
 
