@@ -274,7 +274,7 @@ void sendSignalToRust() {
           await insertTextToFile(
             dartPath,
             '''
-void sendSignalToRustWithBinary(Uint8List binary) {
+void sendSignalToRust(Uint8List binary) {
   sendDartSignal(
     ${markedMessage.id},
     this.writeToBuffer(),
@@ -323,7 +323,7 @@ impl ${normalizePascal(messageName)} {
             rustPath,
             '''
 impl ${normalizePascal(messageName)} {
-    pub fn send_signal_to_dart_with_binary(&self, binary: Vec<u8>) {
+    pub fn send_signal_to_dart(&self, binary: Vec<u8>) {
         send_rust_signal(
             ${markedMessage.id},
             self.encode_to_vec(),

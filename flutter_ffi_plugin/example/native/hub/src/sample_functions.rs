@@ -98,7 +98,7 @@ pub async fn stream_fractal() {
                         sample_field_two: false,
                     }),
                 }
-                .send_signal_to_dart_with_binary(fractal_image);
+                .send_signal_to_dart(fractal_image);
             };
         }
     });

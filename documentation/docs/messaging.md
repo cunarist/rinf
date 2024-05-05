@@ -38,7 +38,7 @@ message MyDataInput { ... }
 
 ```dart title="Dart"
 Uint8List binary = Uint8List(64);
-MyDataInput( ... ).sendSignalToRustWithBinary(binary);
+MyDataInput( ... ).sendSignalToRust(binary);
 ```
 
 ```rust title="Rust"
@@ -89,5 +89,5 @@ await for (final rustSignal in stream) {
 
 ```rust title="Rust"
 let binary: Vec<u8> = vec![0; 64];
-MyDataOutput { ... }.send_signal_to_dart_with_binary(binary);
+MyDataOutput { ... }.send_signal_to_dart(binary);
 ```
