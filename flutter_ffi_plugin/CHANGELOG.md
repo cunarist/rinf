@@ -1,3 +1,8 @@
+## 6.8.0
+
+- Now `sendSignalToRust` and `send_signal_to_dart` methods no longer require `null` or `None`, making the API much cleaner. To make them include binary data, write `[RINF:DART-SIGNAL-BINARY]` or `[RINF:RUST-SIGNAL-BINARY]` in Protobuf files.
+- The problem of panicking from null pointers that arise from empty signal data has been fixed.
+
 ## 6.7.0
 
 - Allowed `enum` and `oneof` statements to work in Protobuf message files. Thanks @yeoupooh!
