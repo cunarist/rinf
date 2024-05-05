@@ -44,7 +44,7 @@ pub async fn tell_numbers() {
             dummy_two: number_input.dummy_two,
             dummy_three: number_input.dummy_three,
         }
-        .send_signal_to_dart(None);
+        .send_signal_to_dart();
     }
 }
 
@@ -98,7 +98,7 @@ pub async fn stream_fractal() {
                         sample_field_two: false,
                     }),
                 }
-                .send_signal_to_dart(Some(fractal_image));
+                .send_signal_to_dart(fractal_image);
             };
         }
     });
@@ -113,7 +113,7 @@ async fn use_messages() {
         kind: 3,
         oneof_input: Some(sample_output::OneofInput::Age(25)),
     }
-    .send_signal_to_dart(None)
+    .send_signal_to_dart()
 }
 
 // Business logic for testing various crates.

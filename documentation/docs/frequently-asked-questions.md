@@ -226,7 +226,7 @@ onPressed: () async {
   MyUniqueInput(
     beforeNumber: 3,
     interactionId: currentInteractionId,
-  ).sendSignalToRust(null);
+  ).sendSignalToRust();
   currentInteractionId += 1;
   final myUniqueOutput = await completer.future;
 },
@@ -244,7 +244,7 @@ pub async fn respond() {
             interaction_id: my_unique_input.interaction_id,
             after_number: my_unique_input.before_number + 4,
         }
-        .send_signal_to_dart(None);
+        .send_signal_to_dart();
     }
 }
 ```

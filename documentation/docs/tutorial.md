@@ -50,7 +50,7 @@ child: Column(
         MyPreciousData(
           inputNumbers: [3, 4, 5],
           inputString: 'Zero-cost abstraction',
-        ).sendSignalToRust(null); // GENERATED
+        ).sendSignalToRust(); // GENERATED
       },
       child: Text("Send a Signal from Dart to Rust"),
     ),
@@ -134,7 +134,7 @@ pub async fn stream_amazing_number() {
     let mut current_number: i32 = 1;
     loop {
         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-        MyAmazingNumber { current_number }.send_signal_to_dart(None); // GENERATED
+        MyAmazingNumber { current_number }.send_signal_to_dart(); // GENERATED
         current_number += 1;
     }
 }
@@ -211,7 +211,7 @@ children: [
   ),
   ElevatedButton(
     onPressed: () {
-      MyTreasureInput().sendSignalToRust(null); // GENERATED
+      MyTreasureInput().sendSignalToRust(); // GENERATED
     },
     child: Text('Send the input'),
   ),
@@ -228,7 +228,7 @@ pub async fn tell_treasure() {
     let mut current_value: i32 = 1;
     let mut receiver = MyTreasureInput::get_dart_signal_receiver(); // GENERATED
     while let Some(_) = receiver.recv().await {
-        MyTreasureOutput { current_value }.send_signal_to_dart(None); // GENERATED
+        MyTreasureOutput { current_value }.send_signal_to_dart(); // GENERATED
         current_value += 1;
     }
 }

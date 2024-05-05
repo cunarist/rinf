@@ -73,7 +73,7 @@ class MyHomePage extends StatelessWidget {
                       ),
                     );
                   }
-                  final imageData = rustSignal.blob!;
+                  final imageData = rustSignal.binary;
                   return Container(
                     margin: const EdgeInsets.all(20),
                     width: 256,
@@ -125,7 +125,7 @@ class MyHomePage extends StatelessWidget {
               sampleFieldTwo: false,
             ),
             dummyThree: [4, 5, 6],
-          ).sendSignalToRust(null);
+          ).sendSignalToRust();
         },
         tooltip: 'Increment',
         child: const Icon(Icons.add),

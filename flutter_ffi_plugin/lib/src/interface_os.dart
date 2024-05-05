@@ -26,21 +26,26 @@ Future<void> prepareInterfaceExtern(
 
   // Listen to Rust via isolate port.
   rustSignalPort.listen((rustSignalRaw) {
-    Uint8List? blob;
-    if (rustSignalRaw[2]) {
-      blob = rustSignalRaw[3];
-    } else {
-      blob = null;
+    final messageId = rustSignalRaw[0];
+    var messageBytes = rustSignalRaw[1];
+    var binary = rustSignalRaw[2];
+    if (binary == null) {
+      // Rust will send null if the vector is empty.
+      // Converting is needed on the Dart side.
+      binary = Uint8List(0);
     }
     if (rustSignalRaw[0] == -1) {
       // -1 is a special message ID for Rust reports.
-      String rustReport = utf8.decode(rustSignalRaw[3]);
+      String rustReport = utf8.decode(binary);
       print(rustReport);
       return;
     }
-    final messageId = rustSignalRaw[0];
-    final messageBytes = rustSignalRaw[1];
-    handleRustSignal(messageId, messageBytes, blob);
+    if (messageBytes == null) {
+      // Rust will send null if the vector is empty.
+      // Converting is needed on the Dart side.
+      messageBytes = Uint8List(0);
+    }
+    handleRustSignal(messageId, messageBytes, binary);
   });
 
   // Make Rust prepare its isolate to send data to Dart.
@@ -67,21 +72,19 @@ void stopRustLogicExtern() {
 Future<void> sendDartSignalExtern(
   int messageId,
   Uint8List messageBytes,
-  bool blobValid,
-  Uint8List blobBytes,
+  Uint8List binary,
 ) async {
   final Pointer<Uint8> messageMemory = malloc.allocate(messageBytes.length);
   messageMemory.asTypedList(messageBytes.length).setAll(0, messageBytes);
 
-  final Pointer<Uint8> blobMemory = malloc.allocate(blobBytes.length);
-  blobMemory.asTypedList(blobBytes.length).setAll(0, blobBytes);
+  final Pointer<Uint8> binaryMemory = malloc.allocate(binary.length);
+  binaryMemory.asTypedList(binary.length).setAll(0, binary);
 
   final rustFunction = rustLibrary.lookupFunction<
       Void Function(
         IntPtr,
         Pointer<Uint8>,
         IntPtr,
-        Bool,
         Pointer<Uint8>,
         IntPtr,
       ),
@@ -89,7 +92,6 @@ Future<void> sendDartSignalExtern(
         int,
         Pointer<Uint8>,
         int,
-        bool,
         Pointer<Uint8>,
         int,
       )>('send_dart_signal_extern');
@@ -98,9 +100,8 @@ Future<void> sendDartSignalExtern(
     messageId,
     messageMemory.cast(),
     messageBytes.length,
-    blobValid,
-    blobMemory.cast(),
-    blobBytes.length,
+    binaryMemory.cast(),
+    binary.length,
   );
 
   // Note that we do not free memory here with `malloc.free()`,

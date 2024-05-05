@@ -71,29 +71,20 @@ macro_rules! write_interface {
                 message_id: i64,
                 message_pointer: *const u8,
                 message_size: usize,
-                blob_valid: bool,
-                blob_pointer: *const u8,
-                blob_size: usize,
+                binary_pointer: *const u8,
+                binary_size: usize,
             ) {
                 let message_bytes = unsafe {
                     Vec::from_raw_parts(message_pointer as *mut u8, message_size, message_size)
                 };
-                let blob = if blob_valid {
-                    unsafe {
-                        Some(Vec::from_raw_parts(
-                            blob_pointer as *mut u8,
-                            blob_size,
-                            blob_size,
-                        ))
-                    }
-                } else {
-                    None
+                let binary = unsafe {
+                    Vec::from_raw_parts(binary_pointer as *mut u8, binary_size, binary_size)
                 };
                 let _ = catch_unwind(|| {
                     crate::messages::generated::handle_dart_signal(
                         message_id as i32,
                         message_bytes,
-                        blob,
+                        binary,
                     );
                 });
             }
@@ -123,20 +114,15 @@ macro_rules! write_interface {
             }
 
             #[wasm_bindgen]
-            pub fn send_dart_signal_extern(
-                message_id: i32,
-                message_bytes: &[u8],
-                blob_valid: bool,
-                blob_bytes: &[u8],
-            ) {
+            pub fn send_dart_signal_extern(message_id: i32, message_bytes: &[u8], binary: &[u8]) {
                 let message_bytes = message_bytes.to_vec();
-                let blob = if blob_valid {
-                    Some(blob_bytes.to_vec())
-                } else {
-                    None
-                };
+                let binary = binary.to_vec();
                 let _ = catch_unwind(|| {
-                    crate::messages::generated::handle_dart_signal(message_id, message_bytes, blob);
+                    crate::messages::generated::handle_dart_signal(
+                        message_id,
+                        message_bytes,
+                        binary,
+                    );
                 });
             }
         }
@@ -157,7 +143,7 @@ macro_rules! debug_print {
         rinf::send_rust_signal(
             -1, // This is a special message ID for Rust reports
             Vec::new(),
-            Some(rust_report.into_bytes()),
+            rust_report.into_bytes(),
         );
         #[cfg(not(debug_assertions))]
         let _ = rust_report;

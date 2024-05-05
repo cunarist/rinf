@@ -4,8 +4,10 @@ import 'package:watcher/watcher.dart';
 import 'config.dart';
 
 enum MarkType {
-  fromDart,
-  fromRust,
+  dartSignal,
+  dartSignalBinary,
+  rustSignal,
+  rustSignalBinary,
 }
 
 class MarkedMessage {
@@ -226,22 +228,11 @@ use tokio::sync::mpsc::Sender;
       final markedMessages = entry.value;
       for (final markedMessage in markedMessages) {
         final messageName = markedMessage.name;
+        final markType = markedMessage.markType;
         final camelName = pascalToCamel(messageName);
         final snakeName = pascalToSnake(messageName);
-        if (markedMessage.markType == MarkType.fromDart) {
-          await insertTextToFile(
-            dartPath,
-            '''
-void sendSignalToRust(Uint8List? blob) {
-  sendDartSignal(
-    ${markedMessage.id},
-    this.writeToBuffer(),
-    blob,
-  );
-}
-''',
-            after: "class $messageName extends \$pb.GeneratedMessage {",
-          );
+        if (markType == MarkType.dartSignal ||
+            markType == MarkType.dartSignalBinary) {
           await insertTextToFile(
             rustPath,
             '''
@@ -263,8 +254,39 @@ impl ${normalizePascal(messageName)} {
 }
 ''',
           );
+          if (markType == MarkType.dartSignal) {
+            await insertTextToFile(
+              dartPath,
+              '''
+void sendSignalToRust() {
+  sendDartSignal(
+    ${markedMessage.id},
+    this.writeToBuffer(),
+    Uint8List(0),
+  );
+}
+''',
+              after: "class $messageName extends \$pb.GeneratedMessage {",
+            );
+          }
         }
-        if (markedMessage.markType == MarkType.fromRust) {
+        if (markType == MarkType.dartSignalBinary) {
+          await insertTextToFile(
+            dartPath,
+            '''
+void sendSignalToRust(Uint8List binary) {
+  sendDartSignal(
+    ${markedMessage.id},
+    this.writeToBuffer(),
+    binary,
+  );
+}
+''',
+            after: "class $messageName extends \$pb.GeneratedMessage {",
+          );
+        }
+        if (markType == MarkType.rustSignal ||
+            markType == MarkType.rustSignalBinary) {
           await insertTextToFile(
             dartPath,
             '''
@@ -279,15 +301,33 @@ static Stream<RustSignal<$messageName>> rustSignalStream =
 final ${camelName}Controller = StreamController<RustSignal<$messageName>>();
 ''',
           );
+        }
+        if (markType == MarkType.rustSignal) {
           await insertTextToFile(
             rustPath,
             '''
 impl ${normalizePascal(messageName)} {
-    pub fn send_signal_to_dart(&self, blob: Option<Vec<u8>>) {
+    pub fn send_signal_to_dart(&self) {
         send_rust_signal(
             ${markedMessage.id},
             self.encode_to_vec(),
-            blob
+            Vec::new(),
+        );
+    }
+}
+''',
+          );
+        }
+        if (markType == MarkType.rustSignalBinary) {
+          await insertTextToFile(
+            rustPath,
+            '''
+impl ${normalizePascal(messageName)} {
+    pub fn send_signal_to_dart(&self, binary: Vec<u8>) {
+        send_rust_signal(
+            ${markedMessage.id},
+            self.encode_to_vec(),
+            binary,
         );
     }
 }
@@ -312,18 +352,18 @@ use std::sync::Mutex;
 use std::sync::OnceLock;
 
 type SignalHandlers =
-    OnceLock<Mutex<HashMap<i32, Box<dyn Fn(Vec<u8>, Option<Vec<u8>>) + Send>>>>;
+    OnceLock<Mutex<HashMap<i32, Box<dyn Fn(Vec<u8>, Vec<u8>) + Send>>>>;
 static SIGNAL_HANDLERS: SignalHandlers = OnceLock::new();
 
 pub fn handle_dart_signal(
     message_id: i32,
     message_bytes: Vec<u8>,
-    blob: Option<Vec<u8>>
+    binary: Vec<u8>
 ) {    
     let mutex = SIGNAL_HANDLERS.get_or_init(|| {
         let mut hash_map =
             HashMap
-            ::<i32, Box<dyn Fn(Vec<u8>, Option<Vec<u8>>) + Send + 'static>>
+            ::<i32, Box<dyn Fn(Vec<u8>, Vec<u8>) + Send + 'static>>
             ::new();
 ''';
   for (final entry in markedMessagesAll.entries) {
@@ -333,21 +373,23 @@ pub fn handle_dart_signal(
       final filename = entry.key;
       final markedMessages = entry.value;
       for (final markedMessage in markedMessages) {
-        if (markedMessage.markType == MarkType.fromDart) {
+        final markType = markedMessage.markType;
+        if (markType == MarkType.dartSignal ||
+            markType == MarkType.dartSignalBinary) {
           final messageName = markedMessage.name;
           final snakeName = pascalToSnake(messageName);
           var modulePath = subpath.replaceAll("/", "::");
           rustReceiveScript += '''
 hash_map.insert(
     ${markedMessage.id},
-    Box::new(|message_bytes: Vec<u8>, blob: Option<Vec<u8>>| {
+    Box::new(|message_bytes: Vec<u8>, binary: Vec<u8>| {
         use super$modulePath::$filename::*;
         let message = ${normalizePascal(messageName)}::decode(
             message_bytes.as_slice()
         ).unwrap();
         let dart_signal = DartSignal {
             message,
-            blob,
+            binary,
         };
         let cell = ${snakeName.toUpperCase()}_SENDER
             .get_or_init(|| Mutex::new(RefCell::new(None)))
@@ -371,7 +413,7 @@ hash_map.insert(
 
     let guard = mutex.lock().unwrap();
     let signal_handler = guard.get(&message_id).unwrap();
-    signal_handler(message_bytes, blob);
+    signal_handler(message_bytes, binary);
 }
 ''';
   await File('$rustOutputPath/generated.rs').writeAsString(rustReceiveScript);
@@ -394,7 +436,7 @@ Future<void> finalizeRust() async {
   await Future.delayed(const Duration(milliseconds: 10));
 }
 
-final signalHandlers = <int, void Function(Uint8List, Uint8List?)>{
+final signalHandlers = <int, void Function(Uint8List, Uint8List)>{
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -403,7 +445,9 @@ final signalHandlers = <int, void Function(Uint8List, Uint8List?)>{
       final filename = entry.key;
       final markedMessages = entry.value;
       for (final markedMessage in markedMessages) {
-        if (markedMessage.markType == MarkType.fromRust) {
+        final markType = markedMessage.markType;
+        if (markType == MarkType.rustSignal ||
+            markType == MarkType.rustSignalBinary) {
           final messageName = markedMessage.name;
           final camelName = pascalToCamel(messageName);
           final importPath = '$subpath/$filename.pb.dart';
@@ -414,11 +458,11 @@ import '.$importPath' as $filename;
                 dartReceiveScript;
           }
           dartReceiveScript += '''
-${markedMessage.id}: (Uint8List messageBytes, Uint8List? blob) {
+${markedMessage.id}: (Uint8List messageBytes, Uint8List binary) {
   final message = $filename.$messageName.fromBuffer(messageBytes);
   final rustSignal = RustSignal(
     message,
-    blob,
+    binary,
   );
   $filename.${camelName}Controller.add(rustSignal);
 },
@@ -430,8 +474,8 @@ ${markedMessage.id}: (Uint8List messageBytes, Uint8List? blob) {
   dartReceiveScript += '''
 };
 
-void handleRustSignal(int messageId, Uint8List messageBytes, Uint8List? blob) {
-  signalHandlers[messageId]!(messageBytes, blob);
+void handleRustSignal(int messageId, Uint8List messageBytes, Uint8List binary) {
+  signalHandlers[messageId]!(messageBytes, binary);
 }
 ''';
   await File('$dartOutputPath/generated.dart').writeAsString(dartReceiveScript);
@@ -636,36 +680,40 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
       final statements = contentWithoutBlocks.split(";");
       for (final statementRaw in statements) {
         final statement = statementRaw.trim();
-        if (statement.startsWith("// [RINF:DART-SIGNAL]")) {
-          final lines = statement.split('\n');
-          for (final line in lines) {
-            final trimmed = line.trim();
-            if (trimmed.startsWith("message")) {
-              final messageName = trimmed.replaceFirst("message", "").trim();
-              markedMessages[subpath]![filename]!.add(MarkedMessage(
-                MarkType.fromDart,
-                messageName,
-                messageId,
-              ));
-              messageId += 1;
-            }
-          }
-          // NOTE To find "}\n\n// [RINF:RUST-SIGNAL]", contains used instead of startsWith
-        } else if (statement.contains("// [RINF:RUST-SIGNAL]")) {
-          final lines = statement.split('\n');
-          for (final line in lines) {
-            final trimmed = line.trim();
-            if (trimmed.startsWith("message")) {
-              final messageName = trimmed.replaceFirst("message", "").trim();
-              markedMessages[subpath]![filename]!.add(MarkedMessage(
-                MarkType.fromRust,
-                messageName,
-                messageId,
-              ));
-              messageId += 1;
-            }
+        // To find "}\n\n// [RINF:RUST-SIGNAL]",
+        // `contains` is used instead of `startsWith`
+        String? messageName = null;
+        final lines = statement.split('\n');
+        for (final line in lines) {
+          final trimmed = line.trim();
+          if (trimmed.startsWith("message")) {
+            messageName = trimmed.replaceFirst("message", "").trim();
           }
         }
+        if (messageName == null) {
+          // When the statement is not a message
+          continue;
+        }
+        MarkType? markType = null;
+        if (statement.contains("[RINF:DART-SIGNAL]")) {
+          markType = MarkType.dartSignal;
+        } else if (statement.contains("[RINF:DART-SIGNAL-BINARY]")) {
+          markType = MarkType.dartSignalBinary;
+        } else if (statement.contains("[RINF:RUST-SIGNAL]")) {
+          markType = MarkType.rustSignal;
+        } else if (statement.contains("[RINF:RUST-SIGNAL-BINARY]")) {
+          markType = MarkType.rustSignalBinary;
+        }
+        if (markType == null) {
+          // If there's no mark in the message, just ignore it
+          continue;
+        }
+        markedMessages[subpath]![filename]!.add(MarkedMessage(
+          markType,
+          messageName,
+          messageId,
+        ));
+        messageId += 1;
       }
     }
   }
