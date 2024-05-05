@@ -26,7 +26,9 @@ Future<void> prepareInterfaceExtern(
 
   // Listen to Rust via isolate port.
   rustSignalPort.listen((rustSignalRaw) {
-    Uint8List? binary = rustSignalRaw[2];
+    final messageId = rustSignalRaw[0];
+    var messageBytes = rustSignalRaw[1];
+    var binary = rustSignalRaw[2];
     if (binary == null) {
       // Rust will send null if the vector is empty.
       // Converting is needed on the Dart side.
@@ -38,8 +40,6 @@ Future<void> prepareInterfaceExtern(
       print(rustReport);
       return;
     }
-    final messageId = rustSignalRaw[0];
-    var messageBytes = rustSignalRaw[1];
     if (messageBytes == null) {
       // Rust will send null if the vector is empty.
       // Converting is needed on the Dart side.
