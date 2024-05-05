@@ -283,11 +283,18 @@ final ${camelName}Controller = StreamController<RustSignal<$messageName>>();
             rustPath,
             '''
 impl ${normalizePascal(messageName)} {
-    pub fn send_signal_to_dart(&self, blob: Option<Vec<u8>>) {
+    pub fn send_signal_to_dart(&self) {
         send_rust_signal(
             ${markedMessage.id},
             self.encode_to_vec(),
-            blob
+            None,
+        );
+    }
+    pub fn send_signal_to_dart_with_binary(&self, binary: Vec<u8>) {
+        send_rust_signal(
+            ${markedMessage.id},
+            self.encode_to_vec(),
+            Some(binary),
         );
     }
 }

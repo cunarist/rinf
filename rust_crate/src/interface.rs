@@ -20,11 +20,11 @@ pub struct DartSignal<T> {
 }
 
 /// Send a signal to Dart.
-pub fn send_rust_signal(message_id: i32, message_bytes: Vec<u8>, blob: Option<Vec<u8>>) {
+pub fn send_rust_signal(message_id: i32, message_bytes: Vec<u8>, binary: Option<Vec<u8>>) {
     send_rust_signal_extern(
         message_id,
         message_bytes,
-        blob.is_some(),
-        blob.unwrap_or_default(),
+        binary.is_some(),
+        binary.unwrap_or_default(),
     );
 }
