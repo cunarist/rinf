@@ -37,7 +37,7 @@ message MyDataInput { ... }
 ```
 
 ```dart title="Dart"
-Uint8List binary = Uint8List(64);
+final binary = Uint8List(64);
 MyDataInput( ... ).sendSignalToRust(binary);
 ```
 
@@ -45,7 +45,7 @@ MyDataInput( ... ).sendSignalToRust(binary);
 let mut receiver = MyDataInput::get_dart_signal_receiver();
 while let Some(dart_signal) = receiver.recv().await {
     let message: MyDataInput = dart_signal.message;
-    let binary: Vec<u8> = dart_signal.binary.unwrap();
+    let binary: Vec<u8> = dart_signal.binary;
     // Custom Rust logic here
 }
 ```
@@ -82,7 +82,7 @@ message MyDataOutput { ... }
 final stream = MyDataOutput.rustSignalStream;
 await for (final rustSignal in stream) {
     MyDataOutput message = rustSignal.message;
-    Uint8List binary = rustSignal.binary!;
+    Uint8List binary = rustSignal.binary;
     // Custom Dart logic here
 }
 ```
