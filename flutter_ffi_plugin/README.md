@@ -36,7 +36,7 @@ MySchemaInput(
   fieldOne: 1,
   fieldTwo: 2,
   fieldThree: 3,
-).sendSignalToRust(null)
+).sendSignalToRust()
 
 final stream = MySchemaOutput.rustSignalStream;
 await for (final rustSignal in stream) {
@@ -49,7 +49,7 @@ MySchemaOutput {
     field_four: 4,
     field_five: 5,
     field_six: 6,
-}.send_signal_to_dart(None)
+}.send_signal_to_dart()
 
 let mut receiver = MySchemaInput::get_dart_signal_receiver();
 while let Some(dart_signal) = receiver.recv().await {

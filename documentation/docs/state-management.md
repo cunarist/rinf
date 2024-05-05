@@ -32,7 +32,7 @@ pub async fn do_something_with_state() {
     MyMessage {
        some_latest_state: vector.len() as i32,
     }
-    .send_signal_to_dart(None);
+    .send_signal_to_dart();
 }
 ```
 
