@@ -125,7 +125,7 @@ class MyHomePage extends StatelessWidget {
               sampleFieldTwo: false,
             ),
             dummyThree: [4, 5, 6],
-          ).sendSignalToRust(null);
+          ).sendSignalToRust();
         },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
