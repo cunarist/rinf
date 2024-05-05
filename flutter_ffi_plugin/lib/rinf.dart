@@ -31,21 +31,11 @@ void stopRustLogic() async {
 void sendDartSignal(
   int messageId,
   Uint8List messageBytes,
-  Uint8List? binary,
+  Uint8List binary,
 ) async {
-  bool binaryIncluded;
-  Uint8List binaryBytes;
-  if (binary == null) {
-    binaryIncluded = false;
-    binaryBytes = Uint8List(0);
-  } else {
-    binaryIncluded = true;
-    binaryBytes = binary;
-  }
   sendDartSignalExtern(
     messageId,
     messageBytes,
-    binaryIncluded,
-    binaryBytes,
+    binary,
   );
 }

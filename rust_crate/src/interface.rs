@@ -16,15 +16,10 @@ pub type SharedCell<T> = OnceLock<Mutex<RefCell<Option<T>>>>;
 /// can be of any type declared in Protobuf.
 pub struct DartSignal<T> {
     pub message: T,
-    pub binary: Option<Vec<u8>>,
+    pub binary: Vec<u8>,
 }
 
 /// Send a signal to Dart.
-pub fn send_rust_signal(message_id: i32, message_bytes: Vec<u8>, binary: Option<Vec<u8>>) {
-    send_rust_signal_extern(
-        message_id,
-        message_bytes,
-        binary.is_some(),
-        binary.unwrap_or_default(),
-    );
+pub fn send_rust_signal(message_id: i32, message_bytes: Vec<u8>, binary: Vec<u8>) {
+    send_rust_signal_extern(message_id, message_bytes, binary);
 }

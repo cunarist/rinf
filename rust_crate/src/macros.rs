@@ -71,23 +71,14 @@ macro_rules! write_interface {
                 message_id: i64,
                 message_pointer: *const u8,
                 message_size: usize,
-                binary_included: bool,
                 binary_pointer: *const u8,
                 binary_size: usize,
             ) {
                 let message_bytes = unsafe {
                     Vec::from_raw_parts(message_pointer as *mut u8, message_size, message_size)
                 };
-                let binary = if binary_included {
-                    unsafe {
-                        Some(Vec::from_raw_parts(
-                            binary_pointer as *mut u8,
-                            binary_size,
-                            binary_size,
-                        ))
-                    }
-                } else {
-                    None
+                let binary = unsafe {
+                    Vec::from_raw_parts(binary_pointer as *mut u8, binary_size, binary_size)
                 };
                 let _ = catch_unwind(|| {
                     crate::messages::generated::handle_dart_signal(
@@ -123,18 +114,9 @@ macro_rules! write_interface {
             }
 
             #[wasm_bindgen]
-            pub fn send_dart_signal_extern(
-                message_id: i32,
-                message_bytes: &[u8],
-                binary_included: bool,
-                binary_bytes: &[u8],
-            ) {
+            pub fn send_dart_signal_extern(message_id: i32, message_bytes: &[u8], binary: &[u8]) {
                 let message_bytes = message_bytes.to_vec();
-                let binary = if binary_included {
-                    Some(binary_bytes.to_vec())
-                } else {
-                    None
-                };
+                let binary = binary.to_vec();
                 let _ = catch_unwind(|| {
                     crate::messages::generated::handle_dart_signal(
                         message_id,
@@ -161,7 +143,7 @@ macro_rules! debug_print {
         rinf::send_rust_signal(
             -1, // This is a special message ID for Rust reports
             Vec::new(),
-            Some(rust_report.into_bytes()),
+            rust_report.into_bytes(),
         );
         #[cfg(not(debug_assertions))]
         let _ = rust_report;

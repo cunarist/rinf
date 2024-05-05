@@ -26,20 +26,15 @@ Future<void> prepareInterfaceExtern(
 
   // Listen to Rust via isolate port.
   rustSignalPort.listen((rustSignalRaw) {
-    Uint8List? binary;
-    if (rustSignalRaw[2]) {
-      binary = rustSignalRaw[3];
-      if (binary == null) {
-        // Rust will send null if the vector is empty.
-        // Converting is needed on the Dart side.
-        binary = Uint8List(0);
-      }
-    } else {
-      binary = null;
+    Uint8List? binary = rustSignalRaw[2];
+    if (binary == null) {
+      // Rust will send null if the vector is empty.
+      // Converting is needed on the Dart side.
+      binary = Uint8List(0);
     }
     if (rustSignalRaw[0] == -1) {
       // -1 is a special message ID for Rust reports.
-      String rustReport = utf8.decode(rustSignalRaw[3]);
+      String rustReport = utf8.decode(binary);
       print(rustReport);
       return;
     }
@@ -77,21 +72,19 @@ void stopRustLogicExtern() {
 Future<void> sendDartSignalExtern(
   int messageId,
   Uint8List messageBytes,
-  bool binaryIncluded,
-  Uint8List binaryBytes,
+  Uint8List binary,
 ) async {
   final Pointer<Uint8> messageMemory = malloc.allocate(messageBytes.length);
   messageMemory.asTypedList(messageBytes.length).setAll(0, messageBytes);
 
-  final Pointer<Uint8> binaryMemory = malloc.allocate(binaryBytes.length);
-  binaryMemory.asTypedList(binaryBytes.length).setAll(0, binaryBytes);
+  final Pointer<Uint8> binaryMemory = malloc.allocate(binary.length);
+  binaryMemory.asTypedList(binary.length).setAll(0, binary);
 
   final rustFunction = rustLibrary.lookupFunction<
       Void Function(
         IntPtr,
         Pointer<Uint8>,
         IntPtr,
-        Bool,
         Pointer<Uint8>,
         IntPtr,
       ),
@@ -99,7 +92,6 @@ Future<void> sendDartSignalExtern(
         int,
         Pointer<Uint8>,
         int,
-        bool,
         Pointer<Uint8>,
         int,
       )>('send_dart_signal_extern');
@@ -108,9 +100,8 @@ Future<void> sendDartSignalExtern(
     messageId,
     messageMemory.cast(),
     messageBytes.length,
-    binaryIncluded,
     binaryMemory.cast(),
-    binaryBytes.length,
+    binary.length,
   );
 
   // Note that we do not free memory here with `malloc.free()`,

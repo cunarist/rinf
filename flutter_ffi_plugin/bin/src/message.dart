@@ -262,7 +262,7 @@ void sendSignalToRust() {
   sendDartSignal(
     ${markedMessage.id},
     this.writeToBuffer(),
-    null,
+    Uint8List(0),
   );
 }
 ''',
@@ -311,7 +311,7 @@ impl ${normalizePascal(messageName)} {
         send_rust_signal(
             ${markedMessage.id},
             self.encode_to_vec(),
-            None,
+            Vec::new(),
         );
     }
 }
@@ -327,7 +327,7 @@ impl ${normalizePascal(messageName)} {
         send_rust_signal(
             ${markedMessage.id},
             self.encode_to_vec(),
-            Some(binary),
+            binary,
         );
     }
 }
@@ -352,18 +352,18 @@ use std::sync::Mutex;
 use std::sync::OnceLock;
 
 type SignalHandlers =
-    OnceLock<Mutex<HashMap<i32, Box<dyn Fn(Vec<u8>, Option<Vec<u8>>) + Send>>>>;
+    OnceLock<Mutex<HashMap<i32, Box<dyn Fn(Vec<u8>, Vec<u8>) + Send>>>>;
 static SIGNAL_HANDLERS: SignalHandlers = OnceLock::new();
 
 pub fn handle_dart_signal(
     message_id: i32,
     message_bytes: Vec<u8>,
-    binary: Option<Vec<u8>>
+    binary: Vec<u8>
 ) {    
     let mutex = SIGNAL_HANDLERS.get_or_init(|| {
         let mut hash_map =
             HashMap
-            ::<i32, Box<dyn Fn(Vec<u8>, Option<Vec<u8>>) + Send + 'static>>
+            ::<i32, Box<dyn Fn(Vec<u8>, Vec<u8>) + Send + 'static>>
             ::new();
 ''';
   for (final entry in markedMessagesAll.entries) {
@@ -382,7 +382,7 @@ pub fn handle_dart_signal(
           rustReceiveScript += '''
 hash_map.insert(
     ${markedMessage.id},
-    Box::new(|message_bytes: Vec<u8>, binary: Option<Vec<u8>>| {
+    Box::new(|message_bytes: Vec<u8>, binary: Vec<u8>| {
         use super$modulePath::$filename::*;
         let message = ${normalizePascal(messageName)}::decode(
             message_bytes.as_slice()
@@ -436,7 +436,7 @@ Future<void> finalizeRust() async {
   await Future.delayed(const Duration(milliseconds: 10));
 }
 
-final signalHandlers = <int, void Function(Uint8List, Uint8List?)>{
+final signalHandlers = <int, void Function(Uint8List, Uint8List)>{
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -458,7 +458,7 @@ import '.$importPath' as $filename;
                 dartReceiveScript;
           }
           dartReceiveScript += '''
-${markedMessage.id}: (Uint8List messageBytes, Uint8List? binary) {
+${markedMessage.id}: (Uint8List messageBytes, Uint8List binary) {
   final message = $filename.$messageName.fromBuffer(messageBytes);
   final rustSignal = RustSignal(
     message,
@@ -474,7 +474,7 @@ ${markedMessage.id}: (Uint8List messageBytes, Uint8List? binary) {
   dartReceiveScript += '''
 };
 
-void handleRustSignal(int messageId, Uint8List messageBytes, Uint8List? binary) {
+void handleRustSignal(int messageId, Uint8List messageBytes, Uint8List binary) {
   signalHandlers[messageId]!(messageBytes, binary);
 }
 ''';

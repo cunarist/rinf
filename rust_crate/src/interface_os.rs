@@ -21,12 +21,7 @@ pub extern "C" fn prepare_isolate_extern(port: i64) {
     });
 }
 
-pub fn send_rust_signal_extern(
-    message_id: i32,
-    message_bytes: Vec<u8>,
-    binary_included: bool,
-    binary_bytes: Vec<u8>,
-) {
+pub fn send_rust_signal_extern(message_id: i32, message_bytes: Vec<u8>, binary: Vec<u8>) {
     let cell = DART_ISOLATE.get().unwrap().lock().unwrap();
     let dart_isolate = cell.borrow().unwrap();
 
@@ -34,7 +29,7 @@ pub fn send_rust_signal_extern(
     // because panic can occur from null pointers.
     // Instead, we will reconstruct the empty vector from the Dart side.
     let message_filled = !message_bytes.is_empty();
-    let binary_filled = !binary_bytes.is_empty();
+    let binary_filled = !binary.is_empty();
 
     dart_isolate.post(
         vec![
@@ -44,9 +39,8 @@ pub fn send_rust_signal_extern(
             } else {
                 ().into_dart()
             },
-            binary_included.into_dart(),
             if binary_filled {
-                ZeroCopyBuffer(binary_bytes).into_dart()
+                ZeroCopyBuffer(binary).into_dart()
             } else {
                 ().into_dart()
             },

@@ -17,20 +17,13 @@ Future<void> prepareInterfaceExtern(
   jsObject['send_rust_signal_extern'] = (
     int messageId,
     Uint8List messageBytes,
-    bool binaryIncluded,
-    Uint8List binaryBytes,
+    Uint8List binary,
   ) {
     if (messageId == -1) {
       // -1 is a special message ID for Rust reports.
-      String rustReport = utf8.decode(binaryBytes);
+      String rustReport = utf8.decode(binary);
       print(rustReport);
       return;
-    }
-    Uint8List? binary;
-    if (binaryIncluded) {
-      binary = binaryBytes;
-    } else {
-      binary = null;
     }
     handleRustSignal(messageId, messageBytes, binary);
   };
@@ -51,14 +44,12 @@ void stopRustLogicExtern() {
 void sendDartSignalExtern(
   int messageId,
   Uint8List messageBytes,
-  bool binaryIncluded,
-  Uint8List binaryBytes,
+  Uint8List binary,
 ) {
   final jsObject = js.context['rinf'] as js.JsObject;
   jsObject.callMethod('send_dart_signal_extern', [
     messageId,
     messageBytes,
-    binaryIncluded,
-    binaryBytes,
+    binary,
   ]);
 }

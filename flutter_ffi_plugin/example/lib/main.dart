@@ -73,7 +73,7 @@ class MyHomePage extends StatelessWidget {
                       ),
                     );
                   }
-                  final imageData = rustSignal.binary!;
+                  final imageData = rustSignal.binary;
                   return Container(
                     margin: const EdgeInsets.all(20),
                     width: 256,
