@@ -1,8 +1,9 @@
 import 'dart:io';
 import 'package:package_config/package_config.dart';
+import 'package:yaml/yaml.dart';
 import 'config.dart';
 import 'message.dart';
-import 'package:yaml/yaml.dart';
+import 'common.dart';
 
 /// Creates new folders and files to an existing Flutter project folder.
 Future<void> applyRustTemplate({
@@ -24,7 +25,7 @@ Future<void> applyRustTemplate({
 
   // Check if current folder is a Flutter app project.
   final specFile = File(
-    flutterProjectPath.resolve("/pubspec.yaml").toFilePath(),
+    flutterProjectPath.join("pubspec.yaml").toFilePath(),
   );
   final isFlutterProject = await specFile.exists();
   if (!isFlutterProject) {
@@ -39,11 +40,11 @@ Future<void> applyRustTemplate({
   }
 
   // Copy basic folders needed for Rust to work
-  final templateSource = packagePath.resolve("/example/native");
-  final templateDestination = flutterProjectPath.resolve("/native");
+  final templateSource = packagePath.join("example/native/");
+  final templateDestination = flutterProjectPath.join("native/");
   await copyDirectory(templateSource, templateDestination);
-  final messagesSource = packagePath.resolve("example/messages");
-  final messagesDestination = flutterProjectPath.resolve("/messages");
+  final messagesSource = packagePath.join("example/messages/");
+  final messagesDestination = flutterProjectPath.join("messages/");
   await copyDirectory(messagesSource, messagesDestination);
 
   // Create workspace `Cargo.toml`
@@ -58,15 +59,13 @@ members = ["./native/*"]
 resolver = "2"
 ''';
   final cargoFile = File(
-    flutterProjectPath.resolve('Cargo.toml').toFilePath(),
+    flutterProjectPath.join('Cargo.toml').toFilePath(),
   );
   await cargoFile.writeAsString(cargoText);
 
   // Disable demonstrations in sample functions
   final sampleFunctionsFile = File(
-    flutterProjectPath
-        .resolve('native/hub/src/sample_functions.rs')
-        .toFilePath(),
+    flutterProjectPath.join('native/hub/src/sample_functions.rs').toFilePath(),
   );
   var sampleFunctionsContent = await sampleFunctionsFile.readAsString();
   sampleFunctionsContent = sampleFunctionsContent.replaceAll(
@@ -79,7 +78,7 @@ resolver = "2"
   final rustSectionTitle = '# Rust related';
   final messageSectionTitle = '# Generated messages';
   final gitignoreFile = File(
-    flutterProjectPath.resolve('.gitignore').toFilePath(),
+    flutterProjectPath.join('.gitignore').toFilePath(),
   );
   if (!(await gitignoreFile.exists())) {
     await gitignoreFile.create(recursive: true);
@@ -103,7 +102,7 @@ resolver = "2"
   // Add some guides to `README.md`
   final guideSectionTitle = '## Using Rust Inside Flutter';
   final readmeFile = File(
-    flutterProjectPath.resolve('README.md').toFilePath(),
+    flutterProjectPath.join('README.md').toFilePath(),
   );
   if (!(await readmeFile.exists())) {
     await readmeFile.create(recursive: true);
@@ -164,7 +163,7 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
 
   // Modify `./lib/main.dart`
   final mainFile = File(
-    flutterProjectPath.resolve("/lib/main.dart").toFilePath(),
+    flutterProjectPath.join("lib/main.dart").toFilePath(),
   );
   if (await mainFile.exists()) {
     await Process.run('dart', ['format', './lib/main.dart']);
@@ -200,20 +199,19 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
 }
 
 Future<void> copyDirectory(Uri source, Uri destination) async {
-  final sourceDir = Directory(source.path);
-  final destDir = Directory(destination.path);
-  await destDir.create(recursive: true);
-  await for (final entity in sourceDir.list(recursive: false)) {
+  final sourceDir = Directory(source.toFilePath());
+  await Directory(destination.toFilePath()).create(recursive: true);
+  await for (final entity in sourceDir.list()) {
     final entityName = entity.path.split(Platform.pathSeparator).last;
     if (entity is Directory) {
       final newDirectory = Directory(
-        destination.resolve(entityName).toFilePath(),
+        destination.join('$entityName/').toFilePath(),
       );
       await newDirectory.create();
       await copyDirectory(entity.uri, newDirectory.uri);
     } else if (entity is File) {
       await entity.copy(
-        destination.resolve(entityName).toFilePath(),
+        destination.join(entityName).toFilePath(),
       );
     }
   }
@@ -258,8 +256,8 @@ Future<void> buildWebassembly({bool isReleaseMode = false}) async {
 
   // Prepare the webassembly output path.
   final flutterProjectPath = Directory.current;
-  final subPath = './web/pkg';
-  final outputPath = flutterProjectPath.uri.resolve(subPath);
+  final subPath = 'web/pkg/';
+  final outputPath = flutterProjectPath.uri.join(subPath);
 
   // Build the webassembly module.
   print("Compiling Rust with `wasm-pack` to `web` target...");
