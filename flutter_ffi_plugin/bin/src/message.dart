@@ -529,24 +529,26 @@ void handleRustSignal(int messageId, Uint8List messageBytes, Uint8List binary) {
 }
 
 Future<void> patchServerHeaders() async {
-  // Get the Flutter SDK's path.
-  String flutterPath;
+  // Get the Flutter executable's path.
+  final Uri rawPath;
   if (Platform.isWindows) {
     // Windows
-    final whereFlutterResult = await Process.run('where', ['flutter']);
-    flutterPath = (whereFlutterResult.stdout as String).split('\n').first;
+    final output = await Process.run('where', ['flutter']);
+    rawPath = Uri.file((output.stdout as String).split('\n').first.trim());
   } else {
     // macOS and Linux
-    final whichFlutterResult = await Process.run('which', ['flutter']);
-    flutterPath = whichFlutterResult.stdout as String;
+    final output = await Process.run('which', ['flutter']);
+    rawPath = Uri.file((output.stdout as String).trim());
   }
-  flutterPath = flutterPath.trim();
-  flutterPath = await File(flutterPath).resolveSymbolicLinks();
-  flutterPath = File(flutterPath).parent.parent.path;
+  final flutterFilePath = Uri.file(
+    await File.fromUri(rawPath).resolveSymbolicLinks(),
+  );
+  final flutterPath = File.fromUri(flutterFilePath).parent.parent.uri;
 
   // Get the server module file's path.
-  final serverFile = File(
-      '$flutterPath/packages/flutter_tools/lib/src/isolated/devfs_web.dart');
+  final serverFile = File.fromUri(
+    flutterPath.join('packages/flutter_tools/lib/src/isolated/devfs_web.dart'),
+  );
   var serverFileContent = await serverFile.readAsString();
 
   // Check if the server already includes cross-origin HTTP headers.
@@ -572,9 +574,11 @@ httpServer.defaultResponseHeaders.add(
   await serverFile.writeAsString(serverFileContent);
 
   // Remove the stamp file to make it re-generated.
-  final flutterToolsStampPath = '$flutterPath/bin/cache/flutter_tools.stamp';
-  if (await File(flutterToolsStampPath).exists()) {
-    await File(flutterToolsStampPath).delete();
+  final flutterToolsStampPath = flutterPath.join(
+    'bin/cache/flutter_tools.stamp',
+  );
+  if (await File.fromUri(flutterToolsStampPath).exists()) {
+    await File.fromUri(flutterToolsStampPath).delete();
   }
 }
 
