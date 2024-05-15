@@ -5,9 +5,9 @@ You can customize some Rinf behaviors by configuring the `pubspec.yaml` file. Ri
 ```yaml title="pubspec.yaml"
 rinf:
   message:
-    input_dir: messages
-    rust_output_dir: native/hub/src/messages
-    dart_output_dir: lib/messages
+    input_dir: messages/
+    rust_output_dir: native/hub/src/messages/
+    dart_output_dir: lib/messages/
 ```
 
 You can check the current configuration status by running the command below in the CLI.

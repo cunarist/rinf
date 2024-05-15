@@ -48,9 +48,9 @@ class RinfConfigMessage {
   static const KEY_RUST_OUTPUT_DIR = "rust_output_dir";
   static const KEY_DART_OUTPUT_DIR = "dart_output_dir";
 
-  static const DEFAULT_INPUT_DIR = "messages";
-  static const DEFAULT_RUST_OUTPUT_DIR = "native/hub/src/messages";
-  static const DEFAULT_DART_OUTPUT_DIR = "lib/messages";
+  static const DEFAULT_INPUT_DIR = "messages/";
+  static const DEFAULT_RUST_OUTPUT_DIR = "native/hub/src/messages/";
+  static const DEFAULT_DART_OUTPUT_DIR = "lib/messages/";
 
   static const MESSAGE_CONFIG_KEYS = [
     KEY_INPUT_DIR,

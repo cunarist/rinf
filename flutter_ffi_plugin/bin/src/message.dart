@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:watcher/watcher.dart';
 import 'config.dart';
+import 'common.dart';
 
 enum MarkType {
   dartSignal,
@@ -27,22 +28,21 @@ Future<void> generateMessageCode({
 }) async {
   // Prepare paths.
   final flutterProjectPath = Directory.current;
-  final protoPath =
-      flutterProjectPath.uri.resolve(messageConfig.inputDir).toFilePath();
+  final protoPath = flutterProjectPath.uri.join(messageConfig.inputDir);
   final rustOutputPath =
-      flutterProjectPath.uri.resolve(messageConfig.rustOutputDir).toFilePath();
+      flutterProjectPath.uri.join(messageConfig.rustOutputDir);
   final dartOutputPath =
-      flutterProjectPath.uri.resolve(messageConfig.dartOutputDir).toFilePath();
-  await Directory(rustOutputPath).create(recursive: true);
+      flutterProjectPath.uri.join(messageConfig.dartOutputDir);
+  await Directory.fromUri(rustOutputPath).create(recursive: true);
   await emptyDirectory(rustOutputPath);
-  await Directory(dartOutputPath).create(recursive: true);
+  await Directory.fromUri(dartOutputPath).create(recursive: true);
   await emptyDirectory(dartOutputPath);
 
   // Get the list of `.proto` files.
   final resourcesInFolders = <String, List<String>>{};
   await collectProtoFiles(
-    Directory(protoPath),
-    Directory(protoPath),
+    Directory.fromUri(protoPath),
+    Directory.fromUri(protoPath),
     resourcesInFolders,
   );
 
@@ -54,7 +54,9 @@ Future<void> generateMessageCode({
     final subPath = entry.key;
     final resourceNames = entry.value;
     for (final resourceName in resourceNames) {
-      final protoFile = File('$protoPath$subPath/$resourceName.proto');
+      final protoFile = File.fromUri(
+        protoPath.join(subPath).join('$resourceName.proto'),
+      );
       final lines = await protoFile.readAsLines();
       List<String> outputLines = [];
       for (var line in lines) {
@@ -89,17 +91,20 @@ Future<void> generateMessageCode({
   for (final entry in resourcesInFolders.entries) {
     final subPath = entry.key;
     final resourceNames = entry.value;
-    await Directory('$rustOutputPath$subPath').create(recursive: true);
+    await Directory.fromUri(rustOutputPath.join(subPath))
+        .create(recursive: true);
     if (resourceNames.isEmpty) {
       continue;
     }
     final protoPaths = <String>[];
     for (final key in resourcesInFolders.keys) {
-      protoPaths.add('--proto_path=$protoPath$key');
+      final joinedPath = protoPath.join(key).toFilePath();
+      protoPaths.add('--proto_path=$joinedPath');
     }
+    final rustFullPath = rustOutputPath.join(subPath).toFilePath();
     final protocRustResult = await Process.run('protoc', [
       ...protoPaths,
-      '--prost_out=$rustOutputPath$subPath',
+      '--prost_out=$rustFullPath',
       ...resourceNames.map((name) => '$name.proto'),
     ]);
     if (protocRustResult.exitCode != 0) {
@@ -117,18 +122,43 @@ Future<void> generateMessageCode({
     }).toList();
     for (final otherSubPath in resourcesInFolders.keys) {
       if (otherSubPath != subPath && otherSubPath.contains(subPath)) {
-        final relation =
-            otherSubPath.replaceFirst(subPath, "").replaceFirst('/', '');
-        if (!relation.contains('/')) {
-          modRsLines.add('pub mod $relation;');
+        final subPathSplitted = subPath
+            .trim()
+            .split("/")
+            .where(
+              (element) => element.isNotEmpty,
+            )
+            .toList();
+        final otherSubPathSplitted = otherSubPath
+            .split("/")
+            .where(
+              (element) => element.isNotEmpty,
+            )
+            .toList();
+        ;
+        if (subPathSplitted.length != otherSubPathSplitted.length - 1) {
+          continue;
         }
+        var isOtherChild = true;
+        for (int i = 0; i < subPathSplitted.length; i++) {
+          if (subPathSplitted[i] != subPathSplitted[i]) {
+            isOtherChild = false;
+            break;
+          }
+        }
+        if (!isOtherChild) {
+          continue;
+        }
+        final childName = otherSubPathSplitted.last;
+        modRsLines.add('pub mod $childName;');
       }
     }
-    if (subPath == "") {
+    if (subPath == "/") {
       modRsLines.add("pub mod generated;");
     }
     final modRsContent = modRsLines.join('\n');
-    await File('$rustOutputPath$subPath/mod.rs').writeAsString(modRsContent);
+    await File.fromUri(rustOutputPath.join(subPath).join('mod.rs'))
+        .writeAsString(modRsContent);
   }
 
   // Generate Dart message files.
@@ -149,19 +179,22 @@ Future<void> generateMessageCode({
   for (final entry in resourcesInFolders.entries) {
     final subPath = entry.key;
     final resourceNames = entry.value;
-    await Directory('$dartOutputPath$subPath').create(recursive: true);
+    await Directory.fromUri(dartOutputPath.join(subPath))
+        .create(recursive: true);
     if (resourceNames.isEmpty) {
       continue;
     }
     final protoPaths = <String>[];
     for (final key in resourcesInFolders.keys) {
-      protoPaths.add('--proto_path=$protoPath$key');
+      final joinedPath = protoPath.join(key).toFilePath();
+      protoPaths.add('--proto_path=$joinedPath');
     }
+    final dartFullPath = dartOutputPath.join(subPath).toFilePath();
     final protocDartResult = await Process.run(
       'protoc',
       [
         ...protoPaths,
-        '--dart_out=$dartOutputPath$subPath',
+        '--dart_out=$dartFullPath',
         ...resourceNames.map((name) => '$name.proto'),
       ],
     );
@@ -186,11 +219,11 @@ Future<void> generateMessageCode({
         continue;
       }
       final filename = entry.key;
-      final dartPath = '$dartOutputPath$subPath/$filename.pb.dart';
-      final dartFile = File(dartPath);
+      final dartPath = dartOutputPath.join(subPath).join('$filename.pb.dart');
+      final dartFile = File.fromUri(dartPath);
       final dartContent = await dartFile.readAsString();
-      final rustPath = '$rustOutputPath$subPath/$filename.rs';
-      final rustFile = File(rustPath);
+      final rustPath = rustOutputPath.join(subPath).join('$filename.rs');
+      final rustFile = File.fromUri(rustPath);
       final rustContent = await rustFile.readAsString();
       if (!dartContent.contains("import 'dart:typed_data'")) {
         await insertTextToFile(
@@ -379,11 +412,12 @@ pub fn handle_dart_signal(
           final messageName = markedMessage.name;
           final snakeName = pascalToSnake(messageName);
           var modulePath = subpath.replaceAll("/", "::");
+          modulePath = modulePath == "::" ? "" : modulePath;
           rustReceiveScript += '''
 hash_map.insert(
     ${markedMessage.id},
     Box::new(|message_bytes: Vec<u8>, binary: Vec<u8>| {
-        use super$modulePath::$filename::*;
+        use super::$modulePath$filename::*;
         let message = ${normalizePascal(messageName)}::decode(
             message_bytes.as_slice()
         ).unwrap();
@@ -416,7 +450,8 @@ hash_map.insert(
     signal_handler(message_bytes, binary);
 }
 ''';
-  await File('$rustOutputPath/generated.rs').writeAsString(rustReceiveScript);
+  await File.fromUri(rustOutputPath.join('generated.rs'))
+      .writeAsString(rustReceiveScript);
 
   // Get ready to handle received signals in Dart.
   var dartReceiveScript = "";
@@ -450,10 +485,12 @@ final signalHandlers = <int, void Function(Uint8List, Uint8List)>{
             markType == MarkType.rustSignalBinary) {
           final messageName = markedMessage.name;
           final camelName = pascalToCamel(messageName);
-          final importPath = '$subpath/$filename.pb.dart';
+          final importPath = subpath == "/"
+              ? '$filename.pb.dart'
+              : '$subpath$filename.pb.dart';
           if (!dartReceiveScript.contains(importPath)) {
             dartReceiveScript = '''
-import '.$importPath' as $filename;
+import './$importPath' as $filename;
 ''' +
                 dartReceiveScript;
           }
@@ -478,7 +515,8 @@ void handleRustSignal(int messageId, Uint8List messageBytes, Uint8List binary) {
   signalHandlers[messageId]!(messageBytes, binary);
 }
 ''';
-  await File('$dartOutputPath/generated.dart').writeAsString(dartReceiveScript);
+  await File.fromUri(dartOutputPath.join('generated.dart'))
+      .writeAsString(dartReceiveScript);
 
   // Notify that it's done
   if (!silent) {
@@ -487,24 +525,26 @@ void handleRustSignal(int messageId, Uint8List messageBytes, Uint8List binary) {
 }
 
 Future<void> patchServerHeaders() async {
-  // Get the Flutter SDK's path.
-  String flutterPath;
+  // Get the Flutter executable's path.
+  final Uri rawPath;
   if (Platform.isWindows) {
     // Windows
-    final whereFlutterResult = await Process.run('where', ['flutter']);
-    flutterPath = (whereFlutterResult.stdout as String).split('\n').first;
+    final output = await Process.run('where', ['flutter']);
+    rawPath = Uri.file((output.stdout as String).split('\n').first.trim());
   } else {
     // macOS and Linux
-    final whichFlutterResult = await Process.run('which', ['flutter']);
-    flutterPath = whichFlutterResult.stdout as String;
+    final output = await Process.run('which', ['flutter']);
+    rawPath = Uri.file((output.stdout as String).trim());
   }
-  flutterPath = flutterPath.trim();
-  flutterPath = await File(flutterPath).resolveSymbolicLinks();
-  flutterPath = File(flutterPath).parent.parent.path;
+  final flutterFilePath = Uri.file(
+    await File.fromUri(rawPath).resolveSymbolicLinks(),
+  );
+  final flutterPath = File.fromUri(flutterFilePath).parent.parent.uri;
 
   // Get the server module file's path.
-  final serverFile = File(
-      '$flutterPath/packages/flutter_tools/lib/src/isolated/devfs_web.dart');
+  final serverFile = File.fromUri(
+    flutterPath.join('packages/flutter_tools/lib/src/isolated/devfs_web.dart'),
+  );
   var serverFileContent = await serverFile.readAsString();
 
   // Check if the server already includes cross-origin HTTP headers.
@@ -530,9 +570,11 @@ httpServer.defaultResponseHeaders.add(
   await serverFile.writeAsString(serverFileContent);
 
   // Remove the stamp file to make it re-generated.
-  final flutterToolsStampPath = '$flutterPath/bin/cache/flutter_tools.stamp';
-  if (await File(flutterToolsStampPath).exists()) {
-    await File(flutterToolsStampPath).delete();
+  final flutterToolsStampPath = flutterPath.join(
+    'bin/cache/flutter_tools.stamp',
+  );
+  if (await File.fromUri(flutterToolsStampPath).exists()) {
+    await File.fromUri(flutterToolsStampPath).delete();
   }
 }
 
@@ -611,11 +653,12 @@ Future<void> collectProtoFiles(
   }
   var subPath = directory.path.replaceFirst(rootDirectory.path, '');
   subPath = subPath.replaceAll("\\", "/"); // For Windows
+  subPath = '$subPath/'; // Indicate that it's a folder, not a file
   resourcesInFolders[subPath] = resources;
 }
 
-Future<void> emptyDirectory(String directoryPath) async {
-  final directory = Directory(directoryPath);
+Future<void> emptyDirectory(Uri directoryPath) async {
+  final directory = Directory.fromUri(directoryPath);
 
   if (await directory.exists()) {
     await for (final entity in directory.list()) {
@@ -629,13 +672,13 @@ Future<void> emptyDirectory(String directoryPath) async {
 }
 
 Future<void> insertTextToFile(
-  String filePath,
+  Uri filePath,
   String textToAppend, {
   bool atFront = false,
   String? after,
 }) async {
   // Read the existing content of the file
-  final file = File(filePath);
+  final file = File.fromUri(filePath);
   if (!(await file.exists())) {
     await file.create(recursive: true);
   }
@@ -655,7 +698,7 @@ Future<void> insertTextToFile(
 }
 
 Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
-  String protoPath,
+  Uri protoPath,
   Map<String, List<String>> resourcesInFolders,
 ) async {
   final markedMessages = <String, Map<String, List<MarkedMessage>>>{};
@@ -670,9 +713,11 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
   }
   int messageId = 0;
   for (final entry in resourcesInFolders.entries) {
-    final subpath = entry.key;
+    final subPath = entry.key;
     for (final filename in entry.value) {
-      final protoFile = File('$protoPath/$subpath/$filename.proto');
+      final protoFile = File.fromUri(
+        protoPath.join(subPath).join('$filename.proto'),
+      );
       final content = await protoFile.readAsString();
       final regExp = RegExp(r'{[^}]*}');
       // Remove all { ... } blocks from the string
@@ -708,7 +753,7 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
           // If there's no mark in the message, just ignore it
           continue;
         }
-        markedMessages[subpath]![filename]!.add(MarkedMessage(
+        markedMessages[subPath]![filename]!.add(MarkedMessage(
           markType,
           messageName,
           messageId,
