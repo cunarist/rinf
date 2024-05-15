@@ -91,10 +91,8 @@ Future<void> generateMessageCode({
   for (final entry in resourcesInFolders.entries) {
     final subPath = entry.key;
     final resourceNames = entry.value;
-    if (subPath.isNotEmpty) {
-      await Directory.fromUri(rustOutputPath.join(subPath))
-          .create(recursive: true);
-    }
+    await Directory.fromUri(rustOutputPath.join(subPath))
+        .create(recursive: true);
     if (resourceNames.isEmpty) {
       continue;
     }
@@ -181,10 +179,8 @@ Future<void> generateMessageCode({
   for (final entry in resourcesInFolders.entries) {
     final subPath = entry.key;
     final resourceNames = entry.value;
-    if (subPath.isNotEmpty) {
-      await Directory.fromUri(dartOutputPath.join(subPath))
-          .create(recursive: true);
-    }
+    await Directory.fromUri(dartOutputPath.join(subPath))
+        .create(recursive: true);
     if (resourceNames.isEmpty) {
       continue;
     }
