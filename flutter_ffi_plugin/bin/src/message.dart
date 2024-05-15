@@ -33,16 +33,16 @@ Future<void> generateMessageCode({
       flutterProjectPath.uri.join(messageConfig.rustOutputDir);
   final dartOutputPath =
       flutterProjectPath.uri.join(messageConfig.dartOutputDir);
-  await Directory(rustOutputPath.toFilePath()).create(recursive: true);
-  await emptyDirectory(rustOutputPath.toFilePath());
-  await Directory(dartOutputPath.toFilePath()).create(recursive: true);
-  await emptyDirectory(dartOutputPath.toFilePath());
+  await Directory.fromUri(rustOutputPath).create(recursive: true);
+  await emptyDirectory(rustOutputPath);
+  await Directory.fromUri(dartOutputPath).create(recursive: true);
+  await emptyDirectory(dartOutputPath);
 
   // Get the list of `.proto` files.
   final resourcesInFolders = <String, List<String>>{};
   await collectProtoFiles(
-    Directory(protoPath.toFilePath()),
-    Directory(protoPath.toFilePath()),
+    Directory.fromUri(protoPath),
+    Directory.fromUri(protoPath),
     resourcesInFolders,
   );
 
@@ -54,8 +54,8 @@ Future<void> generateMessageCode({
     final subPath = entry.key;
     final resourceNames = entry.value;
     for (final resourceName in resourceNames) {
-      final protoFile = File(
-        protoPath.join(subPath).join('$resourceName.proto').toFilePath(),
+      final protoFile = File.fromUri(
+        protoPath.join(subPath).join('$resourceName.proto'),
       );
       final lines = await protoFile.readAsLines();
       List<String> outputLines = [];
@@ -92,9 +92,8 @@ Future<void> generateMessageCode({
     final subPath = entry.key;
     final resourceNames = entry.value;
     if (subPath.isNotEmpty) {
-      await Directory(
-        rustOutputPath.join(subPath).toFilePath(),
-      ).create(recursive: true);
+      await Directory.fromUri(rustOutputPath.join(subPath))
+          .create(recursive: true);
     }
     if (resourceNames.isEmpty) {
       continue;
@@ -160,9 +159,8 @@ Future<void> generateMessageCode({
       modRsLines.add("pub mod generated;");
     }
     final modRsContent = modRsLines.join('\n');
-    await File(
-      rustOutputPath.join(subPath).join('mod.rs').toFilePath(),
-    ).writeAsString(modRsContent);
+    await File.fromUri(rustOutputPath.join(subPath).join('mod.rs'))
+        .writeAsString(modRsContent);
   }
 
   // Generate Dart message files.
@@ -184,9 +182,8 @@ Future<void> generateMessageCode({
     final subPath = entry.key;
     final resourceNames = entry.value;
     if (subPath.isNotEmpty) {
-      await Directory(
-        dartOutputPath.join(subPath).toFilePath(),
-      ).create(recursive: true);
+      await Directory.fromUri(dartOutputPath.join(subPath))
+          .create(recursive: true);
     }
     if (resourceNames.isEmpty) {
       continue;
@@ -457,9 +454,8 @@ hash_map.insert(
     signal_handler(message_bytes, binary);
 }
 ''';
-  await File(
-    rustOutputPath.join('generated.rs').toFilePath(),
-  ).writeAsString(rustReceiveScript);
+  await File.fromUri(rustOutputPath.join('generated.rs'))
+      .writeAsString(rustReceiveScript);
 
   // Get ready to handle received signals in Dart.
   var dartReceiveScript = "";
@@ -523,9 +519,8 @@ void handleRustSignal(int messageId, Uint8List messageBytes, Uint8List binary) {
   signalHandlers[messageId]!(messageBytes, binary);
 }
 ''';
-  await File(
-    dartOutputPath.join('generated.dart').toFilePath(),
-  ).writeAsString(dartReceiveScript);
+  await File.fromUri(dartOutputPath.join('generated.dart'))
+      .writeAsString(dartReceiveScript);
 
   // Notify that it's done
   if (!silent) {
@@ -662,8 +657,8 @@ Future<void> collectProtoFiles(
   resourcesInFolders[subPath] = resources;
 }
 
-Future<void> emptyDirectory(String directoryPath) async {
-  final directory = Directory(directoryPath);
+Future<void> emptyDirectory(Uri directoryPath) async {
+  final directory = Directory.fromUri(directoryPath);
 
   if (await directory.exists()) {
     await for (final entity in directory.list()) {
@@ -720,8 +715,8 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
   for (final entry in resourcesInFolders.entries) {
     final subPath = entry.key;
     for (final filename in entry.value) {
-      final protoFile = File(
-        protoPath.join(subPath).join('$filename.proto').toFilePath(),
+      final protoFile = File.fromUri(
+        protoPath.join(subPath).join('$filename.proto'),
       );
       final content = await protoFile.readAsString();
       final regExp = RegExp(r'{[^}]*}');
