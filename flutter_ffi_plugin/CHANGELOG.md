@@ -1,3 +1,8 @@
+## 6.9.0
+
+- This version supports Flutter 3.22
+- The new version of Flutter has a little different way of resolving paths. This release adapts to this change.
+
 ## 6.8.0
 
 - Now `sendSignalToRust` and `send_signal_to_dart` methods no longer require `null` or `None`, making the API much cleaner. To make them include binary data, write `[RINF:DART-SIGNAL-BINARY]` or `[RINF:RUST-SIGNAL-BINARY]` in Protobuf files.
