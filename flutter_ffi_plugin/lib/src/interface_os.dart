@@ -98,17 +98,14 @@ Future<void> sendDartSignalExtern(
 
   rustFunction(
     messageId,
-    messageMemory.cast(),
+    messageMemory,
     messageBytes.length,
-    binaryMemory.cast(),
+    binaryMemory,
     binary.length,
   );
 
-  // Note that we do not free memory here with `malloc.free()`,
-  // because Rust will take the ownership of the memory space
-  // with `Vec::from_raw_parts()`.
-  // Rust will properly deallocate the memory later
-  // when `Vec<u8>` is dropped.
+  malloc.free(messageMemory);
+  malloc.free(binaryMemory);
 }
 
 void prepareIsolateExtern(int port) {
