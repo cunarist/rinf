@@ -75,10 +75,10 @@ macro_rules! write_interface {
                 binary_size: usize,
             ) {
                 let message_bytes = unsafe {
-                    Vec::from_raw_parts(message_pointer as *mut u8, message_size, message_size)
+                    std::slice::from_raw_parts(message_pointer as *mut u8, message_size).to_vec()
                 };
                 let binary = unsafe {
-                    Vec::from_raw_parts(binary_pointer as *mut u8, binary_size, binary_size)
+                    std::slice::from_raw_parts(binary_pointer as *mut u8, binary_size).to_vec()
                 };
                 let _ = catch_unwind(|| {
                     crate::messages::generated::handle_dart_signal(
