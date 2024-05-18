@@ -1,3 +1,7 @@
+## 6.9.1
+
+- Now the memory allocation and drop is done in each language.
+
 ## 6.9.0
 
 - This version supports Flutter 3.22
