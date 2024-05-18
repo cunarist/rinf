@@ -98,9 +98,9 @@ Future<void> sendDartSignalExtern(
 
   rustFunction(
     messageId,
-    messageMemory.cast(),
+    messageMemory,
     messageBytes.length,
-    binaryMemory.cast(),
+    binaryMemory,
     binary.length,
   );
 
