@@ -378,6 +378,7 @@ impl ${normalizePascal(messageName)} {
 #![allow(unused_mut)]
 
 use prost::Message;
+use rinf::debug_print;
 use rinf::DartSignal;
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -429,11 +430,14 @@ hash_map.insert(
             .get_or_init(|| Mutex::new(RefCell::new(None)))
             .lock()
             .unwrap();
-        let sender = cell.clone().replace(None).expect(concat!(
-            "Looks like the channel is not created yet.",
-            "\\nTry using `$messageName::get_dart_signal_receiver()`."
-        ));
-        let _ = sender.try_send(dart_signal);
+        if let Some(sender) = cell.clone().replace(None) {
+            let _ = sender.try_send(dart_signal);
+        } else {
+            debug_print!(concat!(
+                "Looks like the channel is not created yet.",
+                "\\nTry using `$messageName::get_dart_signal_receiver()`."
+            ));
+        }
     }),
 );
 ''';
