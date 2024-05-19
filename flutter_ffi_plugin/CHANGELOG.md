@@ -1,3 +1,7 @@
+## 6.9.2
+
+- Early Dart signals have become more stable.
+
 ## 6.9.1
 
 - Now the memory allocation and drop is done in each language.
