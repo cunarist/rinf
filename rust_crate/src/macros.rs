@@ -61,7 +61,7 @@ macro_rules! write_interface {
                         // most likely due to Dart's hot restart,
                         // its tasks as well as itself will be terminated,
                         // being replaced with the new one.
-                        cell.replace(None);
+                        cell.take();
                     });
                 });
             }
