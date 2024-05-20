@@ -57,10 +57,7 @@ macro_rules! write_interface {
                     let os_cell =
                         TOKIO_RUNTIME.get_or_init(|| ThreadLocal::new(|| RefCell::new(None)));
                     os_cell.with(move |cell| {
-                        // If there was already a tokio runtime previously,
-                        // most likely due to Dart's hot restart,
-                        // its tasks as well as itself will be terminated,
-                        // being replaced with the new one.
+                        // Dropping the tokio runtime causes it to shut down.
                         cell.take();
                     });
                 });
