@@ -37,7 +37,7 @@ After running the command, you'll have new files and folders as your starter Rus
     │   └── ...
     ├── linux/
 +   ├── messages/
-+   │   ├── counter_number.proto
++   │   ├── basic.proto
 +   │   └── README.md
 +   ├── native/
 +   │   ├── hub/
