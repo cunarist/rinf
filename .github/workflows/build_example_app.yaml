@@ -75,6 +75,10 @@ jobs:
         working-directory: rust_crate/
         run: cargo install --path ./
 
+      - name: Generate message files
+        working-directory: flutter_ffi_plugin/example/
+        run: rinf message
+
       - name: Build the example app
         if: matrix.target == 'linux'
         working-directory: flutter_ffi_plugin/example/
