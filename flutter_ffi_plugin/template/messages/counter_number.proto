@@ -1,0 +1,12 @@
+syntax = "proto3";
+package counter_number;
+
+// [RINF:DART-SIGNAL]
+message NumberInput {
+  string letter = 1;
+}
+
+// [RINF:RUST-SIGNAL]
+message NumberOutput {
+  int32 current_number = 1;
+}

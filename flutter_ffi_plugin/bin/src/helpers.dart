@@ -38,10 +38,10 @@ Future<void> applyRustTemplate({
   }
 
   // Copy basic folders needed for Rust to work
-  final templateSource = packagePath.join("example/native/");
+  final templateSource = packagePath.join("template/native/");
   final templateDestination = flutterProjectPath.join("native/");
   await copyDirectory(templateSource, templateDestination);
-  final messagesSource = packagePath.join("example/messages/");
+  final messagesSource = packagePath.join("template/messages/");
   final messagesDestination = flutterProjectPath.join("messages/");
   await copyDirectory(messagesSource, messagesDestination);
 
@@ -58,17 +58,6 @@ resolver = "2"
 ''';
   final cargoFile = File.fromUri(flutterProjectPath.join('Cargo.toml'));
   await cargoFile.writeAsString(cargoText);
-
-  // Disable demonstrations in sample functions
-  final sampleFunctionsFile = File.fromUri(
-    flutterProjectPath.join('native/hub/src/sample_functions.rs'),
-  );
-  var sampleFunctionsContent = await sampleFunctionsFile.readAsString();
-  sampleFunctionsContent = sampleFunctionsContent.replaceAll(
-    'SHOULD_DEMONSTRATE: bool = true',
-    'SHOULD_DEMONSTRATE: bool = false',
-  );
-  await sampleFunctionsFile.writeAsString(sampleFunctionsContent);
 
   // Add some lines to `.gitignore`
   final rustSectionTitle = '# Rust related';

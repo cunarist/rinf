@@ -6,9 +6,6 @@ use crate::tokio;
 use rinf::debug_print;
 use tokio::sync::Mutex;
 
-// Disabled when applied as Rinf template.
-const SHOULD_DEMONSTRATE: bool = true;
-
 // Using the `cfg` macro enables conditional statement.
 #[cfg(debug_assertions)]
 const IS_DEBUG_MODE: bool = true;
@@ -52,10 +49,6 @@ pub async fn tell_numbers() {
 pub async fn stream_fractal() {
     use messages::counter_number::*;
     use messages::fractal_art::*;
-
-    if !SHOULD_DEMONSTRATE {
-        return;
-    }
 
     let mut current_scale: f64 = 1.0;
 
@@ -118,7 +111,7 @@ async fn use_messages() {
 
 // Business logic for testing various crates.
 pub async fn run_debug_tests() {
-    if !SHOULD_DEMONSTRATE || !IS_DEBUG_MODE {
+    if !IS_DEBUG_MODE {
         return;
     }
 
