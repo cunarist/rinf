@@ -287,15 +287,17 @@ impl ${normalizePascal(messageName)} {
             .lock()
             .unwrap();
         #[cfg(debug_assertions)]
-        {          
+        {
             // After Dart's hot restart,
-            // there is already a sender that is closed from the previous run.
-            let pair = cell.take().unwrap();
-            if pair.0.as_ref().unwrap().is_closed() {
+            // a sender from the previous run already exists
+            // which is now closed.
+            let borrowed = cell.borrow();
+            let pair = borrowed.as_ref().unwrap();
+            let is_closed = pair.0.as_ref().unwrap().is_closed();
+            drop(borrowed);
+            if is_closed {
                 let (sender, receiver) = channel(1024);
                 cell.replace(Some((Some(sender), Some(receiver))));
-            } else {
-                cell.replace(Some(pair));
             }
         }
         let pair = cell.take().unwrap();
@@ -454,20 +456,22 @@ hash_map.insert(
             .lock()
             .unwrap();
         #[cfg(debug_assertions)]
-        {                    
+        {
             // After Dart's hot restart,
-            // there is already a sender that is closed from the previous run.
-            let pair = cell.take().unwrap();
-            if pair.0.as_ref().unwrap().is_closed() {
+            // a sender from the previous run already exists
+            // which is now closed.
+            let borrowed = cell.borrow();
+            let pair = borrowed.as_ref().unwrap();
+            let is_closed = pair.0.as_ref().unwrap().is_closed();
+            drop(borrowed);
+            if is_closed {
                 let (sender, receiver) = channel(1024);
                 cell.replace(Some((Some(sender), Some(receiver))));
-            } else {
-                cell.replace(Some(pair));
             }
         }
         let borrowed = cell.borrow();
         let pair = borrowed.as_ref().unwrap();
-        let sender = pair.0.clone().unwrap();
+        let sender = pair.0.as_ref().unwrap();
         let _ = sender.try_send(dart_signal);
     }),
 );
