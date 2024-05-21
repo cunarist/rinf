@@ -1,5 +1,4 @@
-//! This module is only for Rinf demonstrations.
-//! You might want to remove this module in production.
+//! This crate is written for Rinf demonstrations.
 
 use crate::messages;
 use crate::tokio;

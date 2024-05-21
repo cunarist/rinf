@@ -53,7 +53,7 @@ After running the command, you'll have new files and folders as your starter Rus
     └── ...
 ```
 
-Various comments are written in the actual code to help you understand the whole structure. Also, you might want to remove `sample_crate` in production.
+Various comments are written in the actual code to help you understand the whole structure.
 
 If you already have a Rust crate that you want to use here, just put it inside `./native` and set it as a dependency of the `hub` crate.
 
