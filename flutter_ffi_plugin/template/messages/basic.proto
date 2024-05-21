@@ -2,11 +2,11 @@ syntax = "proto3";
 package counter_number;
 
 // [RINF:DART-SIGNAL]
-message NumberInput {
+message SmallLetter {
   string letter = 1;
 }
 
 // [RINF:RUST-SIGNAL]
-message NumberOutput {
+message SmallNumber {
   int32 current_number = 1;
 }

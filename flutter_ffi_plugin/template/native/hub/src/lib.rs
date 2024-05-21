@@ -14,7 +14,9 @@ rinf::write_interface!();
 // use `tokio::task::spawn_blocking`.
 async fn main() {
     // Use `tokio::spawn` to run concurrent tasks.
-    use messages::counter_number::*;
-    let _receiver = NumberInput::get_dart_signal_receiver();
-    NumberOutput { current_number: 7 }.send_signal_to_dart();
+    use messages::basic::*;
+    // Send signals to Dart like below.
+    SmallNumber { current_number: 7 }.send_signal_to_dart();
+    // Get receivers that listen to Dart signals like below.
+    let _ = SmallLetter::get_dart_signal_receiver();
 }
