@@ -3,6 +3,14 @@ import sys
 import time
 
 
+def replace_text_in_file(filepath: str, change_from: str, change_to: str):
+    with open(filepath, mode="r", encoding="utf8") as file:
+        content: str = file.read()
+    content = content.replace(change_from, change_to)
+    with open(filepath, mode="w", encoding="utf8") as file:
+        file.write(content)
+
+
 if len(sys.argv) == 1:
     print("Automation option is not provided.")
     print("Use `python automate --help` to see all available operations.")
@@ -39,17 +47,35 @@ elif sys.argv[1] == "create-test-app":
 
     os.remove("Cargo.toml")
 
+    # Enable the web target, as it's not by default.
+    replace_text_in_file(
+        "native/hub/src/lib.rs",
+        "use tokio;",
+        "// use tokio;",
+    )
+    replace_text_in_file(
+        "native/hub/src/lib.rs",
+        "// use tokio_with_wasm",
+        "use tokio_with_wasm",
+    )
+    replace_text_in_file(
+        "native/hub/Cargo.toml",
+        "# wasm-bindgen",
+        "wasm-bindgen",
+    )
+    replace_text_in_file(
+        "native/hub/Cargo.toml",
+        "# tokio_with_wasm",
+        "tokio_with_wasm",
+    )
+
     os.chdir("../")
 
-    filepath = "Cargo.toml"
-    with open(filepath, mode="r", encoding="utf8") as file:
-        content: str = file.read()
-    content = content.replace(
+    replace_text_in_file(
+        "Cargo.toml",
         "flutter_ffi_plugin/example/native/*",
         "test_app/native/*",
     )
-    with open(filepath, mode="w", encoding="utf8") as file:
-        file.write(content)
 
 elif sys.argv[1] == "create-user-app":
     filepath = ".gitignore"
@@ -73,17 +99,37 @@ elif sys.argv[1] == "create-user-app":
         # associated with the 'protoc_prebuilt' crate.
         time.sleep(60)
 
+    os.remove("Cargo.toml")
+
+    # Enable the web target, as it's not by default.
+    replace_text_in_file(
+        "native/hub/src/lib.rs",
+        "use tokio;",
+        "// use tokio;",
+    )
+    replace_text_in_file(
+        "native/hub/src/lib.rs",
+        "// use tokio_with_wasm",
+        "use tokio_with_wasm",
+    )
+    replace_text_in_file(
+        "native/hub/Cargo.toml",
+        "# wasm-bindgen",
+        "wasm-bindgen",
+    )
+    replace_text_in_file(
+        "native/hub/Cargo.toml",
+        "# tokio_with_wasm",
+        "tokio_with_wasm",
+    )
+
     os.chdir("../")
 
-    filepath = "Cargo.toml"
-    with open(filepath, mode="r", encoding="utf8") as file:
-        content: str = file.read()
-    content = content.replace(
+    replace_text_in_file(
+        "Cargo.toml",
         "flutter_ffi_plugin/example/native/*",
         "user_app/native/*",
     )
-    with open(filepath, mode="w", encoding="utf8") as file:
-        file.write(content)
 
 else:
     print("No such option for automation is available.")
