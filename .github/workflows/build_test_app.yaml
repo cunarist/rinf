@@ -1,6 +1,6 @@
 # Verify that the app build works as intended
 # when utilizing the code inside the repository.
-name: build-test
+name: build-test-app
 
 on:
   push:
@@ -81,8 +81,8 @@ jobs:
         working-directory: rust_crate/
         run: cargo install --path ./
 
-      - name: Create a Flutter app for testing
-        run: python automate create-test-app
+      - name: Prepare a Flutter app for testing
+        run: python automate prepare-test-app
 
       - name: Build the example app
         if: matrix.target == 'linux'

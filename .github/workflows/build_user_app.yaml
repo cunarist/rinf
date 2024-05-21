@@ -1,0 +1,102 @@
+# Verify that the documentation steps function as intended
+# when users utilize released versions
+# instead of the code from the repository.
+name: build-user-app
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/30 * * * *"
+
+jobs:
+  build:
+    name: ${{ matrix.runner }} / ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false # Important
+      matrix:
+        runner: [ubuntu-latest, windows-latest, macos-latest]
+        target: [android, web] # On all platforms
+        include:
+          # Specify targets for each platform
+          - runner: ubuntu-latest
+            target: linux
+          - runner: windows-latest
+            target: windows
+          - runner: macos-latest
+            target: macos
+          - runner: macos-latest
+            target: ios
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup Ninja and GTK3 toolchain (Only Linux target)
+        if: matrix.target == 'linux'
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ninja-build libgtk-3-dev
+
+      - name: Setup Java toolchain (Only Android target)
+        if: matrix.target == 'android'
+        uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "11"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install the CLI tool
+        working-directory: rust_crate/
+        run: cargo install rinf
+
+      - name: Prepare a Flutter app for testing
+        run: python automate prepare-user-app
+
+      - name: Build the example app
+        if: matrix.target == 'linux'
+        working-directory: user_app/
+        run: flutter build linux --verbose
+
+      - name: Build the example app
+        if: matrix.target == 'android'
+        working-directory: user_app/
+        run: |
+          flutter build apk --verbose
+          flutter build appbundle --verbose
+
+      - name: Build the example app
+        if: matrix.target == 'windows'
+        working-directory: user_app/
+        run: flutter build windows --verbose
+
+      - name: Build the example app
+        if: matrix.target == 'macos'
+        working-directory: user_app/
+        run: flutter build macos --verbose
+
+      - name: Build the example app
+        if: matrix.target == 'ios'
+        working-directory: user_app/
+        run: flutter build ios --verbose --no-codesign
+
+      - name: Build the example app
+        if: matrix.target == 'web'
+        working-directory: user_app/
+        run: |
+          rinf wasm --release
+          flutter build web --verbose

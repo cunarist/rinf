@@ -1,0 +1,12 @@
+syntax = "proto3";
+package basic;
+
+// [RINF:DART-SIGNAL]
+message SmallText {
+  string text = 1;
+}
+
+// [RINF:RUST-SIGNAL]
+message SmallNumber {
+  int32 number = 1;
+}

@@ -1,12 +1,28 @@
-# Verify that the documentation steps function as intended
-# when users utilize released versions
-# instead of the code from the repository.
-name: user-installation
+# Verify that the example app works properly.
+name: build-example-app
 
 on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**.md"
+      - "**.html"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+      - "**.html"
   workflow_dispatch:
-  schedule:
-    - cron: "*/30 * * * *"
+
+concurrency:
+  # Cancels the workflow
+  # when another event in the same context happens.
+  # If it's a PR, context is the pull request number.
+  # Otherwise, it uses the Git reference(branch or tag name).
+  group: >
+    ${{ github.workflow }}
+    ${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -62,41 +78,41 @@ jobs:
 
       - name: Install the CLI tool
         working-directory: rust_crate/
-        run: cargo install rinf
+        run: cargo install --path ./
 
-      - name: Create a Flutter app for testing
-        run: python automate create-user-app
+      - name: Prepare a Flutter app for testing
+        run: python automate prepare-example-app
 
       - name: Build the example app
         if: matrix.target == 'linux'
-        working-directory: user_app/
+        working-directory: flutter_ffi_plugin/example/
         run: flutter build linux --verbose
 
       - name: Build the example app
         if: matrix.target == 'android'
-        working-directory: user_app/
+        working-directory: flutter_ffi_plugin/example/
         run: |
           flutter build apk --verbose
           flutter build appbundle --verbose
 
       - name: Build the example app
         if: matrix.target == 'windows'
-        working-directory: user_app/
+        working-directory: flutter_ffi_plugin/example/
         run: flutter build windows --verbose
 
       - name: Build the example app
         if: matrix.target == 'macos'
-        working-directory: user_app/
+        working-directory: flutter_ffi_plugin/example/
         run: flutter build macos --verbose
 
       - name: Build the example app
         if: matrix.target == 'ios'
-        working-directory: user_app/
+        working-directory: flutter_ffi_plugin/example/
         run: flutter build ios --verbose --no-codesign
 
       - name: Build the example app
         if: matrix.target == 'web'
-        working-directory: user_app/
+        working-directory: flutter_ffi_plugin/example/
         run: |
           rinf wasm --release
           flutter build web --verbose

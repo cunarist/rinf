@@ -2,10 +2,9 @@
 //! entry point of the Rust logic.
 
 mod messages;
-mod sample_functions;
 
-// use tokio;
-use tokio_with_wasm::tokio; // Uncomment this line to target the web
+use tokio;
+// use tokio_with_wasm::tokio; // Uncomment this line to target the web
 
 rinf::write_interface!();
 
@@ -15,7 +14,9 @@ rinf::write_interface!();
 // If you really need to use blocking code,
 // use `tokio::task::spawn_blocking`.
 async fn main() {
-    tokio::spawn(sample_functions::tell_numbers());
-    tokio::spawn(sample_functions::stream_fractal());
-    tokio::spawn(sample_functions::run_debug_tests());
+    use messages::basic::*;
+    // Send signals to Dart like below.
+    SmallNumber { number: 7 }.send_signal_to_dart();
+    // Get receivers that listen to Dart signals like below.
+    let _ = SmallText::get_dart_signal_receiver();
 }
