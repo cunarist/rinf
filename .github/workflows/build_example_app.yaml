@@ -1,5 +1,5 @@
 # Verify that the example app works properly.
-name: example-test
+name: build-example-app
 
 on:
   push:
