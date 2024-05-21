@@ -15,7 +15,7 @@ rinf::write_interface!();
 // use `tokio::task::spawn_blocking`.
 async fn main() {
     // Repeat `tokio::spawn` anywhere in your code
-    // if more concurrent tasks are needed.
+    // to run concurrent tasks.
     tokio::spawn(sample_functions::tell_numbers());
     tokio::spawn(sample_functions::stream_fractal());
     tokio::spawn(sample_functions::run_debug_tests());
