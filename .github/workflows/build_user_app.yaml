@@ -64,8 +64,8 @@ jobs:
         working-directory: rust_crate/
         run: cargo install rinf
 
-      - name: Create a Flutter app for testing
-        run: python automate create-user-app
+      - name: Prepare a Flutter app for testing
+        run: python automate prepare-user-app
 
       - name: Build the example app
         if: matrix.target == 'linux'

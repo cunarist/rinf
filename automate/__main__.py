@@ -23,7 +23,7 @@ elif sys.argv[1] == "cargokit-update":
     command += " main"
     os.system(command)
 
-elif sys.argv[1] == "create-test-app":
+elif sys.argv[1] == "prepare-test-app":
     filepath = ".gitignore"
     with open(filepath, mode="r", encoding="utf8") as file:
         content: str = file.read()
@@ -47,7 +47,7 @@ elif sys.argv[1] == "create-test-app":
 
     os.remove("Cargo.toml")
 
-    # Enable the web target, as it's not by default.
+    # Enable the web target, since it's not enabled by default.
     replace_text_in_file(
         "native/hub/src/lib.rs",
         "use tokio;",
@@ -77,7 +77,7 @@ elif sys.argv[1] == "create-test-app":
         "test_app/native/*",
     )
 
-elif sys.argv[1] == "create-user-app":
+elif sys.argv[1] == "prepare-user-app":
     filepath = ".gitignore"
     with open(filepath, mode="r", encoding="utf8") as file:
         content: str = file.read()
@@ -101,7 +101,7 @@ elif sys.argv[1] == "create-user-app":
 
     os.remove("Cargo.toml")
 
-    # Enable the web target, as it's not by default.
+    # Enable the web target, since it's not enabled by default.
     replace_text_in_file(
         "native/hub/src/lib.rs",
         "use tokio;",
@@ -130,6 +130,16 @@ elif sys.argv[1] == "create-user-app":
         "flutter_ffi_plugin/example/native/*",
         "user_app/native/*",
     )
+
+elif sys.argv[1] == "prepare-example-app":
+    os.chdir("./flutter_ffi_plugin/example")
+
+    command = "rinf message"
+    while os.system(command) != 0:
+        # Retry the command in case of failure,
+        # possibly due to GitHub API rate limiting
+        # associated with the 'protoc_prebuilt' crate.
+        time.sleep(60)
 
 else:
     print("No such option for automation is available.")
