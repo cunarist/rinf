@@ -3,7 +3,7 @@
 [![Pub Version](https://img.shields.io/pub/v/rinf)](https://pub.dev/packages/rinf)
 [![Crate Version](https://img.shields.io/crates/v/rinf)](https://crates.io/crates/rinf)
 [![GitHub Stars](https://img.shields.io/github/stars/cunarist/rinf)](https://github.com/cunarist/rinf/stargazers)
-[![Build Test](https://github.com/cunarist/rinf/actions/workflows/build_test_app.yaml/badge.svg)](https://github.com/cunarist/rinf/actions/workflows/build_test_app.yaml?query=branch%3Amain)
+[![Test App](https://github.com/cunarist/rinf/actions/workflows/test_app.yaml/badge.svg)](https://github.com/cunarist/rinf/actions/workflows/test_app.yaml?query=branch%3Amain)
 [![GitHub License](https://img.shields.io/github/license/cunarist/rinf)](https://github.com/cunarist/rinf/blob/main/LICENSE)
 
 **Rust for native business logic, Flutter for flexible and beautiful GUI**
@@ -18,7 +18,7 @@ Visit the [demo](https://rinf-demo.cunarist.com/) running on the web to experien
 
 ## 🖥️ Platform Support
 
-All platforms available with Flutter are [tested](https://github.com/cunarist/rinf/actions/workflows/build_test_app.yaml?query=branch%3Amain) and supported. Challenging build settings are automatically handled by this framework.
+All platforms available with Flutter are [tested](https://github.com/cunarist/rinf/actions/workflows/test_app.yaml?query=branch%3Amain) and supported. Challenging build settings are automatically handled by this framework.
 
 - ✅ Linux: Tested and supported
 - ✅ Android: Tested and supported

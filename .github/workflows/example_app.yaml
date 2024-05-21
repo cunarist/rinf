@@ -1,6 +1,5 @@
-# Verify that the app build works as intended
-# when utilizing the code inside the repository.
-name: build-test-app
+# Verify that the example app works properly.
+name: example-app
 
 on:
   push:
@@ -82,38 +81,38 @@ jobs:
         run: cargo install --path ./
 
       - name: Prepare a Flutter app for testing
-        run: python automate prepare-test-app
+        run: python automate prepare-example-app
 
       - name: Build the example app
         if: matrix.target == 'linux'
-        working-directory: test_app/
+        working-directory: flutter_ffi_plugin/example/
         run: flutter build linux --verbose
 
       - name: Build the example app
         if: matrix.target == 'android'
-        working-directory: test_app/
+        working-directory: flutter_ffi_plugin/example/
         run: |
           flutter build apk --verbose
           flutter build appbundle --verbose
 
       - name: Build the example app
         if: matrix.target == 'windows'
-        working-directory: test_app/
+        working-directory: flutter_ffi_plugin/example/
         run: flutter build windows --verbose
 
       - name: Build the example app
         if: matrix.target == 'macos'
-        working-directory: test_app/
+        working-directory: flutter_ffi_plugin/example/
         run: flutter build macos --verbose
 
       - name: Build the example app
         if: matrix.target == 'ios'
-        working-directory: test_app/
+        working-directory: flutter_ffi_plugin/example/
         run: flutter build ios --verbose --no-codesign
 
       - name: Build the example app
         if: matrix.target == 'web'
-        working-directory: test_app/
+        working-directory: flutter_ffi_plugin/example/
         run: |
           rinf wasm --release
           flutter build web --verbose
