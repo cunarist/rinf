@@ -37,15 +37,10 @@ After running the command, you'll have new files and folders as your starter Rus
     │   └── ...
     ├── linux/
 +   ├── messages/
-+   │   ├── sample_folder/
 +   │   ├── counter_number.proto
-+   │   ├── fractal_art.proto
 +   │   └── README.md
 +   ├── native/
 +   │   ├── hub/
-+   │   │   ├── src/
-+   │   │   └── Cargo.toml
-+   │   ├── sample_crate/
 +   │   │   ├── src/
 +   │   │   └── Cargo.toml
 +   │   └── README.md
