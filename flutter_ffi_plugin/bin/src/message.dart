@@ -83,6 +83,7 @@ Future<void> generateMessageCode({
   final cargoInstallCommand = await Process.run('cargo', [
     'install',
     'protoc-gen-prost',
+    ...(messageConfig.rustSerde ? ['protoc-gen-prost-serde'] : [])
   ]);
   if (cargoInstallCommand.exitCode != 0) {
     print(cargoInstallCommand.stderr.toString().trim());
@@ -105,6 +106,7 @@ Future<void> generateMessageCode({
     final protocRustResult = await Process.run('protoc', [
       ...protoPaths,
       '--prost_out=$rustFullPath',
+      ...(messageConfig.rustSerde ? ['--prost-serde_out=$rustFullPath'] : []),
       ...resourceNames.map((name) => '$name.proto'),
     ]);
     if (protocRustResult.exitCode != 0) {
