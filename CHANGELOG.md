@@ -3,7 +3,7 @@
 - Early Dart signals are now stored in the tokio channel instead of being ignored. Their performance is also slightly better.
 - Excessive sample code is not included in the template from the `rinf template` command anymore.
 - Now `tokio` is enabled by default in the template, not `tokio_with_wasm`.
-- A configuration option, `rinf.messages.rust_serde`, was added to make generated Rust message files compatible with `serde`. Thanks @NeoVance!
+- A configuration option, `rinf.message.rust_serde`, was added to make generated Rust message files compatible with `serde`. Thanks @NeoVance!
 
 ## 6.9.2
 
