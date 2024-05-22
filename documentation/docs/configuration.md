@@ -8,6 +8,7 @@ rinf:
     input_dir: messages/
     rust_output_dir: native/hub/src/messages/
     dart_output_dir: lib/messages/
+    rust_serde: true
 ```
 
 You can check the current configuration status by running the command below in the CLI.

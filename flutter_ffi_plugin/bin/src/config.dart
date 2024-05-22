@@ -117,6 +117,7 @@ rinf:
 ///     input_dir: messages
 ///     rust_output_dir: native/hub/src/messages
 ///     dart_output_dir: lib/messages
+///     rust_serde: true
 /// ```
 Future<RinfConfig> loadVerifiedRinfConfig(String pubspecYamlFile) async {
   final pubspec = loadYaml(await File(pubspecYamlFile).readAsString());
