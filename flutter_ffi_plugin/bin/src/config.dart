@@ -16,10 +16,11 @@ class RinfConfigMessage {
 
   factory RinfConfigMessage.defaultConfig() {
     return RinfConfigMessage(
-        inputDir: DEFAULT_INPUT_DIR,
-        rustOutputDir: DEFAULT_RUST_OUTPUT_DIR,
-        dartOutputDir: DEFAULT_DART_OUTPUT_DIR,
-        rustSerde: DEFAULT_RUST_SERDE);
+      inputDir: DEFAULT_INPUT_DIR,
+      rustOutputDir: DEFAULT_RUST_OUTPUT_DIR,
+      dartOutputDir: DEFAULT_DART_OUTPUT_DIR,
+      rustSerde: DEFAULT_RUST_SERDE,
+    );
   }
 
   factory RinfConfigMessage.from(YamlMap yaml) {
