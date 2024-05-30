@@ -347,7 +347,7 @@ extension {$messageName}Extension on $messageName{
           await insertTextToFile(
             dartPath,
             '''
-static Stream<RustSignal<$messageName>> rustSignalStream =
+static final rustSignalStream =
     ${camelName}Controller.stream.asBroadcastStream();
 ''',
             after: "class $messageName extends \$pb.GeneratedMessage {",
