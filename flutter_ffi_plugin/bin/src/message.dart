@@ -313,15 +313,16 @@ impl ${normalizePascal(messageName)} {
             await insertTextToFile(
               dartPath,
               '''
-void sendSignalToRust() {
-  sendDartSignal(
-    ${markedMessage.id},
-    this.writeToBuffer(),
-    Uint8List(0),
-  );
+extension ${messageName}Extension on $messageName{
+  void sendSignalToRust() {
+    sendDartSignal(
+      ${markedMessage.id},
+      this.writeToBuffer(),
+      Uint8List(0),
+    );
+  }
 }
 ''',
-              after: "class $messageName extends \$pb.GeneratedMessage {",
             );
           }
         }
@@ -329,15 +330,16 @@ void sendSignalToRust() {
           await insertTextToFile(
             dartPath,
             '''
-void sendSignalToRust(Uint8List binary) {
-  sendDartSignal(
-    ${markedMessage.id},
-    this.writeToBuffer(),
-    binary,
-  );
+extension {$messageName}Extension on $messageName{
+  void sendSignalToRust(Uint8List binary) {
+    sendDartSignal(
+      ${markedMessage.id},
+      this.writeToBuffer(),
+      binary,
+    );
+  }
 }
 ''',
-            after: "class $messageName extends \$pb.GeneratedMessage {",
           );
         }
         if (markType == MarkType.rustSignal ||
