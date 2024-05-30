@@ -60,9 +60,15 @@ In order to use nightly Rust, you need to add a cargokit configuration file. Car
 
 ```yaml title="native/hub/cargokit.yaml"
 cargo:
+  debug:
+    toolchain: nightly
   release:
     toolchain: nightly
 ```
+
+More information about `cargokit.yaml` can be found at the link below. Cargokit is the linker for Rust crates that are used in various Flutter projects, including Rinf.
+
+- https://github.com/irondash/cargokit/blob/main/docs/architecture.md
 
 ### Is it safe enough to pass secret parameters between Dart and Rust?
 
