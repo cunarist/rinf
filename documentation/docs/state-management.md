@@ -20,9 +20,8 @@ async fn main() {
 }
 
 pub async fn do_something_with_state(data: Arc<Mutex<Vec<i32>>>) {
-    // Get the mutex guard.
-    let mut vector = data.lock().await;
-    vector.push(3);
+    // Mutate the shared variable directly.
+    VECTOR.lock().await.push(3);
 }
 ```
 
@@ -35,12 +34,11 @@ use tokio::sync::Mutex;
 static VECTOR: Mutex<Vec<bool>> = Mutex::const_new(Vec::new());
 
 pub async fn do_something_with_state() {
-    // Get the mutex guard.
-    let mut vector = VECTOR.lock().await;
+    VECTOR.lock().await.push(true);
 
-    // Custom logic here.
-    vector.push(true);
-    let length = vector.len();
+    // Use the global variable by acquiring the guard.
+    let guard = VECTOR.lock().await;
+    let length = guard.len();
     debug_print!("{length}");
 }
 ```
