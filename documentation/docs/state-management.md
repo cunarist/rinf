@@ -1,16 +1,37 @@
 # State Management
 
-This section is not an introduction to a specific Rinf feature, but rather a general guide about how you can smoothly manage the application state while using Rinf.
+This section is not an introduction to a specific Rinf's feature, but rather a general guide about how you can smoothly manage the application state while using Rinf.
 
 Rinf works best when the application logic is entirely written in Rust, while Flutter is only being used for GUI. Given that, there are situations where you want to store the application state in Rust.
 
-You can set a simple mutable global state variable like this that only involves constant `new` function call. Note that `tokio::sync::RwLock` can be a better option when there are multiple concurrent readers.
+It is generally recommended to avoid static variables because of their characteristics, which can lead to issues such as difficulties in testing and managing lifetimes.
+
+Try passing the state of your app down the function tree like below whenever it's acceptable.
+
+```rust title="Rust"
+use std::sync::Arc;
+use tokio::sync::Mutex;
+
+async fn main() {
+    // `Mutex` prevents race conditions between threads.
+    let shared_data = Arc::new(Mutex::new(Vec::new()));
+    do_something_with_state(shared_data.clone()).await;
+    do_something_with_state(shared_data.clone()).await;
+}
+
+pub async fn do_something_with_state(data: Arc<Mutex<Vec<i32>>>) {
+    // Get the mutex guard.
+    let mut vector = data.lock().await;
+    vector.push(3);
+}
+```
+
+If you cannot pass down the state down the function tree for any reason, you can declare a static variable like below that spans the entire duration of the app.
 
 ```rust title="Rust"
 use rinf::debug_print;
 use tokio::sync::Mutex;
 
-// `Mutex` prevents race conditions between threads.
 static VECTOR: Mutex<Vec<bool>> = Mutex::const_new(Vec::new());
 
 pub async fn do_something_with_state() {
@@ -24,61 +45,15 @@ pub async fn do_something_with_state() {
 }
 ```
 
-After that, the latest state can be streamed to a Flutter widget to be shown on the screen.
+Only use static variables in certain situations as described in the [Rust docs](https://doc.rust-lang.org/reference/items/static-items.html):
 
-```rust title="Rust"
-pub async fn do_something_with_state() {
-    ...
-    MyMessage {
-       some_latest_state: vector.len() as i32,
-    }
-    .send_signal_to_dart();
-}
-```
+- Large amounts of data are being stored.
+- The single-address property of statics is required.
+- Interior mutability is required.
 
-```dart title="Dart"
-StreamBuilder(
-  stream: MyMessage.rustSignalStream,
-  builder: (context, snapshot) {
-    final rustSignal = snapshot.data;
-    if (rustSignal == null) {
-      return SomeWidget(null);
-    }
-    final myMessage = rustSignal.message;
-    final someLatestState = myMessage.someLatestState;
-    return SomeWidget(someLatestState);
-  },
-),
-```
+It's important to remember that destructors of static variables implemented by the [`Drop`](https://doc.rust-lang.org/rust-by-example/trait/drop.html) trait don't get called on app shutdown. Therefore, if you need destructors of static variables to be run, you must drop or close them explicitly before exiting.
 
-If initialization logic is required to fill in the global state, you can use the singleton getter pattern just like below. This might be useful when the app involves some IO operations, which means that the initial resource size is not known at compile time.
+There are also alternatives. Choose the one that you think is most appropriate for your needs:
 
-```rust title="Rust"
-use rinf::debug_print;
-use sqlx::{sqlite::SqlitePoolOptions, Pool, Sqlite};
-use tokio::sync::OnceCell;
-
-// `OnceCell` can be assigned a value only once.
-static DB_POOL: OnceCell<Pool<Sqlite>> = OnceCell::const_new();
-
-async fn get_db_pool<'a>() -> &'a Pool<Sqlite> {
-    DB_POOL.get_or_init(|| async {
-        SqlitePoolOptions::new()
-            .connect("sqlite::memory:")
-            .await
-            .unwrap()
-    }).await
-}
-
-pub async fn do_something_with_state() {
-    // Use the getter function.
-    let db_pool = get_db_pool().await;
-
-    // Custom logic here.
-    let fetched = db_pool.
-        fetch_one("SELECT * FROM sample_table").
-        await.
-        unwrap();
-    debug_print!("{fetched:?}");
-}
-```
+- [`std::sync::LazyLock`](https://doc.rust-lang.org/std/sync/struct.LazyLock.html)
+- [`tokio::sync::RwLock`](https://docs.rs/tokio/latest/tokio/sync/struct.RwLock.html)
