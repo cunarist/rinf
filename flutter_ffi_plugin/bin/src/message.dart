@@ -254,9 +254,9 @@ use rinf::SharedCell;
 use std::cell::RefCell;
 use std::sync::Mutex;
 use std::sync::OnceLock;
-use tokio::sync::mpsc::channel;
-use tokio::sync::mpsc::Receiver;
-use tokio::sync::mpsc::Sender;
+use tokio::sync::mpsc::unbounded_channel;
+use tokio::sync::mpsc::UnboundedReceiver;
+use tokio::sync::mpsc::UnboundedSender;
 ''',
           atFront: true,
         );
@@ -273,17 +273,17 @@ use tokio::sync::mpsc::Sender;
             rustPath,
             '''
 type ${messageName}Cell = SharedCell<(
-    Option<Sender<DartSignal<${normalizePascal(messageName)}>>>,
-    Option<Receiver<DartSignal<${normalizePascal(messageName)}>>>,
+    Option<UnboundedSender<DartSignal<${normalizePascal(messageName)}>>>,
+    Option<UnboundedReceiver<DartSignal<${normalizePascal(messageName)}>>>,
 )>;
 pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Cell =
     OnceLock::new();
 
 impl ${normalizePascal(messageName)} {
-    pub fn get_dart_signal_receiver() -> Receiver<DartSignal<Self>> {
+    pub fn get_dart_signal_receiver() -> UnboundedReceiver<DartSignal<Self>> {
         let cell = ${snakeName.toUpperCase()}_CHANNEL
             .get_or_init(|| {
-                let (sender, receiver) = channel(1024);
+                let (sender, receiver) = unbounded_channel();
                 Mutex::new(RefCell::new(Some((Some(sender), Some(receiver)))))
             })
             .lock()
@@ -298,7 +298,7 @@ impl ${normalizePascal(messageName)} {
             let is_closed = pair.0.as_ref().unwrap().is_closed();
             drop(borrowed);
             if is_closed {
-                let (sender, receiver) = channel(1024);
+                let (sender, receiver) = unbounded_channel();
                 cell.replace(Some((Some(sender), Some(receiver))));
             }
         }
@@ -407,7 +407,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::sync::Mutex;
 use std::sync::OnceLock;
-use tokio::sync::mpsc::channel;
+use tokio::sync::mpsc::unbounded_channel;
 
 type SignalHandlers =
     OnceLock<Mutex<HashMap<i32, Box<dyn Fn(Vec<u8>, Vec<u8>) + Send>>>>;
@@ -452,7 +452,7 @@ hash_map.insert(
         };
         let cell = ${snakeName.toUpperCase()}_CHANNEL
             .get_or_init(|| {
-                let (sender, receiver) = channel(1024);
+                let (sender, receiver) = unbounded_channel();
                 Mutex::new(RefCell::new(Some((Some(sender), Some(receiver)))))
             })
             .lock()
@@ -467,14 +467,14 @@ hash_map.insert(
             let is_closed = pair.0.as_ref().unwrap().is_closed();
             drop(borrowed);
             if is_closed {
-                let (sender, receiver) = channel(1024);
+                let (sender, receiver) = unbounded_channel();
                 cell.replace(Some((Some(sender), Some(receiver))));
             }
         }
         let borrowed = cell.borrow();
         let pair = borrowed.as_ref().unwrap();
         let sender = pair.0.as_ref().unwrap();
-        let _ = sender.try_send(dart_signal);
+        let _ = sender.send(dart_signal);
     }),
 );
 ''';
