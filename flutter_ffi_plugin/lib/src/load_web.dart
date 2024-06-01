@@ -4,10 +4,16 @@ import 'dart:js' as js;
 import 'dart:html';
 import 'dart:async';
 
+String? jsLibPath;
+
 // When Dart performs hot restart,
 // the `rinf` object is already defined
 // as a global JavaScript variable.
 final wasAlreadyLoaded = js.context.hasProperty("rinf");
+
+void setJsLibPath(String? path) {
+  jsLibPath = path;
+}
 
 Future<void> loadJsFile() async {
   if (wasAlreadyLoaded) {
@@ -17,10 +23,13 @@ Future<void> loadJsFile() async {
   final loadCompleter = Completer<void>();
   js.context['completeRinfLoad'] = loadCompleter.complete;
 
+  // Use the default JavaScript path unless provided.
+  final path = jsLibPath ?? "/pkg/hub.js";
+
   final scriptElement = ScriptElement();
   scriptElement.type = "module";
   scriptElement.innerHtml = '''
-import init, * as wasmBindings from "/pkg/hub.js";
+import init, * as wasmBindings from "$path";
 await init();
 window.rinf = { ...wasmBindings };
 completeRinfLoad();

@@ -6,6 +6,16 @@ import 'src/exports.dart';
 
 export 'src/interface.dart' show RustSignal;
 
+/// Sets the exact file path of the dynamic library
+/// compiled from the `hub` crate.
+/// On the web, this function sets the path to the JavaScript module
+/// that needs to be loaded.
+/// This function might not be necessary for major platforms
+/// but can be useful when the app runs on embedded devices.
+void setCompiledLibPath(String? path) {
+  setCompiledLibPathExtern(path);
+}
+
 /// Prepares the native interface
 /// needed to communicate with Rust.
 Future<void> prepareInterface(HandleRustSignal handleRustSignal) async {
@@ -18,9 +28,9 @@ void startRustLogic() async {
 }
 
 /// Terminates all Rust tasks.
-/// Doing so before closing the Flutter app
-/// can prevent potential memory errors that may occur
-/// when Rust attempts to send data after the Dart VM has been turned off.
+/// Calling this function before closing the Flutter app
+/// can prevent potential resource leaks that may occur
+/// if the Rust side is abruptly terminated.
 /// Please note that on the web, this function does not have any effect,
 /// as tasks are managed by the JavaScript runtime, not Rust.
 void stopRustLogic() async {
