@@ -504,7 +504,8 @@ hash_map.insert(
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
 
-Future<void> initializeRust() async {
+Future<void> initializeRust({String? compiledLibPath}) async {
+  setCompiledLibPath(compiledLibPath);
   await prepareInterface(handleRustSignal);
   startRustLogic();
 }

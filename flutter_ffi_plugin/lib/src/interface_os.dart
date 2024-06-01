@@ -7,6 +7,10 @@ import 'dart:isolate';
 import 'interface.dart';
 import 'dart:convert';
 
+void setCompiledLibPathExtern(String? path) {
+  setDynamicLibPath(path);
+}
+
 Future<void> prepareInterfaceExtern(
   HandleRustSignal handleRustSignal,
 ) async {
