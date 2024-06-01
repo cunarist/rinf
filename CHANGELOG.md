@@ -1,3 +1,8 @@
+## 6.11.0
+
+- Now it's possible to set the dynamic library's path.
+- Now `rinf message` generates more memory-efficient and cleaner code.
+
 ## 6.10.0
 
 - Early Dart signals are now stored in the tokio channel instead of being ignored. Their performance is also slightly better.
