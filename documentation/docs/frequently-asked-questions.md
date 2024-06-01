@@ -308,3 +308,25 @@ These links might be a help:
 - https://kazlauskas.me/entries/writing-proper-buildrs-scripts
 - https://github.com/RustAudio/rodio/issues/404
 - https://github.com/breez/c-breez/issues/553
+
+### How do I set the path to a compiled dynamic library?
+
+You might want to run your app on embedded devices. However, you may encounter this error when running your app on a non-major platform:
+
+```
+Failed to load dynamic library 'libhub.so': libhub.so: cannot open shared object file: No such file or directory
+```
+
+In this case, you can specify a path that points to the compiled Rust library. Simply provide a string path to your dynamic library file.
+
+```dart title="lib/main.dart"
+import './messages/generated.dart';
+
+async void main() {
+  await initializeRust(compiledLibPath: "/path/to/library/libhub.so");
+  ...
+}
+...
+```
+
+This provided path will be used for finding dynamic library files on native platforms with Dart's `DynamicLibrary.open([compiledLibPath])`, and for loading the JavaScript module on the web with `import init, * as wasmBindings from "[compiledLibPath]"`.
