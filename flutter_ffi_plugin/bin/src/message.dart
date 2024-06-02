@@ -330,7 +330,7 @@ extension ${messageName}Extension on $messageName{
           await insertTextToFile(
             dartPath,
             '''
-extension {$messageName}Extension on $messageName{
+extension ${messageName}Extension on $messageName{
   void sendSignalToRust(Uint8List binary) {
     sendDartSignal(
       ${markedMessage.id},
