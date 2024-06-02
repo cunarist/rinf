@@ -1,3 +1,7 @@
+## 6.11.1
+
+- Fixed a bug with Dart's extension methods in the generated message code.
+
 ## 6.11.0
 
 - Now it's possible to set the dynamic library's path.
