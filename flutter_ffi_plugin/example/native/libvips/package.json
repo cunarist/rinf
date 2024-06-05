@@ -1,0 +1,71 @@
+{
+  "preset": "conventionalcommits",
+  "presetConfig": {
+    "types": [
+      {
+        "type": "feat",
+        "section": "Features"
+      },
+      {
+        "type": "feature",
+        "section": "Features"
+      },
+      {
+        "type": "fix",
+        "section": "Bug Fixes"
+      },
+      {
+        "type": "perf",
+        "section": "Performance Improvements"
+      },
+      {
+        "type": "revert",
+        "section": "Reverts"
+      },
+      {
+        "type": "docs",
+        "section": "Documentation"
+      },
+      {
+        "type": "style",
+        "section": "Styles"
+      },
+      {
+        "type": "chore",
+        "section": "Miscellaneous Chores"
+      },
+      {
+        "type": "refactor",
+        "section": "Code Refactoring"
+      },
+      {
+        "type": "test",
+        "section": "Tests"
+      },
+      {
+        "type": "build",
+        "section": "Build System"
+      },
+      {
+        "type": "ci",
+        "section": "Continuous Integration"
+      }
+    ]
+  },
+  "tagFormat": "v${version}",
+  "devDependencies": {
+    "@commitlint/config-conventional": "18.6.0",
+    "@semantic-release-cargo/semantic-release-cargo": "2.2.68",
+    "@semantic-release/changelog": "6.0.3",
+    "@semantic-release/commit-analyzer": "11.1.0",
+    "@semantic-release/exec": "6.0.3",
+    "@semantic-release/git": "10.0.1",
+    "@semantic-release/github": "9.2.6",
+    "@semantic-release/release-notes-generator": "12.1.0",
+    "semantic-release": "22.0.12",
+    "semantic-release-major-tag": "^0.3.2"
+  },
+  "engines": {
+    "node": "^20.0.0"
+  }
+}

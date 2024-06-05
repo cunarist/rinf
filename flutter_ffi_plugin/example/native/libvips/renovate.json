@@ -1,0 +1,86 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommits",
+    ":semanticPrefixFixDepsChoreOthers",
+    ":label(renovate)"
+  ],
+  "assignees": [
+    "@bassco"
+  ],
+  "vulnerabilityAlerts": {
+    "labels": [
+      "security"
+    ],
+    "automerge": true
+  },
+  "dependencyDashboard": true,
+  "configMigration": true,
+  "commitMessageLowerCase": "auto",
+  "timezone": "Europe/Berlin",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "recreateWhen": "always",
+    "rebaseWhen": "behind-base-branch",
+    "branchTopic": "lock-file-maintenance",
+    "commitMessageAction": "lock file maintenance",
+    "commitMessageTopic": "dependency {{ lowercase depName}}",
+    "commitMessagePrefix": "fix(cargo):",
+    "schedule": [
+      "before 4am on monday"
+    ],
+    "groupName": null,
+    "prBodyDefinitions": {
+      "Change": "All locks refreshed"
+    }
+  },
+  "packageRules": [
+    {
+      "description": "Automatically merge minor and patch-level updates without creating a PR",
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest"
+      ],
+      "automerge": true,
+      "automergeType": "branch"
+    },
+    {
+      "description": "Causes the bot to create a PR (and thus, an email notification), whenever there is a new major version",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false,
+      "prCreation": "not-pending"
+    },
+    {
+      "description": "Take special care of the generator cargo configuration with a PR",
+      "matchFileNames": [
+        "generator/Cargo.toml"
+      ],
+      "semanticCommitType": "fix",
+      "semanticCommitScope": "generator",
+      "automerge": false,
+      "prCreation": "not-pending"
+    },
+    {
+      "matchManagers": [
+        "github-actions"
+      ],
+      "automerge": true,
+      "automergeType": "branch",
+      "semanticCommitType": "ci",
+      "semanticCommitScope": "workflow"
+    },
+    {
+      "matchManagers": [
+        "dockerfile"
+      ],
+      "semanticCommitScope": "docker",
+      "automerge": false
+    }
+  ],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 3
+}

@@ -1,0 +1,18 @@
+edition = "2021"
+
+array_width = 60
+chain_width = 10
+disable_all_formatting = false
+fn_call_width = 10
+fn_params_layout = "Tall"
+newline_style = "Unix"
+remove_nested_parens = true
+reorder_imports = true
+reorder_modules = true
+short_array_element_width_threshold = 5
+struct_lit_width = 0
+struct_variant_width = 0
+tab_spaces = 4
+use_field_init_shorthand = false
+use_small_heuristics = "Max"
+use_try_shorthand = false

@@ -1,0 +1,37 @@
+{
+  "preset": "conventionalcommits",
+  "branches": ["master"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "./bump-versions.sh ${nextRelease.version}"
+      }
+    ],
+    "@semantic-release/release-notes-generator",
+    ["@semantic-release/changelog", { "changelogTitle": "# Changelog" }],
+    "@semantic-release-cargo/semantic-release-cargo",
+    [
+      "semantic-release-major-tag",
+      {
+        "customTags": ["v${major}", "v${major}.${minor}"]
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "failComment": false,
+        "failTitle": false,
+        "releasedLabels": false
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["README.md", "CHANGELOG.md", "Cargo.toml", "Cargo.lock"],
+        "message": "chore: Release ${nextRelease.version} [skip ci]"
+      }
+    ]
+  ]
+}

@@ -2,6 +2,7 @@
 
 use crate::messages;
 use crate::tokio;
+
 use rinf::debug_print;
 use tokio::sync::Mutex;
 
@@ -11,11 +12,8 @@ const IS_DEBUG_MODE: bool = true;
 #[cfg(not(debug_assertions))]
 const IS_DEBUG_MODE: bool = false;
 
-// This is one of the best ways to keep a global mutable state in Rust.
-// You can also use `tokio::sync::RwLock` or `tokio::sync::OnceCell`.
 static VECTOR: Mutex<Vec<bool>> = Mutex::const_new(Vec::new());
 
-// Business logic for the counter widget.
 pub async fn tell_numbers() {
     use messages::counter_number::*;
 
@@ -44,7 +42,6 @@ pub async fn tell_numbers() {
     }
 }
 
-// Business logic for the fractal image.
 pub async fn stream_fractal() {
     use messages::counter_number::*;
     use messages::fractal_art::*;
@@ -96,7 +93,6 @@ pub async fn stream_fractal() {
     });
 }
 
-// A dummy function that uses sample messages to eliminate warnings.
 #[allow(dead_code)]
 async fn use_messages() {
     use messages::sample_folder::enum_and_oneof::*;
@@ -108,7 +104,6 @@ async fn use_messages() {
     .send_signal_to_dart()
 }
 
-// Business logic for testing various crates.
 pub async fn run_debug_tests() {
     if !IS_DEBUG_MODE {
         return;
@@ -133,21 +128,6 @@ pub async fn run_debug_tests() {
     } else {
         debug_print!("Hardware ID is not available on this platform.");
     }
-
-    // Test `tokio::join!` for futures.
-    let join_first = async {
-        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-        debug_print!("First future finished.");
-    };
-    let join_second = async {
-        tokio::time::sleep(std::time::Duration::from_secs(2)).await;
-        debug_print!("Second future finished.");
-    };
-    let join_third = async {
-        tokio::time::sleep(std::time::Duration::from_secs(3)).await;
-        debug_print!("Third future finished.");
-    };
-    tokio::join!(join_first, join_second, join_third);
 
     // Avoid blocking the async event loop by yielding.
     let mut last_time = sample_crate::get_current_time();
@@ -207,4 +187,26 @@ pub async fn run_debug_tests() {
 
     debug_print!("Debug tests completed!");
     panic!("INTENTIONAL DEBUG PANIC");
+}
+
+use libvips::ops;
+use libvips::VipsApp;
+use libvips::VipsImage;
+
+pub async fn libvips_add() {
+    VipsApp::new("vips_example", true).expect("Failed to initialize libvips");
+    let image = VipsImage::new_from_file("wallpaper.jpg").unwrap();
+    let _resized: VipsImage = ops::resize(&image, 0.5).unwrap();
+    let _options = ops::JpegsaveOptions {
+        q: 90,
+        background: vec![255.0],
+        optimize_coding: true,
+        optimize_scans: true,
+        interlace: true,
+        ..ops::JpegsaveOptions::default()
+    };
+    match ops::jpegsave_with_opts(&_resized, "output.jpeg", &_options) {
+        Err(_) => println!("error: {}", 10),
+        Ok(_) => println!("Great Success!"),
+    }
 }

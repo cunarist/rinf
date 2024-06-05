@@ -1,0 +1,21 @@
+# (c) Copyright 2019-2024 OLX
+[package]
+name = "libvips"
+description = "Safe bindings for libvips"
+version = "1.7.0"
+authors = ["Andrew Basson <andrew.basson@olx.com>","Bogdan Vidrean <bogdan.vidrean@olx.com>"]
+repository = "https://github.com/olxgroup-oss/libvips-rust-bindings"
+readme = "README.md"
+license = "MIT"
+edition = "2021"
+keywords = ["libvips", "bindgen", "image", "bindings"]
+categories = ["multimedia::images", "multimedia::encoding", "graphics"]
+exclude = ["generator"]
+
+[package.metadata.release]
+pre-release-commit-message = "release version {{version}}"
+tag-message = "Version {{version}} of libvips."
+
+[dependencies]
+num-traits = "0.2"
+num-derive = "0.4"

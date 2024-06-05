@@ -1,0 +1,16 @@
+[package]
+name = "vips-sys"
+version = "0.1.2"
+authors = ["elbaro <elbaro@github>"]
+description = "This crate provides bindings to libvips."
+keywords = ["vips", "image", "libvips"]
+documentation = "https://elbaro.github.io/vips-sys/vips_sys/"
+repository = "https://github.com/elbaro/vips-sys"
+readme = "README.md"
+categories = ["multimedia::images", "external-ffi-bindings"]
+license = "MIT"
+
+[build-dependencies]
+pkg-config = "0.3.11"
+
+[dependencies]
