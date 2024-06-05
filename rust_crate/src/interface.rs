@@ -7,6 +7,9 @@ use super::interface_os::*;
 #[cfg(target_family = "wasm")]
 use super::interface_web::*;
 
+#[cfg(feature = "bevy")]
+use bevy_ecs::event::Event;
+
 /// This is a mutable cell type that can be shared across threads.
 pub type SharedCell<T> = OnceLock<Mutex<RefCell<Option<T>>>>;
 
@@ -14,6 +17,8 @@ pub type SharedCell<T> = OnceLock<Mutex<RefCell<Option<T>>>>;
 /// Optionally, a custom binary called `binary` can also be included.
 /// This type is generic, and the message
 /// can be of any type declared in Protobuf.
+/// If the bevy feature is used, every message can be received as an event in bevy.
+#[cfg_attr(feature = "bevy", derive(Event))]
 pub struct DartSignal<T> {
     pub message: T,
     pub binary: Vec<u8>,

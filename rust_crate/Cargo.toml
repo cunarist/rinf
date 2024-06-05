@@ -15,7 +15,12 @@ protoc-prebuilt = "0.3.0"
 home = "0.5.9"
 which = "6.0.0"
 allo-isolate = "0.1.24"
+bevy_ecs = { version = "0.13", optional = true }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3.69"
 wasm-bindgen = "0.2.92"
+bevy_ecs = { version = "0.13", optional = true }
+
+[features]
+bevy = ["dep:bevy_ecs"]
