@@ -7,14 +7,42 @@
 /// at the root of the `hub` crate.
 macro_rules! write_interface {
     () => {
+        use crate::tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+        use std::sync::mpsc::Receiver;
+        use std::sync::{Mutex, OnceLock};
+
+        struct ShutdownStore {
+            shutdown_sender: Option<UnboundedSender<()>>,
+            shutdown_receiver: Option<UnboundedReceiver<()>>,
+            done_receiver: Receiver<()>,
+        }
+
+        type ShutdownStoreShared = OnceLock<Mutex<Option<ShutdownStore>>>;
+        static SHUTDOWN_STORE: ShutdownStoreShared = OnceLock::new();
+
+        fn get_shutdown_receiver() -> UnboundedReceiver<()> {
+            let mut guard = SHUTDOWN_STORE
+                .get_or_init(|| Mutex::new(None))
+                .lock()
+                .unwrap();
+            guard.as_mut().unwrap().shutdown_receiver.take().unwrap()
+        }
+
+        async fn dart_shutdown() {
+            let mut shutdown_receiver = get_shutdown_receiver();
+            shutdown_receiver.recv().await;
+        }
+
         #[cfg(not(target_family = "wasm"))]
         mod interface_os {
             use crate::tokio::runtime::Builder;
             use crate::tokio::runtime::Runtime;
+            use crate::tokio::sync::mpsc::unbounded_channel;
             use rinf::externs::os_thread_local::ThreadLocal;
             use std::cell::RefCell;
             use std::panic::catch_unwind;
-            use std::sync::OnceLock;
+            use std::sync::mpsc::channel as std_channel;
+            use std::sync::{Mutex, OnceLock};
 
             // We use `os_thread_local` so that when the program fails
             // and the main thread exits unexpectedly,
@@ -36,9 +64,28 @@ macro_rules! write_interface {
                         }));
                     }
 
+                    // Prepare to notify Dart shutdown.
+                    let (shutdown_sender, shutdown_receiver) = unbounded_channel();
+                    let (done_sender, done_receiver) = std_channel::<()>();
+                    let mut guard = crate::SHUTDOWN_STORE
+                        .get_or_init(|| Mutex::new(None))
+                        .lock()
+                        .unwrap();
+                    guard.replace(crate::ShutdownStore {
+                        shutdown_sender: Some(shutdown_sender),
+                        shutdown_receiver: Some(shutdown_receiver),
+                        done_receiver,
+                    });
+
                     // Run the main function.
                     let tokio_runtime = Builder::new_multi_thread().enable_all().build().unwrap();
-                    tokio_runtime.spawn(crate::main());
+                    tokio_runtime.spawn(async move {
+                        // Start the logic.
+                        crate::main().await;
+                        // After the async runtime has done its job,
+                        // tell the main thread to stop waiting.
+                        let _ = done_sender.send(());
+                    });
                     let os_cell =
                         TOKIO_RUNTIME.get_or_init(|| ThreadLocal::new(|| RefCell::new(None)));
                     os_cell.with(move |cell| {
@@ -53,11 +100,24 @@ macro_rules! write_interface {
 
             #[no_mangle]
             pub extern "C" fn stop_rust_logic_extern() {
+                // Tell the Rust logic to perform finalziation code.
+                let mut guard = crate::SHUTDOWN_STORE
+                    .get_or_init(|| Mutex::new(None))
+                    .lock()
+                    .unwrap();
+                let _ = guard
+                    .as_ref()
+                    .unwrap()
+                    .shutdown_sender
+                    .as_ref()
+                    .unwrap()
+                    .send(());
+                let _ = guard.as_ref().unwrap().done_receiver.recv();
+                // Dropping the tokio runtime causes it to shut down completely.
                 let _ = catch_unwind(|| {
                     let os_cell =
                         TOKIO_RUNTIME.get_or_init(|| ThreadLocal::new(|| RefCell::new(None)));
                     os_cell.with(move |cell| {
-                        // Dropping the tokio runtime causes it to shut down.
                         cell.take();
                     });
                 });

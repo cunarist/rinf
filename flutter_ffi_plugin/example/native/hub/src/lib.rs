@@ -18,4 +18,10 @@ async fn main() {
     tokio::spawn(sample_functions::tell_numbers());
     tokio::spawn(sample_functions::stream_fractal());
     tokio::spawn(sample_functions::run_debug_tests());
+    dart_shutdown().await;
+    for i in 0..15 {
+        use std::time::Duration;
+        println!("{i}");
+        tokio::time::sleep(Duration::from_secs(1)).await;
+    }
 }
