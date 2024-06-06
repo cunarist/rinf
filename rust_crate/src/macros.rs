@@ -7,41 +7,17 @@
 /// at the root of the `hub` crate.
 macro_rules! write_interface {
     () => {
-        use crate::tokio::sync::mpsc::{Receiver, Sender};
-        use std::sync::mpsc::Receiver as StdReceiver;
-        use std::sync::{Mutex, OnceLock};
-
-        struct ShutdownStore {
-            shutdown_sender: Option<Sender<()>>,
-            shutdown_receiver: Option<Receiver<()>>,
-            done_receiver: StdReceiver<()>,
-        }
-
-        type ShutdownStoreShared = OnceLock<Mutex<Option<ShutdownStore>>>;
-        static SHUTDOWN_STORE: ShutdownStoreShared = OnceLock::new();
-
-        fn get_shutdown_receiver() -> Receiver<()> {
-            let mut guard = SHUTDOWN_STORE
-                .get_or_init(|| Mutex::new(None))
-                .lock()
-                .unwrap();
-            guard.as_mut().unwrap().shutdown_receiver.take().unwrap()
-        }
-
-        async fn dart_shutdown() {
-            let mut shutdown_receiver = get_shutdown_receiver();
-            shutdown_receiver.recv().await;
-        }
-
         #[cfg(not(target_family = "wasm"))]
         mod interface_os {
             use crate::tokio::runtime::Builder;
             use crate::tokio::runtime::Runtime;
             use crate::tokio::sync::mpsc::channel;
+            use crate::tokio::sync::mpsc::{Receiver, Sender};
             use rinf::externs::os_thread_local::ThreadLocal;
             use std::cell::RefCell;
             use std::panic::catch_unwind;
             use std::sync::mpsc::sync_channel;
+            use std::sync::mpsc::Receiver as StdReceiver;
             use std::sync::{Mutex, OnceLock};
 
             // We use `os_thread_local` so that when the program fails
@@ -49,6 +25,30 @@ macro_rules! write_interface {
             // the whole async tokio runtime can disappear as well.
             type TokioRuntime = OnceLock<ThreadLocal<RefCell<Option<Runtime>>>>;
             static TOKIO_RUNTIME: TokioRuntime = OnceLock::new();
+
+            // These channels are used for gracefully shutting down the tokio runtime.
+            // Right before the topmost Flutter widget gets disposed,
+            // these channels will ensure that Rust logic is properly stopped.
+            struct ShutdownStore {
+                shutdown_sender: Option<Sender<()>>,
+                shutdown_receiver: Option<Receiver<()>>,
+                done_receiver: StdReceiver<()>,
+            }
+            type ShutdownStoreShared = OnceLock<Mutex<Option<ShutdownStore>>>;
+            static SHUTDOWN_STORE: ShutdownStoreShared = OnceLock::new();
+
+            fn get_shutdown_receiver() -> Receiver<()> {
+                let mut guard = SHUTDOWN_STORE
+                    .get_or_init(|| Mutex::new(None))
+                    .lock()
+                    .unwrap();
+                guard.as_mut().unwrap().shutdown_receiver.take().unwrap()
+            }
+
+            async fn dart_shutdown() {
+                let mut shutdown_receiver = get_shutdown_receiver();
+                shutdown_receiver.recv().await;
+            }
 
             #[no_mangle]
             pub extern "C" fn start_rust_logic_extern() {
@@ -67,11 +67,11 @@ macro_rules! write_interface {
                     // Prepare to notify Dart shutdown.
                     let (shutdown_sender, shutdown_receiver) = channel(1);
                     let (done_sender, done_receiver) = sync_channel::<()>(1);
-                    let mut guard = crate::SHUTDOWN_STORE
+                    let mut guard = SHUTDOWN_STORE
                         .get_or_init(|| Mutex::new(None))
                         .lock()
                         .unwrap();
-                    guard.replace(crate::ShutdownStore {
+                    guard.replace(ShutdownStore {
                         shutdown_sender: Some(shutdown_sender),
                         shutdown_receiver: Some(shutdown_receiver),
                         done_receiver,
@@ -101,7 +101,7 @@ macro_rules! write_interface {
             #[no_mangle]
             pub extern "C" fn stop_rust_logic_extern() {
                 // Tell the Rust logic to perform finalziation code.
-                let mut guard = crate::SHUTDOWN_STORE
+                let mut guard = SHUTDOWN_STORE
                     .get_or_init(|| Mutex::new(None))
                     .lock()
                     .unwrap();
