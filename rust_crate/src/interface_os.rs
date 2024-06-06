@@ -1,4 +1,3 @@
-use super::SharedLock;
 use allo_isolate::IntoDart;
 use allo_isolate::Isolate;
 use allo_isolate::ZeroCopyBuffer;
@@ -6,7 +5,7 @@ use std::panic::catch_unwind;
 use std::sync::Mutex;
 use std::sync::OnceLock;
 
-static DART_ISOLATE: SharedLock<Isolate> = OnceLock::new();
+static DART_ISOLATE: OnceLock<Mutex<Option<Isolate>>> = OnceLock::new();
 
 #[no_mangle]
 pub extern "C" fn prepare_isolate_extern(port: i64) {

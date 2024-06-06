@@ -1,13 +1,7 @@
-use std::sync::Mutex;
-use std::sync::OnceLock;
-
 #[cfg(not(target_family = "wasm"))]
 use super::interface_os::*;
 #[cfg(target_family = "wasm")]
 use super::interface_web::*;
-
-/// This is a mutable cell type that can be shared across threads.
-pub type SharedLock<T> = OnceLock<Mutex<Option<T>>>;
 
 /// This contains a message from Dart.
 /// Optionally, a custom binary called `binary` can also be included.

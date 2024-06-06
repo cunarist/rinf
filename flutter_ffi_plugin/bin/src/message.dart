@@ -250,7 +250,6 @@ use crate::tokio;
 use prost::Message;
 use rinf::send_rust_signal;
 use rinf::DartSignal;
-use rinf::SharedLock;
 use std::sync::Mutex;
 use std::sync::OnceLock;
 use tokio::sync::mpsc::unbounded_channel;
@@ -271,10 +270,10 @@ use tokio::sync::mpsc::UnboundedSender;
           await insertTextToFile(
             rustPath,
             '''
-type ${messageName}Cell = SharedLock<(
+type ${messageName}Cell = OnceLock<Mutex<Option<(
     Option<UnboundedSender<DartSignal<${normalizePascal(messageName)}>>>,
     Option<UnboundedReceiver<DartSignal<${normalizePascal(messageName)}>>>,
-)>;
+)>>>;
 pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Cell =
     OnceLock::new();
 
