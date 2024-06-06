@@ -7,18 +7,27 @@
 /// at the root of the `hub` crate.
 macro_rules! write_interface {
     () => {
+        async fn dart_shutdown() {
+            #[cfg(not(target_family = "wasm"))]
+            {
+                let mut shutdown_receiver = interface_os::get_shutdown_receiver();
+                shutdown_receiver.recv().await;
+            }
+        }
+
         #[cfg(not(target_family = "wasm"))]
         mod interface_os {
-            use crate::tokio::runtime::Builder;
-            use crate::tokio::runtime::Runtime;
-            use crate::tokio::sync::mpsc::channel;
-            use crate::tokio::sync::mpsc::{Receiver, Sender};
+            use crate::tokio;
             use rinf::externs::os_thread_local::ThreadLocal;
             use std::cell::RefCell;
             use std::panic::catch_unwind;
             use std::sync::mpsc::sync_channel;
             use std::sync::mpsc::Receiver as StdReceiver;
             use std::sync::{Mutex, OnceLock};
+            use tokio::runtime::Builder;
+            use tokio::runtime::Runtime;
+            use tokio::sync::mpsc::channel;
+            use tokio::sync::mpsc::{Receiver, Sender};
 
             // We use `os_thread_local` so that when the program fails
             // and the main thread exits unexpectedly,
@@ -37,17 +46,12 @@ macro_rules! write_interface {
             type ShutdownStoreShared = OnceLock<Mutex<Option<ShutdownStore>>>;
             static SHUTDOWN_STORE: ShutdownStoreShared = OnceLock::new();
 
-            fn get_shutdown_receiver() -> Receiver<()> {
+            pub fn get_shutdown_receiver() -> Receiver<()> {
                 let mut guard = SHUTDOWN_STORE
                     .get_or_init(|| Mutex::new(None))
                     .lock()
                     .unwrap();
                 guard.as_mut().unwrap().shutdown_receiver.take().unwrap()
-            }
-
-            async fn dart_shutdown() {
-                let mut shutdown_receiver = get_shutdown_receiver();
-                shutdown_receiver.recv().await;
             }
 
             #[no_mangle]
