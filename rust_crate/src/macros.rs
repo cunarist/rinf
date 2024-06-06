@@ -10,8 +10,16 @@ macro_rules! write_interface {
         async fn dart_shutdown() {
             #[cfg(not(target_family = "wasm"))]
             {
+                // The receiver will get a signal
+                // while the topmost Flutter widget is getting disposed.
                 let mut shutdown_receiver = interface_os::get_shutdown_receiver();
                 shutdown_receiver.recv().await;
+            }
+            #[cfg(target_family = "wasm")]
+            {
+                // The receiver will wait forever because it never gets a message.
+                let (_sender, receiver) = tokio::sync::oneshot::channel::<()>();
+                let _ = receiver.await;
             }
         }
 
