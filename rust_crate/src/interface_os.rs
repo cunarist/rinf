@@ -12,11 +12,11 @@ static DART_ISOLATE: SharedLock<Isolate> = OnceLock::new();
 pub extern "C" fn prepare_isolate_extern(port: i64) {
     let _ = catch_unwind(|| {
         let dart_isolate = Isolate::new(port);
-        let mut cell = DART_ISOLATE
+        let mut guard = DART_ISOLATE
             .get_or_init(|| Mutex::new(None))
             .lock()
             .unwrap();
-        cell.replace(dart_isolate);
+        guard.replace(dart_isolate);
     });
 }
 

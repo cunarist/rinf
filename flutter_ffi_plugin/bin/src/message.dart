@@ -280,7 +280,7 @@ pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Cell =
 
 impl ${normalizePascal(messageName)} {
     pub fn get_dart_signal_receiver() -> UnboundedReceiver<DartSignal<Self>> {
-        let mut lock = ${snakeName.toUpperCase()}_CHANNEL
+        let mut guard = ${snakeName.toUpperCase()}_CHANNEL
             .get_or_init(|| {
                 let (sender, receiver) = unbounded_channel();
                 Mutex::new(Some((Some(sender), Some(receiver))))
@@ -292,15 +292,15 @@ impl ${normalizePascal(messageName)} {
             // After Dart's hot restart,
             // a sender from the previous run already exists
             // which is now closed.
-            let pair = lock.as_ref().unwrap();
+            let pair = guard.as_ref().unwrap();
             let is_closed = pair.0.as_ref().unwrap().is_closed();
             if is_closed {
                 let (sender, receiver) = unbounded_channel();
-                lock.replace((Some(sender), Some(receiver)));
+                guard.replace((Some(sender), Some(receiver)));
             }
         }
-        let pair = lock.take().unwrap();
-        lock.replace((pair.0, None));
+        let pair = guard.take().unwrap();
+        guard.replace((pair.0, None));
         pair.1.expect("A receiver can be taken only once")
     }
 }
@@ -448,7 +448,7 @@ hash_map.insert(
             message,
             binary,
         };
-        let mut lock = ${snakeName.toUpperCase()}_CHANNEL
+        let mut guard = ${snakeName.toUpperCase()}_CHANNEL
             .get_or_init(|| {
                 let (sender, receiver) = unbounded_channel();
                 Mutex::new(Some((Some(sender), Some(receiver))))
@@ -460,14 +460,14 @@ hash_map.insert(
             // After Dart's hot restart,
             // a sender from the previous run already exists
             // which is now closed.
-            let pair = lock.as_ref().unwrap();
+            let pair = guard.as_ref().unwrap();
             let is_closed = pair.0.as_ref().unwrap().is_closed();
             if is_closed {
                 let (sender, receiver) = unbounded_channel();
-                lock.replace((Some(sender), Some(receiver)));
+                guard.replace((Some(sender), Some(receiver)));
             }
         }
-        let pair = lock.as_ref().unwrap();
+        let pair = guard.as_ref().unwrap();
         let sender = pair.0.as_ref().unwrap();
         let _ = sender.send(dart_signal);
     }),
