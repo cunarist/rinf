@@ -105,7 +105,7 @@ macro_rules! write_interface {
             #[no_mangle]
             pub extern "C" fn stop_rust_logic_extern() {
                 // Tell the Rust logic to perform finalziation code.
-                let mut guard = SHUTDOWN_STORE
+                let guard = SHUTDOWN_STORE
                     .get_or_init(|| Mutex::new(None))
                     .lock()
                     .unwrap();
