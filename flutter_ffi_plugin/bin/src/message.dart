@@ -250,8 +250,7 @@ use crate::tokio;
 use prost::Message;
 use rinf::send_rust_signal;
 use rinf::DartSignal;
-use rinf::SharedCell;
-use std::cell::RefCell;
+use rinf::SharedLock;
 use std::sync::Mutex;
 use std::sync::OnceLock;
 use tokio::sync::mpsc::unbounded_channel;
@@ -272,7 +271,7 @@ use tokio::sync::mpsc::UnboundedSender;
           await insertTextToFile(
             rustPath,
             '''
-type ${messageName}Cell = SharedCell<(
+type ${messageName}Cell = SharedLock<(
     Option<UnboundedSender<DartSignal<${normalizePascal(messageName)}>>>,
     Option<UnboundedReceiver<DartSignal<${normalizePascal(messageName)}>>>,
 )>;
@@ -281,10 +280,10 @@ pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Cell =
 
 impl ${normalizePascal(messageName)} {
     pub fn get_dart_signal_receiver() -> UnboundedReceiver<DartSignal<Self>> {
-        let cell = ${snakeName.toUpperCase()}_CHANNEL
+        let mut lock = ${snakeName.toUpperCase()}_CHANNEL
             .get_or_init(|| {
                 let (sender, receiver) = unbounded_channel();
-                Mutex::new(RefCell::new(Some((Some(sender), Some(receiver)))))
+                Mutex::new(Some((Some(sender), Some(receiver))))
             })
             .lock()
             .unwrap();
@@ -293,17 +292,15 @@ impl ${normalizePascal(messageName)} {
             // After Dart's hot restart,
             // a sender from the previous run already exists
             // which is now closed.
-            let borrowed = cell.borrow();
-            let pair = borrowed.as_ref().unwrap();
+            let pair = lock.as_ref().unwrap();
             let is_closed = pair.0.as_ref().unwrap().is_closed();
-            drop(borrowed);
             if is_closed {
                 let (sender, receiver) = unbounded_channel();
-                cell.replace(Some((Some(sender), Some(receiver))));
+                lock.replace((Some(sender), Some(receiver)));
             }
         }
-        let pair = cell.take().unwrap();
-        cell.replace(Some((pair.0, None)));
+        let pair = lock.take().unwrap();
+        lock.replace((pair.0, None));
         pair.1.expect("A receiver can be taken only once")
     }
 }
@@ -405,7 +402,6 @@ use crate::tokio;
 use prost::Message;
 use rinf::debug_print;
 use rinf::DartSignal;
-use std::cell::RefCell;
 use std::collections::HashMap;
 use std::sync::Mutex;
 use std::sync::OnceLock;
@@ -452,10 +448,10 @@ hash_map.insert(
             message,
             binary,
         };
-        let cell = ${snakeName.toUpperCase()}_CHANNEL
+        let mut lock = ${snakeName.toUpperCase()}_CHANNEL
             .get_or_init(|| {
                 let (sender, receiver) = unbounded_channel();
-                Mutex::new(RefCell::new(Some((Some(sender), Some(receiver)))))
+                Mutex::new(Some((Some(sender), Some(receiver))))
             })
             .lock()
             .unwrap();
@@ -464,17 +460,14 @@ hash_map.insert(
             // After Dart's hot restart,
             // a sender from the previous run already exists
             // which is now closed.
-            let borrowed = cell.borrow();
-            let pair = borrowed.as_ref().unwrap();
+            let pair = lock.as_ref().unwrap();
             let is_closed = pair.0.as_ref().unwrap().is_closed();
-            drop(borrowed);
             if is_closed {
                 let (sender, receiver) = unbounded_channel();
-                cell.replace(Some((Some(sender), Some(receiver))));
+                lock.replace((Some(sender), Some(receiver)));
             }
         }
-        let borrowed = cell.borrow();
-        let pair = borrowed.as_ref().unwrap();
+        let pair = lock.as_ref().unwrap();
         let sender = pair.0.as_ref().unwrap();
         let _ = sender.send(dart_signal);
     }),

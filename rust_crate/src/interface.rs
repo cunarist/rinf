@@ -1,4 +1,3 @@
-use std::cell::RefCell;
 use std::sync::Mutex;
 use std::sync::OnceLock;
 
@@ -8,7 +7,7 @@ use super::interface_os::*;
 use super::interface_web::*;
 
 /// This is a mutable cell type that can be shared across threads.
-pub type SharedCell<T> = OnceLock<Mutex<RefCell<Option<T>>>>;
+pub type SharedLock<T> = OnceLock<Mutex<Option<T>>>;
 
 /// This contains a message from Dart.
 /// Optionally, a custom binary called `binary` can also be included.
