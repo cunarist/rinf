@@ -37,7 +37,7 @@ macro_rules! write_interface {
                     }
 
                     // Run the main function.
-                    let tokio_runtime = Builder::new_multi_thread().enable_all().build().unwrap();
+                    let tokio_runtime = Builder::new_current_thread().enable_all().build().unwrap();
                     tokio_runtime.spawn(crate::main());
                     let os_cell =
                         TOKIO_RUNTIME.get_or_init(|| ThreadLocal::new(|| RefCell::new(None)));
