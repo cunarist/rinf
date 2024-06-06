@@ -5,7 +5,6 @@ import 'package:example_app/messages/counter_number.pb.dart';
 import 'package:example_app/messages/fractal_art.pb.dart';
 
 void main() async {
-  // Wait for Rust initialization to be completed first.
   await initializeRust();
   runApp(const MyApp());
 }
@@ -20,7 +19,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final _appLifecycleListener = AppLifecycleListener(
     onExitRequested: () async {
-      // Terminate Rust tasks before closing the Flutter app.
       await finalizeRust();
       return AppExitResponse.exit;
     },
@@ -56,8 +54,6 @@ class MyHomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // `StreamBuilder` listens to a stream
-            // and rebuilds the widget accordingly.
             StreamBuilder(
                 stream: SampleFractal.rustSignalStream,
                 builder: (context, snapshot) {
@@ -93,16 +89,11 @@ class MyHomePage extends StatelessWidget {
                   );
                 }),
             StreamBuilder(
-              // This stream is generated from a marked Protobuf message.
               stream: SampleNumberOutput.rustSignalStream,
               builder: (context, snapshot) {
                 final rustSignal = snapshot.data;
-                // If the app has just started and widget is built
-                // without receiving a Rust signal,
-                // the snapshot data will be null.
-                // It's when the widget is being built for the first time.
+
                 if (rustSignal == null) {
-                  // Return the initial widget if the snapshot data is null.
                   return Text('Initial value 0');
                 }
                 final sampleNumberOutput = rustSignal.message;
@@ -113,10 +104,8 @@ class MyHomePage extends StatelessWidget {
           ],
         ),
       ),
-      // This is a button that calls the generated function.
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // The method is generated from a marked Protobuf message.
           SampleNumberInput(
             letter: "HELLO FROM DART!",
             dummyOne: 25,
