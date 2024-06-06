@@ -7,20 +7,20 @@
 /// at the root of the `hub` crate.
 macro_rules! write_interface {
     () => {
-        use crate::tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
-        use std::sync::mpsc::Receiver;
+        use crate::tokio::sync::mpsc::{Receiver, Sender};
+        use std::sync::mpsc::Receiver as StdReceiver;
         use std::sync::{Mutex, OnceLock};
 
         struct ShutdownStore {
-            shutdown_sender: Option<UnboundedSender<()>>,
-            shutdown_receiver: Option<UnboundedReceiver<()>>,
-            done_receiver: Receiver<()>,
+            shutdown_sender: Option<Sender<()>>,
+            shutdown_receiver: Option<Receiver<()>>,
+            done_receiver: StdReceiver<()>,
         }
 
         type ShutdownStoreShared = OnceLock<Mutex<Option<ShutdownStore>>>;
         static SHUTDOWN_STORE: ShutdownStoreShared = OnceLock::new();
 
-        fn get_shutdown_receiver() -> UnboundedReceiver<()> {
+        fn get_shutdown_receiver() -> Receiver<()> {
             let mut guard = SHUTDOWN_STORE
                 .get_or_init(|| Mutex::new(None))
                 .lock()
@@ -37,11 +37,11 @@ macro_rules! write_interface {
         mod interface_os {
             use crate::tokio::runtime::Builder;
             use crate::tokio::runtime::Runtime;
-            use crate::tokio::sync::mpsc::unbounded_channel;
+            use crate::tokio::sync::mpsc::channel;
             use rinf::externs::os_thread_local::ThreadLocal;
             use std::cell::RefCell;
             use std::panic::catch_unwind;
-            use std::sync::mpsc::channel as std_channel;
+            use std::sync::mpsc::sync_channel;
             use std::sync::{Mutex, OnceLock};
 
             // We use `os_thread_local` so that when the program fails
@@ -65,8 +65,8 @@ macro_rules! write_interface {
                     }
 
                     // Prepare to notify Dart shutdown.
-                    let (shutdown_sender, shutdown_receiver) = unbounded_channel();
-                    let (done_sender, done_receiver) = std_channel::<()>();
+                    let (shutdown_sender, shutdown_receiver) = channel(1);
+                    let (done_sender, done_receiver) = sync_channel::<()>(1);
                     let mut guard = crate::SHUTDOWN_STORE
                         .get_or_init(|| Mutex::new(None))
                         .lock()
@@ -111,7 +111,7 @@ macro_rules! write_interface {
                     .shutdown_sender
                     .as_ref()
                     .unwrap()
-                    .send(());
+                    .try_send(());
                 let _ = guard.as_ref().unwrap().done_receiver.recv();
                 // Dropping the tokio runtime causes it to shut down completely.
                 let _ = catch_unwind(|| {
