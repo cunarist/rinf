@@ -24,6 +24,12 @@ rootProject.allprojects {
 
 apply plugin: 'com.android.library'
 
+// SDK Version 34 is the LTS as of now, till Flutter upgrades
+// There are also deprecated attributes, this takes all of them into account
+def compileSdkVersion = Math.max(android.compileSdkVersion, android.compileSdk, 31).toInteger()
+// Defaults to the 16 if nothing is specified, or else overrides from the parent
+def minSdkVersion = Math.max(android.minSdkVersion, android.minSdk, 16).toInteger()
+
 android {
     if (project.android.hasProperty("namespace")) {
         namespace 'com.cunarist.rinf'
@@ -31,7 +37,7 @@ android {
 
     // Bumping the plugin compileSdkVersion requires all clients of this plugin
     // to bump the version in their app.
-    compileSdkVersion 31
+    compileSdkVersion compileSdkVersion
 
     // Simply use the `android.ndkVersion`
     // declared in the `./android/app/build.gradle` file of the Flutter project.
@@ -58,7 +64,7 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion minSdkVersion
     }
 }
 
