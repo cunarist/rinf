@@ -21,7 +21,7 @@ async fn main() {
     dart_shutdown().await;
     for i in 0..15 {
         use std::time::Duration;
-        rinf::debug_print!("SHUTDOWN {i}");
+        println!("SHUTDOWN {i}");
         tokio::time::sleep(Duration::from_secs(1)).await;
     }
 }
