@@ -20,7 +20,13 @@ pub extern "C" fn prepare_isolate_extern(port: i64) {
 }
 
 pub fn send_rust_signal_extern(message_id: i32, message_bytes: Vec<u8>, binary: Vec<u8>) {
-    let dart_isolate = DART_ISOLATE.get().unwrap().lock().unwrap().unwrap();
+    // When `DART_ISOLATE` is not initialized, do nothing.
+    // This can happen when running test code in Rust.
+    let mutex = match DART_ISOLATE.get() {
+        Some(mutex) => mutex,
+        None => return,
+    };
+    let dart_isolate = mutex.lock().unwrap().unwrap();
 
     // If a `Vec<u8>` is empty, we can't just simply send it to Dart
     // because panic can occur from null pointers.
