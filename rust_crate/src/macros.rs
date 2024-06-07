@@ -7,7 +7,7 @@
 /// at the root of the `hub` crate.
 macro_rules! write_interface {
     () => {
-        async fn dart_shutdown() {
+        async fn widget_dispose() {
             #[cfg(not(target_family = "wasm"))]
             {
                 // The receiver will get a signal

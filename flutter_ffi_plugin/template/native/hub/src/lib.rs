@@ -19,4 +19,8 @@ async fn main() {
     SmallNumber { number: 7 }.send_signal_to_dart();
     // Get receivers that listen to Dart signals like below.
     let _ = SmallText::get_dart_signal_receiver();
+    // Keep the tokio runtime alive until the widget is disposed.
+    widget_dispose().await;
+    // Perform finalization here, such as saving files.
+    // Ensure this process is quick to avoid blocking the screen.
 }
