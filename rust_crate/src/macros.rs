@@ -32,6 +32,7 @@ macro_rules! write_interface {
             use std::sync::mpsc::sync_channel;
             use std::sync::mpsc::Receiver as StdReceiver;
             use std::sync::{Mutex, OnceLock};
+            use std::thread;
             use tokio::runtime::Builder;
             use tokio::runtime::Runtime;
             use tokio::sync::mpsc::channel;
@@ -111,9 +112,13 @@ macro_rules! write_interface {
                     tokio_runtime.spawn(async move {
                         // Start the logic.
                         crate::main().await;
-                        // After the async runtime has done its job,
-                        // tell the main thread to stop waiting.
-                        let _ = done_sender.send(());
+                        // After the main function has finished,
+                        // terminate the tokio runtime and
+                        // tell the main thread not to wait before exit.
+                        thread::spawn(move || {
+                            drop_tokio_runtime();
+                            let _ = done_sender.send(());
+                        });
                     });
                     let mut guard = TOKIO_RUNTIME
                         .get_or_init(|| Mutex::new(None))
