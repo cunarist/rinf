@@ -61,7 +61,7 @@ pub fn send_rust_signal_real(message_id: i32, message_bytes: Vec<u8>, binary: Ve
     let dart_isolate = match guard.as_ref() {
         Some(inner) => inner,
         None => {
-            debug_print!("Dart isolate is not present.");
+            debug_print!("Dart isolate for sending Rust signals is not present.");
             return;
         }
     };
