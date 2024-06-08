@@ -19,6 +19,7 @@ pub fn send_rust_signal(message_id: i32, message_bytes: Vec<u8>, binary: Vec<u8>
     send_rust_signal_real(message_id, message_bytes, binary);
 }
 
+/// Runs the main function in Rust.
 pub fn start_rust_logic<F>(main_future: F)
 where
     F: Future<Output = ()> + Send + 'static,
