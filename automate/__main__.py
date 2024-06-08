@@ -130,6 +130,11 @@ elif sys.argv[1] == "prepare-user-app":
         "flutter_ffi_plugin/example/native/*",
         "user_app/native/*",
     )
+    replace_text_in_file(
+        "Cargo.toml",
+        'rinf = { path = "./rust_crate" }',
+        "",
+    )
 
 elif sys.argv[1] == "prepare-example-app":
     os.chdir("./flutter_ffi_plugin/example")
