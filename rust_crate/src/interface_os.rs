@@ -60,7 +60,10 @@ pub fn send_rust_signal_extern(message_id: i32, message_bytes: Vec<u8>, binary: 
     let guard = DART_ISOLATE.lock().unwrap();
     let dart_isolate = match guard.as_ref() {
         Some(inner) => inner,
-        None => return,
+        None => {
+            debug_print!("Dart isolate is not present.");
+            return;
+        }
     };
 
     // If a `Vec<u8>` is empty, we can't just simply send it to Dart
