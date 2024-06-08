@@ -41,10 +41,6 @@ void startRustLogicExtern() {
   jsObject.callMethod('start_rust_logic_extern', []);
 }
 
-void stopRustLogicExtern() {
-  // Dummy function to match that of the OS module.
-}
-
 void sendDartSignalExtern(
   int messageId,
   Uint8List messageBytes,

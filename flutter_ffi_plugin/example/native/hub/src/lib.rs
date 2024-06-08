@@ -18,6 +18,4 @@ async fn main() {
     tokio::spawn(sample_functions::tell_numbers());
     tokio::spawn(sample_functions::stream_fractal());
     tokio::spawn(sample_functions::run_debug_tests());
-    // Keep the tokio runtime alive until the widget is disposed.
-    widget_dispose().await;
 }

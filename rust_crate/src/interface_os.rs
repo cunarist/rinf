@@ -3,18 +3,14 @@ use allo_isolate::Isolate;
 use allo_isolate::ZeroCopyBuffer;
 use std::panic::catch_unwind;
 use std::sync::Mutex;
-use std::sync::OnceLock;
 
-static DART_ISOLATE: OnceLock<Mutex<Option<Isolate>>> = OnceLock::new();
+static DART_ISOLATE: Mutex<Option<Isolate>> = Mutex::new(None);
 
 #[no_mangle]
 pub extern "C" fn prepare_isolate_extern(port: i64) {
     let _ = catch_unwind(|| {
         let dart_isolate = Isolate::new(port);
-        let mut guard = DART_ISOLATE
-            .get_or_init(|| Mutex::new(None))
-            .lock()
-            .unwrap();
+        let mut guard = DART_ISOLATE.lock().unwrap();
         guard.replace(dart_isolate);
     });
 }
@@ -22,11 +18,11 @@ pub extern "C" fn prepare_isolate_extern(port: i64) {
 pub fn send_rust_signal_extern(message_id: i32, message_bytes: Vec<u8>, binary: Vec<u8>) {
     // When `DART_ISOLATE` is not initialized, do nothing.
     // This can happen when running test code in Rust.
-    let mutex = match DART_ISOLATE.get() {
-        Some(mutex) => mutex,
+    let guard = DART_ISOLATE.lock().unwrap();
+    let dart_isolate = match guard.as_ref() {
+        Some(inner) => inner,
         None => return,
     };
-    let dart_isolate = mutex.lock().unwrap().unwrap();
 
     // If a `Vec<u8>` is empty, we can't just simply send it to Dart
     // because panic can occur from null pointers.

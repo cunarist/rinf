@@ -7,22 +7,6 @@
 /// at the root of the `hub` crate.
 macro_rules! write_interface {
     () => {
-        async fn widget_dispose() {
-            #[cfg(not(target_family = "wasm"))]
-            {
-                // The receiver will get a signal
-                // while the topmost Flutter widget is getting disposed.
-                let mut shutdown_receiver = interface_os::get_shutdown_receiver();
-                shutdown_receiver.recv().await;
-            }
-            #[cfg(target_family = "wasm")]
-            {
-                // The receiver will wait forever because it never gets a message.
-                let (_sender, receiver) = tokio::sync::oneshot::channel::<()>();
-                let _ = receiver.await;
-            }
-        }
-
         #[cfg(not(target_family = "wasm"))]
         mod interface_os {
             use crate::tokio;
@@ -38,43 +22,13 @@ macro_rules! write_interface {
             use tokio::sync::mpsc::channel;
             use tokio::sync::mpsc::{Receiver, Sender};
 
-            // This is the runtime where async event loop runs.
-            type TokioRuntime = Mutex<Option<Runtime>>;
-            static TOKIO_RUNTIME: TokioRuntime = Mutex::new(None);
-
             // We use `os_thread_local` so that when the program fails
             // and the main thread exits unexpectedly,
             // the whole async tokio runtime can disappear as well.
-            // Without this struct, zombie threads inside the runtime
+            // Without this solution, zombie threads inside the runtime
             // might outlive the app.
-            struct RuntimeDropper;
-            impl Drop for RuntimeDropper {
-                fn drop(&mut self) {
-                    drop_tokio_runtime();
-                }
-            }
-            static RUNTIME_DROPPER: OnceLock<ThreadLocal<RuntimeDropper>> = OnceLock::new();
-
-            // These channels are used for gracefully shutting down the tokio runtime.
-            // Right before the topmost Flutter widget gets disposed,
-            // these channels will help ensure that Rust logic is properly stopped.
-            struct ShutdownStore {
-                shutdown_sender: Option<Sender<()>>,
-                shutdown_receiver: Option<Receiver<()>>,
-                done_receiver: StdReceiver<()>,
-            }
-            type ShutdownStoreShared = Mutex<Option<ShutdownStore>>;
-            static SHUTDOWN_STORE: ShutdownStoreShared = Mutex::new(None);
-
-            pub fn get_shutdown_receiver() -> Receiver<()> {
-                let mut guard = SHUTDOWN_STORE.lock().unwrap();
-                guard.as_mut().unwrap().shutdown_receiver.take().unwrap()
-            }
-
-            fn drop_tokio_runtime() {
-                // Dropping the tokio runtime causes it to shut down completely.
-                TOKIO_RUNTIME.lock().unwrap().take();
-            }
+            type TokioRuntime = OnceLock<ThreadLocal<RefCell<Option<Runtime>>>>;
+            static TOKIO_RUNTIME: TokioRuntime = OnceLock::new();
 
             #[no_mangle]
             pub extern "C" fn start_rust_logic_extern() {
@@ -90,50 +44,18 @@ macro_rules! write_interface {
                         }));
                     }
 
-                    // Prepare to notify Dart shutdown.
-                    let (shutdown_sender, shutdown_receiver) = channel(1);
-                    let (done_sender, done_receiver) = sync_channel::<()>(1);
-                    SHUTDOWN_STORE.lock().unwrap().replace(ShutdownStore {
-                        shutdown_sender: Some(shutdown_sender),
-                        shutdown_receiver: Some(shutdown_receiver),
-                        done_receiver,
-                    });
-
-                    // Prepare to drop the async runtime
-                    // when program fails unexpectedly.
-                    RUNTIME_DROPPER.get_or_init(|| ThreadLocal::new(|| RuntimeDropper));
-
                     // Run the main function.
                     let tokio_runtime = Builder::new_multi_thread().enable_all().build().unwrap();
-                    tokio_runtime.spawn(async move {
-                        // Start the logic.
-                        crate::main().await;
-                        // After the main function has finished,
-                        // terminate the tokio runtime and
-                        // tell the main thread not to wait before exit.
-                        thread::spawn(move || {
-                            drop_tokio_runtime();
-                            let _ = done_sender.send(());
+                    tokio_runtime.spawn(crate::main());
+                    TOKIO_RUNTIME
+                        .get_or_init(|| ThreadLocal::new(|| RefCell::new(None)))
+                        .with(move |cell| {
+                            // If there was already a tokio runtime previously,
+                            // most likely due to Dart's hot restart,
+                            // its tasks as well as itself will be terminated,
+                            // being replaced with the new one.
+                            cell.replace(Some(tokio_runtime));
                         });
-                    });
-                    TOKIO_RUNTIME.lock().unwrap().replace(tokio_runtime);
-                });
-            }
-
-            #[no_mangle]
-            pub extern "C" fn stop_rust_logic_extern() {
-                let _ = catch_unwind(|| {
-                    // Tell the Rust logic to perform finalziation code.
-                    let guard = SHUTDOWN_STORE.lock().unwrap();
-                    let _ = guard
-                        .as_ref()
-                        .unwrap()
-                        .shutdown_sender
-                        .as_ref()
-                        .unwrap()
-                        .try_send(());
-                    let _ = guard.as_ref().unwrap().done_receiver.recv();
-                    drop_tokio_runtime();
                 });
             }
 
