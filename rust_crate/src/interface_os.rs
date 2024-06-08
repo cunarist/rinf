@@ -22,7 +22,7 @@ pub extern "C" fn prepare_isolate_extern(port: i64) {
 // We use `os_thread_local` so that when the program fails
 // and the main thread exits unexpectedly,
 // the whole async tokio runtime can disappear as well.
-// Without this solution, zombie threads inside the runtime
+// Without this solution, zombie threads inside the tokio runtime
 // might outlive the app.
 type TokioRuntime = OnceLock<ThreadLocal<RefCell<Option<Runtime>>>>;
 static TOKIO_RUNTIME: TokioRuntime = OnceLock::new();
