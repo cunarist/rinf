@@ -1,8 +1,12 @@
-use allo_isolate::IntoDart;
-use allo_isolate::Isolate;
-use allo_isolate::ZeroCopyBuffer;
+use crate::debug_print;
+use allo_isolate::{IntoDart, Isolate, ZeroCopyBuffer};
+use backtrace::Backtrace;
+use os_thread_local::ThreadLocal;
+use std::cell::RefCell;
+use std::future::Future;
 use std::panic::catch_unwind;
-use std::sync::Mutex;
+use std::sync::{Mutex, OnceLock};
+use tokio::runtime::{Builder, Runtime};
 
 static DART_ISOLATE: Mutex<Option<Isolate>> = Mutex::new(None);
 
@@ -13,6 +17,41 @@ pub extern "C" fn prepare_isolate_extern(port: i64) {
         let mut guard = DART_ISOLATE.lock().unwrap();
         guard.replace(dart_isolate);
     });
+}
+
+// We use `os_thread_local` so that when the program fails
+// and the main thread exits unexpectedly,
+// the whole async tokio runtime can disappear as well.
+// Without this solution, zombie threads inside the runtime
+// might outlive the app.
+type TokioRuntime = OnceLock<ThreadLocal<RefCell<Option<Runtime>>>>;
+static TOKIO_RUNTIME: TokioRuntime = OnceLock::new();
+
+pub fn start_rust_logic_extern<F>(main_future: F)
+where
+    F: Future<Output = ()> + Send + 'static,
+{
+    // Enable backtrace output for panics.
+    #[cfg(debug_assertions)]
+    {
+        std::panic::set_hook(Box::new(|panic_info| {
+            let backtrace = Backtrace::new();
+            debug_print!("A panic occurred in Rust.\n{panic_info}\n{backtrace:?}");
+        }));
+    }
+
+    // Run the main function.
+    let tokio_runtime = Builder::new_multi_thread().enable_all().build().unwrap();
+    tokio_runtime.spawn(main_future);
+    TOKIO_RUNTIME
+        .get_or_init(|| ThreadLocal::new(|| RefCell::new(None)))
+        .with(move |cell| {
+            // If there was already a tokio runtime previously,
+            // most likely due to Dart's hot restart,
+            // its tasks as well as itself will be terminated,
+            // being replaced with the new one.
+            cell.replace(Some(tokio_runtime));
+        });
 }
 
 pub fn send_rust_signal_extern(message_id: i32, message_bytes: Vec<u8>, binary: Vec<u8>) {

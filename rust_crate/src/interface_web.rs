@@ -1,5 +1,24 @@
+use crate::debug_print;
 use js_sys::Uint8Array;
+use std::future::Future;
 use wasm_bindgen::prelude::*;
+use wasm_bindgen_futures::spawn_local;
+
+pub fn start_rust_logic_extern<F>(main_future: F)
+where
+    F: Future<Output = ()> + Send + 'static,
+{
+    // Add kind description for panics.
+    #[cfg(debug_assertions)]
+    {
+        std::panic::set_hook(Box::new(|panic_info| {
+            debug_print!("A panic occurred in Rust.\n{panic_info}");
+        }));
+    }
+
+    // Run the main function.
+    spawn_local(main_future);
+}
 
 #[wasm_bindgen]
 extern "C" {
