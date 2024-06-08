@@ -248,12 +248,9 @@ import 'package:rinf/rinf.dart';
 
 use crate::tokio;
 use prost::Message;
-use rinf::send_rust_signal;
-use rinf::DartSignal;
+use rinf::{send_rust_signal, DartSignal};
 use std::sync::Mutex;
-use tokio::sync::mpsc::unbounded_channel;
-use tokio::sync::mpsc::UnboundedReceiver;
-use tokio::sync::mpsc::UnboundedSender;
+use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 ''',
           atFront: true,
         );
@@ -394,7 +391,6 @@ impl ${normalizePascal(messageName)} {
 
 use crate::tokio;
 use prost::Message;
-use rinf::debug_print;
 use rinf::DartSignal;
 use std::collections::HashMap;
 use std::sync::OnceLock;
