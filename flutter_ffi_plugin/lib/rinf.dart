@@ -13,18 +13,18 @@ export 'src/interface.dart' show RustSignal;
 /// This function might not be necessary for major platforms
 /// but can be useful when the app runs on embedded devices.
 void setCompiledLibPath(String? path) {
-  setCompiledLibPathExtern(path);
+  setCompiledLibPathReal(path);
 }
 
 /// Prepares the native interface
 /// needed to communicate with Rust.
 Future<void> prepareInterface(HandleRustSignal handleRustSignal) async {
-  await prepareInterfaceExtern(handleRustSignal);
+  await prepareInterfaceReal(handleRustSignal);
 }
 
 /// Starts the `main` function in Rust.
 void startRustLogic() async {
-  startRustLogicExtern();
+  startRustLogicReal();
 }
 
 /// Sends a signal to Rust.
@@ -33,7 +33,7 @@ void sendDartSignal(
   Uint8List messageBytes,
   Uint8List binary,
 ) async {
-  sendDartSignalExtern(
+  sendDartSignalReal(
     messageId,
     messageBytes,
     binary,
