@@ -1,70 +1,69 @@
-// The Android Gradle Plugin builds the native code with the Android NDK.
-
-group 'com.cunarist.rinf'
-version '1.0'
+group = "com.cunarist.rinf"
+version = "1.0-SNAPSHOT"
 
 buildscript {
+    ext.kotlin_version = "1.7.10"
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        // The Android Gradle Plugin knows how to build native code with the NDK.
-        classpath 'com.android.tools.build:gradle:7.3.0'
+        classpath("com.android.tools.build:gradle:7.3.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
     }
 }
 
-rootProject.allprojects {
+allprojects {
     repositories {
         google()
         mavenCentral()
     }
 }
 
-apply plugin: 'com.android.library'
-
-// SDK Version 34 is the LTS as of now, till Flutter upgrades
-// There are also deprecated attributes, this takes all of them into account
-def compileSdkVersion = Math.max(android.compileSdkVersion, android.compileSdk, 31).toInteger()
-// Defaults to the 16 if nothing is specified, or else overrides from the parent
-def minSdkVersion = Math.max(android.minSdkVersion, android.minSdk, 16).toInteger()
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
 
 android {
     if (project.android.hasProperty("namespace")) {
-        namespace 'com.cunarist.rinf'
+        namespace = "com.cunarist.rinf"
     }
 
-    // Bumping the plugin compileSdkVersion requires all clients of this plugin
-    // to bump the version in their app.
-    compileSdkVersion compileSdkVersion
-
-    // Simply use the `android.ndkVersion`
-    // declared in the `./android/app/build.gradle` file of the Flutter project.
-    ndkVersion android.ndkVersion
-
-    // Invoke the shared CMake build with the Android Gradle Plugin.
-    externalNativeBuild {
-        cmake {
-            path "../src/CMakeLists.txt"
-
-            // The default CMake version for the Android Gradle Plugin is 3.10.2.
-            // https://developer.android.com/studio/projects/install-ndk#vanilla_cmake
-            //
-            // The Flutter tooling requires that developers have CMake 3.10 or later
-            // installed. You should not increase this version, as doing so will cause
-            // the plugin to fail to compile for some customers of the plugin.
-            // version "3.10.2"
-        }
-    }
+    compileSdk = 34
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+        test.java.srcDirs += "src/test/kotlin"
     }
 
     defaultConfig {
-        minSdkVersion minSdkVersion
+        minSdk = 21
+    }
+
+    dependencies {
+        testImplementation("org.jetbrains.kotlin:kotlin-test")
+        testImplementation("org.mockito:mockito-core:5.0.0")
+    }
+
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+
+            testLogging {
+               events "passed", "skipped", "failed", "standardOut", "standardError"
+               outputs.upToDateWhen {false}
+               showStandardStreams = true
+            }
+        }
     }
 }
 
