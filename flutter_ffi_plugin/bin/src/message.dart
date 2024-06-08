@@ -248,15 +248,9 @@ import 'package:rinf/rinf.dart';
 
 use crate::tokio;
 use prost::Message;
-use rinf::send_rust_signal;
-use rinf::DartSignal;
-use rinf::SharedCell;
-use std::cell::RefCell;
+use rinf::{send_rust_signal, DartSignal};
 use std::sync::Mutex;
-use std::sync::OnceLock;
-use tokio::sync::mpsc::unbounded_channel;
-use tokio::sync::mpsc::UnboundedReceiver;
-use tokio::sync::mpsc::UnboundedSender;
+use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 ''',
           atFront: true,
         );
@@ -272,38 +266,32 @@ use tokio::sync::mpsc::UnboundedSender;
           await insertTextToFile(
             rustPath,
             '''
-type ${messageName}Cell = SharedCell<(
+type ${messageName}Cell = Mutex<Option<(
     Option<UnboundedSender<DartSignal<${normalizePascal(messageName)}>>>,
     Option<UnboundedReceiver<DartSignal<${normalizePascal(messageName)}>>>,
-)>;
+)>>;
 pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Cell =
-    OnceLock::new();
+    Mutex::new(None);
 
 impl ${normalizePascal(messageName)} {
     pub fn get_dart_signal_receiver() -> UnboundedReceiver<DartSignal<Self>> {
-        let cell = ${snakeName.toUpperCase()}_CHANNEL
-            .get_or_init(|| {
-                let (sender, receiver) = unbounded_channel();
-                Mutex::new(RefCell::new(Some((Some(sender), Some(receiver)))))
-            })
-            .lock()
-            .unwrap();
+        let mut guard = ${snakeName.toUpperCase()}_CHANNEL.lock().unwrap();
+        if guard.is_none() {
+            let (sender, receiver) = unbounded_channel();
+            guard.replace((Some(sender), Some(receiver)));
+        }
         #[cfg(debug_assertions)]
         {
             // After Dart's hot restart,
             // a sender from the previous run already exists
             // which is now closed.
-            let borrowed = cell.borrow();
-            let pair = borrowed.as_ref().unwrap();
-            let is_closed = pair.0.as_ref().unwrap().is_closed();
-            drop(borrowed);
-            if is_closed {
+            if guard.as_ref().unwrap().0.as_ref().unwrap().is_closed() {
                 let (sender, receiver) = unbounded_channel();
-                cell.replace(Some((Some(sender), Some(receiver))));
+                guard.replace((Some(sender), Some(receiver)));
             }
         }
-        let pair = cell.take().unwrap();
-        cell.replace(Some((pair.0, None)));
+        let pair = guard.take().unwrap();
+        guard.replace((pair.0, None));
         pair.1.expect("A receiver can be taken only once")
     }
 }
@@ -403,16 +391,13 @@ impl ${normalizePascal(messageName)} {
 
 use crate::tokio;
 use prost::Message;
-use rinf::debug_print;
 use rinf::DartSignal;
-use std::cell::RefCell;
 use std::collections::HashMap;
-use std::sync::Mutex;
 use std::sync::OnceLock;
 use tokio::sync::mpsc::unbounded_channel;
 
 type SignalHandlers =
-    OnceLock<Mutex<HashMap<i32, Box<dyn Fn(Vec<u8>, Vec<u8>) + Send>>>>;
+    OnceLock<HashMap<i32, Box<dyn Fn(Vec<u8>, Vec<u8>) + Send + Sync>>>;
 static SIGNAL_HANDLERS: SignalHandlers = OnceLock::new();
 
 pub fn handle_dart_signal(
@@ -420,10 +405,10 @@ pub fn handle_dart_signal(
     message_bytes: Vec<u8>,
     binary: Vec<u8>
 ) {    
-    let mutex = SIGNAL_HANDLERS.get_or_init(|| {
-        let mut hash_map =
+    let hash_map = SIGNAL_HANDLERS.get_or_init(|| {
+        let mut new_hash_map =
             HashMap
-            ::<i32, Box<dyn Fn(Vec<u8>, Vec<u8>) + Send + 'static>>
+            ::<i32, Box<dyn Fn(Vec<u8>, Vec<u8>) + Send + Sync>>
             ::new();
 ''';
   for (final entry in markedMessagesAll.entries) {
@@ -441,7 +426,7 @@ pub fn handle_dart_signal(
           var modulePath = subpath.replaceAll("/", "::");
           modulePath = modulePath == "::" ? "" : modulePath;
           rustReceiveScript += '''
-hash_map.insert(
+new_hash_map.insert(
     ${markedMessage.id},
     Box::new(|message_bytes: Vec<u8>, binary: Vec<u8>| {
         use super::$modulePath$filename::*;
@@ -452,29 +437,22 @@ hash_map.insert(
             message,
             binary,
         };
-        let cell = ${snakeName.toUpperCase()}_CHANNEL
-            .get_or_init(|| {
-                let (sender, receiver) = unbounded_channel();
-                Mutex::new(RefCell::new(Some((Some(sender), Some(receiver)))))
-            })
-            .lock()
-            .unwrap();
+        let mut guard = ${snakeName.toUpperCase()}_CHANNEL.lock().unwrap();
+        if guard.is_none() {
+            let (sender, receiver) = unbounded_channel();
+            guard.replace((Some(sender), Some(receiver)));
+        }
         #[cfg(debug_assertions)]
         {
             // After Dart's hot restart,
             // a sender from the previous run already exists
             // which is now closed.
-            let borrowed = cell.borrow();
-            let pair = borrowed.as_ref().unwrap();
-            let is_closed = pair.0.as_ref().unwrap().is_closed();
-            drop(borrowed);
-            if is_closed {
+            if guard.as_ref().unwrap().0.as_ref().unwrap().is_closed() {
                 let (sender, receiver) = unbounded_channel();
-                cell.replace(Some((Some(sender), Some(receiver))));
+                guard.replace((Some(sender), Some(receiver)));
             }
         }
-        let borrowed = cell.borrow();
-        let pair = borrowed.as_ref().unwrap();
+        let pair = guard.as_ref().unwrap();
         let sender = pair.0.as_ref().unwrap();
         let _ = sender.send(dart_signal);
     }),
@@ -485,11 +463,10 @@ hash_map.insert(
     }
   }
   rustReceiveScript += '''
-        Mutex::new(hash_map)
+        new_hash_map
     });
 
-    let guard = mutex.lock().unwrap();
-    let signal_handler = guard.get(&message_id).unwrap();
+    let signal_handler = hash_map.get(&message_id).unwrap();
     signal_handler(message_bytes, binary);
 }
 ''';
@@ -508,11 +485,6 @@ Future<void> initializeRust({String? compiledLibPath}) async {
   setCompiledLibPath(compiledLibPath);
   await prepareInterface(handleRustSignal);
   startRustLogic();
-}
-
-Future<void> finalizeRust() async {
-  stopRustLogic();
-  await Future.delayed(const Duration(milliseconds: 10));
 }
 
 final signalHandlers = <int, void Function(Uint8List, Uint8List)>{

@@ -7,11 +7,11 @@ import 'dart:isolate';
 import 'interface.dart';
 import 'dart:convert';
 
-void setCompiledLibPathExtern(String? path) {
+void setCompiledLibPathReal(String? path) {
   setDynamicLibPath(path);
 }
 
-Future<void> prepareInterfaceExtern(
+Future<void> prepareInterfaceReal(
   HandleRustSignal handleRustSignal,
 ) async {
   /// This should be called once at startup
@@ -53,10 +53,10 @@ Future<void> prepareInterfaceExtern(
   });
 
   // Make Rust prepare its isolate to send data to Dart.
-  prepareIsolateExtern(rustSignalPort.sendPort.nativePort);
+  prepareIsolateReal(rustSignalPort.sendPort.nativePort);
 }
 
-void startRustLogicExtern() {
+void startRustLogicReal() {
   final rustFunction =
       rustLibrary.lookupFunction<Void Function(), void Function()>(
     'start_rust_logic_extern',
@@ -64,16 +64,8 @@ void startRustLogicExtern() {
   rustFunction();
 }
 
-void stopRustLogicExtern() {
-  final rustFunction =
-      rustLibrary.lookupFunction<Void Function(), void Function()>(
-    'stop_rust_logic_extern',
-  );
-  rustFunction();
-}
-
 /// Sends bytes to Rust.
-Future<void> sendDartSignalExtern(
+Future<void> sendDartSignalReal(
   int messageId,
   Uint8List messageBytes,
   Uint8List binary,
@@ -112,7 +104,7 @@ Future<void> sendDartSignalExtern(
   malloc.free(binaryMemory);
 }
 
-void prepareIsolateExtern(int port) {
+void prepareIsolateReal(int port) {
   final rustFunction = rustLibrary.lookupFunction<
       Void Function(
         IntPtr,
