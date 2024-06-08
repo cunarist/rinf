@@ -1,6 +1,3 @@
-pub use interface::*;
-
-pub mod externs;
 mod macros;
 
 mod interface;
@@ -8,3 +5,5 @@ mod interface;
 mod interface_os;
 #[cfg(target_family = "wasm")]
 mod interface_web;
+
+pub use interface::*;

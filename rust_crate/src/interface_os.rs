@@ -27,7 +27,7 @@ pub extern "C" fn prepare_isolate_extern(port: i64) {
 type TokioRuntime = OnceLock<ThreadLocal<RefCell<Option<Runtime>>>>;
 static TOKIO_RUNTIME: TokioRuntime = OnceLock::new();
 
-pub fn start_rust_logic_extern<F>(main_future: F)
+pub fn start_rust_logic_real<F>(main_future: F)
 where
     F: Future<Output = ()> + Send + 'static,
 {
@@ -54,7 +54,7 @@ where
         });
 }
 
-pub fn send_rust_signal_extern(message_id: i32, message_bytes: Vec<u8>, binary: Vec<u8>) {
+pub fn send_rust_signal_real(message_id: i32, message_bytes: Vec<u8>, binary: Vec<u8>) {
     // When `DART_ISOLATE` is not initialized, do nothing.
     // This can happen when running test code in Rust.
     let guard = DART_ISOLATE.lock().unwrap();
