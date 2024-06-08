@@ -29,12 +29,10 @@ macro_rules! write_interface {
             binary_size: usize,
         ) {
             let _ = std::panic::catch_unwind(|| {
-                let message_bytes = unsafe {
-                    std::slice::from_raw_parts(message_pointer as *mut u8, message_size).to_vec()
-                };
-                let binary = unsafe {
-                    std::slice::from_raw_parts(binary_pointer as *mut u8, binary_size).to_vec()
-                };
+                let message_bytes =
+                    unsafe { std::slice::from_raw_parts(message_pointer, message_size).to_vec() };
+                let binary =
+                    unsafe { std::slice::from_raw_parts(binary_pointer, binary_size).to_vec() };
                 messages::generated::handle_dart_signal(message_id as i32, message_bytes, binary);
             });
         }
