@@ -39,8 +39,8 @@ macro_rules! write_interface {
             use tokio::sync::mpsc::{Receiver, Sender};
 
             // This is the runtime where async event loop runs.
-            type TokioRuntime = OnceLock<Mutex<Option<Runtime>>>;
-            static TOKIO_RUNTIME: TokioRuntime = OnceLock::new();
+            type TokioRuntime = Mutex<Option<Runtime>>;
+            static TOKIO_RUNTIME: TokioRuntime = Mutex::new(None);
 
             // We use `os_thread_local` so that when the program fails
             // and the main thread exits unexpectedly,
@@ -63,17 +63,17 @@ macro_rules! write_interface {
                 shutdown_receiver: Option<Receiver<()>>,
                 done_receiver: StdReceiver<()>,
             }
-            type ShutdownStoreShared = OnceLock<Mutex<Option<ShutdownStore>>>;
-            static SHUTDOWN_STORE: ShutdownStoreShared = OnceLock::new();
+            type ShutdownStoreShared = Mutex<Option<ShutdownStore>>;
+            static SHUTDOWN_STORE: ShutdownStoreShared = Mutex::new(None);
 
             pub fn get_shutdown_receiver() -> Receiver<()> {
-                let mut guard = SHUTDOWN_STORE.get().unwrap().lock().unwrap();
+                let mut guard = SHUTDOWN_STORE.lock().unwrap();
                 guard.as_mut().unwrap().shutdown_receiver.take().unwrap()
             }
 
             fn drop_tokio_runtime() {
                 // Dropping the tokio runtime causes it to shut down completely.
-                TOKIO_RUNTIME.get().unwrap().lock().unwrap().take();
+                TOKIO_RUNTIME.lock().unwrap().take();
             }
 
             #[no_mangle]
@@ -93,11 +93,7 @@ macro_rules! write_interface {
                     // Prepare to notify Dart shutdown.
                     let (shutdown_sender, shutdown_receiver) = channel(1);
                     let (done_sender, done_receiver) = sync_channel::<()>(1);
-                    let mut guard = SHUTDOWN_STORE
-                        .get_or_init(|| Mutex::new(None))
-                        .lock()
-                        .unwrap();
-                    guard.replace(ShutdownStore {
+                    SHUTDOWN_STORE.lock().unwrap().replace(ShutdownStore {
                         shutdown_sender: Some(shutdown_sender),
                         shutdown_receiver: Some(shutdown_receiver),
                         done_receiver,
@@ -120,11 +116,7 @@ macro_rules! write_interface {
                             let _ = done_sender.send(());
                         });
                     });
-                    let mut guard = TOKIO_RUNTIME
-                        .get_or_init(|| Mutex::new(None))
-                        .lock()
-                        .unwrap();
-                    guard.replace(tokio_runtime);
+                    TOKIO_RUNTIME.lock().unwrap().replace(tokio_runtime);
                 });
             }
 
@@ -132,7 +124,7 @@ macro_rules! write_interface {
             pub extern "C" fn stop_rust_logic_extern() {
                 let _ = catch_unwind(|| {
                     // Tell the Rust logic to perform finalziation code.
-                    let guard = SHUTDOWN_STORE.get().unwrap().lock().unwrap();
+                    let guard = SHUTDOWN_STORE.lock().unwrap();
                     let _ = guard
                         .as_ref()
                         .unwrap()
