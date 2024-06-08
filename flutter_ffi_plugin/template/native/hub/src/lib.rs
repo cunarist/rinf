@@ -19,9 +19,8 @@ async fn main() {
     SmallNumber { number: 7 }.send_signal_to_dart();
     // Get receivers that listen to Dart signals like below.
     let receiver = SmallText::get_dart_signal_receiver();
-    tokio::spawn(async {
-        while let Some(dart_signal) = receiver.recv().await {
-            rinf::debug_print!("{dart_signal:?}");
-        }
-    });
+    while let Some(dart_signal) = receiver.recv().await {
+        let message: SmallText = dart_signal.message;
+        rinf::debug_print!("{message:?}");
+    }
 }
