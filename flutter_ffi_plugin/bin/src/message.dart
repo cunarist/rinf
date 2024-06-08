@@ -251,7 +251,6 @@ use prost::Message;
 use rinf::send_rust_signal;
 use rinf::DartSignal;
 use std::sync::Mutex;
-use std::sync::OnceLock;
 use tokio::sync::mpsc::unbounded_channel;
 use tokio::sync::mpsc::UnboundedReceiver;
 use tokio::sync::mpsc::UnboundedSender;
@@ -270,22 +269,16 @@ use tokio::sync::mpsc::UnboundedSender;
           await insertTextToFile(
             rustPath,
             '''
-type ${messageName}Cell = OnceLock<Mutex<Option<(
+type ${messageName}Cell = Mutex<Option<(
     Option<UnboundedSender<DartSignal<${normalizePascal(messageName)}>>>,
     Option<UnboundedReceiver<DartSignal<${normalizePascal(messageName)}>>>,
-)>>>;
+)>>;
 pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Cell =
-    OnceLock::new();
+    Mutex::new(None);
 
 impl ${normalizePascal(messageName)} {
     pub fn get_dart_signal_receiver() -> UnboundedReceiver<DartSignal<Self>> {
-        let mut guard = ${snakeName.toUpperCase()}_CHANNEL
-            .get_or_init(|| {
-                let (sender, receiver) = unbounded_channel();
-                Mutex::new(Some((Some(sender), Some(receiver))))
-            })
-            .lock()
-            .unwrap();
+        let mut guard = ${snakeName.toUpperCase()}_CHANNEL.lock().unwrap();
         #[cfg(debug_assertions)]
         {
             // After Dart's hot restart,
@@ -402,12 +395,11 @@ use prost::Message;
 use rinf::debug_print;
 use rinf::DartSignal;
 use std::collections::HashMap;
-use std::sync::Mutex;
 use std::sync::OnceLock;
 use tokio::sync::mpsc::unbounded_channel;
 
 type SignalHandlers =
-    OnceLock<Mutex<HashMap<i32, Box<dyn Fn(Vec<u8>, Vec<u8>) + Send>>>>;
+    OnceLock<HashMap<i32, Box<dyn Fn(Vec<u8>, Vec<u8>) + Send + Sync>>>;
 static SIGNAL_HANDLERS: SignalHandlers = OnceLock::new();
 
 pub fn handle_dart_signal(
@@ -415,10 +407,10 @@ pub fn handle_dart_signal(
     message_bytes: Vec<u8>,
     binary: Vec<u8>
 ) {    
-    let mutex = SIGNAL_HANDLERS.get_or_init(|| {
-        let mut hash_map =
+    let hash_map = SIGNAL_HANDLERS.get_or_init(|| {
+        let mut new_hash_map =
             HashMap
-            ::<i32, Box<dyn Fn(Vec<u8>, Vec<u8>) + Send + 'static>>
+            ::<i32, Box<dyn Fn(Vec<u8>, Vec<u8>) + Send + Sync>>
             ::new();
 ''';
   for (final entry in markedMessagesAll.entries) {
@@ -436,7 +428,7 @@ pub fn handle_dart_signal(
           var modulePath = subpath.replaceAll("/", "::");
           modulePath = modulePath == "::" ? "" : modulePath;
           rustReceiveScript += '''
-hash_map.insert(
+new_hash_map.insert(
     ${markedMessage.id},
     Box::new(|message_bytes: Vec<u8>, binary: Vec<u8>| {
         use super::$modulePath$filename::*;
@@ -447,13 +439,7 @@ hash_map.insert(
             message,
             binary,
         };
-        let mut guard = ${snakeName.toUpperCase()}_CHANNEL
-            .get_or_init(|| {
-                let (sender, receiver) = unbounded_channel();
-                Mutex::new(Some((Some(sender), Some(receiver))))
-            })
-            .lock()
-            .unwrap();
+        let mut guard = ${snakeName.toUpperCase()}_CHANNEL.lock().unwrap();
         #[cfg(debug_assertions)]
         {
             // After Dart's hot restart,
@@ -477,11 +463,10 @@ hash_map.insert(
     }
   }
   rustReceiveScript += '''
-        Mutex::new(hash_map)
+        new_hash_map
     });
 
-    let guard = mutex.lock().unwrap();
-    let signal_handler = guard.get(&message_id).unwrap();
+    let signal_handler = hash_map.get(&message_id).unwrap();
     signal_handler(message_bytes, binary);
 }
 ''';
