@@ -1,3 +1,7 @@
+## 6.12.1
+
+- Fixed linefeed problem in published files.
+
 ## 6.12.0
 
 - Generated message channels are now more efficient.
