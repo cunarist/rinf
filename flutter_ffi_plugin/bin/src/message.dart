@@ -279,14 +279,16 @@ pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Cell =
 impl ${normalizePascal(messageName)} {
     pub fn get_dart_signal_receiver() -> UnboundedReceiver<DartSignal<Self>> {
         let mut guard = ${snakeName.toUpperCase()}_CHANNEL.lock().unwrap();
+        if guard.is_none() {
+            let (sender, receiver) = unbounded_channel();
+            guard.replace((Some(sender), Some(receiver)));
+        }
         #[cfg(debug_assertions)]
         {
             // After Dart's hot restart,
             // a sender from the previous run already exists
             // which is now closed.
-            let pair = guard.as_ref().unwrap();
-            let is_closed = pair.0.as_ref().unwrap().is_closed();
-            if is_closed {
+            if guard.as_ref().unwrap().0.as_ref().unwrap().is_closed() {
                 let (sender, receiver) = unbounded_channel();
                 guard.replace((Some(sender), Some(receiver)));
             }
@@ -440,14 +442,16 @@ new_hash_map.insert(
             binary,
         };
         let mut guard = ${snakeName.toUpperCase()}_CHANNEL.lock().unwrap();
+        if guard.is_none() {
+            let (sender, receiver) = unbounded_channel();
+            guard.replace((Some(sender), Some(receiver)));
+        }
         #[cfg(debug_assertions)]
         {
             // After Dart's hot restart,
             // a sender from the previous run already exists
             // which is now closed.
-            let pair = guard.as_ref().unwrap();
-            let is_closed = pair.0.as_ref().unwrap().is_closed();
-            if is_closed {
+            if guard.as_ref().unwrap().0.as_ref().unwrap().is_closed() {
                 let (sender, receiver) = unbounded_channel();
                 guard.replace((Some(sender), Some(receiver)));
             }
