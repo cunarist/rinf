@@ -23,6 +23,8 @@ jobs:
   code:
     name: dart-and-rust-code
     runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: -D warnings
 
     steps:
       - name: Checkout repository
