@@ -79,8 +79,14 @@ pub async fn stream_fractal() {
     // Receive frame join handles in order.
     tokio::spawn(async move {
         loop {
-            let join_handle = receiver.recv().await.unwrap();
-            let received_frame = join_handle.await.unwrap();
+            let join_handle = match receiver.recv().await {
+                Some(inner) => inner,
+                None => continue,
+            };
+            let received_frame = match join_handle.await {
+                Ok(inner) => inner,
+                Err(_) => continue,
+            };
             if let Some(fractal_image) = received_frame {
                 // Stream the image data to Dart.
                 SampleFractal {
@@ -124,15 +130,11 @@ pub async fn run_debug_tests() {
     // Fetch data from a web API.
     let url = "http://jsonplaceholder.typicode.com/todos/1";
     let web_response = sample_crate::fetch_from_web_api(url).await;
-    debug_print!("Response from a web API: {web_response}");
+    debug_print!("Response from a web API: {web_response:?}");
 
     // Use a crate that accesses operating system APIs.
-    let option = sample_crate::get_hardward_id();
-    if let Some(hwid) = option {
-        debug_print!("Hardware ID: {hwid}");
-    } else {
-        debug_print!("Hardware ID is not available on this platform.");
-    }
+    let hwid = sample_crate::get_hardward_id();
+    debug_print!("Hardware ID: {hwid:?}");
 
     // Test `tokio::join!` for futures.
     let join_first = async {
@@ -201,8 +203,9 @@ pub async fn run_debug_tests() {
         join_handles.push(join_handle);
     }
     for join_handle in join_handles {
-        let text = join_handle.await.unwrap();
-        debug_print!("{text}");
+        if let Ok(text) = join_handle.await {
+            debug_print!("{text}");
+        }
     }
 
     debug_print!("Debug tests completed!");

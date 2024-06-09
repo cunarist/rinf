@@ -1,8 +1,7 @@
 //! This crate is written for Rinf demonstrations.
 
-pub use fractal::draw_fractal_image;
-
 mod fractal;
+pub use fractal::draw_fractal_image;
 
 // `machineid_rs` only supports desktop platforms.
 
@@ -12,7 +11,7 @@ pub fn get_hardward_id() -> Option<String> {
     builder
         .add_component(machineid_rs::HWIDComponent::SystemID)
         .add_component(machineid_rs::HWIDComponent::CPUCores);
-    let hwid = builder.build("mykey").unwrap();
+    let hwid = builder.build("mykey").ok()?;
     Some(hwid)
 }
 #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
@@ -29,11 +28,6 @@ pub fn get_current_time() -> DateTime<offset::Local> {
 
 // `reqwest` supports all platforms, including web.
 
-pub async fn fetch_from_web_api(url: &str) -> String {
-    reqwest::get(url)
-        .await
-        .expect("Could not get the response from the example web API.")
-        .text()
-        .await
-        .expect("Could not read body from the web response.")
+pub async fn fetch_from_web_api(url: &str) -> Option<String> {
+    reqwest::get(url).await.ok()?.text().await.ok()
 }
