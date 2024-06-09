@@ -57,7 +57,6 @@ jobs:
       - name: Check for any errors
         run: |
           rustup target add wasm32-unknown-unknown
-          RUSTFLAGS="-D warnings"
           cargo clippy
           cargo clippy --release
           cargo clippy --target wasm32-unknown-unknown
