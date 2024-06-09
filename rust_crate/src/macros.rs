@@ -8,13 +8,19 @@ macro_rules! write_interface {
         #[cfg(not(target_family = "wasm"))]
         #[no_mangle]
         pub extern "C" fn start_rust_logic_extern() {
-            let _ = std::panic::catch_unwind(|| $crate::start_rust_logic(main()));
+            let result = $crate::start_rust_logic(main());
+            if let Err(error) = result {
+                println!("Could not start Rust logic.\n{error:#?}");
+            }
         }
 
         #[cfg(target_family = "wasm")]
         #[wasm_bindgen::prelude::wasm_bindgen]
         pub fn start_rust_logic_extern() {
-            let _ = std::panic::catch_unwind(|| $crate::start_rust_logic(main()));
+            let result = $crate::start_rust_logic(main());
+            if let Err(error) = result {
+                println!("Could not start Rust logic.\n{error:#?}");
+            }
         }
 
         #[cfg(not(target_family = "wasm"))]
@@ -26,23 +32,19 @@ macro_rules! write_interface {
             binary_pointer: *const u8,
             binary_size: usize,
         ) {
-            let _ = std::panic::catch_unwind(|| {
-                let message_bytes =
-                    unsafe { std::slice::from_raw_parts(message_pointer, message_size).to_vec() };
-                let binary =
-                    unsafe { std::slice::from_raw_parts(binary_pointer, binary_size).to_vec() };
-                messages::generated::handle_dart_signal(message_id as i32, message_bytes, binary);
-            });
+            let message_bytes =
+                unsafe { std::slice::from_raw_parts(message_pointer, message_size).to_vec() };
+            let binary =
+                unsafe { std::slice::from_raw_parts(binary_pointer, binary_size).to_vec() };
+            messages::generated::handle_dart_signal(message_id as i32, message_bytes, binary);
         }
 
         #[cfg(target_family = "wasm")]
         #[wasm_bindgen::prelude::wasm_bindgen]
         pub fn send_dart_signal_extern(message_id: i32, message_bytes: &[u8], binary: &[u8]) {
-            let _ = std::panic::catch_unwind(|| {
-                let message_bytes = message_bytes.to_vec();
-                let binary = binary.to_vec();
-                messages::generated::handle_dart_signal(message_id, message_bytes, binary);
-            });
+            let message_bytes = message_bytes.to_vec();
+            let binary = binary.to_vec();
+            messages::generated::handle_dart_signal(message_id, message_bytes, binary);
         }
     };
 }

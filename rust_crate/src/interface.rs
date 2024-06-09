@@ -1,3 +1,4 @@
+use crate::common::*;
 use std::future::Future;
 
 #[cfg(not(target_family = "wasm"))]
@@ -18,15 +19,20 @@ pub struct DartSignal<T> {
     pub binary: Vec<u8>,
 }
 
-/// Send a signal to Dart.
-pub fn send_rust_signal(message_id: i32, message_bytes: Vec<u8>, binary: Vec<u8>) {
-    send_rust_signal_real(message_id, message_bytes, binary);
-}
-
 /// Runs the main function in Rust.
-pub fn start_rust_logic<F>(main_future: F)
+pub fn start_rust_logic<F>(main_future: F) -> Result<()>
 where
     F: Future<Output = ()> + Send + 'static,
 {
-    start_rust_logic_real(main_future);
+    start_rust_logic_real(main_future)
+}
+
+/// Send a signal to Dart.
+pub fn send_rust_signal(message_id: i32, message_bytes: Vec<u8>, binary: Vec<u8>) {
+    let result = send_rust_signal_real(message_id, message_bytes, binary);
+    if let Err(error) = result {
+        // We cannot use `debug_print` here because
+        // it uses `send_rust_siganl` internally.
+        println!("Could not send Rust signal.\n{error:#?}");
+    }
 }
