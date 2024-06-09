@@ -1,6 +1,5 @@
 use crate::debug_print;
 use allo_isolate::{IntoDart, Isolate, ZeroCopyBuffer};
-use backtrace::Backtrace;
 use os_thread_local::ThreadLocal;
 use std::cell::RefCell;
 use std::future::Future;
@@ -35,7 +34,7 @@ where
     #[cfg(debug_assertions)]
     {
         std::panic::set_hook(Box::new(|panic_info| {
-            let backtrace = Backtrace::new();
+            let backtrace = backtrace::Backtrace::new();
             debug_print!("A panic occurred in Rust.\n{panic_info}\n{backtrace:?}");
         }));
     }
