@@ -295,7 +295,7 @@ impl ${normalizePascal(messageName)} {
             }
         }
         let pair = guard
-            .as_ref()
+            .take()
             .expect("Message channel in Rust not present.");
         guard.replace((pair.0, None));
         pair.1.expect("Each Dart signal receiver can be taken only once")
