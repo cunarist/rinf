@@ -1,4 +1,4 @@
-use crate::debug_print;
+use crate::common::*;
 use std::future::Future;
 
 #[cfg(not(target_family = "wasm"))]
@@ -20,14 +20,11 @@ pub struct DartSignal<T> {
 }
 
 /// Runs the main function in Rust.
-pub fn start_rust_logic<F>(main_future: F)
+pub fn start_rust_logic<F>(main_future: F) -> Result<()>
 where
     F: Future<Output = ()> + Send + 'static,
 {
-    let result = start_rust_logic_real(main_future);
-    if let Err(error) = result {
-        debug_print!("Could not start Rust logic.\n{error:#?}");
-    }
+    start_rust_logic_real(main_future)
 }
 
 /// Send a signal to Dart.
