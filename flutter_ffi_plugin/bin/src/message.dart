@@ -267,7 +267,7 @@ use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
             rustPath,
             '''
 type ${messageName}Cell = Mutex<Option<(
-    Option<UnboundedSender<DartSignal<${normalizePascal(messageName)}>>>,
+    UnboundedSender<DartSignal<${normalizePascal(messageName)}>>,
     Option<UnboundedReceiver<DartSignal<${normalizePascal(messageName)}>>>,
 )>>;
 pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Cell =
@@ -278,16 +278,16 @@ impl ${normalizePascal(messageName)} {
         let mut guard = ${snakeName.toUpperCase()}_CHANNEL.lock().unwrap();
         if guard.is_none() {
             let (sender, receiver) = unbounded_channel();
-            guard.replace((Some(sender), Some(receiver)));
+            guard.replace((sender, Some(receiver)));
         }
         #[cfg(debug_assertions)]
         {
             // After Dart's hot restart,
             // a sender from the previous run already exists
             // which is now closed.
-            if guard.as_ref().unwrap().0.as_ref().unwrap().is_closed() {
+            if guard.as_ref().unwrap().0.is_closed() {
                 let (sender, receiver) = unbounded_channel();
-                guard.replace((Some(sender), Some(receiver)));
+                guard.replace((sender, Some(receiver)));
             }
         }
         let pair = guard.take().unwrap();
@@ -391,13 +391,17 @@ impl ${normalizePascal(messageName)} {
 
 use crate::tokio;
 use prost::Message;
+use rinf::debug_print;
 use rinf::DartSignal;
 use std::collections::HashMap;
+use std::error::Error;
 use std::sync::OnceLock;
 use tokio::sync::mpsc::unbounded_channel;
 
-type SignalHandlers =
-    OnceLock<HashMap<i32, Box<dyn Fn(Vec<u8>, Vec<u8>) + Send + Sync>>>;
+type SignalHandlers = OnceLock<
+    HashMap<i32, Box<dyn Fn(Vec<u8>, Vec<u8>)
+        -> Result<(), Box<dyn Error>> + Send + Sync>>,
+>;
 static SIGNAL_HANDLERS: SignalHandlers = OnceLock::new();
 
 pub fn handle_dart_signal(
@@ -406,10 +410,11 @@ pub fn handle_dart_signal(
     binary: Vec<u8>
 ) {    
     let hash_map = SIGNAL_HANDLERS.get_or_init(|| {
-        let mut new_hash_map =
-            HashMap
-            ::<i32, Box<dyn Fn(Vec<u8>, Vec<u8>) + Send + Sync>>
-            ::new();
+        let mut new_hash_map = HashMap::<
+            i32,
+            Box<dyn Fn(Vec<u8>, Vec<u8>)
+                -> Result<(), Box<dyn Error>> + Send + Sync>,
+        >::new();
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -432,29 +437,35 @@ new_hash_map.insert(
         use super::$modulePath$filename::*;
         let message = ${normalizePascal(messageName)}::decode(
             message_bytes.as_slice()
-        ).unwrap();
+        )?;
         let dart_signal = DartSignal {
             message,
             binary,
         };
-        let mut guard = ${snakeName.toUpperCase()}_CHANNEL.lock().unwrap();
+        let mut guard = ${snakeName.toUpperCase()}_CHANNEL.lock()?;
         if guard.is_none() {
             let (sender, receiver) = unbounded_channel();
-            guard.replace((Some(sender), Some(receiver)));
+            guard.replace((sender, Some(receiver)));
         }
         #[cfg(debug_assertions)]
         {
             // After Dart's hot restart,
             // a sender from the previous run already exists
             // which is now closed.
-            if guard.as_ref().unwrap().0.as_ref().unwrap().is_closed() {
+            let pair = guard
+                .as_ref()
+                .ok_or("Message channel in Rust not present.")?;
+            if pair.0.is_closed() {
                 let (sender, receiver) = unbounded_channel();
-                guard.replace((Some(sender), Some(receiver)));
+                guard.replace((sender, Some(receiver)));
             }
         }
-        let pair = guard.as_ref().unwrap();
-        let sender = pair.0.as_ref().unwrap();
+        let pair = guard
+            .as_ref()
+            .ok_or("Message channel in Rust not present.")?;
+        let sender = &pair.0;
         let _ = sender.send(dart_signal);
+        Ok(())
     }),
 );
 ''';
@@ -466,8 +477,17 @@ new_hash_map.insert(
         new_hash_map
     });
 
-    let signal_handler = hash_map.get(&message_id).unwrap();
-    signal_handler(message_bytes, binary);
+    let signal_handler = match hash_map.get(&message_id) {
+        Some(inner) => inner,
+        None => {
+            debug_print!("Message ID not found in the handler Hashmap.");
+            return;
+        }
+    };
+    let result = signal_handler(message_bytes, binary);
+    if let Err(error) = result {
+        debug_print!("Could not process hashmap.\\n{error:#?}");
+    }
 }
 ''';
   await File.fromUri(rustOutputPath.join('generated.rs'))
