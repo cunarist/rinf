@@ -1,5 +1,3 @@
-#![allow(clippy::crate_in_macro_def)]
-
 #[macro_export]
 /// Writes the interface code
 /// needed to communicate with Dart.
