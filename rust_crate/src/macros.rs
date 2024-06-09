@@ -1,5 +1,3 @@
-#![allow(clippy::crate_in_macro_def)]
-
 #[macro_export]
 /// Writes the interface code
 /// needed to communicate with Dart.
@@ -21,7 +19,7 @@ macro_rules! write_interface {
 
         #[cfg(not(target_family = "wasm"))]
         #[no_mangle]
-        pub extern "C" fn send_dart_signal_extern(
+        pub unsafe extern "C" fn send_dart_signal_extern(
             message_id: i64,
             message_pointer: *const u8,
             message_size: usize,

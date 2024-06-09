@@ -1,4 +1,3 @@
-use crate::debug_print;
 use js_sys::Uint8Array;
 use std::future::Future;
 use wasm_bindgen::prelude::*;
@@ -12,7 +11,7 @@ where
     #[cfg(debug_assertions)]
     {
         std::panic::set_hook(Box::new(|panic_info| {
-            debug_print!("A panic occurred in Rust.\n{panic_info}");
+            crate::debug_print!("A panic occurred in Rust.\n{panic_info}");
         }));
     }
 
