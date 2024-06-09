@@ -26,7 +26,7 @@ fn main() -> Result<()> {
             "OUT_DIR",
             out_path
                 .to_str()
-                .ok_or("Could not set environment variable path")?,
+                .ok_or("Could not set the path for `protoc` installation.")?,
         );
         let install_result = protoc_prebuilt::init("25.2");
         let (protoc_binary_path, _) = install_result.map_err(|_| {
@@ -76,6 +76,7 @@ fn main() -> Result<()> {
 }
 
 #[cfg(target_family = "wasm")]
-fn main() {
+fn main() -> Result<()> {
     // Dummy function to make the linter happy.
+    Ok(())
 }
