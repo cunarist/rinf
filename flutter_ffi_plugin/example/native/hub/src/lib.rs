@@ -4,8 +4,10 @@
 mod messages;
 mod sample_functions;
 
-// use tokio;
-use tokio_with_wasm::tokio; // Uncomment this line to target the web
+#[cfg(not(target_family = "wasm"))]
+use tokio;
+#[cfg(target_family = "wasm")]
+use tokio_with_wasm as tokio;
 
 rinf::write_interface!();
 
