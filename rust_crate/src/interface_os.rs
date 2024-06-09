@@ -1,9 +1,9 @@
+use crate::common::*;
 use crate::debug_print;
 use allo_isolate::{IntoDart, Isolate, ZeroCopyBuffer};
 use os_thread_local::ThreadLocal;
 use std::cell::RefCell;
 use std::future::Future;
-use std::panic::catch_unwind;
 use std::sync::{Mutex, OnceLock};
 use tokio::runtime::{Builder, Runtime};
 
@@ -11,11 +11,15 @@ static DART_ISOLATE: Mutex<Option<Isolate>> = Mutex::new(None);
 
 #[no_mangle]
 pub extern "C" fn prepare_isolate_extern(port: i64) {
-    let _ = catch_unwind(|| {
-        let dart_isolate = Isolate::new(port);
-        let mut guard = DART_ISOLATE.lock().unwrap();
-        guard.replace(dart_isolate);
-    });
+    let dart_isolate = Isolate::new(port);
+    let mut guard = match DART_ISOLATE.lock() {
+        Ok(inner) => inner,
+        Err(_) => {
+            println!("Could not unlock Dart isolate mutex.");
+            return;
+        }
+    };
+    guard.replace(dart_isolate);
 }
 
 // We use `os_thread_local` so that when the program fails
@@ -26,7 +30,7 @@ pub extern "C" fn prepare_isolate_extern(port: i64) {
 type TokioRuntime = OnceLock<ThreadLocal<RefCell<Option<Runtime>>>>;
 static TOKIO_RUNTIME: TokioRuntime = OnceLock::new();
 
-pub fn start_rust_logic_real<F>(main_future: F)
+pub fn start_rust_logic_real<F>(main_future: F) -> Result<()>
 where
     F: Future<Output = ()> + Send + 'static,
 {
@@ -40,7 +44,7 @@ where
     }
 
     // Run the main function.
-    let tokio_runtime = Builder::new_multi_thread().enable_all().build().unwrap();
+    let tokio_runtime = Builder::new_multi_thread().enable_all().build()?;
     tokio_runtime.spawn(main_future);
     TOKIO_RUNTIME
         .get_or_init(|| ThreadLocal::new(|| RefCell::new(None)))
@@ -51,19 +55,21 @@ where
             // being replaced with the new one.
             cell.replace(Some(tokio_runtime));
         });
+
+    Ok(())
 }
 
-pub fn send_rust_signal_real(message_id: i32, message_bytes: Vec<u8>, binary: Vec<u8>) {
+pub fn send_rust_signal_real(
+    message_id: i32,
+    message_bytes: Vec<u8>,
+    binary: Vec<u8>,
+) -> Result<()> {
     // When `DART_ISOLATE` is not initialized, do nothing.
     // This can happen when running test code in Rust.
-    let guard = DART_ISOLATE.lock().unwrap();
-    let dart_isolate = match guard.as_ref() {
-        Some(inner) => inner,
-        None => {
-            debug_print!("Dart isolate for sending Rust signals is not present.");
-            return;
-        }
-    };
+    let guard = DART_ISOLATE.lock()?;
+    let dart_isolate = guard
+        .as_ref()
+        .ok_or("Dart isolate for sending Rust signals is not present.")?;
 
     // If a `Vec<u8>` is empty, we can't just simply send it to Dart
     // because panic can occur from null pointers.
@@ -87,4 +93,6 @@ pub fn send_rust_signal_real(message_id: i32, message_bytes: Vec<u8>, binary: Ve
         ]
         .into_dart(),
     );
+
+    Ok(())
 }
