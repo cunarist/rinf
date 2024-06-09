@@ -275,7 +275,8 @@ pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Cell =
 
 impl ${normalizePascal(messageName)} {
     pub fn get_dart_signal_receiver() -> UnboundedReceiver<DartSignal<Self>> {
-        let mut guard = ${snakeName.toUpperCase()}_CHANNEL.lock().unwrap();
+        let mut guard = ${snakeName.toUpperCase()}_CHANNEL.lock()
+            .expect("Could not access the channel lock.");
         if guard.is_none() {
             let (sender, receiver) = unbounded_channel();
             guard.replace((sender, Some(receiver)));
@@ -285,14 +286,19 @@ impl ${normalizePascal(messageName)} {
             // After Dart's hot restart,
             // a sender from the previous run already exists
             // which is now closed.
-            if guard.as_ref().unwrap().0.is_closed() {
+            let pair = guard
+                .as_ref()
+                .expect("Message channel in Rust not present.");
+            if pair.0.is_closed() {
                 let (sender, receiver) = unbounded_channel();
                 guard.replace((sender, Some(receiver)));
             }
         }
-        let pair = guard.take().unwrap();
+        let pair = guard
+            .as_ref()
+            .expect("Message channel in Rust not present.");
         guard.replace((pair.0, None));
-        pair.1.expect("A receiver can be taken only once")
+        pair.1.expect("Each Dart signal receiver can be taken only once")
     }
 }
 ''',
