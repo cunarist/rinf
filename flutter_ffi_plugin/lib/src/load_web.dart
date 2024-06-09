@@ -23,13 +23,19 @@ Future<void> loadJsFile() async {
   final loadCompleter = Completer<void>();
   js.context['completeRinfLoad'] = loadCompleter.complete;
 
-  // Use the default JavaScript path unless provided.
-  final path = jsLibPath ?? "/pkg/hub.js";
+  // Flutter app doesn't always have the top-level path of the domain.
+  // Sometimes, the flutter app might be placed in a lower path.
+  // This variable includes domain and the base path.
+  final baseHref = Uri.base;
 
+  // Use the default JavaScript path unless provided.
+  final path = jsLibPath ?? "pkg/hub.js";
+
+  final fullUrl = baseHref.resolve(path);
   final scriptElement = ScriptElement();
   scriptElement.type = "module";
   scriptElement.innerHtml = '''
-import init, * as wasmBindings from "$path";
+import init, * as wasmBindings from "$fullUrl";
 await init();
 window.rinf = { ...wasmBindings };
 completeRinfLoad();
