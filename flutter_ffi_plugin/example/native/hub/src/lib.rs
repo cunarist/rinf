@@ -4,10 +4,8 @@
 mod messages;
 mod sample_functions;
 
-#[cfg(not(target_family = "wasm"))]
-use tokio;
-#[cfg(target_family = "wasm")]
-use tokio_with_wasm as tokio;
+// use tokio;
+use tokio_with_wasm::alias as tokio;
 
 rinf::write_interface!();
 

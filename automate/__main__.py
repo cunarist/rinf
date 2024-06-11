@@ -50,33 +50,23 @@ elif sys.argv[1] == "prepare-test-app":
     # Enable the web target, since it's not enabled by default.
     replace_text_in_file(
         "native/hub/src/lib.rs",
-        '// #[cfg(not(target_family = "wasm"))]',
-        '#[cfg(not(target_family = "wasm"))]',
+        "use tokio;",
+        "// use tokio;",
     )
     replace_text_in_file(
         "native/hub/src/lib.rs",
-        '// #[cfg(target_family = "wasm")]',
-        '#[cfg(target_family = "wasm")]',
-    )
-    replace_text_in_file(
-        "native/hub/src/lib.rs",
-        "// use tokio_with_wasm as tokio;",
-        "use tokio_with_wasm as tokio;",
+        "// use tokio_with_wasm::alias as tokio;",
+        "use tokio_with_wasm::alias as tokio;",
     )
     replace_text_in_file(
         "native/hub/Cargo.toml",
-        "# [target.'cfg(target_family = \"wasm\")'.dependencies]",
-        "[target.'cfg(target_family = \"wasm\")'.dependencies]",
+        '# tokio_with_wasm = { version = "0.5.3", features = ["sync"] }',
+        'tokio_with_wasm = { version = "0.5.3", features = ["sync"] }',
     )
     replace_text_in_file(
         "native/hub/Cargo.toml",
         '# wasm-bindgen = "0.2.92"',
         'wasm-bindgen = "0.2.92"',
-    )
-    replace_text_in_file(
-        "native/hub/Cargo.toml",
-        '# tokio_with_wasm = { version = "0.5.1", features = ["sync"] }',
-        'tokio_with_wasm = { version = "0.5.1", features = ["sync"] }',
     )
 
     os.chdir("../")
@@ -114,33 +104,23 @@ elif sys.argv[1] == "prepare-user-app":
     # Enable the web target, since it's not enabled by default.
     replace_text_in_file(
         "native/hub/src/lib.rs",
-        '// #[cfg(not(target_family = "wasm"))]',
-        '#[cfg(not(target_family = "wasm"))]',
+        "use tokio;",
+        "// use tokio;",
     )
     replace_text_in_file(
         "native/hub/src/lib.rs",
-        '// #[cfg(target_family = "wasm")]',
-        '#[cfg(target_family = "wasm")]',
-    )
-    replace_text_in_file(
-        "native/hub/src/lib.rs",
-        "// use tokio_with_wasm as tokio;",
-        "use tokio_with_wasm as tokio;",
+        "// use tokio_with_wasm::alias as tokio;",
+        "use tokio_with_wasm::alias as tokio;",
     )
     replace_text_in_file(
         "native/hub/Cargo.toml",
-        "# [target.'cfg(target_family = \"wasm\")'.dependencies]",
-        "[target.'cfg(target_family = \"wasm\")'.dependencies]",
+        '# tokio_with_wasm = { version = "0.5.3", features = ["sync"] }',
+        'tokio_with_wasm = { version = "0.5.3", features = ["sync"] }',
     )
     replace_text_in_file(
         "native/hub/Cargo.toml",
         '# wasm-bindgen = "0.2.92"',
         'wasm-bindgen = "0.2.92"',
-    )
-    replace_text_in_file(
-        "native/hub/Cargo.toml",
-        '# tokio_with_wasm = { version = "0.5.1", features = ["sync"] }',
-        'tokio_with_wasm = { version = "0.5.1", features = ["sync"] }',
     )
 
     os.chdir("../")

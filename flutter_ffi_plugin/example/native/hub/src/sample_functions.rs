@@ -209,5 +209,13 @@ pub async fn run_debug_tests() {
     }
 
     debug_print!("Debug tests completed!");
-    panic!("INTENTIONAL DEBUG PANIC");
+
+    tokio::spawn(async {
+        // Panic in a separate task
+        // to avoid memory leak on the web.
+        // On the web (`wasm32-unknown-unknown`),
+        // catching and unwinding panics is not possible.
+        // It is better to avoid panicking code at all costs on the web.
+        panic!("INTENTIONAL DEBUG PANIC");
+    });
 }

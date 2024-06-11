@@ -15,13 +15,11 @@ crate-type = ["lib", "cdylib", "staticlib"]
 rinf = "6.12.1"
 prost = "0.12.6"
 tokio = { version = "1", features = ["rt", "sync", "macros", "time"] }
-sample_crate = { path = "../sample_crate" }
-
-[target.'cfg(target_family = "wasm")'.dependencies]
-wasm-bindgen = "0.2.92"
-tokio_with_wasm = { version = "0.5.1", features = [
+tokio_with_wasm = { version = "0.5.3", features = [
     "rt",
     "sync",
     "macros",
     "time",
 ] }
+wasm-bindgen = "0.2.92"
+sample_crate = { path = "../sample_crate" }
