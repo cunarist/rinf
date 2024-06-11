@@ -36,7 +36,7 @@ macro_rules! write_interface {
                 unsafe { std::slice::from_raw_parts(message_pointer, message_size).to_vec() };
             let binary =
                 unsafe { std::slice::from_raw_parts(binary_pointer, binary_size).to_vec() };
-            messages::generated::handle_dart_signal(message_id as i32, message_bytes, binary);
+            messages::generated::handle_dart_signal(message_id, message_bytes, binary);
         }
 
         #[cfg(target_family = "wasm")]
