@@ -55,18 +55,18 @@ elif sys.argv[1] == "prepare-test-app":
     )
     replace_text_in_file(
         "native/hub/src/lib.rs",
-        "// use tokio_with_wasm",
-        "use tokio_with_wasm",
-    )
-    replace_text_in_file(
-        "native/hub/Cargo.toml",
-        "# wasm-bindgen",
-        "wasm-bindgen",
+        "// use tokio_with_wasm::alias as tokio;",
+        "use tokio_with_wasm::alias as tokio;",
     )
     replace_text_in_file(
         "native/hub/Cargo.toml",
         "# tokio_with_wasm",
         "tokio_with_wasm",
+    )
+    replace_text_in_file(
+        "native/hub/Cargo.toml",
+        "# wasm-bindgen",
+        "wasm-bindgen",
     )
 
     os.chdir("../")
@@ -109,18 +109,18 @@ elif sys.argv[1] == "prepare-user-app":
     )
     replace_text_in_file(
         "native/hub/src/lib.rs",
-        "// use tokio_with_wasm",
-        "use tokio_with_wasm",
-    )
-    replace_text_in_file(
-        "native/hub/Cargo.toml",
-        "# wasm-bindgen",
-        "wasm-bindgen",
+        "// use tokio_with_wasm::alias as tokio;",
+        "use tokio_with_wasm::alias as tokio;",
     )
     replace_text_in_file(
         "native/hub/Cargo.toml",
         "# tokio_with_wasm",
         "tokio_with_wasm",
+    )
+    replace_text_in_file(
+        "native/hub/Cargo.toml",
+        "# wasm-bindgen",
+        "wasm-bindgen",
     )
 
     os.chdir("../")
