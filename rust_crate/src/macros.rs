@@ -26,7 +26,7 @@ macro_rules! write_interface {
         #[cfg(not(target_family = "wasm"))]
         #[no_mangle]
         pub unsafe extern "C" fn send_dart_signal_extern(
-            message_id: i64,
+            message_id: i32,
             message_pointer: *const u8,
             message_size: usize,
             binary_pointer: *const u8,

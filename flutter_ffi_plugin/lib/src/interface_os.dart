@@ -77,20 +77,10 @@ Future<void> sendDartSignalReal(
   binaryMemory.asTypedList(binary.length).setAll(0, binary);
 
   final rustFunction = rustLibrary.lookupFunction<
-      Void Function(
-        IntPtr,
-        Pointer<Uint8>,
-        IntPtr,
-        Pointer<Uint8>,
-        IntPtr,
-      ),
-      void Function(
-        int,
-        Pointer<Uint8>,
-        int,
-        Pointer<Uint8>,
-        int,
-      )>('send_dart_signal_extern');
+      Void Function(Int32, Pointer<Uint8>, UintPtr, Pointer<Uint8>, UintPtr),
+      void Function(int, Pointer<Uint8>, int, Pointer<Uint8>, int)>(
+    'send_dart_signal_extern',
+  );
 
   rustFunction(
     messageId,
@@ -105,12 +95,9 @@ Future<void> sendDartSignalReal(
 }
 
 void prepareIsolateReal(int port) {
-  final rustFunction = rustLibrary.lookupFunction<
-      Void Function(
-        IntPtr,
-      ),
-      void Function(
-        int,
-      )>('prepare_isolate_extern');
+  final rustFunction =
+      rustLibrary.lookupFunction<Void Function(Int64), void Function(int)>(
+    'prepare_isolate_extern',
+  );
   rustFunction(port);
 }
