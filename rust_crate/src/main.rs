@@ -8,7 +8,7 @@ fn main() -> Result<()> {
     use std::path;
     use std::process;
 
-    // Verify Protobuf compiler.
+    // Ensure Protobuf compiler.
     let protoc_path = if let Ok(installed) = which::which("protoc") {
         // Get the path of Protobuf compiler that's already installed.
         println!("Detected `protoc`, skipping auto installation.");

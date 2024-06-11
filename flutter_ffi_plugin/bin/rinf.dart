@@ -1,6 +1,7 @@
 import 'src/config.dart';
 import 'src/helpers.dart';
 import 'src/message.dart';
+import 'src/internet.dart';
 
 Future<void> main(List<String> args) async {
   if (args.isEmpty) {
@@ -10,6 +11,7 @@ Future<void> main(List<String> args) async {
   }
 
   final rinfConfig = await loadVerifiedRinfConfig("pubspec.yaml");
+  await checkConnectivity();
 
   switch (args[0]) {
     case "config":
