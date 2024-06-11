@@ -4,6 +4,7 @@ import 'package:yaml/yaml.dart';
 import 'config.dart';
 import 'message.dart';
 import 'common.dart';
+import 'internet.dart';
 
 /// Creates new folders and files to an existing Flutter project folder.
 Future<void> applyRustTemplate({
@@ -197,31 +198,52 @@ Future<void> copyDirectory(Uri source, Uri destination) async {
 }
 
 Future<void> buildWebassembly({bool isReleaseMode = false}) async {
-  // Verify Rust toolchain.
-  print("Verifying Rust toolchain for the web." +
-      "\nThis might take a while if there are new updates.");
-  await Process.run("rustup", ["toolchain", "install", "nightly"]);
-  await Process.run("rustup", [
-    "+nightly",
-    "component",
-    "add",
-    "rust-src",
-  ]);
-  await Process.run("rustup", [
-    "+nightly",
-    "target",
-    "add",
-    "wasm32-unknown-unknown",
-  ]); // For actual compilation
-  await Process.run("rustup", [
-    "target",
-    "add",
-    "wasm32-unknown-unknown",
-  ]); // For Rust-analyzer
-  await Process.run("cargo", ["install", "wasm-pack"]);
-  await Process.run("cargo", ["install", "wasm-bindgen-cli"]);
+  // Ensure Rust toolchain.
+  if (isInternetConnected) {
+    print("Ensuring Rust toolchain for the web." +
+        "\nThis is done by installing it globally on the system.");
+    final processResults = <ProcessResult>[];
+    processResults.add(await Process.run("rustup", [
+      "toolchain",
+      "install",
+      "nightly",
+    ]));
+    processResults.add(await Process.run("rustup", [
+      "+nightly",
+      "component",
+      "add",
+      "rust-src",
+    ]));
+    processResults.add(await Process.run("rustup", [
+      "+nightly",
+      "target",
+      "add",
+      "wasm32-unknown-unknown",
+    ])); // For actual compilation
+    processResults.add(await Process.run("rustup", [
+      "target",
+      "add",
+      "wasm32-unknown-unknown",
+    ])); // For Rust-analyzer
+    processResults.add(await Process.run("cargo", [
+      "install",
+      "wasm-pack",
+    ]));
+    processResults.add(await Process.run("cargo", [
+      "install",
+      "wasm-bindgen-cli",
+    ]));
+    processResults.forEach((processResult) {
+      if (processResult.exitCode != 0) {
+        print(processResult.stderr.toString().trim());
+        throw Exception('Cannot globally install Rust toolchain for the web.');
+      }
+    });
+  } else {
+    print("Skipping ensurement of Rust toolchain for the web.");
+  }
 
-  // Verify Flutter SDK web server's response headers.
+  // Patch Flutter SDK web server's response headers.
   try {
     await patchServerHeaders();
     print("Patched Flutter SDK's web server with CORS HTTP headers.");

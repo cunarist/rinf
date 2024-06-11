@@ -3,6 +3,7 @@ import 'package:path/path.dart';
 import 'package:watcher/watcher.dart';
 import 'config.dart';
 import 'common.dart';
+import 'internet.dart';
 
 enum MarkType {
   dartSignal,
@@ -46,7 +47,7 @@ Future<void> generateMessageCode({
     resourcesInFolders,
   );
 
-  // Verify `package` statement in `.proto` files.
+  // Include `package` statement in `.proto` files.
   // Package name should be the same as the filename
   // because Rust filenames are written with package name
   // and Dart filenames are written with the `.proto` filename.
@@ -76,18 +77,24 @@ Future<void> generateMessageCode({
   }
 
   // Generate Rust message files.
-  if (!silent) {
-    print("Verifying `protoc-gen-prost` for Rust." +
-        "\nThis might take a while if there are new updates.");
-  }
-  final cargoInstallCommand = await Process.run('cargo', [
-    'install',
-    'protoc-gen-prost',
-    ...(messageConfig.rustSerde ? ['protoc-gen-prost-serde'] : [])
-  ]);
-  if (cargoInstallCommand.exitCode != 0) {
-    print(cargoInstallCommand.stderr.toString().trim());
-    throw Exception('Cannot globally install `protoc-gen-prost` Rust crate');
+  if (isInternetConnected) {
+    if (!silent) {
+      print("Ensuring `protoc-gen-prost` for Rust." +
+          "\nThis is done by installing it globally on the system.");
+    }
+    final cargoInstallCommand = await Process.run('cargo', [
+      'install',
+      'protoc-gen-prost',
+      ...(messageConfig.rustSerde ? ['protoc-gen-prost-serde'] : [])
+    ]);
+    if (cargoInstallCommand.exitCode != 0) {
+      print(cargoInstallCommand.stderr.toString().trim());
+      throw Exception('Cannot globally install `protoc-gen-prost` Rust crate');
+    }
+  } else {
+    if (!silent) {
+      print("Skipping ensurement of `protoc-gen-prost` for Rust.");
+    }
   }
   for (final entry in resourcesInFolders.entries) {
     final subPath = entry.key;
@@ -164,19 +171,25 @@ Future<void> generateMessageCode({
   }
 
   // Generate Dart message files.
-  if (!silent) {
-    print("Verifying `protoc_plugin` for Dart." +
-        "\nThis might take a while if there are new updates.");
-  }
-  final pubGlobalActivateCommand = await Process.run('dart', [
-    'pub',
-    'global',
-    'activate',
-    'protoc_plugin',
-  ]);
-  if (pubGlobalActivateCommand.exitCode != 0) {
-    print(pubGlobalActivateCommand.stderr.toString().trim());
-    throw Exception('Cannot globally install `protoc_plugin` Dart package');
+  if (isInternetConnected) {
+    if (!silent) {
+      print("Ensuring `protoc_plugin` for Dart." +
+          "\nThis is done by installing it globally on the system.");
+    }
+    final pubGlobalActivateCommand = await Process.run('dart', [
+      'pub',
+      'global',
+      'activate',
+      'protoc_plugin',
+    ]);
+    if (pubGlobalActivateCommand.exitCode != 0) {
+      print(pubGlobalActivateCommand.stderr.toString().trim());
+      throw Exception('Cannot globally install `protoc_plugin` Dart package');
+    }
+  } else {
+    if (!silent) {
+      print("Skipping ensurement of `protoc_plugin` for Dart.");
+    }
   }
   for (final entry in resourcesInFolders.entries) {
     final subPath = entry.key;
