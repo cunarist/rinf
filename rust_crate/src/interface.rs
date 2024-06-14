@@ -19,10 +19,22 @@ pub struct DartSignal<T> {
     pub binary: Vec<u8>,
 }
 
-/// Runs the main function in Rust.
-pub fn start_rust_logic<F>(main_future: F) -> Result<()>
+/// Runs the async main function in Rust.
+/// This spawns the function in a multi-threaded runtime.
+#[cfg(not(target_family = "wasm"))]
+pub fn start_rust_logic_mt<F>(main_future: F) -> Result<()>
 where
     F: Future<Output = ()> + Send + 'static,
+{
+    start_rust_logic_real(main_future)
+}
+
+/// Runs the async main function in Rust.
+/// This spawns the function in a single-threaded runtime.
+#[cfg(target_family = "wasm")]
+pub fn start_rust_logic_st<F>(main_future: F) -> Result<()>
+where
+    F: Future<Output = ()> + 'static,
 {
     start_rust_logic_real(main_future)
 }

@@ -208,6 +208,7 @@ pub async fn run_debug_tests() {
         }
     }
 
+    tokio::time::sleep(std::time::Duration::from_secs(2)).await;
     debug_print!("Debug tests completed!");
 
     tokio::spawn(async {

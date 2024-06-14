@@ -6,7 +6,7 @@ use wasm_bindgen_futures::spawn_local;
 
 pub fn start_rust_logic_real<F>(main_future: F) -> Result<()>
 where
-    F: Future<Output = ()> + Send + 'static,
+    F: Future<Output = ()> + 'static,
 {
     // Add kind description for panics.
     #[cfg(debug_assertions)]
