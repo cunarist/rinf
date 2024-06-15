@@ -31,7 +31,7 @@ static TOKIO_RUNTIME: TokioRuntime = OnceLock::new();
 
 pub fn start_rust_logic_real<F>(main_future: F) -> Result<()>
 where
-    F: Future<Output = ()> + Send + 'static,
+    F: Future + Send + 'static,
 {
     // Enable backtrace output for panics.
     #[cfg(debug_assertions)]
@@ -42,9 +42,19 @@ where
         }));
     }
 
-    // Run the main function.
+    // Build the tokio runtime.
+    #[cfg(not(feature = "multi-worker"))]
+    let tokio_runtime = Builder::new_multi_thread()
+        .worker_threads(1)
+        .enable_all()
+        .build()?;
+    #[cfg(feature = "multi-worker")]
     let tokio_runtime = Builder::new_multi_thread().enable_all().build()?;
-    tokio_runtime.spawn(main_future);
+
+    // Run the main function.
+    tokio_runtime.spawn(async {
+        main_future.await;
+    });
     TOKIO_RUNTIME
         .get_or_init(|| ThreadLocal::new(|| RefCell::new(None)))
         .with(move |cell| {
