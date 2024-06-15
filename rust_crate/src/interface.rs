@@ -20,9 +20,13 @@ pub struct DartSignal<T> {
 }
 
 /// Runs the async main function in Rust.
-/// This spawns the function in a multi-threaded runtime.
+/// On native platforms, futures usually implement the `Send` trait
+/// to be safely sent between threads.
+/// Even in a single-threaded (current-thread) runtime,
+/// the `Runtime` object itself might be moved between threads,
+/// along with all the tasks it manages.
 #[cfg(not(target_family = "wasm"))]
-pub fn start_rust_logic_mt<F>(main_future: F) -> Result<()>
+pub fn start_rust_logic<F>(main_future: F) -> Result<()>
 where
     F: Future<Output = ()> + Send + 'static,
 {
@@ -30,9 +34,10 @@ where
 }
 
 /// Runs the async main function in Rust.
-/// This spawns the function in a single-threaded runtime.
+/// On the web, futures usually don't implement the `Send` trait
+/// because JavaScript environment is fundamentally single-threaded.
 #[cfg(target_family = "wasm")]
-pub fn start_rust_logic_st<F>(main_future: F) -> Result<()>
+pub fn start_rust_logic<F>(main_future: F) -> Result<()>
 where
     F: Future<Output = ()> + 'static,
 {

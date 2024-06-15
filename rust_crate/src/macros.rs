@@ -8,7 +8,7 @@ macro_rules! write_interface {
         #[cfg(not(target_family = "wasm"))]
         #[no_mangle]
         pub extern "C" fn start_rust_logic_extern() {
-            let result = $crate::start_rust_logic_mt(main());
+            let result = $crate::start_rust_logic(main());
             if let Err(error) = result {
                 println!("Could not start Rust logic.\n{error:#?}");
             }
@@ -17,7 +17,7 @@ macro_rules! write_interface {
         #[cfg(target_family = "wasm")]
         #[wasm_bindgen::prelude::wasm_bindgen]
         pub fn start_rust_logic_extern() {
-            let result = $crate::start_rust_logic_st(main());
+            let result = $crate::start_rust_logic(main());
             if let Err(error) = result {
                 println!("Could not start Rust logic.\n{error:#?}");
             }
