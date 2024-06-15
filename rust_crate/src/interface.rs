@@ -28,7 +28,7 @@ pub struct DartSignal<T> {
 #[cfg(not(target_family = "wasm"))]
 pub fn start_rust_logic<F>(main_future: F) -> Result<()>
 where
-    F: Future<Output = ()> + Send + 'static,
+    F: Future + Send + 'static,
 {
     start_rust_logic_real(main_future)
 }
@@ -39,7 +39,7 @@ where
 #[cfg(target_family = "wasm")]
 pub fn start_rust_logic<F>(main_future: F) -> Result<()>
 where
-    F: Future<Output = ()> + 'static,
+    F: Future + 'static,
 {
     start_rust_logic_real(main_future)
 }
