@@ -418,7 +418,7 @@ use std::sync::OnceLock;
 use tokio::sync::mpsc::unbounded_channel;
 
 type SignalHandlers = OnceLock<
-    HashMap<i32, Box<dyn Fn(&[u8], Vec<u8>)
+    HashMap<i32, Box<dyn Fn(&[u8], &[u8])
         -> Result<(), Box<dyn Error>> + Send + Sync>>,
 >;
 static SIGNAL_HANDLERS: SignalHandlers = OnceLock::new();
@@ -426,12 +426,12 @@ static SIGNAL_HANDLERS: SignalHandlers = OnceLock::new();
 pub fn handle_dart_signal(
     message_id: i32,
     message_bytes: &[u8],
-    binary: Vec<u8>
+    binary: &[u8]
 ) {    
     let hash_map = SIGNAL_HANDLERS.get_or_init(|| {
         let mut new_hash_map = HashMap::<
             i32,
-            Box<dyn Fn(&[u8], Vec<u8>)
+            Box<dyn Fn(&[u8], &[u8])
                 -> Result<(), Box<dyn Error>> + Send + Sync>,
         >::new();
 ''';
@@ -452,14 +452,14 @@ pub fn handle_dart_signal(
           rustReceiveScript += '''
 new_hash_map.insert(
     ${markedMessage.id},
-    Box::new(|message_bytes: &[u8], binary: Vec<u8>| {
+    Box::new(|message_bytes: &[u8], binary: &[u8]| {
         use super::$modulePath$filename::*;
         let message = ${normalizePascal(messageName)}::decode(
             message_bytes
         )?;
         let dart_signal = DartSignal {
             message,
-            binary,
+            binary: binary.to_vec(),
         };
         let mut guard = ${snakeName.toUpperCase()}_CHANNEL.lock()?;
         if guard.is_none() {
