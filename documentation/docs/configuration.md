@@ -26,3 +26,4 @@ rinf = { version = "0.0.0", features = ["feature-name"] }
 ```
 
 - `multi-worker`: Starts a worker thread for each CPU core available on the system within the `tokio` runtime. By default, the `tokio` runtime uses only one thread. Enabling this feature allows the `tokio` runtime to utilize all the cores on your computer. This feature does not affect applications on the web platform.
+- `show-backtrace`: Prints the full backtrace in the CLI when a panic occurs in debug mode. This feature does not affect debugging on the web platform.
