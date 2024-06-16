@@ -33,7 +33,9 @@ rinf wasm --release
 flutter run --release  # Choose a browser
 ```
 
-To build the optimized release version of the web application:
+To build the optimized release version of the web application[^4]:
+
+[^4]: Rinf supports hosting a Flutter app at a [non-root location](https://docs.flutter.dev/ui/navigation/url-strategies#hosting-a-flutter-app-at-a-non-root-location). For example, you can place your Flutter app in `https://mywebsite.com/subpath/deeperpath/`.
 
 ```bash title="CLI"
 rinf wasm --release
