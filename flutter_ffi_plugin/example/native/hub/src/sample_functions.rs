@@ -3,6 +3,7 @@
 use crate::messages;
 use crate::tokio;
 use rinf::debug_print;
+use std::time::Duration;
 use tokio::sync::Mutex;
 
 // Using the `cfg` macro enables conditional statement.
@@ -57,7 +58,7 @@ pub async fn stream_fractal() {
     tokio::spawn(async move {
         loop {
             // Wait for 40 milliseconds on each frame
-            tokio::time::sleep(std::time::Duration::from_millis(40)).await;
+            tokio::time::sleep(Duration::from_millis(40)).await;
             if sender.capacity() == 0 {
                 continue;
             }
@@ -120,7 +121,7 @@ pub async fn run_debug_tests() {
         return;
     }
 
-    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+    tokio::time::sleep(Duration::from_secs(1)).await;
     debug_print!("Starting debug tests.");
 
     // Get the current time.
@@ -138,15 +139,15 @@ pub async fn run_debug_tests() {
 
     // Test `tokio::join!` for futures.
     let join_first = async {
-        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+        tokio::time::sleep(Duration::from_secs(1)).await;
         debug_print!("First future finished.");
     };
     let join_second = async {
-        tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+        tokio::time::sleep(Duration::from_secs(2)).await;
         debug_print!("Second future finished.");
     };
     let join_third = async {
-        tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+        tokio::time::sleep(Duration::from_secs(3)).await;
         debug_print!("Third future finished.");
     };
     tokio::join!(join_first, join_second, join_third);
