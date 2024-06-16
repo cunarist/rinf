@@ -21,6 +21,8 @@ rinf config
 
 ## 📦 Crate Features
 
+Customizing the behavior of the Rinf crate is possible through its crate features.
+
 ```toml title="native/hub/Cargo.toml"
 rinf = { version = "0.0.0", features = ["feature-name"] }
 ```
