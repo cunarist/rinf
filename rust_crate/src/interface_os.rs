@@ -87,7 +87,14 @@ where
             })
         });
         if let Ok(mut guard) = TOKIO_RUNTIME.lock() {
-            guard.replace(tokio_runtime);
+            // If there was already a tokio runtime previously,
+            // most likely due to Dart's hot restart,
+            // its tasks as well as itself will be terminated,
+            // being replaced with the new one.
+            let runtime_option = guard.replace(tokio_runtime);
+            if let Some(previous_runtime) = runtime_option {
+                drop(previous_runtime);
+            }
         }
     }
 
