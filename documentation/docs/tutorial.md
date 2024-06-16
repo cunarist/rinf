@@ -127,13 +127,14 @@ Define an async Rust function that runs forever, sending numbers to Dart every s
 ```rust title="native/hub/src/sample_functions.rs"
 ...
 use crate::messages;
+use std::time::Duration;
 ...
 pub async fn stream_amazing_number() {
     use messages::tutorial_resource::*;
 
     let mut current_number: i32 = 1;
     loop {
-        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+        tokio::time::sleep(Duration::from_secs(1)).await;
         MyAmazingNumber { current_number }.send_signal_to_dart(); // GENERATED
         current_number += 1;
     }
