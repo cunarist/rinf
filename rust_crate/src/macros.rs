@@ -42,7 +42,7 @@ macro_rules! write_interface {
         #[wasm_bindgen::prelude::wasm_bindgen]
         pub fn send_dart_signal_extern(message_id: i32, message_bytes: &[u8], binary: &[u8]) {
             let message_bytes = message_bytes;
-            let binary = binary.to_vec();
+            let binary = binary;
             messages::generated::handle_dart_signal(message_id, message_bytes, binary);
         }
     };
