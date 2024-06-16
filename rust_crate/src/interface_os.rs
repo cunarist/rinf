@@ -41,10 +41,19 @@ where
     // Enable backtrace output for panics.
     #[cfg(debug_assertions)]
     {
-        std::panic::set_hook(Box::new(|panic_info| {
-            let backtrace = backtrace::Backtrace::new();
-            crate::debug_print!("A panic occurred in Rust.\n{panic_info}\n{backtrace:?}");
-        }));
+        #[cfg(not(feature = "backtrace"))]
+        {
+            std::panic::set_hook(Box::new(|panic_info| {
+                crate::debug_print!("A panic occurred in Rust.\n{panic_info}");
+            }));
+        }
+        #[cfg(feature = "backtrace")]
+        {
+            std::panic::set_hook(Box::new(|panic_info| {
+                let backtrace = backtrace::Backtrace::new();
+                crate::debug_print!("A panic occurred in Rust.\n{panic_info}\n{backtrace:?}");
+            }));
+        }
     }
 
     // Prepare the channel that will notify tokio runtime to shutdown
