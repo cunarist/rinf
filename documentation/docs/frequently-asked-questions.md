@@ -209,7 +209,7 @@ var currentInteractionId = 0;
 final myUniqueOutputs = Map<int, Completer<MyUniqueOutput>>();
 
 void main() async {
-    MyUniqueOutput.rustSignalStream.listen((rustSignal) {
+  MyUniqueOutput.rustSignalStream.listen((rustSignal) {
     final myUniqueInput = rustSignal.message;
     myUniqueOutputs[myUniqueInput.interactionId]!.complete(myUniqueInput);
   });
