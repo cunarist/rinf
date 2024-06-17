@@ -19,7 +19,7 @@ StreamBuilder(
     if (rustSignal == null) {
       // Return an empty widget.
     }
-    final myDataOutput = rustSignal.message;
+    MyDataOutput message = rustSignal.message;
     // Return a filled widget.
   },
 )
@@ -44,7 +44,8 @@ StreamBuilder(
     if (rustSignal == null) {
       // Return an empty widget.
     }
-    final myDataOutput = rustSignal.message;
+    MyDataOutput message = rustSignal.message;
+    Uint8List binary = rustSignal.binary;
     // Return a filled widget.
   },
 )
