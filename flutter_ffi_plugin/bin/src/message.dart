@@ -294,10 +294,9 @@ impl ${normalizePascal(messageName)} {
     pub fn get_dart_signal_receiver()
         -> Result<UnboundedReceiver<DartSignal<Self>>> 
     {       
-        let mut guard =
-            ${snakeName.toUpperCase()}_CHANNEL.lock().map_err(|_| {
-                String::from("Could not acquire the channel lock.")
-            })?;
+        let mut guard = ${snakeName.toUpperCase()}_CHANNEL
+            .lock()
+            .map_err(|_| "Could not acquire the channel lock.")?;
         if guard.is_none() {
             let (sender, receiver) = unbounded_channel();
             guard.replace((sender, Some(receiver)));
@@ -321,7 +320,7 @@ impl ${normalizePascal(messageName)} {
         guard.replace((pair.0, None));
         let receiver = pair
             .1
-            .ok_or("Each Dart signal receiver can be taken only once")?;
+            .ok_or("Each Dart signal receiver can be taken only once.")?;
         Ok(receiver)
     }
 }
