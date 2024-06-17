@@ -4,8 +4,9 @@
 mod common;
 mod messages;
 
+use crate::common::*;
 use tokio; // Comment this line to target the web.
-           // use tokio_with_wasm::alias as tokio; // Uncomment this line to target the web.
+// use tokio_with_wasm::alias as tokio; // Uncomment this line to target the web.
 
 rinf::write_interface!();
 
@@ -15,11 +16,11 @@ rinf::write_interface!();
 // If you really need to use blocking code,
 // use `tokio::task::spawn_blocking`.
 async fn main() {
-    use messages::basic::*;
     tokio::spawn(communicate());
 }
 
 async fn communicate() -> Result<()> {
+    use messages::basic::*;
     // Send signals to Dart like below.
     SmallNumber { number: 7 }.send_signal_to_dart();
     // Get receivers that listen to Dart signals like below.
@@ -28,4 +29,5 @@ async fn communicate() -> Result<()> {
         let message: SmallText = dart_signal.message;
         rinf::debug_print!("{message:?}");
     }
+    Ok(())
 }
