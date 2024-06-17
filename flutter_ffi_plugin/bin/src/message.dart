@@ -258,12 +258,16 @@ import 'package:rinf/rinf.dart';
           rustPath,
           '''
 #![allow(unused_imports)]
+#![allow(dead_code)]
 
 use crate::tokio;
 use prost::Message;
 use rinf::{send_rust_signal, DartSignal};
+use std::error::Error;
 use std::sync::Mutex;
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
+
+type Result<T> = std::result::Result<T, Box<dyn Error + Send + Sync>>;
 ''',
           atFront: true,
         );
@@ -287,9 +291,13 @@ pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Cell =
     Mutex::new(None);
 
 impl ${normalizePascal(messageName)} {
-    pub fn get_dart_signal_receiver() -> UnboundedReceiver<DartSignal<Self>> {
-        let mut guard = ${snakeName.toUpperCase()}_CHANNEL.lock()
-            .expect("Could not access the channel lock.");
+    pub fn get_dart_signal_receiver()
+        -> Result<UnboundedReceiver<DartSignal<Self>>> 
+    {       
+        let mut guard =
+            ${snakeName.toUpperCase()}_CHANNEL.lock().map_err(|_| {
+                String::from("Could not acquire the channel lock.")
+            })?;
         if guard.is_none() {
             let (sender, receiver) = unbounded_channel();
             guard.replace((sender, Some(receiver)));
@@ -301,7 +309,7 @@ impl ${normalizePascal(messageName)} {
             // which is now closed.
             let pair = guard
                 .as_ref()
-                .expect("Message channel in Rust not present.");
+                .ok_or("Message channel in Rust not present.")?;
             if pair.0.is_closed() {
                 let (sender, receiver) = unbounded_channel();
                 guard.replace((sender, Some(receiver)));
@@ -309,9 +317,12 @@ impl ${normalizePascal(messageName)} {
         }
         let pair = guard
             .take()
-            .expect("Message channel in Rust not present.");
+            .ok_or("Message channel in Rust not present.")?;
         guard.replace((pair.0, None));
-        pair.1.expect("Each Dart signal receiver can be taken only once")
+        let receiver = pair
+            .1
+            .ok_or("Each Dart signal receiver can be taken only once")?;
+        Ok(receiver)
     }
 }
 ''',

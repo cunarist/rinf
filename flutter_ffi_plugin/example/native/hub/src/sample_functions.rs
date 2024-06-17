@@ -18,11 +18,11 @@ const IS_DEBUG_MODE: bool = false;
 static VECTOR: Mutex<Vec<bool>> = Mutex::const_new(Vec::new());
 
 // Business logic for the counter widget.
-pub async fn tell_numbers() {
+pub async fn tell_numbers() -> Result<()> {
     use messages::counter_number::*;
 
     // Stream getter is generated from a marked Protobuf message.
-    let mut receiver = SampleNumberInput::get_dart_signal_receiver();
+    let mut receiver = SampleNumberInput::get_dart_signal_receiver()?;
     while let Some(dart_signal) = receiver.recv().await {
         // Extract values from the message received from Dart.
         // This message is a type that's declared in its Protobuf file.
@@ -44,6 +44,8 @@ pub async fn tell_numbers() {
         }
         .send_signal_to_dart();
     }
+
+    Ok(())
 }
 
 // Business logic for the fractal image.
