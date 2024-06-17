@@ -18,8 +18,8 @@ pub fn get_hardward_id() -> Result<String> {
     Ok(hwid)
 }
 #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
-pub fn get_hardward_id() -> Option<String> {
-    None
+pub fn get_hardward_id() -> Result<String> {
+    Ok(String::from("UNSUPPORTED"))
 }
 
 // `chrono` supports all platforms, including web.
