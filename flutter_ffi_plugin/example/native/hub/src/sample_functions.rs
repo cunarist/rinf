@@ -1,5 +1,6 @@
 //! This crate is written for Rinf demonstrations.
 
+use crate::common::*;
 use crate::messages;
 use crate::tokio;
 use rinf::debug_print;
@@ -12,8 +13,8 @@ const IS_DEBUG_MODE: bool = true;
 #[cfg(not(debug_assertions))]
 const IS_DEBUG_MODE: bool = false;
 
-// This is one of the best ways to keep a global mutable state in Rust.
-// You can also use `tokio::sync::RwLock` or `tokio::sync::OnceCell`.
+// This is one of the ways to keep a global mutable state in Rust.
+// You can also use `tokio::sync::RwLock` or `std::lazy::LazyLock`.
 static VECTOR: Mutex<Vec<bool>> = Mutex::const_new(Vec::new());
 
 // Business logic for the counter widget.
@@ -116,9 +117,9 @@ async fn use_messages() {
 }
 
 // Business logic for testing various crates.
-pub async fn run_debug_tests() {
+pub async fn run_debug_tests() -> Result<()> {
     if !IS_DEBUG_MODE {
-        return;
+        return Ok(());
     }
 
     tokio::time::sleep(Duration::from_secs(1)).await;
@@ -130,11 +131,11 @@ pub async fn run_debug_tests() {
 
     // Fetch data from a web API.
     let url = "http://jsonplaceholder.typicode.com/todos/1";
-    let web_response = sample_crate::fetch_from_web_api(url).await;
+    let web_response = sample_crate::fetch_from_web_api(url).await?;
     debug_print!("Response from a web API: {web_response:?}");
 
     // Use a crate that accesses operating system APIs.
-    let hwid = sample_crate::get_hardward_id();
+    let hwid = sample_crate::get_hardward_id()?;
     debug_print!("Hardware ID: {hwid:?}");
 
     // Test `tokio::join!` for futures.
@@ -219,4 +220,6 @@ pub async fn run_debug_tests() {
         // It is better to avoid panicking code at all costs on the web.
         panic!("INTENTIONAL DEBUG PANIC");
     });
+
+    Ok(())
 }
