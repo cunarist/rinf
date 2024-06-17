@@ -131,9 +131,9 @@ There might be various Rust codes with these attribute above:
 
 ```rust title="Rust"
 #[cfg(target_family = "wasm")]
-...
+{}
 #[cfg(not(target_family = "wasm"))]
-...
+{}
 ```
 
 Since the environments of the web and native platforms are so different, there are times when you need to use these attributes to include and exclude parts of the code depending on whether they are targeting web or not.
@@ -147,6 +147,8 @@ By default, Rust-analyzer runs in native mode. To make it run in webassembly mod
 # You might have to restart Rust-analyzer for this change to take effect.
 target = "wasm32-unknown-unknown"
 ```
+
+You need to restart Rust language server for this to take effect.
 
 ### CMake cache is broken after I moved the app folder
 
@@ -171,12 +173,9 @@ If you are using older Android versions, you may encounter errors due to issues 
 To address this, you can modify `AndroidManifest.xml` files under `./android/app/src/` as follows.
 
 ```xml title="android/app/src/**/AndroidManifest.xml"
-...
 <application
     android:extractNativeLibs="true"
-    ...
 >
-...
 ```
 
 ### How can I await a response?
@@ -188,7 +187,7 @@ However, if you really need to store some state in a Flutter widget, you can ach
 ```proto title="messages/tutorial_resource.proto"
 syntax = "proto3";
 package tutorial_resource;
-...
+
 // [RINF:DART-SIGNAL]
 message MyUniqueInput {
   int32 interaction_id = 1;
@@ -203,7 +202,6 @@ message MyUniqueOutput {
 ```
 
 ```dart title="lib/main.dart"
-...
 import 'dart:async';
 import 'package:example_app/messages/tutorial_resource.pb.dart';
 
@@ -211,21 +209,17 @@ var currentInteractionId = 0;
 final myUniqueOutputs = Map<int, Completer<MyUniqueOutput>>();
 
 void main() async {
-  ...
-  MyUniqueOutput.rustSignalStream.listen((rustSignal) {
+    MyUniqueOutput.rustSignalStream.listen((rustSignal) {
     final myUniqueInput = rustSignal.message;
     myUniqueOutputs[myUniqueInput.interactionId]!.complete(myUniqueInput);
   });
-  ...
 }
-...
 ```
 
 ```dart title="lib/main.dart"
-...
 import 'dart:async';
 import 'package:example_app/messages/tutorial_resource.pb.dart';
-...
+
 onPressed: () async {
   final completer = Completer<MyUniqueOutput>();
   myUniqueOutputs[currentInteractionId] = completer;
@@ -236,7 +230,6 @@ onPressed: () async {
   currentInteractionId += 1;
   final myUniqueOutput = await completer.future;
 },
-...
 ```
 
 ```rust title="native/hub/src/sample_functions.rs"
@@ -257,7 +250,6 @@ pub async fn respond() {
 
 ```rust title="native/hub/src/lib.rs"
 async fn main() {
-    ...
     tokio::spawn(sample_functions::respond());
 }
 ```
@@ -324,9 +316,7 @@ import './messages/generated.dart';
 
 async void main() {
   await initializeRust(compiledLibPath: "/path/to/library/libhub.so");
-  ...
 }
-...
 ```
 
 This provided path will be used for finding dynamic library files on native platforms with Dart's `DynamicLibrary.open([compiledLibPath])`, and for loading the JavaScript module on the web with `import init, * as wasmBindings from "[compiledLibPath]"`.

@@ -9,7 +9,7 @@ In some cases, you might need to run some finalization code in Rust before the a
 ```dart title="lib/main.dart"
 import 'dart:ui';
 import 'package:flutter/material.dart';
-...
+
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -39,7 +39,6 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-...
 ```
 
 It's worth noting that `AppLifecycleListener` or `dispose` cannot always be relied upon for app closings. Below is a text snippet quoted from the official [Flutter docs](https://api.flutter.dev/flutter/widgets/State/dispose.html):
