@@ -1,5 +1,6 @@
 //! This crate is written for Rinf demonstrations.
 
+use crate::common::*;
 use crate::messages;
 use crate::tokio;
 use rinf::debug_print;
@@ -12,16 +13,16 @@ const IS_DEBUG_MODE: bool = true;
 #[cfg(not(debug_assertions))]
 const IS_DEBUG_MODE: bool = false;
 
-// This is one of the best ways to keep a global mutable state in Rust.
-// You can also use `tokio::sync::RwLock` or `tokio::sync::OnceCell`.
+// This is one of the ways to keep a global mutable state in Rust.
+// You can also use `tokio::sync::RwLock` or `std::lazy::LazyLock`.
 static VECTOR: Mutex<Vec<bool>> = Mutex::const_new(Vec::new());
 
 // Business logic for the counter widget.
-pub async fn tell_numbers() {
+pub async fn tell_numbers() -> Result<()> {
     use messages::counter_number::*;
 
     // Stream getter is generated from a marked Protobuf message.
-    let mut receiver = SampleNumberInput::get_dart_signal_receiver();
+    let mut receiver = SampleNumberInput::get_dart_signal_receiver()?;
     while let Some(dart_signal) = receiver.recv().await {
         // Extract values from the message received from Dart.
         // This message is a type that's declared in its Protobuf file.
@@ -43,6 +44,8 @@ pub async fn tell_numbers() {
         }
         .send_signal_to_dart();
     }
+
+    Ok(())
 }
 
 // Business logic for the fractal image.
@@ -105,20 +108,21 @@ pub async fn stream_fractal() {
 
 // A dummy function that uses sample messages to eliminate warnings.
 #[allow(dead_code)]
-async fn use_messages() {
+async fn use_messages() -> Result<()> {
     use messages::sample_folder::enum_and_oneof::*;
-    _ = SampleInput::get_dart_signal_receiver();
+    let _ = SampleInput::get_dart_signal_receiver()?;
     SampleOutput {
         kind: 3,
         oneof_input: Some(sample_output::OneofInput::Age(25)),
     }
-    .send_signal_to_dart()
+    .send_signal_to_dart();
+    Ok(())
 }
 
 // Business logic for testing various crates.
-pub async fn run_debug_tests() {
+pub async fn run_debug_tests() -> Result<()> {
     if !IS_DEBUG_MODE {
-        return;
+        return Ok(());
     }
 
     tokio::time::sleep(Duration::from_secs(1)).await;
@@ -130,11 +134,11 @@ pub async fn run_debug_tests() {
 
     // Fetch data from a web API.
     let url = "http://jsonplaceholder.typicode.com/todos/1";
-    let web_response = sample_crate::fetch_from_web_api(url).await;
+    let web_response = sample_crate::fetch_from_web_api(url).await?;
     debug_print!("Response from a web API: {web_response:?}");
 
     // Use a crate that accesses operating system APIs.
-    let hwid = sample_crate::get_hardward_id();
+    let hwid = sample_crate::get_hardward_id()?;
     debug_print!("Hardware ID: {hwid:?}");
 
     // Test `tokio::join!` for futures.
@@ -219,4 +223,6 @@ pub async fn run_debug_tests() {
         // It is better to avoid panicking code at all costs on the web.
         panic!("INTENTIONAL DEBUG PANIC");
     });
+
+    Ok(())
 }
