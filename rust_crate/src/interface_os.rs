@@ -36,7 +36,7 @@ static SHUTDOWN_SENDER: ShutdownSenderLock = OnceLock::new();
 
 pub fn start_rust_logic_real<F>(main_future: F) -> Result<()>
 where
-    F: Future + Send + 'static,
+    F: Future<Output = ()> + Send + 'static,
 {
     // Enable backtrace output for panics.
     #[cfg(debug_assertions)]
@@ -68,9 +68,7 @@ where
     {
         let tokio_runtime = Builder::new_current_thread().enable_all().build()?;
         thread::spawn(move || {
-            tokio_runtime.spawn(async {
-                main_future.await;
-            });
+            tokio_runtime.spawn(main_future);
             tokio_runtime.block_on(shutdown_receiver);
             // Dropping the tokio runtime makes it shut down.
             drop(tokio_runtime);
