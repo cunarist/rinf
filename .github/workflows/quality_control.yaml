@@ -54,13 +54,17 @@ jobs:
         working-directory: flutter_ffi_plugin/example/
         run: rinf message
 
-      - name: Check for any errors
+      - name: Check for errors in various targets
         run: |
           rustup target add wasm32-unknown-unknown
           cargo clippy
           cargo clippy --release
           cargo clippy --target wasm32-unknown-unknown
           cargo clippy --target wasm32-unknown-unknown --release
+
+      - name: Check for errors with all features enabled
+        working-directory: flutter_ffi_plugin/example/native/hub
+        run: cargo clippy --all-features
 
       - name: Analyze code
         run: |
