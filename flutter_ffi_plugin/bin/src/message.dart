@@ -293,7 +293,7 @@ impl ${normalizePascal(messageName)} {
     {       
         let mut guard = ${snakeName.toUpperCase()}_CHANNEL
             .lock()
-            .map_err(|_| RinfError::MessageReceiverTaken)?;
+            .map_err(|_| RinfError::LockMessageChannel)?;
         if guard.is_none() {
             let (sender, receiver) = unbounded_channel();
             guard.replace((sender, Some(receiver)));
