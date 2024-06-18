@@ -120,15 +120,12 @@ pub fn send_rust_signal_real(
     message_bytes: Vec<u8>,
     binary: Vec<u8>,
 ) -> Result<(), RinfError> {
-    // When `DART_ISOLATE` is not initialized, do nothing.
+    // When `DART_ISOLATE` is not initialized, just return the error.
     // This can happen when running test code in Rust.
     let guard = DART_ISOLATE
         .lock()
         .map_err(|_| RinfError::LockDartIsolate)?;
-    let dart_isolate = guard
-        .as_ref()
-        .ok_or("Dart isolate for sending Rust signals is not present.")
-        .map_err(|_| RinfError::NoDartIsolate)?;
+    let dart_isolate = guard.as_ref().ok_or(RinfError::NoDartIsolate)?;
 
     // If a `Vec<u8>` is empty, we can't just simply send it to Dart
     // because panic can occur from null pointers.
