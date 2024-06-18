@@ -81,7 +81,10 @@ where
     #[cfg(feature = "multi-worker")]
     {
         static TOKIO_RUNTIME: Mutex<Option<tokio::runtime::Runtime>> = Mutex::new(None);
-        let tokio_runtime = Builder::new_multi_thread().enable_all().build()?;
+        let tokio_runtime = Builder::new_multi_thread()
+            .enable_all()
+            .build()
+            .map_err(|_| RinfError::BuildRuntime)?;
         tokio_runtime.spawn(async {
             main_future.await;
         });
