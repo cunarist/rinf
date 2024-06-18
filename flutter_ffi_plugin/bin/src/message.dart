@@ -431,8 +431,7 @@ use tokio::sync::mpsc::unbounded_channel;
 
 type Handler = dyn Fn(&[u8], &[u8]) -> Result<(), RinfError> + Send + Sync;
 type SignalHandlers = HashMap<i32, Box<Handler>>;
-type SignalHandlersLock = OnceLock<SignalHandlers>;
-static SIGNAL_HANDLERS: SignalHandlersLock = OnceLock::new();
+static SIGNAL_HANDLERS: OnceLock<SignalHandlers> = OnceLock::new();
 
 pub fn handle_dart_signal(
     message_id: i32,
