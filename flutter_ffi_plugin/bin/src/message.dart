@@ -423,8 +423,7 @@ impl ${normalizePascal(messageName)} {
 
 use crate::tokio;
 use prost::Message;
-use rinf::debug_print;
-use rinf::{DartSignal, RinfError};
+use rinf::{debug_print, DartSignal, RinfError};
 use std::collections::HashMap;
 use std::error::Error;
 use std::sync::OnceLock;
