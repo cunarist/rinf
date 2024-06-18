@@ -10,7 +10,8 @@ macro_rules! write_interface {
         pub extern "C" fn start_rust_logic_extern() {
             let result = $crate::start_rust_logic(main());
             if let Err(error) = result {
-                println!("Could not start Rust logic.\n{error:#?}");
+                println!("Could not start Rust logic.");
+                println!("{error:?}");
             }
         }
 
@@ -19,7 +20,8 @@ macro_rules! write_interface {
         pub fn start_rust_logic_extern() {
             let result = $crate::start_rust_logic(main());
             if let Err(error) = result {
-                println!("Could not start Rust logic.\n{error:#?}");
+                println!("Could not start Rust logic.");
+                println!("{error:?}");
             }
         }
 
@@ -59,11 +61,14 @@ macro_rules! debug_print {
     ( $( $t:tt )* ) => {
         let rust_report = format!( $( $t )* );
         #[cfg(debug_assertions)]
-        $crate::send_rust_signal(
+        let result = $crate::send_rust_signal(
             -1, // This is a special message ID for Rust reports
             Vec::new(),
-            rust_report.into_bytes(),
+            rust_report.clone().into_bytes(),
         );
+        if let Err(error) = result {
+            println!("Could not send Rust report.\n{error:?}\n{rust_report}");
+        }
         #[cfg(not(debug_assertions))]
         let _ = rust_report;
     }

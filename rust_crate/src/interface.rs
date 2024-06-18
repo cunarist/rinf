@@ -1,4 +1,4 @@
-use crate::common::*;
+use crate::error::RinfError;
 use std::future::Future;
 
 #[cfg(not(target_family = "wasm"))]
@@ -26,7 +26,7 @@ pub struct DartSignal<T> {
 /// the `Runtime` object itself might be moved between threads,
 /// along with all the tasks it manages.
 #[cfg(not(target_family = "wasm"))]
-pub fn start_rust_logic<F>(main_future: F) -> Result<()>
+pub fn start_rust_logic<F>(main_future: F) -> Result<(), RinfError>
 where
     F: Future<Output = ()> + Send + 'static,
 {
@@ -37,7 +37,7 @@ where
 /// On the web, futures usually don't implement the `Send` trait
 /// because JavaScript environment is fundamentally single-threaded.
 #[cfg(target_family = "wasm")]
-pub fn start_rust_logic<F>(main_future: F) -> Result<()>
+pub fn start_rust_logic<F>(main_future: F) -> Result<(), RinfError>
 where
     F: Future<Output = ()> + 'static,
 {
@@ -45,11 +45,10 @@ where
 }
 
 /// Send a signal to Dart.
-pub fn send_rust_signal(message_id: i32, message_bytes: Vec<u8>, binary: Vec<u8>) {
-    let result = send_rust_signal_real(message_id, message_bytes, binary);
-    if let Err(error) = result {
-        // We cannot use `debug_print` here because
-        // it uses `send_rust_siganl` internally.
-        println!("Could not send Rust signal.\n{error:#?}");
-    }
+pub fn send_rust_signal(
+    message_id: i32,
+    message_bytes: Vec<u8>,
+    binary: Vec<u8>,
+) -> Result<(), RinfError> {
+    send_rust_signal_real(message_id, message_bytes, binary)
 }

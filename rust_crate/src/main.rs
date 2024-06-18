@@ -1,8 +1,7 @@
-mod common;
-use common::*;
+use std::error::Error;
 
 #[cfg(not(target_family = "wasm"))]
-fn main() -> Result<()> {
+fn main() -> Result<(), Box<dyn Error>> {
     use std::env;
     use std::fs;
     use std::path;
@@ -76,7 +75,7 @@ fn main() -> Result<()> {
 }
 
 #[cfg(target_family = "wasm")]
-fn main() -> Result<()> {
+fn main() -> Result<(), Box<dyn Error>> {
     // Dummy function to make the linter happy.
     Ok(())
 }

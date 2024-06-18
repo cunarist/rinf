@@ -1,4 +1,4 @@
-use crate::common::*;
+use crate::error::RinfError;
 use allo_isolate::{IntoDart, Isolate, ZeroCopyBuffer};
 use os_thread_local::ThreadLocal;
 use std::cell::RefCell;
@@ -34,7 +34,7 @@ pub extern "C" fn prepare_isolate_extern(port: i64) {
 type ShutdownSenderLock = OnceLock<ThreadLocal<RefCell<Option<ShutdownSender>>>>;
 static SHUTDOWN_SENDER: ShutdownSenderLock = OnceLock::new();
 
-pub fn start_rust_logic_real<F>(main_future: F) -> Result<()>
+pub fn start_rust_logic_real<F>(main_future: F) -> Result<(), RinfError>
 where
     F: Future<Output = ()> + Send + 'static,
 {
@@ -66,7 +66,10 @@ where
     // Build the tokio runtime.
     #[cfg(not(feature = "multi-worker"))]
     {
-        let tokio_runtime = Builder::new_current_thread().enable_all().build()?;
+        let tokio_runtime = Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .map_err(|_| RinfError::BuildRuntime)?;
         thread::spawn(move || {
             tokio_runtime.spawn(main_future);
             tokio_runtime.block_on(shutdown_receiver);
@@ -112,13 +115,16 @@ pub fn send_rust_signal_real(
     message_id: i32,
     message_bytes: Vec<u8>,
     binary: Vec<u8>,
-) -> Result<()> {
+) -> Result<(), RinfError> {
     // When `DART_ISOLATE` is not initialized, do nothing.
     // This can happen when running test code in Rust.
-    let guard = DART_ISOLATE.lock()?;
+    let guard = DART_ISOLATE
+        .lock()
+        .map_err(|_| RinfError::LockDartIsolate)?;
     let dart_isolate = guard
         .as_ref()
-        .ok_or("Dart isolate for sending Rust signals is not present.")?;
+        .ok_or("Dart isolate for sending Rust signals is not present.")
+        .map_err(|_| RinfError::NoDartIsolate)?;
 
     // If a `Vec<u8>` is empty, we can't just simply send it to Dart
     // because panic can occur from null pointers.

@@ -1,10 +1,10 @@
-use crate::common::*;
+use crate::error::RinfError;
 use js_sys::Uint8Array;
 use std::future::Future;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
 
-pub fn start_rust_logic_real<F>(main_future: F) -> Result<()>
+pub fn start_rust_logic_real<F>(main_future: F) -> Result<(), RinfError>
 where
     F: Future<Output = ()> + 'static,
 {
@@ -32,12 +32,11 @@ pub fn send_rust_signal_real(
     message_id: i32,
     message_bytes: Vec<u8>,
     binary: Vec<u8>,
-) -> Result<()> {
+) -> Result<(), RinfError> {
     send_rust_signal_extern(
         message_id,
         js_sys::Uint8Array::from(message_bytes.as_slice()),
         js_sys::Uint8Array::from(binary.as_slice()),
     );
-
     Ok(())
 }
