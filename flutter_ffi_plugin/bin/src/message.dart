@@ -385,7 +385,7 @@ impl ${normalizePascal(messageName)} {
             Vec::new(),
         );
         if let Err(error) = result {
-            debug_print!("{error}\n{self:?}");
+            debug_print!("{error}\\n{self:?}");
         }
     }
 }
@@ -404,7 +404,7 @@ impl ${normalizePascal(messageName)} {
             binary,
         );
         if let Err(error) = result {
-            debug_print!("{error}\n{self:?}");
+            debug_print!("{error}\\n{self:?}");
         }
     }
 }
