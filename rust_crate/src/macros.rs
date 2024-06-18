@@ -65,13 +65,15 @@ macro_rules! debug_print {
     ( $( $t:tt )* ) => {
         let rust_report = format!( $( $t )* );
         #[cfg(debug_assertions)]
-        let result = $crate::send_rust_signal(
-            -1, // This is a special message ID for Rust reports
-            Vec::new(),
-            rust_report.clone().into_bytes(),
-        );
-        if let Err(error) = result {
-            println!("{error}\n{rust_report}");
+        {
+            let result = $crate::send_rust_signal(
+                -1, // This is a special message ID for Rust reports
+                Vec::new(),
+                rust_report.clone().into_bytes(),
+            );
+            if let Err(error) = result {
+                println!("{error}\n{rust_report}");
+            }
         }
         #[cfg(not(debug_assertions))]
         let _ = rust_report;
