@@ -10,8 +10,7 @@ macro_rules! write_interface {
         pub extern "C" fn start_rust_logic_extern() {
             let result = $crate::start_rust_logic(main());
             if let Err(error) = result {
-                println!("Could not start Rust logic.");
-                println!("{error:?}");
+                rinf::debug_print!("{error}");
             }
         }
 
@@ -20,8 +19,7 @@ macro_rules! write_interface {
         pub fn start_rust_logic_extern() {
             let result = $crate::start_rust_logic(main());
             if let Err(error) = result {
-                println!("Could not start Rust logic.");
-                println!("{error:?}");
+                rinf::debug_print!("{error}");
             }
         }
 
@@ -37,7 +35,10 @@ macro_rules! write_interface {
             use std::slice::from_raw_parts;
             let message_bytes = unsafe { from_raw_parts(message_pointer, message_size) };
             let binary = unsafe { from_raw_parts(binary_pointer, binary_size) };
-            messages::generated::handle_dart_signal(message_id, message_bytes, binary);
+            let result = messages::generated::handle_dart_signal(message_id, message_bytes, binary);
+            if let Err(error) = result {
+                rinf::debug_print!("{error}");
+            }
         }
 
         #[cfg(target_family = "wasm")]
@@ -45,7 +46,10 @@ macro_rules! write_interface {
         pub fn send_dart_signal_extern(message_id: i32, message_bytes: &[u8], binary: &[u8]) {
             let message_bytes = message_bytes;
             let binary = binary;
-            messages::generated::handle_dart_signal(message_id, message_bytes, binary);
+            let result = messages::generated::handle_dart_signal(message_id, message_bytes, binary);
+            if let Err(error) = result {
+                rinf::debug_print!("{error}");
+            }
         }
     };
 }
@@ -67,7 +71,7 @@ macro_rules! debug_print {
             rust_report.clone().into_bytes(),
         );
         if let Err(error) = result {
-            println!("Could not send Rust report.\n{error:?}\n{rust_report}");
+            println!("{error}\n{rust_report}");
         }
         #[cfg(not(debug_assertions))]
         let _ = rust_report;

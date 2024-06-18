@@ -261,7 +261,7 @@ import 'package:rinf/rinf.dart';
 
 use crate::tokio;
 use prost::Message;
-use rinf::{send_rust_signal, DartSignal, RinfError};
+use rinf::{debug_print, send_rust_signal, DartSignal, RinfError};
 use std::error::Error;
 use std::sync::Mutex;
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
@@ -386,9 +386,7 @@ impl ${normalizePascal(messageName)} {
             Vec::new(),
         );
         if let Err(error) = result {
-            println!("Could not send Rust signal.");
-            println!("{error:?}");
-            println!("{self:?}");
+            debug_print!("{error}\n{self:?}");
         }
     }
 }
@@ -405,11 +403,9 @@ impl ${normalizePascal(messageName)} {
             ${markedMessage.id},
             self.encode_to_vec(),
             binary,
-        );        
+        );
         if let Err(error) = result {
-            println!("Could not send Rust signal.");
-            println!("{error:?}");
-            println!("{self:?}");
+            debug_print!("{error}\n{self:?}");
         }
     }
 }
@@ -444,7 +440,7 @@ pub fn handle_dart_signal(
     message_id: i32,
     message_bytes: &[u8],
     binary: &[u8]
-) {    
+) -> Result<(), RinfError> {    
     let hash_map = SIGNAL_HANDLERS.get_or_init(|| {
         let mut new_hash_map: SignalHandlers = HashMap::new();
 ''';
@@ -513,15 +509,9 @@ new_hash_map.insert(
 
     let signal_handler = match hash_map.get(&message_id) {
         Some(inner) => inner,
-        None => {
-            debug_print!("Message ID not found in the handler Hashmap.");
-            return;
-        }
+        None => return Err(RinfError::NoSignalHandler),
     };
-    let result = signal_handler(message_bytes, binary);
-    if let Err(error) = result {
-        debug_print!("Could not process hashmap.\\n{error:#?}");
-    }
+    signal_handler(message_bytes, binary)
 }
 ''';
   await File.fromUri(rustOutputPath.join('generated.rs'))

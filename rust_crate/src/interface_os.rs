@@ -18,7 +18,8 @@ pub extern "C" fn prepare_isolate_extern(port: i64) {
     let mut guard = match DART_ISOLATE.lock() {
         Ok(inner) => inner,
         Err(_) => {
-            println!("Could not unlock Dart isolate mutex.");
+            let error = RinfError::LockDartIsolate;
+            println!("{error}");
             return;
         }
     };

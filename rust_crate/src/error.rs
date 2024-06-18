@@ -10,6 +10,7 @@ pub enum RinfError {
     NoMessageChannel,
     MessageReceiverTaken,
     DecodeMessage,
+    NoSignalHandler,
 }
 
 impl fmt::Display for RinfError {
@@ -35,6 +36,9 @@ impl fmt::Display for RinfError {
             }
             RinfError::DecodeMessage => {
                 write!(f, "Could not decode the message.")
+            }
+            RinfError::NoSignalHandler => {
+                write!(f, "Could not find the handler for Dart signal.")
             }
         }
     }
