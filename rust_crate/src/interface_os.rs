@@ -67,7 +67,10 @@ where
     // Build the tokio runtime.
     #[cfg(not(feature = "multi-worker"))]
     {
-        let tokio_runtime = Builder::new_current_thread().enable_all().build()?;
+        let tokio_runtime = Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .map_err(|_| RinfError::BuildRuntime)?;
         thread::spawn(move || {
             tokio_runtime.spawn(main_future);
             tokio_runtime.block_on(shutdown_receiver);
@@ -78,10 +81,7 @@ where
     #[cfg(feature = "multi-worker")]
     {
         static TOKIO_RUNTIME: Mutex<Option<tokio::runtime::Runtime>> = Mutex::new(None);
-        let tokio_runtime = Builder::new_multi_thread()
-            .enable_all()
-            .build()
-            .map_err(|_| RinfError::BuildRuntime)?;
+        let tokio_runtime = Builder::new_multi_thread().enable_all().build()?;
         tokio_runtime.spawn(async {
             main_future.await;
         });
