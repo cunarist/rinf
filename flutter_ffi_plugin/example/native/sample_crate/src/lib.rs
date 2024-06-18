@@ -20,7 +20,7 @@ pub fn get_hardward_id() -> Result<String, ExampleError> {
     Ok(hwid)
 }
 #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
-pub fn get_hardward_id() -> Result<String> {
+pub fn get_hardward_id() -> Result<String, ExampleError> {
     Ok(String::from("UNSUPPORTED"))
 }
 
