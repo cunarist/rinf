@@ -48,6 +48,7 @@ StreamBuilder(
 ```rust
 MyMessage {
     current_number: 7,
+    other_bool: true,
 }
 .send_signal_to_dart()
 ```
