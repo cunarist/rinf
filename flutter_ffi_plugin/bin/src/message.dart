@@ -258,16 +258,13 @@ import 'package:rinf/rinf.dart';
           rustPath,
           '''
 #![allow(unused_imports)]
-#![allow(dead_code)]
 
 use crate::tokio;
 use prost::Message;
-use rinf::{send_rust_signal, DartSignal};
-use std::error::Error;
+use rinf::{debug_print, send_rust_signal, DartSignal, RinfError};
 use std::sync::Mutex;
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 
-type Result<T> = std::result::Result<T, Box<dyn Error + Send + Sync>>;
 ''',
           atFront: true,
         );
@@ -292,11 +289,11 @@ pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Cell =
 
 impl ${normalizePascal(messageName)} {
     pub fn get_dart_signal_receiver()
-        -> Result<UnboundedReceiver<DartSignal<Self>>> 
+        -> Result<UnboundedReceiver<DartSignal<Self>>, RinfError> 
     {       
         let mut guard = ${snakeName.toUpperCase()}_CHANNEL
             .lock()
-            .map_err(|_| "Could not acquire the channel lock.")?;
+            .map_err(|_| RinfError::LockMessageChannel)?;
         if guard.is_none() {
             let (sender, receiver) = unbounded_channel();
             guard.replace((sender, Some(receiver)));
@@ -308,7 +305,7 @@ impl ${normalizePascal(messageName)} {
             // which is now closed.
             let pair = guard
                 .as_ref()
-                .ok_or("Message channel in Rust not present.")?;
+                .ok_or(RinfError::NoMessageChannel)?;
             if pair.0.is_closed() {
                 let (sender, receiver) = unbounded_channel();
                 guard.replace((sender, Some(receiver)));
@@ -316,11 +313,11 @@ impl ${normalizePascal(messageName)} {
         }
         let pair = guard
             .take()
-            .ok_or("Message channel in Rust not present.")?;
+            .ok_or(RinfError::NoMessageChannel)?;
         guard.replace((pair.0, None));
         let receiver = pair
             .1
-            .ok_or("Each Dart signal receiver can be taken only once.")?;
+            .ok_or(RinfError::MessageReceiverTaken)?;
         Ok(receiver)
     }
 }
@@ -382,11 +379,14 @@ final ${camelName}Controller = StreamController<RustSignal<$messageName>>();
             '''
 impl ${normalizePascal(messageName)} {
     pub fn send_signal_to_dart(&self) {
-        send_rust_signal(
+        let result = send_rust_signal(
             ${markedMessage.id},
             self.encode_to_vec(),
             Vec::new(),
         );
+        if let Err(error) = result {
+            debug_print!("{error}\\n{self:?}");
+        }
     }
 }
 ''',
@@ -398,11 +398,14 @@ impl ${normalizePascal(messageName)} {
             '''
 impl ${normalizePascal(messageName)} {
     pub fn send_signal_to_dart(&self, binary: Vec<u8>) {
-        send_rust_signal(
+        let result = send_rust_signal(
             ${markedMessage.id},
             self.encode_to_vec(),
             binary,
         );
+        if let Err(error) = result {
+            debug_print!("{error}\\n{self:?}");
+        }
     }
 }
 ''',
@@ -420,30 +423,23 @@ impl ${normalizePascal(messageName)} {
 
 use crate::tokio;
 use prost::Message;
-use rinf::debug_print;
-use rinf::DartSignal;
+use rinf::{debug_print, DartSignal, RinfError};
 use std::collections::HashMap;
 use std::error::Error;
 use std::sync::OnceLock;
 use tokio::sync::mpsc::unbounded_channel;
 
-type SignalHandlers = OnceLock<
-    HashMap<i32, Box<dyn Fn(&[u8], &[u8])
-        -> Result<(), Box<dyn Error>> + Send + Sync>>,
->;
-static SIGNAL_HANDLERS: SignalHandlers = OnceLock::new();
+type Handler = dyn Fn(&[u8], &[u8]) -> Result<(), RinfError> + Send + Sync;
+type SignalHandlers = HashMap<i32, Box<Handler>>;
+static SIGNAL_HANDLERS: OnceLock<SignalHandlers> = OnceLock::new();
 
 pub fn handle_dart_signal(
     message_id: i32,
     message_bytes: &[u8],
     binary: &[u8]
-) {    
+) -> Result<(), RinfError> {    
     let hash_map = SIGNAL_HANDLERS.get_or_init(|| {
-        let mut new_hash_map = HashMap::<
-            i32,
-            Box<dyn Fn(&[u8], &[u8])
-                -> Result<(), Box<dyn Error>> + Send + Sync>,
-        >::new();
+        let mut new_hash_map: SignalHandlers = HashMap::new();
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -464,14 +460,16 @@ new_hash_map.insert(
     ${markedMessage.id},
     Box::new(|message_bytes: &[u8], binary: &[u8]| {
         use super::$modulePath$filename::*;
-        let message = ${normalizePascal(messageName)}::decode(
-            message_bytes
-        )?;
+        let message =
+            ${normalizePascal(messageName)}::decode(message_bytes)
+            .map_err(|_| RinfError::DecodeMessage)?;
         let dart_signal = DartSignal {
             message,
             binary: binary.to_vec(),
         };
-        let mut guard = ${snakeName.toUpperCase()}_CHANNEL.lock()?;
+        let mut guard = ${snakeName.toUpperCase()}_CHANNEL
+            .lock()
+            .map_err(|_| RinfError::LockMessageChannel)?;
         if guard.is_none() {
             let (sender, receiver) = unbounded_channel();
             guard.replace((sender, Some(receiver)));
@@ -483,7 +481,7 @@ new_hash_map.insert(
             // which is now closed.
             let pair = guard
                 .as_ref()
-                .ok_or("Message channel in Rust not present.")?;
+                .ok_or(RinfError::NoMessageChannel)?;
             if pair.0.is_closed() {
                 let (sender, receiver) = unbounded_channel();
                 guard.replace((sender, Some(receiver)));
@@ -491,7 +489,7 @@ new_hash_map.insert(
         }
         let pair = guard
             .as_ref()
-            .ok_or("Message channel in Rust not present.")?;
+            .ok_or(RinfError::NoMessageChannel)?;
         let sender = &pair.0;
         let _ = sender.send(dart_signal);
         Ok(())
@@ -508,15 +506,9 @@ new_hash_map.insert(
 
     let signal_handler = match hash_map.get(&message_id) {
         Some(inner) => inner,
-        None => {
-            debug_print!("Message ID not found in the handler Hashmap.");
-            return;
-        }
+        None => return Err(RinfError::NoSignalHandler),
     };
-    let result = signal_handler(message_bytes, binary);
-    if let Err(error) = result {
-        debug_print!("Could not process hashmap.\\n{error:#?}");
-    }
+    signal_handler(message_bytes, binary)
 }
 ''';
   await File.fromUri(rustOutputPath.join('generated.rs'))

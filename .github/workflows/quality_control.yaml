@@ -54,13 +54,21 @@ jobs:
         working-directory: flutter_ffi_plugin/example/
         run: rinf message
 
-      - name: Check for any errors
+      # Targets are basically combinations of
+      # web/native and debug/release.
+      - name: Check for errors in various targets
         run: |
           rustup target add wasm32-unknown-unknown
           cargo clippy
           cargo clippy --release
           cargo clippy --target wasm32-unknown-unknown
           cargo clippy --target wasm32-unknown-unknown --release
+
+      # The `--all-features` flag doesn't work for the entire workspace.
+      # That's why we are checking only the library crate.
+      - name: Check for errors with all features enabled
+        working-directory: rust_crate/
+        run: cargo clippy --all-features
 
       - name: Analyze code
         run: |

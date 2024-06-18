@@ -1,4 +1,4 @@
-mod common;
+mod error;
 mod macros;
 
 mod interface;
@@ -7,4 +7,5 @@ mod interface_os;
 #[cfg(target_family = "wasm")]
 mod interface_web;
 
+pub use error::*;
 pub use interface::*;

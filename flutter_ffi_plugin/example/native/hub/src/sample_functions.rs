@@ -91,7 +91,7 @@ pub async fn stream_fractal() {
                 Ok(inner) => inner,
                 Err(_) => continue,
             };
-            if let Some(fractal_image) = received_frame {
+            if let Ok(fractal_image) = received_frame {
                 // Stream the image data to Dart.
                 SampleFractal {
                     current_scale,
