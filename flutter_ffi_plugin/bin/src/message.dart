@@ -262,7 +262,6 @@ import 'package:rinf/rinf.dart';
 use crate::tokio;
 use prost::Message;
 use rinf::{debug_print, send_rust_signal, DartSignal, RinfError};
-use std::error::Error;
 use std::sync::Mutex;
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 
