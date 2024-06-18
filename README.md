@@ -42,7 +42,7 @@ StreamBuilder(
     final myMessage = rustSignal.message;
     return Text(myMessage.currentNumber.toString());
   },
-)
+),
 ```
 
 ```rust
@@ -50,7 +50,7 @@ MyMessage {
     current_number: 7,
     other_bool: true,
 }
-.send_signal_to_dart()
+.send_signal_to_dart();
 ```
 
 Of course, the opposite way from Dart to Rust is also possible in a similar manner.
