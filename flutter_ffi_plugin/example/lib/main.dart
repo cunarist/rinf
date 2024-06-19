@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:rinf/rinf.dart';
 import 'package:example_app/messages/generated.dart';
 import 'package:example_app/messages/counter_number.pb.dart';
 import 'package:example_app/messages/fractal_art.pb.dart';
 
 void main() async {
-  // Wait for Rust initialization to be completed first.
-  await initializeRust();
-  runApp(MyApp());
+  runApp(Rusty(
+    child: MyApp(),
+    assignRustSignal: assignRustSignal,
+  ));
 }
 
 class MyApp extends StatelessWidget {

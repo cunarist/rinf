@@ -2,6 +2,7 @@
 library;
 
 import 'dart:typed_data';
+import 'package:flutter/material.dart';
 import 'src/exports.dart';
 
 export 'src/interface.dart' show RustSignal;
@@ -16,15 +17,54 @@ void setCompiledLibPath(String? path) {
   setCompiledLibPathReal(path);
 }
 
-/// Prepares the native interface
-/// needed to communicate with Rust.
-Future<void> prepareInterface(HandleRustSignal handleRustSignal) async {
-  await prepareInterfaceReal(handleRustSignal);
+/// This widget manages the lifecycle of the
+/// async runtime on the Rust side.
+/// In essense, this widget is responsible of
+/// creation and graceful shutdown of the async runtime in Rust.
+/// The Rust async runtime will be created
+/// when the state of this widget is initialized,
+/// and it will be shut down when this widget is disposed.
+class Rusty extends StatefulWidget {
+  final Widget child;
+  final AssignRustSignal assignRustSignal;
+  const Rusty({
+    required this.child,
+    required this.assignRustSignal,
+  });
+
+  @override
+  State<Rusty> createState() => _RustyState();
 }
 
-/// Starts the `main` function in Rust.
-void startRustLogic() async {
-  startRustLogicReal();
+class _RustyState extends State<Rusty> {
+  late Future<void> initialLoad;
+
+  @override
+  void initState() {
+    super.initState();
+    initialLoad = () async {
+      await prepareInterfaceReal(widget.assignRustSignal);
+      startRustLogicReal();
+      print("START DART (TEMP)");
+    }();
+  }
+
+  @override
+  void dispose() {
+    print("STOP DART (TEMP)");
+    stopRustLogicReal();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: initialLoad,
+      builder: (context, snapshot) {
+        return widget.child;
+      },
+    );
+  }
 }
 
 /// Sends a signal to Rust.

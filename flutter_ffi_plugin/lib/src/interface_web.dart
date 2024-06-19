@@ -12,7 +12,7 @@ void setCompiledLibPathReal(String? path) {
 }
 
 Future<void> prepareInterfaceReal(
-  HandleRustSignal handleRustSignal,
+  AssignRustSignal assignRustSignal,
 ) async {
   await loadJsFile();
 
@@ -29,7 +29,7 @@ Future<void> prepareInterfaceReal(
       print(rustReport);
       return;
     }
-    handleRustSignal(messageId, messageBytes, binary);
+    assignRustSignal(messageId, messageBytes, binary);
   };
 }
 
@@ -39,6 +39,10 @@ void startRustLogicReal() {
   }
   final jsObject = js.context['rinf'] as js.JsObject;
   jsObject.callMethod('start_rust_logic_extern', []);
+}
+
+void stopRustLogicReal() {
+  // Dummy function to match the structure of native platforms.
 }
 
 void sendDartSignalReal(

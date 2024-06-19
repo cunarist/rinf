@@ -35,7 +35,7 @@ macro_rules! write_interface {
             use std::slice::from_raw_parts;
             let message_bytes = unsafe { from_raw_parts(message_pointer, message_size) };
             let binary = unsafe { from_raw_parts(binary_pointer, binary_size) };
-            let result = messages::generated::handle_dart_signal(message_id, message_bytes, binary);
+            let result = messages::generated::assign_dart_signal(message_id, message_bytes, binary);
             if let Err(error) = result {
                 rinf::debug_print!("{error}");
             }
@@ -46,7 +46,7 @@ macro_rules! write_interface {
         pub fn send_dart_signal_extern(message_id: i32, message_bytes: &[u8], binary: &[u8]) {
             let message_bytes = message_bytes;
             let binary = binary;
-            let result = messages::generated::handle_dart_signal(message_id, message_bytes, binary);
+            let result = messages::generated::assign_dart_signal(message_id, message_bytes, binary);
             if let Err(error) = result {
                 rinf::debug_print!("{error}");
             }
