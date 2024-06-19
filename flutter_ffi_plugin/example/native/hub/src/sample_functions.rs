@@ -1,8 +1,10 @@
 //! This crate is written for Rinf demonstrations.
 
+use crate::common::*;
 use crate::messages;
 use crate::tokio;
 use rinf::debug_print;
+use std::time::Duration;
 use tokio::sync::Mutex;
 
 // Using the `cfg` macro enables conditional statement.
@@ -11,16 +13,16 @@ const IS_DEBUG_MODE: bool = true;
 #[cfg(not(debug_assertions))]
 const IS_DEBUG_MODE: bool = false;
 
-// This is one of the best ways to keep a global mutable state in Rust.
-// You can also use `tokio::sync::RwLock` or `tokio::sync::OnceCell`.
+// This is one of the ways to keep a global mutable state in Rust.
+// You can also use `tokio::sync::RwLock` or `std::lazy::LazyLock`.
 static VECTOR: Mutex<Vec<bool>> = Mutex::const_new(Vec::new());
 
 // Business logic for the counter widget.
-pub async fn tell_numbers() {
+pub async fn tell_numbers() -> Result<()> {
     use messages::counter_number::*;
 
     // Stream getter is generated from a marked Protobuf message.
-    let mut receiver = SampleNumberInput::get_dart_signal_receiver();
+    let mut receiver = SampleNumberInput::get_dart_signal_receiver()?;
     while let Some(dart_signal) = receiver.recv().await {
         // Extract values from the message received from Dart.
         // This message is a type that's declared in its Protobuf file.
@@ -42,6 +44,8 @@ pub async fn tell_numbers() {
         }
         .send_signal_to_dart();
     }
+
+    Ok(())
 }
 
 // Business logic for the fractal image.
@@ -57,7 +61,7 @@ pub async fn stream_fractal() {
     tokio::spawn(async move {
         loop {
             // Wait for 40 milliseconds on each frame
-            tokio::time::sleep(std::time::Duration::from_millis(40)).await;
+            tokio::time::sleep(Duration::from_millis(40)).await;
             if sender.capacity() == 0 {
                 continue;
             }
@@ -79,9 +83,15 @@ pub async fn stream_fractal() {
     // Receive frame join handles in order.
     tokio::spawn(async move {
         loop {
-            let join_handle = receiver.recv().await.unwrap();
-            let received_frame = join_handle.await.unwrap();
-            if let Some(fractal_image) = received_frame {
+            let join_handle = match receiver.recv().await {
+                Some(inner) => inner,
+                None => continue,
+            };
+            let received_frame = match join_handle.await {
+                Ok(inner) => inner,
+                Err(_) => continue,
+            };
+            if let Ok(fractal_image) = received_frame {
                 // Stream the image data to Dart.
                 SampleFractal {
                     current_scale,
@@ -98,23 +108,24 @@ pub async fn stream_fractal() {
 
 // A dummy function that uses sample messages to eliminate warnings.
 #[allow(dead_code)]
-async fn use_messages() {
+async fn use_messages() -> Result<()> {
     use messages::sample_folder::enum_and_oneof::*;
-    _ = SampleInput::get_dart_signal_receiver();
+    let _ = SampleInput::get_dart_signal_receiver()?;
     SampleOutput {
         kind: 3,
         oneof_input: Some(sample_output::OneofInput::Age(25)),
     }
-    .send_signal_to_dart()
+    .send_signal_to_dart();
+    Ok(())
 }
 
 // Business logic for testing various crates.
-pub async fn run_debug_tests() {
+pub async fn run_debug_tests() -> Result<()> {
     if !IS_DEBUG_MODE {
-        return;
+        return Ok(());
     }
 
-    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+    tokio::time::sleep(Duration::from_secs(1)).await;
     debug_print!("Starting debug tests.");
 
     // Get the current time.
@@ -123,28 +134,24 @@ pub async fn run_debug_tests() {
 
     // Fetch data from a web API.
     let url = "http://jsonplaceholder.typicode.com/todos/1";
-    let web_response = sample_crate::fetch_from_web_api(url).await;
-    debug_print!("Response from a web API: {web_response}");
+    let web_response = sample_crate::fetch_from_web_api(url).await?;
+    debug_print!("Response from a web API: {web_response:?}");
 
     // Use a crate that accesses operating system APIs.
-    let option = sample_crate::get_hardward_id();
-    if let Some(hwid) = option {
-        debug_print!("Hardware ID: {hwid}");
-    } else {
-        debug_print!("Hardware ID is not available on this platform.");
-    }
+    let hwid = sample_crate::get_hardward_id()?;
+    debug_print!("Hardware ID: {hwid:?}");
 
     // Test `tokio::join!` for futures.
     let join_first = async {
-        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+        tokio::time::sleep(Duration::from_secs(1)).await;
         debug_print!("First future finished.");
     };
     let join_second = async {
-        tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+        tokio::time::sleep(Duration::from_secs(2)).await;
         debug_print!("Second future finished.");
     };
     let join_third = async {
-        tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+        tokio::time::sleep(Duration::from_secs(3)).await;
         debug_print!("Third future finished.");
     };
     tokio::join!(join_first, join_second, join_third);
@@ -201,10 +208,21 @@ pub async fn run_debug_tests() {
         join_handles.push(join_handle);
     }
     for join_handle in join_handles {
-        let text = join_handle.await.unwrap();
-        debug_print!("{text}");
+        if let Ok(text) = join_handle.await {
+            debug_print!("{text}");
+        }
     }
 
     debug_print!("Debug tests completed!");
-    panic!("INTENTIONAL DEBUG PANIC");
+
+    tokio::spawn(async {
+        // Panic in a separate task
+        // to avoid memory leak on the web.
+        // On the web (`wasm32-unknown-unknown`),
+        // catching and unwinding panics is not possible.
+        // It is better to avoid panicking code at all costs on the web.
+        panic!("INTENTIONAL DEBUG PANIC");
+    });
+
+    Ok(())
 }

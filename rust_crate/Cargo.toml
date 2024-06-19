@@ -1,6 +1,6 @@
 [package]
 name = "rinf"
-version = "6.11.1"
+version = "6.12.1"
 edition = "2021"
 license = "MIT"
 description = "Rust for native business logic, Flutter for flexible and beautiful GUI"
@@ -8,19 +8,23 @@ repository = "https://github.com/cunarist/rinf"
 documentation = "https://rinf.cunarist.com"
 rust-version = "1.70"
 
+[features]
+multi-worker = ["tokio/rt-multi-thread"]
+show-backtrace = ["backtrace"]
+bevy = ["dep:bevy_ecs"]
+
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 os-thread-local = "0.1.3"
-backtrace = "0.3.69"
+backtrace = { version = "0.3.69", optional = true }
 protoc-prebuilt = "0.3.0"
 home = "0.5.9"
 which = "6.0.0"
-allo-isolate = "0.1.24"
+allo-isolate = "0.1.25"
+tokio = { version = "1", features = ["rt"] }
 bevy_ecs = { version = "0.13", optional = true }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3.69"
 wasm-bindgen = "0.2.92"
+wasm-bindgen-futures = "0.4.42"
 bevy_ecs = { version = "0.13", optional = true }
-
-[features]
-bevy = ["dep:bevy_ecs"]

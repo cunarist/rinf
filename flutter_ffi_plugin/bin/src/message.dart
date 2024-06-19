@@ -3,6 +3,7 @@ import 'package:path/path.dart';
 import 'package:watcher/watcher.dart';
 import 'config.dart';
 import 'common.dart';
+import 'internet.dart';
 
 enum MarkType {
   dartSignal,
@@ -46,7 +47,7 @@ Future<void> generateMessageCode({
     resourcesInFolders,
   );
 
-  // Verify `package` statement in `.proto` files.
+  // Include `package` statement in `.proto` files.
   // Package name should be the same as the filename
   // because Rust filenames are written with package name
   // and Dart filenames are written with the `.proto` filename.
@@ -76,18 +77,24 @@ Future<void> generateMessageCode({
   }
 
   // Generate Rust message files.
-  if (!silent) {
-    print("Verifying `protoc-gen-prost` for Rust." +
-        "\nThis might take a while if there are new updates.");
-  }
-  final cargoInstallCommand = await Process.run('cargo', [
-    'install',
-    'protoc-gen-prost',
-    ...(messageConfig.rustSerde ? ['protoc-gen-prost-serde'] : [])
-  ]);
-  if (cargoInstallCommand.exitCode != 0) {
-    print(cargoInstallCommand.stderr.toString().trim());
-    throw Exception('Cannot globally install `protoc-gen-prost` Rust crate');
+  if (isInternetConnected) {
+    if (!silent) {
+      print("Ensuring `protoc-gen-prost` for Rust." +
+          "\nThis is done by installing it globally on the system.");
+    }
+    final cargoInstallCommand = await Process.run('cargo', [
+      'install',
+      'protoc-gen-prost',
+      ...(messageConfig.rustSerde ? ['protoc-gen-prost-serde'] : [])
+    ]);
+    if (cargoInstallCommand.exitCode != 0) {
+      print(cargoInstallCommand.stderr.toString().trim());
+      throw Exception('Cannot globally install `protoc-gen-prost` Rust crate');
+    }
+  } else {
+    if (!silent) {
+      print("Skipping ensurement of `protoc-gen-prost` for Rust.");
+    }
   }
   for (final entry in resourcesInFolders.entries) {
     final subPath = entry.key;
@@ -164,19 +171,25 @@ Future<void> generateMessageCode({
   }
 
   // Generate Dart message files.
-  if (!silent) {
-    print("Verifying `protoc_plugin` for Dart." +
-        "\nThis might take a while if there are new updates.");
-  }
-  final pubGlobalActivateCommand = await Process.run('dart', [
-    'pub',
-    'global',
-    'activate',
-    'protoc_plugin',
-  ]);
-  if (pubGlobalActivateCommand.exitCode != 0) {
-    print(pubGlobalActivateCommand.stderr.toString().trim());
-    throw Exception('Cannot globally install `protoc_plugin` Dart package');
+  if (isInternetConnected) {
+    if (!silent) {
+      print("Ensuring `protoc_plugin` for Dart." +
+          "\nThis is done by installing it globally on the system.");
+    }
+    final pubGlobalActivateCommand = await Process.run('dart', [
+      'pub',
+      'global',
+      'activate',
+      'protoc_plugin',
+    ]);
+    if (pubGlobalActivateCommand.exitCode != 0) {
+      print(pubGlobalActivateCommand.stderr.toString().trim());
+      throw Exception('Cannot globally install `protoc_plugin` Dart package');
+    }
+  } else {
+    if (!silent) {
+      print("Skipping ensurement of `protoc_plugin` for Dart.");
+    }
   }
   for (final entry in resourcesInFolders.entries) {
     final subPath = entry.key;
@@ -248,15 +261,10 @@ import 'package:rinf/rinf.dart';
 
 use crate::tokio;
 use prost::Message;
-use rinf::send_rust_signal;
-use rinf::DartSignal;
-use rinf::SharedCell;
-use std::cell::RefCell;
+use rinf::{debug_print, send_rust_signal, DartSignal, RinfError};
 use std::sync::Mutex;
-use std::sync::OnceLock;
-use tokio::sync::mpsc::unbounded_channel;
-use tokio::sync::mpsc::UnboundedReceiver;
-use tokio::sync::mpsc::UnboundedSender;
+use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
+
 ''',
           atFront: true,
         );
@@ -272,39 +280,45 @@ use tokio::sync::mpsc::UnboundedSender;
           await insertTextToFile(
             rustPath,
             '''
-type ${messageName}Cell = SharedCell<(
-    Option<UnboundedSender<DartSignal<${normalizePascal(messageName)}>>>,
+type ${messageName}Cell = Mutex<Option<(
+    UnboundedSender<DartSignal<${normalizePascal(messageName)}>>,
     Option<UnboundedReceiver<DartSignal<${normalizePascal(messageName)}>>>,
-)>;
+)>>;
 pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Cell =
-    OnceLock::new();
+    Mutex::new(None);
 
 impl ${normalizePascal(messageName)} {
-    pub fn get_dart_signal_receiver() -> UnboundedReceiver<DartSignal<Self>> {
-        let cell = ${snakeName.toUpperCase()}_CHANNEL
-            .get_or_init(|| {
-                let (sender, receiver) = unbounded_channel();
-                Mutex::new(RefCell::new(Some((Some(sender), Some(receiver)))))
-            })
+    pub fn get_dart_signal_receiver()
+        -> Result<UnboundedReceiver<DartSignal<Self>>, RinfError> 
+    {       
+        let mut guard = ${snakeName.toUpperCase()}_CHANNEL
             .lock()
-            .unwrap();
+            .map_err(|_| RinfError::LockMessageChannel)?;
+        if guard.is_none() {
+            let (sender, receiver) = unbounded_channel();
+            guard.replace((sender, Some(receiver)));
+        }
         #[cfg(debug_assertions)]
         {
             // After Dart's hot restart,
             // a sender from the previous run already exists
             // which is now closed.
-            let borrowed = cell.borrow();
-            let pair = borrowed.as_ref().unwrap();
-            let is_closed = pair.0.as_ref().unwrap().is_closed();
-            drop(borrowed);
-            if is_closed {
+            let pair = guard
+                .as_ref()
+                .ok_or(RinfError::NoMessageChannel)?;
+            if pair.0.is_closed() {
                 let (sender, receiver) = unbounded_channel();
-                cell.replace(Some((Some(sender), Some(receiver))));
+                guard.replace((sender, Some(receiver)));
             }
         }
-        let pair = cell.take().unwrap();
-        cell.replace(Some((pair.0, None)));
-        pair.1.expect("A receiver can be taken only once")
+        let pair = guard
+            .take()
+            .ok_or(RinfError::NoMessageChannel)?;
+        guard.replace((pair.0, None));
+        let receiver = pair
+            .1
+            .ok_or(RinfError::MessageReceiverTaken)?;
+        Ok(receiver)
     }
 }
 ''',
@@ -365,11 +379,14 @@ final ${camelName}Controller = StreamController<RustSignal<$messageName>>();
             '''
 impl ${normalizePascal(messageName)} {
     pub fn send_signal_to_dart(&self) {
-        send_rust_signal(
+        let result = send_rust_signal(
             ${markedMessage.id},
             self.encode_to_vec(),
             Vec::new(),
         );
+        if let Err(error) = result {
+            debug_print!("{error}\\n{self:?}");
+        }
     }
 }
 ''',
@@ -381,11 +398,14 @@ impl ${normalizePascal(messageName)} {
             '''
 impl ${normalizePascal(messageName)} {
     pub fn send_signal_to_dart(&self, binary: Vec<u8>) {
-        send_rust_signal(
+        let result = send_rust_signal(
             ${markedMessage.id},
             self.encode_to_vec(),
             binary,
         );
+        if let Err(error) = result {
+            debug_print!("{error}\\n{self:?}");
+        }
     }
 }
 ''',
@@ -403,28 +423,23 @@ impl ${normalizePascal(messageName)} {
 
 use crate::tokio;
 use prost::Message;
-use rinf::debug_print;
-use rinf::DartSignal;
-use std::cell::RefCell;
+use rinf::{debug_print, DartSignal, RinfError};
 use std::collections::HashMap;
-use std::sync::Mutex;
+use std::error::Error;
 use std::sync::OnceLock;
 use tokio::sync::mpsc::unbounded_channel;
 
-type SignalHandlers =
-    OnceLock<Mutex<HashMap<i32, Box<dyn Fn(Vec<u8>, Vec<u8>) + Send>>>>;
-static SIGNAL_HANDLERS: SignalHandlers = OnceLock::new();
+type Handler = dyn Fn(&[u8], &[u8]) -> Result<(), RinfError> + Send + Sync;
+type SignalHandlers = HashMap<i32, Box<Handler>>;
+static SIGNAL_HANDLERS: OnceLock<SignalHandlers> = OnceLock::new();
 
 pub fn handle_dart_signal(
     message_id: i32,
-    message_bytes: Vec<u8>,
-    binary: Vec<u8>
-) {    
-    let mutex = SIGNAL_HANDLERS.get_or_init(|| {
-        let mut hash_map =
-            HashMap
-            ::<i32, Box<dyn Fn(Vec<u8>, Vec<u8>) + Send + 'static>>
-            ::new();
+    message_bytes: &[u8],
+    binary: &[u8]
+) -> Result<(), RinfError> {    
+    let hash_map = SIGNAL_HANDLERS.get_or_init(|| {
+        let mut new_hash_map: SignalHandlers = HashMap::new();
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -441,42 +456,43 @@ pub fn handle_dart_signal(
           var modulePath = subpath.replaceAll("/", "::");
           modulePath = modulePath == "::" ? "" : modulePath;
           rustReceiveScript += '''
-hash_map.insert(
+new_hash_map.insert(
     ${markedMessage.id},
-    Box::new(|message_bytes: Vec<u8>, binary: Vec<u8>| {
+    Box::new(|message_bytes: &[u8], binary: &[u8]| {
         use super::$modulePath$filename::*;
-        let message = ${normalizePascal(messageName)}::decode(
-            message_bytes.as_slice()
-        ).unwrap();
+        let message =
+            ${normalizePascal(messageName)}::decode(message_bytes)
+            .map_err(|_| RinfError::DecodeMessage)?;
         let dart_signal = DartSignal {
             message,
-            binary,
+            binary: binary.to_vec(),
         };
-        let cell = ${snakeName.toUpperCase()}_CHANNEL
-            .get_or_init(|| {
-                let (sender, receiver) = unbounded_channel();
-                Mutex::new(RefCell::new(Some((Some(sender), Some(receiver)))))
-            })
+        let mut guard = ${snakeName.toUpperCase()}_CHANNEL
             .lock()
-            .unwrap();
+            .map_err(|_| RinfError::LockMessageChannel)?;
+        if guard.is_none() {
+            let (sender, receiver) = unbounded_channel();
+            guard.replace((sender, Some(receiver)));
+        }
         #[cfg(debug_assertions)]
         {
             // After Dart's hot restart,
             // a sender from the previous run already exists
             // which is now closed.
-            let borrowed = cell.borrow();
-            let pair = borrowed.as_ref().unwrap();
-            let is_closed = pair.0.as_ref().unwrap().is_closed();
-            drop(borrowed);
-            if is_closed {
+            let pair = guard
+                .as_ref()
+                .ok_or(RinfError::NoMessageChannel)?;
+            if pair.0.is_closed() {
                 let (sender, receiver) = unbounded_channel();
-                cell.replace(Some((Some(sender), Some(receiver))));
+                guard.replace((sender, Some(receiver)));
             }
         }
-        let borrowed = cell.borrow();
-        let pair = borrowed.as_ref().unwrap();
-        let sender = pair.0.as_ref().unwrap();
+        let pair = guard
+            .as_ref()
+            .ok_or(RinfError::NoMessageChannel)?;
+        let sender = &pair.0;
         let _ = sender.send(dart_signal);
+        Ok(())
     }),
 );
 ''';
@@ -485,12 +501,14 @@ hash_map.insert(
     }
   }
   rustReceiveScript += '''
-        Mutex::new(hash_map)
+        new_hash_map
     });
 
-    let guard = mutex.lock().unwrap();
-    let signal_handler = guard.get(&message_id).unwrap();
-    signal_handler(message_bytes, binary);
+    let signal_handler = match hash_map.get(&message_id) {
+        Some(inner) => inner,
+        None => return Err(RinfError::NoSignalHandler),
+    };
+    signal_handler(message_bytes, binary)
 }
 ''';
   await File.fromUri(rustOutputPath.join('generated.rs'))
@@ -508,11 +526,6 @@ Future<void> initializeRust({String? compiledLibPath}) async {
   setCompiledLibPath(compiledLibPath);
   await prepareInterface(handleRustSignal);
   startRustLogic();
-}
-
-Future<void> finalizeRust() async {
-  stopRustLogic();
-  await Future.delayed(const Duration(milliseconds: 10));
 }
 
 final signalHandlers = <int, void Function(Uint8List, Uint8List)>{

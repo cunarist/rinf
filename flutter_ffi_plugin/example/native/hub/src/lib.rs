@@ -1,11 +1,12 @@
 //! This `hub` crate is the
 //! entry point of the Rust logic.
 
+mod common;
 mod messages;
 mod sample_functions;
 
 // use tokio;
-use tokio_with_wasm::tokio; // Uncomment this line to target the web
+use tokio_with_wasm::alias as tokio;
 
 rinf::write_interface!();
 

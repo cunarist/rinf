@@ -1,3 +1,15 @@
+## 6.12.1
+
+- Fixed linefeed problem in published files.
+
+## 6.12.0
+
+- Generated message channels are now more efficient.
+- Minimum Android SDK version increased from 16 to 21. Thanks @debanjanbasu!
+- The `finalizeRust()` function in Dart has been removed. The `tokio` async runtime, which holds Rust logic, still drops automatically when the app ends.
+- Bumped `prost` version to 0.12.6. Thanks @yeoupooh!
+- Internal code has been organized.
+
 ## 6.11.1
 
 - Fixed a bug with Dart's extension methods in the generated message code.

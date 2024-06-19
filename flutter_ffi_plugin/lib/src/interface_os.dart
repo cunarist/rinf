@@ -7,11 +7,11 @@ import 'dart:isolate';
 import 'interface.dart';
 import 'dart:convert';
 
-void setCompiledLibPathExtern(String? path) {
+void setCompiledLibPathReal(String? path) {
   setDynamicLibPath(path);
 }
 
-Future<void> prepareInterfaceExtern(
+Future<void> prepareInterfaceReal(
   HandleRustSignal handleRustSignal,
 ) async {
   /// This should be called once at startup
@@ -53,10 +53,10 @@ Future<void> prepareInterfaceExtern(
   });
 
   // Make Rust prepare its isolate to send data to Dart.
-  prepareIsolateExtern(rustSignalPort.sendPort.nativePort);
+  prepareIsolateReal(rustSignalPort.sendPort.nativePort);
 }
 
-void startRustLogicExtern() {
+void startRustLogicReal() {
   final rustFunction =
       rustLibrary.lookupFunction<Void Function(), void Function()>(
     'start_rust_logic_extern',
@@ -64,16 +64,8 @@ void startRustLogicExtern() {
   rustFunction();
 }
 
-void stopRustLogicExtern() {
-  final rustFunction =
-      rustLibrary.lookupFunction<Void Function(), void Function()>(
-    'stop_rust_logic_extern',
-  );
-  rustFunction();
-}
-
 /// Sends bytes to Rust.
-Future<void> sendDartSignalExtern(
+Future<void> sendDartSignalReal(
   int messageId,
   Uint8List messageBytes,
   Uint8List binary,
@@ -85,20 +77,10 @@ Future<void> sendDartSignalExtern(
   binaryMemory.asTypedList(binary.length).setAll(0, binary);
 
   final rustFunction = rustLibrary.lookupFunction<
-      Void Function(
-        IntPtr,
-        Pointer<Uint8>,
-        IntPtr,
-        Pointer<Uint8>,
-        IntPtr,
-      ),
-      void Function(
-        int,
-        Pointer<Uint8>,
-        int,
-        Pointer<Uint8>,
-        int,
-      )>('send_dart_signal_extern');
+      Void Function(Int32, Pointer<Uint8>, UintPtr, Pointer<Uint8>, UintPtr),
+      void Function(int, Pointer<Uint8>, int, Pointer<Uint8>, int)>(
+    'send_dart_signal_extern',
+  );
 
   rustFunction(
     messageId,
@@ -112,13 +94,10 @@ Future<void> sendDartSignalExtern(
   malloc.free(binaryMemory);
 }
 
-void prepareIsolateExtern(int port) {
-  final rustFunction = rustLibrary.lookupFunction<
-      Void Function(
-        IntPtr,
-      ),
-      void Function(
-        int,
-      )>('prepare_isolate_extern');
+void prepareIsolateReal(int port) {
+  final rustFunction =
+      rustLibrary.lookupFunction<Void Function(Int64), void Function(int)>(
+    'prepare_isolate_extern',
+  );
   rustFunction(port);
 }

@@ -44,7 +44,7 @@ android {
 
 ### How does concurrency work under the hood?
 
-On native platforms, Dart runs in a single thread as usual, while Rust utilizes the async `tokio` runtime to take advantage of all cores on the computer, allowing async tasks to run efficiently within that runtime.
+On native platforms, Dart runs in the main thread, while Rust utilizes the async `tokio` runtime, allowing async tasks to run efficiently within a separate thread.
 
 On the web, Dart and Rust both run inside JavaScript's async event loop in the main thread, with Rust `Future`s being converted into JavaScript `Promise`s internally. This is a necessary constraint because [webassembly component proposal](https://github.com/WebAssembly/proposals) is not stabilized as of February 2024.
 
@@ -131,9 +131,9 @@ There might be various Rust codes with these attribute above:
 
 ```rust title="Rust"
 #[cfg(target_family = "wasm")]
-...
+{}
 #[cfg(not(target_family = "wasm"))]
-...
+{}
 ```
 
 Since the environments of the web and native platforms are so different, there are times when you need to use these attributes to include and exclude parts of the code depending on whether they are targeting web or not.
@@ -147,6 +147,8 @@ By default, Rust-analyzer runs in native mode. To make it run in webassembly mod
 # You might have to restart Rust-analyzer for this change to take effect.
 target = "wasm32-unknown-unknown"
 ```
+
+You need to restart Rust language server for this to take effect.
 
 ### CMake cache is broken after I moved the app folder
 
@@ -171,12 +173,9 @@ If you are using older Android versions, you may encounter errors due to issues 
 To address this, you can modify `AndroidManifest.xml` files under `./android/app/src/` as follows.
 
 ```xml title="android/app/src/**/AndroidManifest.xml"
-...
 <application
     android:extractNativeLibs="true"
-    ...
 >
-...
 ```
 
 ### How can I await a response?
@@ -188,7 +187,7 @@ However, if you really need to store some state in a Flutter widget, you can ach
 ```proto title="messages/tutorial_resource.proto"
 syntax = "proto3";
 package tutorial_resource;
-...
+
 // [RINF:DART-SIGNAL]
 message MyUniqueInput {
   int32 interaction_id = 1;
@@ -203,7 +202,6 @@ message MyUniqueOutput {
 ```
 
 ```dart title="lib/main.dart"
-...
 import 'dart:async';
 import 'package:example_app/messages/tutorial_resource.pb.dart';
 
@@ -211,21 +209,17 @@ var currentInteractionId = 0;
 final myUniqueOutputs = Map<int, Completer<MyUniqueOutput>>();
 
 void main() async {
-  ...
   MyUniqueOutput.rustSignalStream.listen((rustSignal) {
     final myUniqueInput = rustSignal.message;
     myUniqueOutputs[myUniqueInput.interactionId]!.complete(myUniqueInput);
   });
-  ...
 }
-...
 ```
 
 ```dart title="lib/main.dart"
-...
 import 'dart:async';
 import 'package:example_app/messages/tutorial_resource.pb.dart';
-...
+
 onPressed: () async {
   final completer = Completer<MyUniqueOutput>();
   myUniqueOutputs[currentInteractionId] = completer;
@@ -236,14 +230,13 @@ onPressed: () async {
   currentInteractionId += 1;
   final myUniqueOutput = await completer.future;
 },
-...
 ```
 
 ```rust title="native/hub/src/sample_functions.rs"
-pub async fn respond() {
+pub async fn respond() -> Result<()> {
     use messages::tutorial_resource::*;
 
-    let mut receiver = MyUniqueInput::get_dart_signal_receiver();
+    let mut receiver = MyUniqueInput::get_dart_signal_receiver()?;
     while let Some(dart_signal) = receiver.recv().await {
         let my_unique_input = dart_signal.message;
         MyUniqueOutput {
@@ -252,12 +245,13 @@ pub async fn respond() {
         }
         .send_signal_to_dart();
     }
+
+    Ok(())
 }
 ```
 
 ```rust title="native/hub/src/lib.rs"
 async fn main() {
-    ...
     tokio::spawn(sample_functions::respond());
 }
 ```
@@ -270,7 +264,7 @@ Here are the current constraints of the `wasm32-unknown-unknown` target:
 
 - Numerous functionalities within `std::fs` remain unimplemented.
 - Various features of `std::net` are not available. Consider using `reqwest` crate instead. `reqwest` supports `wasm32-unknown-unknown` and relies on JavaScript to perform network communications.
-- `std::thread::spawn` doesn't work. Consider using `tokio_with_wasm::tokio::task::spawn_blocking` instead.
+- `std::thread::spawn` doesn't work. Consider using `tokio_with_wasm::task::spawn_blocking` instead.
 - Several features of `std::time::Instant` are unimplemented. Consider using `chrono` as an alternative. `chrono` supports `wasm32-unknown-unknown` and relies on JavaScript to obtain system time.
 - In case of a panic in an asynchronous Rust task, it aborts and throws a JavaScript `RuntimeError` [which Rust cannot catch](https://stackoverflow.com/questions/59426545/rust-paniccatch-unwind-no-use-in-webassembly). A recommended practice is to replace `.unwrap` with `.expect` or handle errors with `Err` instances.
 
@@ -324,9 +318,7 @@ import './messages/generated.dart';
 
 async void main() {
   await initializeRust(compiledLibPath: "/path/to/library/libhub.so");
-  ...
 }
-...
 ```
 
 This provided path will be used for finding dynamic library files on native platforms with Dart's `DynamicLibrary.open([compiledLibPath])`, and for loading the JavaScript module on the web with `import init, * as wasmBindings from "[compiledLibPath]"`.

@@ -2,6 +2,7 @@
 //! Copied and modified from
 //! https://github.com/abour/fractal repository.
 
+use crate::error::ExampleError;
 use image::ImageEncoder;
 
 const WIDTH: u32 = 384;
@@ -10,7 +11,7 @@ const BUF_SIZE: u32 = WIDTH * HEIGHT * 3;
 const SIZE: f64 = 0.000000001;
 const MAX_ITER: u32 = 1000;
 
-pub fn draw_fractal_image(scale: f64) -> Option<Vec<u8>> {
+pub fn draw_fractal_image(scale: f64) -> Result<Vec<u8>, ExampleError> {
     let point_x: f64 = -0.5557506;
     let point_y: f64 = -0.55560;
     let mut buffer: Vec<u8> = vec![0; BUF_SIZE as usize];
@@ -27,8 +28,8 @@ pub fn draw_fractal_image(scale: f64) -> Option<Vec<u8>> {
     );
 
     match result {
-        Ok(_) => Some(image_data),
-        Err(_) => None,
+        Ok(_) => Ok(image_data),
+        Err(error) => Err(ExampleError(error.into())),
     }
 }
 
