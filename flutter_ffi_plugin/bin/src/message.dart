@@ -61,7 +61,7 @@ Future<void> generateMessageCode({
       final lines = await protoFile.readAsLines();
       List<String> outputLines = [];
       for (var line in lines) {
-        final packagePattern = r'^package\s+[a-zA-Z_][a-zA-Z0-9_]*\s*[^=];$';
+        final packagePattern = r'^package\s+[a-zA-Z_][a-zA-Z0-9_\.]*\s*[^=];$';
         if (RegExp(packagePattern).hasMatch(line.trim())) {
           continue;
         } else if (line.trim().startsWith("syntax")) {
