@@ -78,9 +78,7 @@ where
             // Dropping the tokio runtime makes it shut down.
             drop(tokio_runtime);
             // After dropping the runtime, tell the main thread to stop waiting.
-            println!("RUNTIME GONE! (TEMP)");
             drop(shutdown_reporter);
-            println!("ALMOST DONE! (TEMP)");
         });
     }
     #[cfg(feature = "multi-worker")]
@@ -124,7 +122,6 @@ where
 
 #[no_mangle]
 pub extern "C" fn stop_rust_logic_extern() {
-    println!("NOW STOP (TEMP)");
     let sender_lock = SHUTDOWN_SENDER.get_or_init(move || ThreadLocal::new(|| RefCell::new(None)));
     let sender_option = sender_lock.with(|cell| cell.take());
     if let Some(shutdown_sender) = sender_option {
@@ -191,7 +188,6 @@ impl Drop for ShutdownSender {
             // Dropping the sender is always done on the main thread.
             park();
         }
-        println!("EVERYTHING DONE! (TEMP)");
     }
 }
 

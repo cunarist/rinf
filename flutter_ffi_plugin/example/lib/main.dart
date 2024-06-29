@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:rinf/rinf.dart';
 import './messages/generated.dart';
@@ -9,7 +10,37 @@ void main() async {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  /// This `AppLifecycleListener` is responsible for the
+  /// graceful shutdown of the async runtime in Rust.
+  /// If you don't care about
+  /// properly dropping Rust objects before shutdown,
+  /// creating this listener is not necessary.
+  late final AppLifecycleListener _listener;
+
+  @override
+  void initState() {
+    super.initState();
+    _listener = AppLifecycleListener(
+      onExitRequested: () async {
+        finalizeRust(); // This line shuts down the async Rust runtime.
+        return AppExitResponse.exit;
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _listener.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
