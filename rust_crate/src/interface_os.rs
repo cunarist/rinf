@@ -66,7 +66,7 @@ where
     sender_lock.with(|cell| cell.replace(Some(shutdown_sender)));
 
     // Build the tokio runtime.
-    #[cfg(not(feature = "multi-worker"))]
+    #[cfg(not(feature = "rt-multi-thread"))]
     {
         let tokio_runtime = Builder::new_current_thread()
             .enable_all()
@@ -81,7 +81,7 @@ where
             drop(shutdown_reporter);
         });
     }
-    #[cfg(feature = "multi-worker")]
+    #[cfg(feature = "rt-multi-thread")]
     {
         static TOKIO_RUNTIME: Mutex<Option<tokio::runtime::Runtime>> = Mutex::new(None);
         let tokio_runtime = Builder::new_multi_thread()
