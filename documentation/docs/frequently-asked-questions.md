@@ -266,7 +266,7 @@ Here are the current constraints of the `wasm32-unknown-unknown` target:
 - Various features of `std::net` are not available. Consider using `reqwest` crate instead. `reqwest` supports `wasm32-unknown-unknown` and relies on JavaScript to perform network communications.
 - `std::thread::spawn` doesn't work. Consider using `tokio_with_wasm::task::spawn_blocking` instead.
 - Several features of `std::time::Instant` are unimplemented. Consider using `chrono` as an alternative. `chrono` supports `wasm32-unknown-unknown` and relies on JavaScript to obtain system time.
-- In case of a panic in an asynchronous Rust task, it aborts and throws a JavaScript `RuntimeError` [which Rust cannot catch](https://stackoverflow.com/questions/59426545/rust-paniccatch-unwind-no-use-in-webassembly). A recommended practice is to replace `.unwrap` with `.expect` or handle errors with `Err` instances.
+- In case of a panic in an asynchronous Rust task, it aborts and throws a JavaScript `RuntimeError` [which Rust cannot catch](https://stackoverflow.com/questions/59426545/rust-paniccatch-unwind-no-use-in-webassembly). A recommended practice is to handle errors with `Err` instances.
 
 ### My app failed to load dynamic library
 
