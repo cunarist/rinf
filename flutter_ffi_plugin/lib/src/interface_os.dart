@@ -7,12 +7,14 @@ import 'dart:isolate';
 import 'interface.dart';
 import 'dart:convert';
 
-void setCompiledLibPathReal(String? path) {
+/// Sets the exact file path of the dynamic library
+/// compiled from the `hub` crate.
+void setCompiledLibPathReal(String path) {
   setDynamicLibPath(path);
 }
 
 Future<void> prepareInterfaceReal(
-  HandleRustSignal handleRustSignal,
+  AssignRustSignal assignRustSignal,
 ) async {
   /// This should be called once at startup
   /// to enable `allo_isolate` to send data from the Rust side.
@@ -49,7 +51,7 @@ Future<void> prepareInterfaceReal(
       // Converting is needed on the Dart side.
       messageBytes = Uint8List(0);
     }
-    handleRustSignal(messageId, messageBytes, binary);
+    assignRustSignal(messageId, messageBytes, binary);
   });
 
   // Make Rust prepare its isolate to send data to Dart.
@@ -60,6 +62,14 @@ void startRustLogicReal() {
   final rustFunction =
       rustLibrary.lookupFunction<Void Function(), void Function()>(
     'start_rust_logic_extern',
+  );
+  rustFunction();
+}
+
+void stopRustLogicReal() {
+  final rustFunction =
+      rustLibrary.lookupFunction<Void Function(), void Function()>(
+    'stop_rust_logic_extern',
   );
   rustFunction();
 }

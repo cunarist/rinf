@@ -8,6 +8,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::task::{Context, Poll, Waker};
 use std::thread;
+use std::thread::{current, park, Thread};
 use tokio::runtime::Builder;
 
 static DART_ISOLATE: Mutex<Option<Isolate>> = Mutex::new(None);
@@ -30,8 +31,9 @@ pub extern "C" fn prepare_isolate_extern(port: i64) {
 // and the main thread exits unexpectedly,
 // the whole async tokio runtime can shut down as well
 // by receiving a signal via the shutdown channel.
-// Without this solution, zombie threads inside the tokio runtime
-// might outlive the app.
+// Without this solution,
+// zombie threads inside the tokio runtime might outlive the app.
+// This `ThreadLocal` is intended to be used only on the main thread.
 type ShutdownSenderLock = OnceLock<ThreadLocal<RefCell<Option<ShutdownSender>>>>;
 static SHUTDOWN_SENDER: ShutdownSenderLock = OnceLock::new();
 
@@ -59,13 +61,12 @@ where
 
     // Prepare the channel that will notify tokio runtime to shutdown
     // after the main Dart thread has gone.
-    let (shutdown_sender, shutdown_receiver) = shutdown_channel();
-    let shutdown_sender_lock =
-        SHUTDOWN_SENDER.get_or_init(move || ThreadLocal::new(|| RefCell::new(None)));
-    shutdown_sender_lock.with(|cell| cell.replace(Some(shutdown_sender)));
+    let (shutdown_sender, shutdown_receiver, shutdown_reporter) = shutdown_channel();
+    let sender_lock = SHUTDOWN_SENDER.get_or_init(move || ThreadLocal::new(|| RefCell::new(None)));
+    sender_lock.with(|cell| cell.replace(Some(shutdown_sender)));
 
     // Build the tokio runtime.
-    #[cfg(not(feature = "multi-worker"))]
+    #[cfg(not(feature = "rt-multi-thread"))]
     {
         let tokio_runtime = Builder::new_current_thread()
             .enable_all()
@@ -76,9 +77,11 @@ where
             tokio_runtime.block_on(shutdown_receiver);
             // Dropping the tokio runtime makes it shut down.
             drop(tokio_runtime);
+            // After dropping the runtime, tell the main thread to stop waiting.
+            drop(shutdown_reporter);
         });
     }
-    #[cfg(feature = "multi-worker")]
+    #[cfg(feature = "rt-multi-thread")]
     {
         static TOKIO_RUNTIME: Mutex<Option<tokio::runtime::Runtime>> = Mutex::new(None);
         let tokio_runtime = Builder::new_multi_thread()
@@ -97,6 +100,8 @@ where
                         // Dropping the tokio runtime makes it shut down.
                         drop(runtime);
                     }
+                    // After dropping the runtime, tell the main thread to stop waiting.
+                    drop(shutdown_reporter);
                 }
             })
         });
@@ -113,6 +118,18 @@ where
     }
 
     Ok(())
+}
+
+#[no_mangle]
+pub extern "C" fn stop_rust_logic_extern() {
+    let sender_lock = SHUTDOWN_SENDER.get_or_init(move || ThreadLocal::new(|| RefCell::new(None)));
+    let sender_option = sender_lock.with(|cell| cell.take());
+    if let Some(shutdown_sender) = sender_option {
+        // Dropping the sender tells the tokio runtime to stop running.
+        // Also, it blocks the main thread until
+        // it gets the report that tokio shutdown is dropped.
+        drop(shutdown_sender);
+    }
 }
 
 pub fn send_rust_signal_real(
@@ -154,49 +171,80 @@ pub fn send_rust_signal_real(
 }
 
 struct ShutdownSender {
-    is_sent: Arc<AtomicBool>,
+    should_shutdown: Arc<AtomicBool>,
+    did_shutdown: Arc<AtomicBool>,
     waker: Arc<Mutex<Option<Waker>>>,
 }
 
 impl Drop for ShutdownSender {
     fn drop(&mut self) {
-        self.is_sent.store(true, Ordering::SeqCst);
+        self.should_shutdown.store(true, Ordering::SeqCst);
         if let Ok(mut guard) = self.waker.lock() {
             if let Some(waker) = guard.take() {
                 waker.wake();
             }
         }
+        while !self.did_shutdown.load(Ordering::SeqCst) {
+            // Dropping the sender is always done on the main thread.
+            park();
+        }
     }
 }
 
 struct ShutdownReceiver {
-    is_sent: Arc<AtomicBool>,
+    should_shutdown: Arc<AtomicBool>,
     waker: Arc<Mutex<Option<Waker>>>,
 }
 
 impl Future for ShutdownReceiver {
     type Output = ();
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        if self.is_sent.load(Ordering::SeqCst) {
-            Poll::Ready(())
-        } else {
+        if !self.should_shutdown.load(Ordering::SeqCst) {
             if let Ok(mut guard) = self.waker.lock() {
                 guard.replace(cx.waker().clone());
             }
             Poll::Pending
+        } else {
+            Poll::Ready(())
         }
     }
 }
 
-fn shutdown_channel() -> (ShutdownSender, ShutdownReceiver) {
-    let is_sent = Arc::new(AtomicBool::new(false));
+type ChannelTuple = (ShutdownSender, ShutdownReceiver, ShutdownReporter);
+fn shutdown_channel() -> ChannelTuple {
+    // This code assumes that
+    // this function is being called from the main thread.
+    let main_thread = current();
+
+    let should_shutdown = Arc::new(AtomicBool::new(false));
+    let is_done = Arc::new(AtomicBool::new(false));
     let waker = Arc::new(Mutex::new(None));
 
     let sender = ShutdownSender {
-        is_sent: Arc::clone(&is_sent),
-        waker: Arc::clone(&waker),
+        should_shutdown: should_shutdown.clone(),
+        waker: waker.clone(),
+        did_shutdown: is_done.clone(),
     };
-    let receiver = ShutdownReceiver { is_sent, waker };
+    let receiver = ShutdownReceiver {
+        should_shutdown,
+        waker,
+    };
+    let reporter = ShutdownReporter {
+        is_done,
+        main_thread,
+    };
 
-    (sender, receiver)
+    (sender, receiver, reporter)
+}
+
+struct ShutdownReporter {
+    is_done: Arc<AtomicBool>,
+    main_thread: Thread,
+}
+
+impl Drop for ShutdownReporter {
+    fn drop(&mut self) {
+        self.is_done.store(true, Ordering::SeqCst);
+        self.main_thread.unpark();
+    }
 }

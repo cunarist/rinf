@@ -430,16 +430,16 @@ use std::sync::OnceLock;
 use tokio::sync::mpsc::unbounded_channel;
 
 type Handler = dyn Fn(&[u8], &[u8]) -> Result<(), RinfError> + Send + Sync;
-type SignalHandlers = HashMap<i32, Box<Handler>>;
-static SIGNAL_HANDLERS: OnceLock<SignalHandlers> = OnceLock::new();
+type DartSignalHandlers = HashMap<i32, Box<Handler>>;
+static DART_SIGNAL_HANDLERS: OnceLock<DartSignalHandlers> = OnceLock::new();
 
-pub fn handle_dart_signal(
+pub fn assign_dart_signal(
     message_id: i32,
     message_bytes: &[u8],
     binary: &[u8]
 ) -> Result<(), RinfError> {    
-    let hash_map = SIGNAL_HANDLERS.get_or_init(|| {
-        let mut new_hash_map: SignalHandlers = HashMap::new();
+    let hash_map = DART_SIGNAL_HANDLERS.get_or_init(|| {
+        let mut new_hash_map: DartSignalHandlers = HashMap::new();
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -522,13 +522,7 @@ new_hash_map.insert(
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
 
-Future<void> initializeRust({String? compiledLibPath}) async {
-  setCompiledLibPath(compiledLibPath);
-  await prepareInterface(handleRustSignal);
-  startRustLogic();
-}
-
-final signalHandlers = <int, void Function(Uint8List, Uint8List)>{
+final rustSignalHandlers = <int, void Function(Uint8List, Uint8List)>{
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
@@ -568,8 +562,8 @@ ${markedMessage.id}: (Uint8List messageBytes, Uint8List binary) {
   dartReceiveScript += '''
 };
 
-void handleRustSignal(int messageId, Uint8List messageBytes, Uint8List binary) {
-  signalHandlers[messageId]!(messageBytes, binary);
+void assignRustSignal(int messageId, Uint8List messageBytes, Uint8List binary) {
+  rustSignalHandlers[messageId]!(messageBytes, binary);
 }
 ''';
   await File.fromUri(dartOutputPath.join('generated.dart'))

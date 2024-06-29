@@ -9,7 +9,7 @@ documentation = "https://rinf.cunarist.com"
 rust-version = "1.70"
 
 [features]
-multi-worker = ["tokio/rt-multi-thread"]
+rt-multi-thread = ["tokio/rt-multi-thread"]
 show-backtrace = ["backtrace"]
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
