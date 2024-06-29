@@ -86,64 +86,65 @@ class MyHomePage extends StatelessWidget {
 class MyColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // `StreamBuilder` listens to a stream
-        // and rebuilds the widget accordingly.
-        StreamBuilder(
-            stream: SampleFractal.rustSignalStream,
-            builder: (context, snapshot) {
-              final rustSignal = snapshot.data;
-              if (rustSignal == null) {
-                return Container(
-                  margin: const EdgeInsets.all(20),
-                  width: 256,
-                  height: 256,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24.0),
-                    color: Colors.black,
-                  ),
-                );
-              }
-              final imageData = rustSignal.binary;
+    final children = [
+      // `StreamBuilder` listens to a stream
+      // and rebuilds the widget accordingly.
+      StreamBuilder(
+          stream: SampleFractal.rustSignalStream,
+          builder: (context, snapshot) {
+            final rustSignal = snapshot.data;
+            if (rustSignal == null) {
               return Container(
                 margin: const EdgeInsets.all(20),
                 width: 256,
                 height: 256,
-                child: ClipRRect(
+                decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(24.0),
-                  child: FittedBox(
-                    fit: BoxFit.contain,
-                    child: Image.memory(
-                      imageData,
-                      width: 256,
-                      height: 256,
-                      gaplessPlayback: true,
-                    ),
-                  ),
+                  color: Colors.black,
                 ),
               );
-            }),
-        StreamBuilder(
-          // This stream is generated from a marked Protobuf message.
-          stream: SampleNumberOutput.rustSignalStream,
-          builder: (context, snapshot) {
-            final rustSignal = snapshot.data;
-            // If the app has just started and widget is built
-            // without receiving a Rust signal,
-            // the snapshot data will be null.
-            // It's when the widget is being built for the first time.
-            if (rustSignal == null) {
-              // Return the initial widget if the snapshot data is null.
-              return Text('Initial value 0');
             }
-            final sampleNumberOutput = rustSignal.message;
-            final currentNumber = sampleNumberOutput.currentNumber;
-            return Text('Current value is $currentNumber');
-          },
-        ),
-      ],
+            final imageData = rustSignal.binary;
+            return Container(
+              margin: const EdgeInsets.all(20),
+              width: 256,
+              height: 256,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24.0),
+                child: FittedBox(
+                  fit: BoxFit.contain,
+                  child: Image.memory(
+                    imageData,
+                    width: 256,
+                    height: 256,
+                    gaplessPlayback: true,
+                  ),
+                ),
+              ),
+            );
+          }),
+      StreamBuilder(
+        // This stream is generated from a marked Protobuf message.
+        stream: SampleNumberOutput.rustSignalStream,
+        builder: (context, snapshot) {
+          final rustSignal = snapshot.data;
+          // If the app has just started and widget is built
+          // without receiving a Rust signal,
+          // the snapshot data will be null.
+          // It's when the widget is being built for the first time.
+          if (rustSignal == null) {
+            // Return the initial widget if the snapshot data is null.
+            return Text('Initial value 0');
+          }
+          final sampleNumberOutput = rustSignal.message;
+          final currentNumber = sampleNumberOutput.currentNumber;
+          return Text('Current value is $currentNumber');
+        },
+      ),
+    ];
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: children,
     );
   }
 }
