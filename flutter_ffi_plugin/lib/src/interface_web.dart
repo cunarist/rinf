@@ -7,7 +7,9 @@ import 'interface.dart';
 import 'dart:async';
 import 'dart:convert';
 
-void setCompiledLibPathReal(String? path) {
+/// Sets the path to the JavaScript module
+/// that needs to be loaded.
+void setCompiledLibPathReal(String path) {
   setJsLibPath(path);
 }
 

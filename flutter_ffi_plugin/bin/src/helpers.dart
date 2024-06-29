@@ -155,18 +155,22 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
       );
       lines.insert(
         lastImportIndex + 1,
+        "import 'package:rinf/rinf.dart';",
+      );
+      lines.insert(
+        lastImportIndex + 2,
         "import './messages/generated.dart';",
       );
       mainText = lines.join("\n");
     }
-    if (!mainText.contains('initializeRust()')) {
+    if (!mainText.contains('initializeRust(assignRustSignal)')) {
       mainText = mainText.replaceFirst(
         'main() {',
         'main() async {',
       );
       mainText = mainText.replaceFirst(
         'main() async {',
-        'main() async { await initializeRust();',
+        'main() async { await initializeRust(assignRustSignal);',
       );
     }
     await mainFile.writeAsString(mainText);

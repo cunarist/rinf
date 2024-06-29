@@ -4,7 +4,7 @@ import 'dart:ffi';
 String? dynamicLibPath;
 final rustLibrary = loadRustLibrary();
 
-void setDynamicLibPath(String? path) {
+void setDynamicLibPath(String path) {
   dynamicLibPath = path;
 }
 

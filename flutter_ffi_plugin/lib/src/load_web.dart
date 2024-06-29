@@ -11,7 +11,7 @@ String? jsLibPath;
 // as a global JavaScript variable.
 final wasAlreadyLoaded = js.context.hasProperty("rinf");
 
-void setJsLibPath(String? path) {
+void setJsLibPath(String path) {
   jsLibPath = path;
 }
 

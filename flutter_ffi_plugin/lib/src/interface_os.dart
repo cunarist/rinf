@@ -7,7 +7,9 @@ import 'dart:isolate';
 import 'interface.dart';
 import 'dart:convert';
 
-void setCompiledLibPathReal(String? path) {
+/// Sets the exact file path of the dynamic library
+/// compiled from the `hub` crate.
+void setCompiledLibPathReal(String path) {
   setDynamicLibPath(path);
 }
 
