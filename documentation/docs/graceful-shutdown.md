@@ -25,7 +25,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _listener = AppLifecycleListener(
       onExitRequested: () async {
-        finalizeRust(); // Shuts down the `tokio` Rust runtime.
+        finalizeRust(); // Shut down the `tokio` Rust runtime.
         return AppExitResponse.exit;
       },
     );
@@ -39,17 +39,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Rinf Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blueGrey,
-          brightness: MediaQuery.platformBrightnessOf(context),
-        ),
-        useMaterial3: true,
-      ),
-      home: MyHomePage(),
-    );
+    // Return a widget.
   }
 }
 ```
