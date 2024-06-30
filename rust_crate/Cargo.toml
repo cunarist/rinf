@@ -9,9 +9,13 @@ documentation = "https://rinf.cunarist.com"
 rust-version = "1.70"
 
 [features]
+default = ["bevy"]
 rt-multi-thread = ["tokio/rt-multi-thread"]
 show-backtrace = ["backtrace"]
-bevy = ["dep:bevy_ecs"]
+bevy = ["bevy_ecs"]
+
+[dependencies]
+bevy_ecs = { version = "0.13", optional = true }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 os-thread-local = "0.1.3"
@@ -21,10 +25,8 @@ home = "0.5.9"
 which = "6.0.0"
 allo-isolate = "0.1.25"
 tokio = { version = "1", features = ["rt"] }
-bevy_ecs = { version = "0.13", optional = true }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3.69"
 wasm-bindgen = "0.2.92"
 wasm-bindgen-futures = "0.4.42"
-bevy_ecs = { version = "0.13", optional = true }
