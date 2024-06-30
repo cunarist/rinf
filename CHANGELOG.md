@@ -1,3 +1,10 @@
+## 6.13.0
+
+- The `get_dart_signal_receiver` function now returns `Result`. You need to use `unwrap` or `?` to retrieve Dart signal receivers from the generated message structs.
+- You now need to manually provide the generated `assignRustSignal` to the `initializeRust` function, which can be imported using `import 'package:rinf/rinf.dart';` in Dart.
+- The tokio runtime will now default to being single-threaded. To use a multi-threaded tokio runtime, enable the new `rt-multi-thread` crate feature.
+- By default, backtraces will be hidden in the CLI, with only the error message being printed. To display the Rust backtrace, enable the new `backtrace` crate feature.
+
 ## 6.12.1
 
 - Fixed linefeed problem in published files.

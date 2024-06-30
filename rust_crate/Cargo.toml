@@ -1,6 +1,6 @@
 [package]
 name = "rinf"
-version = "6.12.1"
+version = "6.13.0"
 edition = "2021"
 license = "MIT"
 description = "Rust for native business logic, Flutter for flexible and beautiful GUI"
@@ -9,7 +9,7 @@ documentation = "https://rinf.cunarist.com"
 rust-version = "1.70"
 
 [features]
-multi-worker = ["tokio/rt-multi-thread"]
+rt-multi-thread = ["tokio/rt-multi-thread"]
 show-backtrace = ["backtrace"]
 bevy = ["dep:bevy_ecs"]
 
