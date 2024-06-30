@@ -9,7 +9,6 @@ documentation = "https://rinf.cunarist.com"
 rust-version = "1.70"
 
 [features]
-default = ["bevy"]
 rt-multi-thread = ["tokio/rt-multi-thread"]
 show-backtrace = ["backtrace"]
 bevy = ["bevy_ecs"]
