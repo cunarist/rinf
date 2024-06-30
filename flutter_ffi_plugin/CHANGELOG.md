@@ -1,3 +1,7 @@
+## 6.14.0
+
+- New feature `bevy` for treating Dart signals as Bevy events was added. Thanks @Deep-co-de!
+
 ## 6.13.0
 
 - The `get_dart_signal_receiver` function now returns `Result`. You need to use `unwrap` or `?` to retrieve Dart signal receivers from the generated message structs.
