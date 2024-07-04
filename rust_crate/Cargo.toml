@@ -14,7 +14,7 @@ show-backtrace = ["backtrace"]
 bevy = ["bevy_ecs"]
 
 [dependencies]
-bevy_ecs = { version = "0.13", optional = true }
+bevy_ecs = { version = "0.14", optional = true }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 os-thread-local = "0.1.3"
