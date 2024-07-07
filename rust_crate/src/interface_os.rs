@@ -77,7 +77,6 @@ where
             tokio_runtime.block_on(shutdown_receiver);
             // Dropping the tokio runtime makes it shut down.
             drop(tokio_runtime);
-            println!("DROPPED RUNTIME (TEMP)");
             // After dropping the runtime, tell the main thread to stop waiting.
             drop(shutdown_reporter);
         });
@@ -193,7 +192,6 @@ impl Drop for ShutdownSender {
                 let _unused = self.is_done.wait(guard);
             }
         }
-        println!("END (TEMP)");
     }
 }
 
