@@ -216,9 +216,6 @@ impl Future for ShutdownReceiver {
 
 type ChannelTuple = (ShutdownSender, ShutdownReceiver, ShutdownReporter);
 fn shutdown_channel() -> ChannelTuple {
-    // This code assumes that
-    // this function is being called from the main thread.
-
     let should_shutdown = Arc::new(AtomicBool::new(false));
     let waker = Arc::new(Mutex::new(None));
     let did_shutdown = Arc::new(Mutex::new(false));
