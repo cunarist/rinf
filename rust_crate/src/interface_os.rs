@@ -37,9 +37,10 @@ pub extern "C" fn prepare_isolate_extern(port: i64) {
 type ShutdownSenderLock = OnceLock<ThreadLocal<RefCell<Option<ShutdownSender>>>>;
 static SHUTDOWN_SENDER: ShutdownSenderLock = OnceLock::new();
 
-pub fn start_rust_logic_real<F>(main_future: F) -> Result<(), RinfError>
+pub fn start_rust_logic_real<F, T>(main_future: F) -> Result<(), RinfError>
 where
-    F: Future<Output = ()> + Send + 'static,
+    F: Future<Output = T> + Send + 'static,
+    T: Send + 'static,
 {
     // Enable backtrace output for panics.
     #[cfg(debug_assertions)]

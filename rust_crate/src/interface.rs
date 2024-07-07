@@ -27,9 +27,10 @@ pub struct DartSignal<T> {
 /// the `Runtime` object itself might be moved between threads,
 /// along with all the tasks it manages.
 #[cfg(not(target_family = "wasm"))]
-pub fn start_rust_logic<F>(main_future: F) -> Result<(), RinfError>
+pub fn start_rust_logic<F, T>(main_future: F) -> Result<(), RinfError>
 where
-    F: Future<Output = ()> + Send + 'static,
+    F: Future<Output = T> + Send + 'static,
+    T: Send + 'static,
 {
     start_rust_logic_real(main_future)
 }
@@ -40,7 +41,7 @@ where
 #[cfg(target_family = "wasm")]
 pub fn start_rust_logic<F>(main_future: F) -> Result<(), RinfError>
 where
-    F: Future<Output = ()> + 'static,
+    F: Future + 'static,
 {
     start_rust_logic_real(main_future)
 }
