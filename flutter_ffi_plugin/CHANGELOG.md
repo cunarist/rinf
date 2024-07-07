@@ -1,3 +1,8 @@
+## 6.14.1
+
+- The return type of Rust's `main` function can now be anything.
+- Fixed the issue causing the app to hang on the splash screen after closing it with the back button on Android.
+
 ## 6.14.0
 
 - New feature `bevy` for treating Dart signals as Bevy events was added. Thanks @Deep-co-de!
