@@ -5,10 +5,9 @@ use std::cell::RefCell;
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex, OnceLock};
+use std::sync::{Arc, Condvar, Mutex, OnceLock};
 use std::task::{Context, Poll, Waker};
 use std::thread;
-use std::thread::{current, park, Thread};
 use tokio::runtime::Builder;
 
 static DART_ISOLATE: Mutex<Option<Isolate>> = Mutex::new(None);
@@ -173,8 +172,9 @@ pub fn send_rust_signal_real(
 
 struct ShutdownSender {
     should_shutdown: Arc<AtomicBool>,
-    did_shutdown: Arc<AtomicBool>,
     waker: Arc<Mutex<Option<Waker>>>,
+    did_shutdown: Arc<Mutex<bool>>,
+    is_done: Arc<Condvar>,
 }
 
 impl Drop for ShutdownSender {
@@ -185,9 +185,12 @@ impl Drop for ShutdownSender {
                 waker.wake();
             }
         }
-        while !self.did_shutdown.load(Ordering::SeqCst) {
-            // Dropping the sender is always done on the main thread.
-            park();
+        while let Ok(guard) = self.did_shutdown.lock() {
+            if *guard {
+                break;
+            } else {
+                let _unused = self.is_done.wait(guard);
+            }
         }
     }
 }
@@ -213,39 +216,39 @@ impl Future for ShutdownReceiver {
 
 type ChannelTuple = (ShutdownSender, ShutdownReceiver, ShutdownReporter);
 fn shutdown_channel() -> ChannelTuple {
-    // This code assumes that
-    // this function is being called from the main thread.
-    let main_thread = current();
-
     let should_shutdown = Arc::new(AtomicBool::new(false));
-    let is_done = Arc::new(AtomicBool::new(false));
     let waker = Arc::new(Mutex::new(None));
+    let did_shutdown = Arc::new(Mutex::new(false));
+    let is_done = Arc::new(Condvar::new());
 
     let sender = ShutdownSender {
         should_shutdown: should_shutdown.clone(),
         waker: waker.clone(),
-        did_shutdown: is_done.clone(),
+        did_shutdown: did_shutdown.clone(),
+        is_done: is_done.clone(),
     };
     let receiver = ShutdownReceiver {
         should_shutdown,
         waker,
     };
     let reporter = ShutdownReporter {
+        did_shutdown,
         is_done,
-        main_thread,
     };
 
     (sender, receiver, reporter)
 }
 
 struct ShutdownReporter {
-    is_done: Arc<AtomicBool>,
-    main_thread: Thread,
+    did_shutdown: Arc<Mutex<bool>>,
+    is_done: Arc<Condvar>,
 }
 
 impl Drop for ShutdownReporter {
     fn drop(&mut self) {
-        self.is_done.store(true, Ordering::SeqCst);
-        self.main_thread.unpark();
+        if let Ok(mut guard) = self.did_shutdown.lock() {
+            *guard = true;
+        }
+        self.is_done.notify_all();
     }
 }
