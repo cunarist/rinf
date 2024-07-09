@@ -298,26 +298,19 @@ impl ${normalizePascal(messageName)} {
             let (sender, receiver) = unbounded_channel();
             guard.replace((sender, Some(receiver)));
         }
-        #[cfg(debug_assertions)]
-        {
-            // After Dart's hot restart,
-            // a sender from the previous run already exists
-            // which is now closed.
-            let pair = guard
-                .as_ref()
-                .ok_or(RinfError::NoMessageChannel)?;
-            if pair.0.is_closed() {
-                let (sender, receiver) = unbounded_channel();
-                guard.replace((sender, Some(receiver)));
-            }
-        }
-        let pair = guard
+        let (mut sender, mut receiver_option) = guard
             .take()
             .ok_or(RinfError::NoMessageChannel)?;
-        guard.replace((pair.0, None));
-        let receiver = pair
-            .1
-            .ok_or(RinfError::MessageReceiverTaken)?;
+        // After Dart's hot restart or app reopen on mobile devices,
+        // a sender from the previous run already exists
+        // which is now closed.
+        if sender.is_closed() {
+            let receiver;
+            (sender, receiver) = unbounded_channel();
+            receiver_option = Some(receiver);
+        }
+        let receiver = receiver_option.ok_or(RinfError::MessageReceiverTaken)?;
+        guard.replace((sender, None));
         Ok(receiver)
     }
 }
@@ -474,22 +467,19 @@ new_hash_map.insert(
             let (sender, receiver) = unbounded_channel();
             guard.replace((sender, Some(receiver)));
         }
-        #[cfg(debug_assertions)]
-        {
-            // After Dart's hot restart,
-            // a sender from the previous run already exists
-            // which is now closed.
-            let pair = guard
-                .as_ref()
-                .ok_or(RinfError::NoMessageChannel)?;
-            if pair.0.is_closed() {
-                let (sender, receiver) = unbounded_channel();
-                guard.replace((sender, Some(receiver)));
-            }
-        }
-        let pair = guard
+        let mut pair = guard
             .as_ref()
             .ok_or(RinfError::NoMessageChannel)?;
+        // After Dart's hot restart or app reopen on mobile devices,
+        // a sender from the previous run already exists
+        // which is now closed.
+        if pair.0.is_closed() {
+            let (sender, receiver) = unbounded_channel();
+            guard.replace((sender, Some(receiver)));
+            pair = guard
+                .as_ref()
+                .ok_or(RinfError::NoMessageChannel)?;
+        }
         let sender = &pair.0;
         let _ = sender.send(dart_signal);
         Ok(())
