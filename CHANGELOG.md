@@ -1,3 +1,7 @@
+## 6.14.2
+
+- Now, the message channels work after reopening the app following the use of the back button on mobile devices.
+
 ## 6.14.1
 
 - The return type of Rust's `main` function can now be anything.
