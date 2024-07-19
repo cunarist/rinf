@@ -45,7 +45,8 @@ class RinfConfigMessage {
     return '''message:
     $KEY_INPUT_DIR: $inputDir
     $KEY_RUST_OUTPUT_DIR: $rustOutputDir
-    $KEY_DART_OUTPUT_DIR: $dartOutputDir''';
+    $KEY_DART_OUTPUT_DIR: $dartOutputDir
+    $KEY_RUST_SERDE: $rustSerde''';
   }
 
   static const KEY_INPUT_DIR = "input_dir";
