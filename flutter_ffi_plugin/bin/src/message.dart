@@ -800,11 +800,12 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
           markType = MarkType.rustSignalBinary;
         }
 
+        // find [RINF:RUST-ATTRIBUTE(...)]
         var attr = attrExp.stringMatch(statement);
         if (attr != null) {
           markedMessages[subPath]![filename]!.add(MarkedMessage(
             MarkType.rustAttribute,
-            "--prost_opt=type_attribute=$filename.$messageName=$attr",
+            "--prost_opt=type_attribute=$filename.$messageName=${attr.replaceAll(",", "\\,")}",
             -1,
           ));
           continue;
