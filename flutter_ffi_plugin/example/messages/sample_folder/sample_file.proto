@@ -1,5 +1,5 @@
 syntax = "proto3";
-package enum_and_oneof;
+package sample_file;
 
 enum Kind {
   one = 0;
@@ -22,4 +22,9 @@ message SampleOutput {
     string name = 2;
     int32 age = 3;
   }
+}
+
+// [RINF:RUST-ATTRIBUTE(#[derive(Copy)])]
+message WithRustAttribute {
+  bool dummy = 1;
 }

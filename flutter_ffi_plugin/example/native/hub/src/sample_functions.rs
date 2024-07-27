@@ -109,7 +109,7 @@ pub async fn stream_fractal() {
 // A dummy function that uses sample messages to eliminate warnings.
 #[allow(dead_code)]
 async fn use_messages() -> Result<()> {
-    use messages::sample_folder::enum_and_oneof::*;
+    use messages::sample_folder::sample_file::*;
     let _ = SampleInput::get_dart_signal_receiver()?;
     SampleOutput {
         kind: 3,
