@@ -10,6 +10,7 @@ enum MarkType {
   dartSignalBinary,
   rustSignal,
   rustSignalBinary,
+  rustAttribute,
 }
 
 class MarkedMessage {
@@ -44,6 +45,12 @@ Future<void> generateMessageCode({
   await collectProtoFiles(
     Directory.fromUri(protoPath),
     Directory.fromUri(protoPath),
+    resourcesInFolders,
+  );
+
+  // Analyze marked messages in `.proto` files.
+  final markedMessagesAll = await analyzeMarkedMessages(
+    protoPath,
     resourcesInFolders,
   );
 
@@ -115,6 +122,12 @@ Future<void> generateMessageCode({
       '--prost_out=$rustFullPath',
       ...(messageConfig.rustSerde ? ['--prost-serde_out=$rustFullPath'] : []),
       ...resourceNames.map((name) => '$name.proto'),
+      ...markedMessagesAll.values.fold<List<String>>([], (args, messages) {
+        messages.values.forEach((messages) => args.addAll(messages
+            .where((message) => message.markType == MarkType.rustAttribute)
+            .map((message) => message.name)));
+        return args;
+      })
     ]);
     if (protocRustResult.exitCode != 0) {
       print(protocRustResult.stderr.toString().trim());
@@ -218,12 +231,6 @@ Future<void> generateMessageCode({
       throw Exception('Could not compile `.proto` files into Dart');
     }
   }
-
-  // Analyze marked messages in `.proto` files.
-  final markedMessagesAll = await analyzeMarkedMessages(
-    protoPath,
-    resourcesInFolders,
-  );
 
   // Prepare communication channels between Dart and Rust.
   for (final entry in markedMessagesAll.entries) {
@@ -761,6 +768,8 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
       );
       final content = await protoFile.readAsString();
       final regExp = RegExp(r'{[^}]*}');
+      final attrExp = RegExp(r"(?<=\[RINF:RUST-ATTRIBUTE\().*(?=\)\])");
+
       // Remove all { ... } blocks from the string
       final contentWithoutBlocks = content.replaceAll(regExp, ';');
       final statements = contentWithoutBlocks.split(";");
@@ -790,6 +799,18 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
         } else if (statement.contains("[RINF:RUST-SIGNAL-BINARY]")) {
           markType = MarkType.rustSignalBinary;
         }
+
+        // find [RINF:RUST-ATTRIBUTE(...)]
+        var attr = attrExp.stringMatch(statement);
+        if (attr != null) {
+          markedMessages[subPath]![filename]!.add(MarkedMessage(
+            MarkType.rustAttribute,
+            "--prost_opt=type_attribute=$filename.$messageName=${attr.replaceAll(",", "\\,")}",
+            -1,
+          ));
+          continue;
+        }
+
         if (markType == null) {
           // If there's no mark in the message, just ignore it
           continue;
