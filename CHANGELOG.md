@@ -1,3 +1,7 @@
+## 6.15.0
+
+- Now it's possible to add attributes to generated message structs in Rust. Thanks @H2Sxxa!
+
 ## 6.14.2
 
 - Now, the message channels work after reopening the app following the use of the back button on mobile devices.
