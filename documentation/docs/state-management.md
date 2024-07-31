@@ -21,7 +21,7 @@ async fn main() {
 
 pub async fn do_something_with_state(data: Arc<Mutex<Vec<i32>>>) {
     // Mutate the shared variable directly.
-    VECTOR.lock().await.push(3);
+    data.lock().await.push(3);
 }
 ```
 
