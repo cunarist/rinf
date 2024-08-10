@@ -5,8 +5,12 @@ mod common;
 mod messages;
 
 use crate::common::*;
-use tokio; // Comment this line to target the web.
-// use tokio_with_wasm::alias as tokio; // Uncomment this line to target the web.
+
+#[cfg(not(target_family = "wasm"))]
+use tokio;
+
+#[cfg(target_family = "wasm")]
+use tokio_with_wasm::alias as tokio;
 
 rinf::write_interface!();
 

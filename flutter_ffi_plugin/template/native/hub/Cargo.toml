@@ -14,8 +14,11 @@ crate-type = ["lib", "cdylib", "staticlib"]
 [dependencies]
 rinf = "6.15.0"
 prost = "0.12.6"
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
 tokio = { version = "1", features = ["sync", "rt"] }
 
-# Uncomment below to target the web.
-# tokio_with_wasm = { version = "0.6.0", features = ["sync", "rt"] }
-# wasm-bindgen = "0.2.92"
+# Web
+[target.'cfg(target_family = "wasm")'.dependencies]
+tokio_with_wasm = { version = "0.6.0", features = ["sync", "rt"] }
+wasm-bindgen = { version = "0.2.92" }
