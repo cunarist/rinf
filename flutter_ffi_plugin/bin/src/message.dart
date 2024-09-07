@@ -572,60 +572,6 @@ void assignRustSignal(int messageId, Uint8List messageBytes, Uint8List binary) {
   }
 }
 
-Future<void> patchServerHeaders() async {
-  // Get the Flutter executable's path.
-  final Uri rawPath;
-  if (Platform.isWindows) {
-    // Windows
-    final output = await Process.run('where', ['flutter']);
-    rawPath = Uri.file((output.stdout as String).split('\n').first.trim());
-  } else {
-    // macOS and Linux
-    final output = await Process.run('which', ['flutter']);
-    rawPath = Uri.file((output.stdout as String).trim());
-  }
-  final flutterFilePath = Uri.file(
-    await File.fromUri(rawPath).resolveSymbolicLinks(),
-  );
-  final flutterPath = File.fromUri(flutterFilePath).parent.parent.uri;
-
-  // Get the server module file's path.
-  final serverFile = File.fromUri(
-    flutterPath.join('packages/flutter_tools/lib/src/isolated/devfs_web.dart'),
-  );
-  var serverFileContent = await serverFile.readAsString();
-
-  // Check if the server already includes cross-origin HTTP headers.
-  if (serverFileContent.contains('Cross-Origin-Opener-Policy')) {
-    return;
-  }
-
-  // Add the HTTP header code to the server file.
-  final lines = serverFileContent.split('\n');
-  final serverDeclaredIndex = lines.lastIndexWhere(
-    (line) => line.contains('httpServer = await'),
-  );
-  lines.insert(serverDeclaredIndex + 1, """
-httpServer.defaultResponseHeaders.add(
-  'Cross-Origin-Opener-Policy',
-  'same-origin',
-);
-httpServer.defaultResponseHeaders.add(
-  'Cross-Origin-Embedder-Policy',
-  'require-corp',
-);""");
-  serverFileContent = lines.join("\n");
-  await serverFile.writeAsString(serverFileContent);
-
-  // Remove the stamp file to make it re-generated.
-  final flutterToolsStampPath = flutterPath.join(
-    'bin/cache/flutter_tools.stamp',
-  );
-  if (await File.fromUri(flutterToolsStampPath).exists()) {
-    await File.fromUri(flutterToolsStampPath).delete();
-  }
-}
-
 Future<void> watchAndGenerateMessageCode(
     {required RinfConfigMessage messageConfig}) async {
   final currentDirectory = Directory.current;
