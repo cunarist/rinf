@@ -101,6 +101,6 @@ while let Some(dart_signal) = receiver.recv().await {
 `[RINF:RUST-ATTRIBUTE(...)]` writes an attribute above the generated message struct in Rust. This is useful when you want to automatically implement a trait for the message struct in Rust.
 
 ```proto title="Protobuf"
-// [RINF:RUST-ATTRIBUTE(#[derive(Copy)])]
+// [RINF:RUST-ATTRIBUTE(#[derive(Hash)])]
 message MyDataInput { ... }
 ```

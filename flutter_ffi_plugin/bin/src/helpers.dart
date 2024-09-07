@@ -247,18 +247,6 @@ Future<void> buildWebassembly({bool isReleaseMode = false}) async {
     print("Skipping ensurement of Rust toolchain for the web.");
   }
 
-  // Patch Flutter SDK web server's response headers.
-  try {
-    await patchServerHeaders();
-    print("Patched Flutter SDK's web server with CORS HTTP headers.");
-  } catch (error) {
-    print("Failed patching Flutter's web server with CORS HTTP headers.");
-    print("Try using the command below.");
-    print('flutter run' +
-        ' --web-header=Cross-Origin-Opener-Policy=same-origin' +
-        ' --web-header=Cross-Origin-Embedder-Policy=require-corp');
-  }
-
   // Prepare the webassembly output path.
   final flutterProjectPath = Directory.current;
   final subPath = 'web/pkg/';
@@ -292,5 +280,33 @@ Future<void> buildWebassembly({bool isReleaseMode = false}) async {
   }
   print("Saved `.wasm` and `.js` files to `$subPath`.");
 
+  // Guide the developer how to run Flutter web server with web headers.
+  print("To run the Flutter web server, use:");
+  final commandLineDivider = await getCommandLineDivider();
+  final commandLines = [
+    'flutter run',
+    '--web-header=Cross-Origin-Opener-Policy=same-origin',
+    '--web-header=Cross-Origin-Embedder-Policy=require-corp'
+  ];
+  print(commandLines.join(" ${commandLineDivider}\n"));
+
   print("🎉 Webassembly module is now ready! 🎉");
+}
+
+Future<String> getCommandLineDivider({bool isReleaseMode = false}) async {
+  if (Platform.isWindows) {
+    // Windows environment, check further for PowerShell or CMD
+    if (Platform.environment['SHELL'] == null) {
+      // Likely PowerShell environment
+      return "`";
+      // // Likely Command Prompt (cmd.exe)
+      // return "^";
+    } else {
+      // Bash or some other shell
+      return "\\";
+    }
+  } else {
+    // Bash or some other shell
+    return "\\";
+  }
 }

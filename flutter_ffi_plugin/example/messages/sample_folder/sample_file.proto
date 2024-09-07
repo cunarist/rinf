@@ -24,7 +24,7 @@ message SampleOutput {
   }
 }
 
-// [RINF:RUST-ATTRIBUTE(#[derive(Copy)])]
+// [RINF:RUST-ATTRIBUTE(#[derive(Hash)])]
 message WithRustAttribute {
   bool dummy = 1;
 }
