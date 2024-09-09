@@ -22,7 +22,7 @@ pub async fn tell_numbers() -> Result<()> {
     use messages::counter_number::*;
 
     // Stream getter is generated from a marked Protobuf message.
-    let mut receiver = SampleNumberInput::get_dart_signal_receiver()?;
+    let receiver = SampleNumberInput::get_dart_signal_receiver()?;
     while let Some(dart_signal) = receiver.recv().await {
         // Extract values from the message received from Dart.
         // This message is a type that's declared in its Protobuf file.
@@ -154,7 +154,9 @@ pub async fn run_debug_tests() -> Result<()> {
         tokio::time::sleep(Duration::from_secs(3)).await;
         debug_print!("Third future finished.");
     };
-    tokio::join!(join_first, join_second, join_third);
+    join_first.await;
+    join_second.await;
+    join_third.await;
 
     // Avoid blocking the async event loop by yielding.
     let mut last_time = sample_crate::get_current_time();

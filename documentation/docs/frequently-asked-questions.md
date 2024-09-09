@@ -236,7 +236,7 @@ onPressed: () async {
 pub async fn respond() -> Result<()> {
     use messages::tutorial_resource::*;
 
-    let mut receiver = MyUniqueInput::get_dart_signal_receiver()?;
+    let receiver = MyUniqueInput::get_dart_signal_receiver()?;
     while let Some(dart_signal) = receiver.recv().await {
         let my_unique_input = dart_signal.message;
         MyUniqueOutput {

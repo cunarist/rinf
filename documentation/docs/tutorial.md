@@ -65,7 +65,7 @@ use rinf::debug_print;
 pub async fn calculate_precious_data() -> Result<()> {
     use messages::tutorial_messages::*;
 
-    let mut receiver = MyPreciousData::get_dart_signal_receiver()?; // GENERATED
+    let receiver = MyPreciousData::get_dart_signal_receiver()?; // GENERATED
     while let Some(dart_signal) = receiver.recv().await {
         let my_precious_data = dart_signal.message;
 
@@ -222,7 +222,7 @@ pub async fn tell_treasure() -> Result<()> {
 
     let mut current_value: i32 = 1;
 
-    let mut receiver = MyTreasureInput::get_dart_signal_receiver()?; // GENERATED
+    let receiver = MyTreasureInput::get_dart_signal_receiver()?; // GENERATED
     while let Some(_) = receiver.recv().await {
         MyTreasureOutput { current_value }.send_signal_to_dart(); // GENERATED
         current_value += 1;
