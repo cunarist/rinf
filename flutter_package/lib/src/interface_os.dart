@@ -64,13 +64,27 @@ typedef SendDartSignalReal = Void Function(
   UintPtr,
 );
 @Native<SendDartSignalReal>(isLeaf: true, symbol: 'send_dart_signal_extern')
-external void sendDartSignalReal(
+external void sendDartSignalExtern(
   int messageId,
   Pointer<Uint8> messageBytesAddress,
   int messageBytesLength,
   Pointer<Uint8> binaryAddress,
   int binaryLength,
 );
+
+void sendDartSignalReal(
+  int messageId,
+  Uint8List messageBytes,
+  Uint8List binary,
+) {
+  sendDartSignalExtern(
+    messageId,
+    messageBytes.address,
+    messageBytes.length,
+    binary.address,
+    binary.length,
+  );
+}
 
 @Native<Void Function(Int64)>(isLeaf: true, symbol: 'prepare_isolate_extern')
 external void prepareIsolateReal(
