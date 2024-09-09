@@ -23,10 +23,10 @@ struct MessageChannel<T> {
 impl<T> MessageSender<T> {
     // Send a message and store it in the queue
     pub fn send(&self, msg: T) -> Result<(), RinfError> {
-        let mut inner = match self.inner.lock() {
-            Ok(inner) => inner,
-            Err(_) => return Err(RinfError::BrokenMessageChannel),
-        };
+        let mut inner = self
+            .inner
+            .lock()
+            .map_err(|_| RinfError::BrokenMessageChannel)?;
 
         // Return an error if the receiver has been dropped
         if inner.receiver_dropped {
@@ -43,17 +43,22 @@ impl<T> MessageSender<T> {
 
     // Check if the receiver is still alive
     pub fn is_closed(&self) -> bool {
-        let inner = self.inner.lock().unwrap();
-        inner.receiver_dropped
+        let inner = self.inner.lock();
+        match inner {
+            Ok(inner) => inner.receiver_dropped,
+            Err(_) => true, // If the lock is poisoned, consider it closed
+        }
     }
 }
 
 impl<T> Drop for MessageSender<T> {
     fn drop(&mut self) {
-        let mut inner = self.inner.lock().unwrap();
-        inner.sender_dropped = true; // Mark that the sender has been dropped
-        if let Some(waker) = inner.waker.take() {
-            waker.wake(); // Wake the receiver in case it's waiting
+        let inner = self.inner.lock();
+        if let Ok(mut inner) = inner {
+            inner.sender_dropped = true; // Mark that the sender has been dropped
+            if let Some(waker) = inner.waker.take() {
+                waker.wake(); // Wake the receiver in case it's waiting
+            }
         }
     }
 }
@@ -70,10 +75,12 @@ impl<T> MessageReceiver<T> {
 
 impl<T> Drop for MessageReceiver<T> {
     fn drop(&mut self) {
-        let mut inner = self.inner.lock().unwrap();
-        inner.receiver_dropped = true; // Mark that the receiver has been dropped
-        if let Some(waker) = inner.waker.take() {
-            waker.wake(); // Wake any waiting sender
+        let inner = self.inner.lock();
+        if let Ok(mut inner) = inner {
+            inner.receiver_dropped = true; // Mark that the receiver has been dropped
+            if let Some(waker) = inner.waker.take() {
+                waker.wake(); // Wake any waiting sender
+            }
         }
     }
 }
