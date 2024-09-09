@@ -122,7 +122,7 @@ rinf message
 Define an async Rust function that runs forever, sending numbers to Dart every second.
 
 ```toml title="native/hub/Cargo.toml"
-tokio = { version = "1", features = ["sync", "rt", "time"] }
+tokio = { version = "1", features = ["sync", "time"] }
 ```
 
 ```rust title="native/hub/src/tutorial_functions.rs"

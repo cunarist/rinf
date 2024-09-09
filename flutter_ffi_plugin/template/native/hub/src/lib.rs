@@ -15,7 +15,7 @@ rinf::write_interface!();
 // such as `tokio::fs::File::open`.
 // If you really need to use blocking code,
 // use `tokio::task::spawn_blocking`.
-#[tokio::main(flavor = "current_thread")]
+#[tokio::main]
 async fn main() -> Result<()> {
     // Spawn the concurrent tasks.
     tokio::spawn(communicate());
