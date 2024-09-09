@@ -24,6 +24,6 @@ which = "6.0.0"
 allo-isolate = "0.1.25"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-js-sys = "0.3.69"
-wasm-bindgen = "0.2.92"
-wasm-bindgen-futures = "0.4.42"
+js-sys = "0.3.70"
+wasm-bindgen = "0.2.93"
+wasm-bindgen-futures = "0.4.43"
