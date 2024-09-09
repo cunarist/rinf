@@ -5,21 +5,18 @@ use crate::messages;
 use crate::tokio;
 use rinf::debug_print;
 use std::time::Duration;
-use tokio::sync::Mutex;
 
 // Using the `cfg` macro enables conditional statement.
 #[cfg(debug_assertions)]
-const IS_DEBUG_MODE: bool = true;
+static IS_DEBUG_MODE: bool = true;
 #[cfg(not(debug_assertions))]
-const IS_DEBUG_MODE: bool = false;
-
-// This is one of the ways to keep a global mutable state in Rust.
-// You can also use `tokio::sync::RwLock` or `std::lazy::LazyLock`.
-static VECTOR: Mutex<Vec<bool>> = Mutex::const_new(Vec::new());
+static IS_DEBUG_MODE: bool = false;
 
 // Business logic for the counter widget.
 pub async fn tell_numbers() -> Result<()> {
     use messages::counter_number::*;
+
+    let mut vector = Vec::new();
 
     // Stream getter is generated from a marked Protobuf message.
     let receiver = SampleNumberInput::get_dart_signal_receiver()?;
@@ -30,8 +27,7 @@ pub async fn tell_numbers() -> Result<()> {
         let letter = number_input.letter;
         debug_print!("{letter}");
 
-        // Use the global state and perform a simple calculation.
-        let mut vector = VECTOR.lock().await;
+        // Perform a simple calculation.
         vector.push(true);
         let current_number = (vector.len() as i32) * 7;
 

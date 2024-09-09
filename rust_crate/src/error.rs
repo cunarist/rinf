@@ -5,7 +5,8 @@ use std::fmt;
 pub enum RinfError {
     LockDartIsolate,
     NoDartIsolate,
-    BuildRuntime,
+    LockShutdownReceiver,
+    NoShutdownReceiver,
     LockMessageChannel,
     BrokenMessageChannel,
     ClosedMessageChannel,
@@ -24,8 +25,11 @@ impl fmt::Display for RinfError {
             RinfError::NoDartIsolate => {
                 write!(f, "Dart isolate for Rust signals was not created.")
             }
-            RinfError::BuildRuntime => {
-                write!(f, "Could not build the tokio runtime.")
+            RinfError::LockShutdownReceiver => {
+                write!(f, "Could not acquire the shutdown receiver lock.")
+            }
+            RinfError::NoShutdownReceiver => {
+                write!(f, "Shutdown receiver was not created.")
             }
             RinfError::LockMessageChannel => {
                 write!(f, "Could not acquire the message channel lock.")

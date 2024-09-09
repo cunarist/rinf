@@ -1,12 +1,11 @@
 use crate::error::RinfError;
+use crate::shutdown::create_shutdown_channel;
 use js_sys::Uint8Array;
-use std::future::Future;
 use wasm_bindgen::prelude::*;
-use wasm_bindgen_futures::spawn_local;
 
-pub fn start_rust_logic_real<F>(main_future: F) -> Result<(), RinfError>
+pub fn start_rust_logic_real<F, T>(main_fn: F) -> Result<(), RinfError>
 where
-    F: Future + 'static,
+    F: Fn() -> T + 'static,
 {
     // Add kind description for panics.
     #[cfg(debug_assertions)]
@@ -16,10 +15,11 @@ where
         }));
     }
 
+    // Prepare the channel to match the behavior of native platforms.
+    let _ = create_shutdown_channel();
+
     // Run the main function.
-    spawn_local(async {
-        main_future.await;
-    });
+    main_fn();
 
     Ok(())
 }
