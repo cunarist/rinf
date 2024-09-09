@@ -7,6 +7,8 @@ pub enum RinfError {
     NoDartIsolate,
     BuildRuntime,
     LockMessageChannel,
+    BrokenMessageChannel,
+    ClosedMessageChannel,
     NoMessageChannel,
     MessageReceiverTaken,
     DecodeMessage,
@@ -27,6 +29,12 @@ impl fmt::Display for RinfError {
             }
             RinfError::LockMessageChannel => {
                 write!(f, "Could not acquire the message channel lock.")
+            }
+            RinfError::BrokenMessageChannel => {
+                write!(f, "Message channel is broken.",)
+            }
+            RinfError::ClosedMessageChannel => {
+                write!(f, "Message channel is closed.",)
             }
             RinfError::NoMessageChannel => {
                 write!(f, "Message channel was not created.",)

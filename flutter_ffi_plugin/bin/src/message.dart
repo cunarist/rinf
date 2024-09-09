@@ -266,11 +266,13 @@ import 'package:rinf/rinf.dart';
           '''
 #![allow(unused_imports)]
 
-use crate::tokio;
 use prost::Message;
-use rinf::{debug_print, send_rust_signal, DartSignal, RinfError};
+use rinf::{
+    debug_print, message_channel, send_rust_signal,
+    DartSignal, MessageReceiver, MessageSender,
+    RinfError,
+};
 use std::sync::Mutex;
-use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 
 ''',
           atFront: true,
@@ -288,21 +290,21 @@ use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
             rustPath,
             '''
 type ${messageName}Cell = Mutex<Option<(
-    UnboundedSender<DartSignal<${normalizePascal(messageName)}>>,
-    Option<UnboundedReceiver<DartSignal<${normalizePascal(messageName)}>>>,
+    MessageSender<DartSignal<${normalizePascal(messageName)}>>,
+    Option<MessageReceiver<DartSignal<${normalizePascal(messageName)}>>>,
 )>>;
 pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Cell =
     Mutex::new(None);
 
 impl ${normalizePascal(messageName)} {
     pub fn get_dart_signal_receiver()
-        -> Result<UnboundedReceiver<DartSignal<Self>>, RinfError> 
+        -> Result<MessageReceiver<DartSignal<Self>>, RinfError> 
     {       
         let mut guard = ${snakeName.toUpperCase()}_CHANNEL
             .lock()
             .map_err(|_| RinfError::LockMessageChannel)?;
         if guard.is_none() {
-            let (sender, receiver) = unbounded_channel();
+            let (sender, receiver) = message_channel();
             guard.replace((sender, Some(receiver)));
         }
         let (mut sender, mut receiver_option) = guard
@@ -313,7 +315,7 @@ impl ${normalizePascal(messageName)} {
         // which is now closed.
         if sender.is_closed() {
             let receiver;
-            (sender, receiver) = unbounded_channel();
+            (sender, receiver) = message_channel();
             receiver_option = Some(receiver);
         }
         let receiver = receiver_option.ok_or(RinfError::MessageReceiverTaken)?;
@@ -421,13 +423,11 @@ impl ${normalizePascal(messageName)} {
 #![allow(unused_imports)]
 #![allow(unused_mut)]
 
-use crate::tokio;
 use prost::Message;
-use rinf::{debug_print, DartSignal, RinfError};
+use rinf::{debug_print, message_channel, DartSignal, RinfError};
 use std::collections::HashMap;
 use std::error::Error;
 use std::sync::OnceLock;
-use tokio::sync::mpsc::unbounded_channel;
 
 type Handler = dyn Fn(&[u8], &[u8]) -> Result<(), RinfError> + Send + Sync;
 type DartSignalHandlers = HashMap<i32, Box<Handler>>;
@@ -471,7 +471,7 @@ new_hash_map.insert(
             .lock()
             .map_err(|_| RinfError::LockMessageChannel)?;
         if guard.is_none() {
-            let (sender, receiver) = unbounded_channel();
+            let (sender, receiver) = message_channel();
             guard.replace((sender, Some(receiver)));
         }
         let mut pair = guard
@@ -481,7 +481,7 @@ new_hash_map.insert(
         // a sender from the previous run already exists
         // which is now closed.
         if pair.0.is_closed() {
-            let (sender, receiver) = unbounded_channel();
+            let (sender, receiver) = message_channel();
             guard.replace((sender, Some(receiver)));
             pair = guard
                 .as_ref()
