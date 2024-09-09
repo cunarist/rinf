@@ -9,7 +9,6 @@ documentation = "https://rinf.cunarist.com"
 rust-version = "1.70"
 
 [features]
-rt-multi-thread = ["tokio/rt-multi-thread"]
 show-backtrace = ["backtrace"]
 bevy = ["bevy_ecs"]
 
@@ -23,7 +22,6 @@ protoc-prebuilt = "0.3.0"
 home = "0.5.9"
 which = "6.0.0"
 allo-isolate = "0.1.25"
-tokio = { version = "1", features = ["rt"] }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3.69"

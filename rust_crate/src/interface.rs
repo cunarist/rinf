@@ -1,5 +1,4 @@
 use crate::error::RinfError;
-use std::future::Future;
 
 #[cfg(not(target_family = "wasm"))]
 use super::interface_os::*;
@@ -27,23 +26,22 @@ pub struct DartSignal<T> {
 /// the `Runtime` object itself might be moved between threads,
 /// along with all the tasks it manages.
 #[cfg(not(target_family = "wasm"))]
-pub fn start_rust_logic<F, T>(main_future: F) -> Result<(), RinfError>
+pub fn start_rust_logic<F, T>(main_fn: F) -> Result<(), RinfError>
 where
-    F: Future<Output = T> + Send + 'static,
-    T: Send + 'static,
+    F: Fn() -> T + Send + 'static,
 {
-    start_rust_logic_real(main_future)
+    start_rust_logic_real(main_fn)
 }
 
 /// Runs the async main function in Rust.
 /// On the web, futures usually don't implement the `Send` trait
 /// because JavaScript environment is fundamentally single-threaded.
 #[cfg(target_family = "wasm")]
-pub fn start_rust_logic<F>(main_future: F) -> Result<(), RinfError>
+pub fn start_rust_logic<F, T>(main_fn: F) -> Result<(), RinfError>
 where
-    F: Future + 'static,
+    F: Fn() -> T + 'static,
 {
-    start_rust_logic_real(main_future)
+    start_rust_logic_real(main_fn)
 }
 
 /// Send a signal to Dart.

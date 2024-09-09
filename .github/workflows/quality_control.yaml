@@ -68,7 +68,9 @@ jobs:
       # That's why we are checking only the library crate.
       - name: Check for errors with all features enabled
         working-directory: rust_crate/
-        run: cargo clippy --all-features
+        run: |
+          cargo clippy --all-features
+          cargo clippy --all-features --target wasm32-unknown-unknown
 
       - name: Analyze code
         run: |
