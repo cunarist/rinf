@@ -20,6 +20,11 @@ pub static SHUTDOWN_SENDER: ShutdownSenderLock = OnceLock::new();
 type ShutdownReceiverLock = Mutex<Option<ShutdownReceiver>>;
 pub static SHUTDOWN_RECEIVER: ShutdownReceiverLock = Mutex::new(None);
 
+/// Retrieves the shutdown receiver that listens for
+/// the Dart runtime's closure.
+/// Awaiting this receiver in the async main Rust function
+/// is necessary to prevent the async runtime in Rust from
+/// finishing immediately.
 pub fn get_shutdown_receiver() -> Result<ShutdownReceiver, RinfError> {
     let mut reciver_lock = SHUTDOWN_RECEIVER
         .lock()
