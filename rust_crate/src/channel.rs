@@ -55,7 +55,8 @@ impl<T> Drop for MessageSender<T> {
     fn drop(&mut self) {
         let inner = self.inner.lock();
         if let Ok(mut inner) = inner {
-            inner.sender_dropped = true; // Mark that the sender has been dropped
+            // Mark that the sender has been dropped
+            inner.sender_dropped = true;
             if let Some(waker) = inner.waker.take() {
                 waker.wake(); // Wake the receiver in case it's waiting
             }
@@ -77,7 +78,8 @@ impl<T> Drop for MessageReceiver<T> {
     fn drop(&mut self) {
         let inner = self.inner.lock();
         if let Ok(mut inner) = inner {
-            inner.receiver_dropped = true; // Mark that the receiver has been dropped
+            // Mark that the receiver has been dropped
+            inner.receiver_dropped = true;
             if let Some(waker) = inner.waker.take() {
                 waker.wake(); // Wake any waiting sender
             }
@@ -108,7 +110,8 @@ impl<T> Future for RecvFuture<T> {
         if inner.sender_dropped && inner.queue.is_empty() {
             Poll::Ready(None)
         } else {
-            inner.waker = Some(cx.waker().clone()); // Set the waker for later notification
+            // Set the waker for later notification
+            inner.waker = Some(cx.waker().clone());
             Poll::Pending // No message available, wait
         }
     }
