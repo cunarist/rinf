@@ -14,8 +14,8 @@ crate-type = ["lib", "cdylib", "staticlib"]
 [dependencies]
 rinf = "6.15.0"
 prost = "0.12.6"
-tokio = { version = "1", features = ["rt"] }
+tokio = { version = "1", features = ["rt", "macros"] }
 
 # Uncomment below to target the web.
-# tokio_with_wasm = { version = "0.6.0", features = ["rt"] }
+# tokio_with_wasm = { version = "0.6.0", features = ["rt", "macros"] }
 # wasm-bindgen = "0.2.92"
