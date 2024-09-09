@@ -1,7 +1,6 @@
 /// This module supports communication with Rust.
 library;
 
-import 'dart:ffi';
 import 'dart:typed_data';
 import 'src/exports.dart';
 
@@ -36,9 +35,7 @@ void sendDartSignal(
 ) async {
   sendDartSignalReal(
     messageId,
-    messageBytes.address,
-    messageBytes.length,
-    binary.address,
-    binary.length,
+    messageBytes,
+    binary,
   );
 }
