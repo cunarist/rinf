@@ -53,10 +53,16 @@ Future<void> prepareInterfaceReal(
   prepareIsolateReal(rustSignalPort.sendPort.nativePort);
 }
 
-@Native<Void Function()>(isLeaf: true, symbol: 'start_rust_logic_extern')
+@Native<Void Function()>(
+  isLeaf: true,
+  symbol: 'start_rust_logic_extern',
+)
 external void startRustLogicReal();
 
-@Native<Void Function()>(isLeaf: true, symbol: 'stop_rust_logic_extern')
+@Native<Void Function()>(
+  isLeaf: true,
+  symbol: 'stop_rust_logic_extern',
+)
 external void stopRustLogicReal();
 
 typedef SendDartSignalReal = Void Function(
@@ -66,7 +72,10 @@ typedef SendDartSignalReal = Void Function(
   Pointer<Uint8>,
   UintPtr,
 );
-@Native<SendDartSignalReal>(isLeaf: true, symbol: 'send_dart_signal_extern')
+@Native<SendDartSignalReal>(
+  isLeaf: true,
+  symbol: 'send_dart_signal_extern',
+)
 external void sendDartSignalExtern(
   int messageId,
   Pointer<Uint8> messageBytesAddress,
@@ -89,7 +98,10 @@ void sendDartSignalReal(
   );
 }
 
-@Native<Void Function(Int64)>(isLeaf: true, symbol: 'prepare_isolate_extern')
+@Native<Void Function(Int64)>(
+  isLeaf: true,
+  symbol: 'prepare_isolate_extern',
+)
 external void prepareIsolateReal(
   int port,
 );
