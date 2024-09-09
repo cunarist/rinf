@@ -1,31 +1,61 @@
 # State Management
 
-This section is not an introduction to a specific Rinf's feature, but rather a general guide about how you can smoothly manage the application state while using Rinf.
+This section provides a general guide on effectively managing application state while using Rinf. It is not an introduction to a specific feature of Rinf.
 
-Rinf works best when the application logic is entirely written in Rust, while Flutter is only being used for GUI. Given that, there are situations where you want to store the application state in Rust.
+Rinf performs best when the application logic is written entirely in Rust, with Flutter used solely for the GUI. In such cases, you might want to store the application state in Rust.
 
-It is generally recommended to avoid static variables because of their characteristics, which can lead to issues such as difficulties in testing and managing lifetimes.
+## 💥 Actor model
 
-Try passing the state of your app down the function tree like below whenever it's acceptable.
+The actor model is highly recommended for managing asynchronous state in Rust. By encapsulating state and behavior within actor structs, which maintain ownership and handle their own async tasks, the actor model provides a scalable and reliable way to manage complex state interactions.
 
-```rust title="Rust"
-use std::sync::Arc;
-use tokio::sync::Mutex;
+1. **Encapsulation**: Actors encapsulate state and behavior, allowing for modular and maintainable code.
+2. **Concurrency**: Each actor operates independently, making it easier to handle concurrent tasks without manual synchronization.
+3. **Scalability**: Actors are well-suited for scalable systems where tasks and state management need to be handled in parallel.
 
-async fn main() {
-    // `Mutex` prevents race conditions between threads.
-    let shared_data = Arc::new(Mutex::new(Vec::new()));
-    do_something_with_state(shared_data.clone()).await;
-    do_something_with_state(shared_data.clone()).await;
+Several crates on `crates.io` provide building blocks for implementing the actor model in Rust. Although Rinf uses `tokio` by default, you can choose any async Rust runtime that fits your needs. Consider exploring these crates to find one that aligns with your requirements.
+
+Here’s a basic example using the [`actix`](https://github.com/actix/actix) crate, a popular choice for the actor model:
+
+```rust
+use actix::prelude::*;
+
+// this is our Message
+// we have to define the response type (rtype)
+#[derive(Message)]
+#[rtype(usize)]
+struct Sum(usize, usize);
+
+// Actor definition
+struct Calculator;
+
+impl Actor for Calculator {
+    type Context = Context<Self>;
 }
 
-pub async fn do_something_with_state(data: Arc<Mutex<Vec<i32>>>) {
-    // Mutate the shared variable directly.
-    data.lock().await.push(3);
+// now we need to implement `Handler` on `Calculator` for the `Sum` message.
+impl Handler<Sum> for Calculator {
+    type Result = usize; // <- Message response type
+
+    fn handle(&mut self, msg: Sum, _ctx: &mut Context<Self>) -> Self::Result {
+        msg.0 + msg.1
+    }
+}
+
+#[actix::main] // <- starts the system and block until future resolves
+async fn main() {
+    let addr = Calculator.start();
+    let res = addr.send(Sum(10, 5)).await; // <- send message and get future for result
+
+    match res {
+        Ok(result) => println!("SUM: {}", result),
+        _ => println!("Communication to the actor has failed"),
+    }
 }
 ```
 
-If you cannot pass down the state down the function tree for any reason, you can declare a static variable like below that spans the entire duration of the app.
+## 🧱 Static variables
+
+Generally, it's advisable to avoid static variables due to their characteristics, which can lead to issues such as difficulties in testing and managing lifetimes. If you must use static variables, you can declare them as shown below, ensuring they span the entire duration of the app.
 
 ```rust title="Rust"
 use rinf::debug_print;
