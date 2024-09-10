@@ -29,7 +29,15 @@ All platforms available with Flutter are [tested](https://github.com/cunarist/ri
 
 ## 📞 Communication
 
-Below is Dart code with widgets, and following that is Rust code with business logic.
+Below is Rust code with business logic, and following that is Dart code with widgets.
+
+```rust
+MyMessage {
+    current_number: 7,
+    other_bool: true,
+}
+.send_signal_to_dart();
+```
 
 ```dart
 StreamBuilder(
@@ -43,14 +51,6 @@ StreamBuilder(
     return Text(myMessage.currentNumber.toString());
   },
 ),
-```
-
-```rust
-MyMessage {
-    current_number: 7,
-    other_bool: true,
-}
-.send_signal_to_dart();
 ```
 
 Of course, the opposite way from Dart to Rust is also possible in a similar manner.
