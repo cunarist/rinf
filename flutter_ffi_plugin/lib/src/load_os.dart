@@ -18,7 +18,7 @@ void loadRustLibrary() {
   if (io.Platform.isLinux) {
     DynamicLibrary.open('libhub.so');
   } else if (io.Platform.isAndroid) {
-    DynamicLibrary.open('libhub.so');
+    // DynamicLibrary.open('libhub.so');
   } else if (io.Platform.isWindows) {
     DynamicLibrary.open('hub.dll');
   } else if (io.Platform.isIOS) {

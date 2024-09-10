@@ -16,6 +16,8 @@ dependencies:
   ffi: ^2.1.0
   yaml: ^3.1.2
   internet_connection_checker: ^1.0.0
+  native_toolchain_rust: ^0.1.0-dev.7
+  native_assets_cli: ^0.7.3
 
 dev_dependencies:
   lints: ">=3.0.0 <5.0.0"

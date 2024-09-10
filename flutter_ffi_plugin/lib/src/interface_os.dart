@@ -1,3 +1,6 @@
+@DefaultAsset('package:rinf/hub')
+library hub;
+
 import 'dart:ffi';
 import 'dart:typed_data';
 import 'load_os.dart';
