@@ -131,7 +131,7 @@ pub async fn run_debug_tests() -> Result<()> {
     // Fetch data from a web API.
     let url = "http://jsonplaceholder.typicode.com/todos/1";
     let web_response = sample_crate::fetch_from_web_api(url).await?;
-    debug_print!("Response from a web API: {web_response:?}");
+    debug_print!("Response from a web API: {web_response}");
 
     // Use a crate that accesses operating system APIs.
     let hwid = sample_crate::get_hardward_id()?;

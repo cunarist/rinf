@@ -22,9 +22,9 @@ void loadRustLibrary() {
   } else if (io.Platform.isWindows) {
     DynamicLibrary.open('hub.dll');
   } else if (io.Platform.isIOS) {
-    DynamicLibrary.open('rinf.framework/rinf');
+    // DynamicLibrary.open('rinf.framework/rinf');
   } else if (io.Platform.isMacOS) {
-    DynamicLibrary.open('rinf.framework/rinf');
+    // DynamicLibrary.open('rinf.framework/rinf');
   } else {
     throw UnsupportedError('This operating system is not supported.');
   }

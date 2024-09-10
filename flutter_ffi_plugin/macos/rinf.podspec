@@ -22,21 +22,8 @@ Pod::Spec.new do |s|
   s.platform = :osx, '10.11'
   s.swift_version = '5.0'
 
-  # Include Rust crates in the build process.
-  s.script_phase = {
-    :name => 'Build a Rust library',
-    :script => 'sh ${PODS_TARGET_SRCROOT}/../cargokit/build_pod.sh ${PROJECT_DIR}/../../native/hub hub',
-    :execution_position=> :before_compile,
-    :input_files => ['${BUILT_PRODUCTS_DIR}/cargokit_phony'],
-    # Let XCode know that the static library referenced in -force_load below is
-    # created by this build step.
-    :output_files => ["${BUILT_PRODUCTS_DIR}/libhub.a"],
-  }
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
-    # Flutter.framework does not contain a i386 slice.
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
-    # We use `-force_load` instead of `-l` since Xcode strips out unused symbols from static libraries.
-    'OTHER_LDFLAGS' => '-force_load ${BUILT_PRODUCTS_DIR}/libhub.a -Wl -undefined dynamic_lookup',
   }
 end
