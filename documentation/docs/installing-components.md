@@ -4,9 +4,18 @@ To get started, you need to have [Flutter SDK](https://docs.flutter.dev/get-star
 
 [^1]: If you're working on Linux, do not install Flutter from `snap`. Flutter from `snap` comes with its own binary linker called `ld`, which is fundamentally incompatible with Rust. Instead, follow the manual installation method as written in the Flutter docs.
 
-Once you're done with the installations, verify your system's readiness with the following commands. Make sure you have installed all the subcomponents that Flutter suggests. If there are no issues in the output, you are good to go onto the next step!
+Once the installations are complete, verify your system's readiness with the following commands:
 
 ```bash title="CLI"
 rustc --version
 flutter doctor
 ```
+
+Additionally, check that the native toolchains are fully set up:
+
+```
+dart pub global activate native_doctor
+dart pub global run native_doctor
+```
+
+Ensure all suggested subcomponents are installed. If no issues appear in the output, you’re ready to move on to the next step!
