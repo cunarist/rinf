@@ -7,11 +7,6 @@ pub enum RinfError {
     NoDartIsolate,
     LockShutdownReceiver,
     NoShutdownReceiver,
-    LockMessageChannel,
-    BrokenMessageChannel,
-    ClosedMessageChannel,
-    NoMessageChannel,
-    MessageReceiverTaken,
     DecodeMessage,
     NoSignalHandler,
 }
@@ -30,21 +25,6 @@ impl fmt::Display for RinfError {
             }
             RinfError::NoShutdownReceiver => {
                 write!(f, "Shutdown receiver was not created.")
-            }
-            RinfError::LockMessageChannel => {
-                write!(f, "Could not acquire the message channel lock.")
-            }
-            RinfError::BrokenMessageChannel => {
-                write!(f, "Message channel is broken.",)
-            }
-            RinfError::ClosedMessageChannel => {
-                write!(f, "Message channel is closed.",)
-            }
-            RinfError::NoMessageChannel => {
-                write!(f, "Message channel was not created.",)
-            }
-            RinfError::MessageReceiverTaken => {
-                write!(f, "Each Dart signal receiver can be taken only once.")
             }
             RinfError::DecodeMessage => {
                 write!(f, "Could not decode the message.")

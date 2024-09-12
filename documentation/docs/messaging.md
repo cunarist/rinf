@@ -68,7 +68,7 @@ MyDataInput( ... ).sendSignalToRust();
 ```
 
 ```rust title="Rust"
-let receiver = MyDataInput::get_dart_signal_receiver()?;
+let receiver = MyDataInput::get_dart_signal_receiver();
 while let Some(dart_signal) = receiver.recv().await {
     let message: MyDataInput = dart_signal.message;
     // Custom Rust logic here
@@ -88,7 +88,7 @@ MyDataInput( ... ).sendSignalToRust(binary);
 ```
 
 ```rust title="Rust"
-let receiver = MyDataInput::get_dart_signal_receiver()?;
+let receiver = MyDataInput::get_dart_signal_receiver();
 while let Some(dart_signal) = receiver.recv().await {
     let message: MyDataInput = dart_signal.message;
     let binary: Vec<u8> = dart_signal.binary;
