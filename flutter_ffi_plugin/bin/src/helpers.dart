@@ -105,11 +105,13 @@ To run and build this app, you need to have
 and [Rust toolchain](https://www.rust-lang.org/tools/install)
 installed on your system.
 You can check that your system is ready with the commands below.
-Note that all the Flutter subcomponents should be installed.
+Note that all the subcomponents should be installed.
 
 ```bash
 rustc --version
 flutter doctor
+dart pub global activate native_doctor
+dart pub global run native_doctor
 ```
 
 You also need to have the CLI tool for Rinf ready.

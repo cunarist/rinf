@@ -9,6 +9,8 @@ Once the installations are complete, verify your system's readiness with the fol
 ```bash title="CLI"
 rustc --version
 flutter doctor
+dart pub global activate native_doctor
+dart pub global run native_doctor
 ```
 
 Additionally, check that the native toolchains are fully set up:

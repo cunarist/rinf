@@ -13,4 +13,6 @@ _Please provide the output from the command below, using markdown codeblock synt
 ```bash
 rustc --version
 flutter doctor
+dart pub global activate native_doctor
+dart pub global run native_doctor
 ```
