@@ -44,11 +44,11 @@ jobs:
       # https://dart.dev/tools/pub/automated-publishing
 
       - name: Check the Flutter FFI plugin
-        working-directory: flutter_ffi_plugin/
+        working-directory: flutter_package/
         run: dart pub publish --dry-run
 
       - name: Publish the Flutter FFI plugin
-        working-directory: flutter_ffi_plugin/
+        working-directory: flutter_package/
         run: dart pub publish --force
 
       # Save the `crates.io` API token at
