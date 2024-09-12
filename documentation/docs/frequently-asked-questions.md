@@ -233,10 +233,10 @@ onPressed: () async {
 ```
 
 ```rust title="native/hub/src/sample_functions.rs"
-pub async fn respond() -> Result<()> {
+pub async fn respond() {
     use messages::tutorial_resource::*;
 
-    let receiver = MyUniqueInput::get_dart_signal_receiver()?;
+    let receiver = MyUniqueInput::get_dart_signal_receiver();
     while let Some(dart_signal) = receiver.recv().await {
         let my_unique_input = dart_signal.message;
         MyUniqueOutput {
@@ -245,8 +245,6 @@ pub async fn respond() -> Result<()> {
         }
         .send_signal_to_dart();
     }
-
-    Ok(())
 }
 ```
 

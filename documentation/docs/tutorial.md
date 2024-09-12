@@ -62,10 +62,10 @@ use crate::common::*;
 use crate::messages;
 use rinf::debug_print;
 
-pub async fn calculate_precious_data() -> Result<()> {
+pub async fn calculate_precious_data() {
     use messages::tutorial_messages::*;
 
-    let receiver = MyPreciousData::get_dart_signal_receiver()?; // GENERATED
+    let receiver = MyPreciousData::get_dart_signal_receiver(); // GENERATED
     while let Some(dart_signal) = receiver.recv().await {
         let my_precious_data = dart_signal.message;
 
@@ -79,8 +79,6 @@ pub async fn calculate_precious_data() -> Result<()> {
         debug_print!("{new_numbers:?}");
         debug_print!("{new_string}");
     }
-
-    Ok(())
 }
 ```
 
@@ -217,18 +215,16 @@ children: [
 use crate::common::*;
 use crate::messages;
 
-pub async fn tell_treasure() -> Result<()> {
+pub async fn tell_treasure() {
     use messages::tutorial_messages::*;
 
     let mut current_value: i32 = 1;
 
-    let receiver = MyTreasureInput::get_dart_signal_receiver()?; // GENERATED
+    let receiver = MyTreasureInput::get_dart_signal_receiver(); // GENERATED
     while let Some(_) = receiver.recv().await {
         MyTreasureOutput { current_value }.send_signal_to_dart(); // GENERATED
         current_value += 1;
     }
-
-    Ok(())
 }
 ```
 

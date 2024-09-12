@@ -272,7 +272,7 @@ use rinf::{
     DartSignal, MessageReceiver, MessageSender,
     RinfError,
 };
-use std::sync::Mutex;
+use std::sync::LazyLock;
 
 ''',
           atFront: true,
@@ -289,38 +289,16 @@ use std::sync::Mutex;
           await insertTextToFile(
             rustPath,
             '''
-type ${messageName}Cell = Mutex<Option<(
+type ${messageName}Cell = LazyLock<(
     MessageSender<DartSignal<${normalizePascal(messageName)}>>,
-    Option<MessageReceiver<DartSignal<${normalizePascal(messageName)}>>>,
-)>>;
+    MessageReceiver<DartSignal<${normalizePascal(messageName)}>>,
+)>;
 pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Cell =
-    Mutex::new(None);
+    LazyLock::new(message_channel);
 
 impl ${normalizePascal(messageName)} {
-    pub fn get_dart_signal_receiver()
-        -> Result<MessageReceiver<DartSignal<Self>>, RinfError> 
-    {       
-        let mut guard = ${snakeName.toUpperCase()}_CHANNEL
-            .lock()
-            .map_err(|_| RinfError::LockMessageChannel)?;
-        if guard.is_none() {
-            let (sender, receiver) = message_channel();
-            guard.replace((sender, Some(receiver)));
-        }
-        let (mut sender, mut receiver_option) = guard
-            .take()
-            .ok_or(RinfError::NoMessageChannel)?;
-        // After Dart's hot restart or app reopen on mobile devices,
-        // a sender from the previous run already exists
-        // which is now closed.
-        if sender.is_closed() {
-            let receiver;
-            (sender, receiver) = message_channel();
-            receiver_option = Some(receiver);
-        }
-        let receiver = receiver_option.ok_or(RinfError::MessageReceiverTaken)?;
-        guard.replace((sender, None));
-        Ok(receiver)
+    pub fn get_dart_signal_receiver() -> MessageReceiver<DartSignal<Self>> {
+        ${snakeName.toUpperCase()}_CHANNEL.1.clone()
     }
 }
 ''',
@@ -467,28 +445,7 @@ new_hash_map.insert(
             message,
             binary: binary.to_vec(),
         };
-        let mut guard = ${snakeName.toUpperCase()}_CHANNEL
-            .lock()
-            .map_err(|_| RinfError::LockMessageChannel)?;
-        if guard.is_none() {
-            let (sender, receiver) = message_channel();
-            guard.replace((sender, Some(receiver)));
-        }
-        let mut pair = guard
-            .as_ref()
-            .ok_or(RinfError::NoMessageChannel)?;
-        // After Dart's hot restart or app reopen on mobile devices,
-        // a sender from the previous run already exists
-        // which is now closed.
-        if pair.0.is_closed() {
-            let (sender, receiver) = message_channel();
-            guard.replace((sender, Some(receiver)));
-            pair = guard
-                .as_ref()
-                .ok_or(RinfError::NoMessageChannel)?;
-        }
-        let sender = &pair.0;
-        let _ = sender.send(dart_signal);
+        ${snakeName.toUpperCase()}_CHANNEL.0.send(dart_signal);
         Ok(())
     }),
 );

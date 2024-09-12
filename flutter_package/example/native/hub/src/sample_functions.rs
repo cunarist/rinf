@@ -13,13 +13,13 @@ static IS_DEBUG_MODE: bool = true;
 static IS_DEBUG_MODE: bool = false;
 
 // Business logic for the counter widget.
-pub async fn tell_numbers() -> Result<()> {
+pub async fn tell_numbers() {
     use messages::counter_number::*;
 
     let mut vector = Vec::new();
 
     // Stream getter is generated from a marked Protobuf message.
-    let receiver = SampleNumberInput::get_dart_signal_receiver()?;
+    let receiver = SampleNumberInput::get_dart_signal_receiver();
     while let Some(dart_signal) = receiver.recv().await {
         // Extract values from the message received from Dart.
         // This message is a type that's declared in its Protobuf file.
@@ -40,8 +40,6 @@ pub async fn tell_numbers() -> Result<()> {
         }
         .send_signal_to_dart();
     }
-
-    Ok(())
 }
 
 // Business logic for the fractal image.
@@ -104,15 +102,14 @@ pub async fn stream_fractal() {
 
 // A dummy function that uses sample messages to eliminate warnings.
 #[allow(dead_code)]
-async fn use_messages() -> Result<()> {
+async fn use_messages() {
     use messages::sample_folder::sample_file::*;
-    let _ = SampleInput::get_dart_signal_receiver()?;
+    let _ = SampleInput::get_dart_signal_receiver();
     SampleOutput {
         kind: 3,
         oneof_input: Some(sample_output::OneofInput::Age(25)),
     }
     .send_signal_to_dart();
-    Ok(())
 }
 
 // Business logic for testing various crates.
