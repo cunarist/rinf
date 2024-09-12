@@ -53,7 +53,10 @@ impl<T> Clone for MessageReceiver<T> {
             inner: self.inner.clone(),
             id: inner.active_receiver_id + 1, // Increment ID for new receiver
         };
-        inner.active_receiver_id = new_receiver.id; // Update active receiver
+        inner.active_receiver_id = new_receiver.id;
+        if let Some(waker) = inner.waker.take() {
+            waker.wake();
+        }
         new_receiver
     }
 }
