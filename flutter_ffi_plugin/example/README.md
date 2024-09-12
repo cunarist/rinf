@@ -11,6 +11,7 @@ utilizing the capabilities of the
 Please activate the necessary features first.
 
 ```
+flutter channel master
 flutter config --enable-native-assets
 dart pub global activate native_doctor
 ```

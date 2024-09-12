@@ -7,6 +7,7 @@ To get started, you need to have [Flutter SDK](https://docs.flutter.dev/get-star
 Then, activate some necessary features:
 
 ```bash title="CLI"
+flutter channel master
 flutter config --enable-native-assets
 dart pub global activate native_doctor
 ```
