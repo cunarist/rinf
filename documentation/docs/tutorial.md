@@ -37,7 +37,7 @@ rinf message
 Create a button widget in Dart that accepts the user input.
 
 ```dart title="lib/main.dart"
-import 'package:test_app/messages/tutorial_messages.pb.dart';
+import "package:test_app/messages/tutorial_messages.pb.dart";
 
 child: Column(
   mainAxisAlignment: MainAxisAlignment.center,
@@ -46,7 +46,7 @@ child: Column(
       onPressed: () async {
         MyPreciousData(
           inputNumbers: [3, 4, 5],
-          inputString: 'Zero-cost abstraction',
+          inputString: "Zero-cost abstraction",
         ).sendSignalToRust(); // GENERATED
       },
       child: Text("Send a Signal from Dart to Rust"),
@@ -150,7 +150,7 @@ async fn main() {
 Finally, receive the signals in Dart with `StreamBuilder` and rebuild the widget accordingly.
 
 ```dart title="lib/main.dart"
-import 'package:test_app/messages/tutorial_messages.pb.dart';
+import "package:test_app/messages/tutorial_messages.pb.dart";
 children: [
   StreamBuilder(
     stream: MyAmazingNumber.rustSignalStream, // GENERATED
@@ -187,7 +187,7 @@ rinf message
 ```
 
 ```dart title="lib/main.dart"
-import 'package:test_app/messages/tutorial_messages.pb.dart';
+import "package:test_app/messages/tutorial_messages.pb.dart";
 
 children: [
   StreamBuilder(
@@ -195,11 +195,11 @@ children: [
     builder: (context, snapshot) {
       final rustSignal = snapshot.data;
       if (rustSignal == null) {
-        return Text('No value yet');
+        return Text("No value yet");
       }
       final myTreasureOutput = rustSignal.message;
       final currentNumber = myTreasureOutput.currentValue;
-      return Text('Output value is $currentNumber');
+      return Text("Output value is $currentNumber");
     },
   ),
   ElevatedButton(

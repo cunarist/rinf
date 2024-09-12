@@ -105,7 +105,7 @@ After running the `protoc` command, you'll find the generated Dart files in the 
 
 ```dart title="Dart"
 // In your Dart code, you can import and use the well-known type:
-import 'package:my_app/messages/google/protobuf/timestamp.pb.dart';
+import "package:my_app/messages/google/protobuf/timestamp.pb.dart";
 ```
 
 ### Can I use this in pure Dart projects?
@@ -202,8 +202,8 @@ message MyUniqueOutput {
 ```
 
 ```dart title="lib/main.dart"
-import 'dart:async';
-import 'package:example_app/messages/tutorial_resource.pb.dart';
+import "dart:async";
+import "package:example_app/messages/tutorial_resource.pb.dart";
 
 var currentInteractionId = 0;
 final myUniqueOutputs = Map<int, Completer<MyUniqueOutput>>();
@@ -217,8 +217,8 @@ void main() async {
 ```
 
 ```dart title="lib/main.dart"
-import 'dart:async';
-import 'package:example_app/messages/tutorial_resource.pb.dart';
+import "dart:async";
+import "package:example_app/messages/tutorial_resource.pb.dart";
 
 onPressed: () async {
   final completer = Completer<MyUniqueOutput>();
@@ -312,7 +312,7 @@ Failed to load dynamic library 'libhub.so': libhub.so: cannot open shared object
 In this case, you can specify a path that points to the compiled Rust library. Simply provide a string path to your dynamic library file.
 
 ```dart title="lib/main.dart"
-import './messages/generated.dart';
+import "./messages/generated.dart";
 
 async void main() {
   await initializeRust(compiledLibPath: "/path/to/library/libhub.so");

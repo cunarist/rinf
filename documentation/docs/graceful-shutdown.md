@@ -7,9 +7,9 @@ In some cases, you might need to drop all Rust resources properly before closing
 To achieve this, you can utilize Flutter's `AppLifecycleListener` to call the `finalizeRust` function before closing the Flutter app.
 
 ```dart title="lib/main.dart"
-import 'dart:ui';
-import 'package:flutter/material.dart';
-import 'package:rinf/rinf.dart';
+import "dart:ui";
+import "package:flutter/material.dart";
+import "package:rinf/rinf.dart";
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
