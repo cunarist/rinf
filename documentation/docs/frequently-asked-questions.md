@@ -54,22 +54,6 @@ No, the updated Rust code cannot be loaded upon Dart's hot restart. To incorpora
 
 On native platforms, Dart's hot restart makes the Rust logic restart, in other words, the `async fn main()` function. On the web, Dart's hot restart has no effect on the Rust logic, because it's not possible to cancel all the async tasks that are already queued inside the JavaScript event loop.
 
-### How do I use nightly Rust?
-
-In order to use nightly Rust, you need to add a cargokit configuration file. Cargokit is the build connector between Dart and Rust used by this framework.
-
-```yaml title="native/hub/cargokit.yaml"
-cargo:
-  debug:
-    toolchain: nightly
-  release:
-    toolchain: nightly
-```
-
-More information about `cargokit.yaml` can be found at the link below. Cargokit is the linker for Rust crates that are used in various Flutter projects, including Rinf.
-
-- https://github.com/irondash/cargokit/blob/main/docs/architecture.md
-
 ### Is it safe enough to pass secret parameters between Dart and Rust?
 
 It is safe to pass secret parameters between Dart and Rust. Some other Rust GUI frameworks use HTTP or websockets to communicate between GUI and Rust, which is quite insecure. However, that's not the case for Rinf because messages are passed within the Flutter app's process. Please note that while it is hard to reverse-engineer compiled native binaries to search for secret keys or params, it is generally not recommended to hardcode sensitive information in the application itself. This caution applies to this framework as well as any other distributed binaries.
