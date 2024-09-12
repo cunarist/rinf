@@ -100,6 +100,13 @@ This project leverages Flutter for GUI and Rust for the backend logic,
 utilizing the capabilities of the
 [Rinf](https://pub.dev/packages/rinf) framework.
 
+Please activate the necessary features first.
+
+```
+flutter config --enable-native-assets
+dart pub global activate native_doctor
+```
+
 To run and build this app, you need to have
 [Flutter SDK](https://docs.flutter.dev/get-started/install)
 and [Rust toolchain](https://www.rust-lang.org/tools/install)
@@ -110,7 +117,6 @@ Note that all the subcomponents should be installed.
 ```bash
 rustc --version
 flutter doctor
-dart pub global activate native_doctor
 dart pub global run native_doctor
 ```
 
