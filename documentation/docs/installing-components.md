@@ -13,11 +13,4 @@ dart pub global activate native_doctor
 dart pub global run native_doctor
 ```
 
-Additionally, check that the native toolchains are fully set up:
-
-```
-dart pub global activate native_doctor
-dart pub global run native_doctor
-```
-
 Ensure all suggested subcomponents are installed. If no issues appear in the output, you’re ready to move on to the next step!
