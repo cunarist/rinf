@@ -1,7 +1,6 @@
 import 'dart:ffi';
 import 'dart:typed_data';
 import 'load_os.dart';
-import 'package:ffi/ffi.dart';
 import 'dart:async';
 import 'dart:isolate';
 import 'interface.dart';
@@ -18,14 +17,7 @@ Future<void> prepareInterfaceReal(
 ) async {
   /// This should be called once at startup
   /// to enable `allo_isolate` to send data from the Rust side.
-  final rustFunction = rustLibrary.lookupFunction<
-      Pointer Function(
-        Pointer<NativeFunction<Int8 Function(Int64, Pointer<Dart_CObject>)>>,
-      ),
-      Pointer Function(
-        Pointer<NativeFunction<Int8 Function(Int64, Pointer<Dart_CObject>)>>,
-      )>('store_dart_post_cobject');
-  rustFunction(NativeApi.postCObject);
+  rustLibrary.storeDartPostCObject(NativeApi.postCObject);
 
   // Prepare ports for communication over isolates.
   final rustSignalPort = ReceivePort();
@@ -55,59 +47,21 @@ Future<void> prepareInterfaceReal(
   });
 
   // Make Rust prepare its isolate to send data to Dart.
-  prepareIsolateReal(rustSignalPort.sendPort.nativePort);
+  rustLibrary.prepareIsolate(rustSignalPort.sendPort.nativePort);
 }
 
 void startRustLogicReal() {
-  final rustFunction =
-      rustLibrary.lookupFunction<Void Function(), void Function()>(
-    'start_rust_logic_extern',
-  );
-  rustFunction();
+  rustLibrary.startRustLogic();
 }
 
 void stopRustLogicReal() {
-  final rustFunction =
-      rustLibrary.lookupFunction<Void Function(), void Function()>(
-    'stop_rust_logic_extern',
-  );
-  rustFunction();
+  rustLibrary.stopRustLogic();
 }
 
-/// Sends bytes to Rust.
-Future<void> sendDartSignalReal(
+void sendDartSignalReal(
   int messageId,
   Uint8List messageBytes,
   Uint8List binary,
-) async {
-  final Pointer<Uint8> messageMemory = malloc.allocate(messageBytes.length);
-  messageMemory.asTypedList(messageBytes.length).setAll(0, messageBytes);
-
-  final Pointer<Uint8> binaryMemory = malloc.allocate(binary.length);
-  binaryMemory.asTypedList(binary.length).setAll(0, binary);
-
-  final rustFunction = rustLibrary.lookupFunction<
-      Void Function(Int32, Pointer<Uint8>, UintPtr, Pointer<Uint8>, UintPtr),
-      void Function(int, Pointer<Uint8>, int, Pointer<Uint8>, int)>(
-    'send_dart_signal_extern',
-  );
-
-  rustFunction(
-    messageId,
-    messageMemory,
-    messageBytes.length,
-    binaryMemory,
-    binary.length,
-  );
-
-  malloc.free(messageMemory);
-  malloc.free(binaryMemory);
-}
-
-void prepareIsolateReal(int port) {
-  final rustFunction =
-      rustLibrary.lookupFunction<Void Function(Int64), void Function(int)>(
-    'prepare_isolate_extern',
-  );
-  rustFunction(port);
+) {
+  rustLibrary.sendDartSignal(messageId, messageBytes, binary);
 }
