@@ -97,15 +97,12 @@ pub fn message_channel<T>() -> (MessageSender<T>, MessageReceiver<T>) {
         active_receiver_id: 0, // Start with receiver ID 0
     }));
 
-    let receiver = MessageReceiver {
+    let sender = MessageSender {
         inner: channel.clone(),
+    };
+    let receiver = MessageReceiver {
+        inner: channel,
         id: 0,
     };
-
-    (
-        MessageSender {
-            inner: channel.clone(),
-        },
-        receiver,
-    )
+    (sender, receiver)
 }
