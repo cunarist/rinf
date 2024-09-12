@@ -35,7 +35,7 @@ RustLibrary loadRustLibrary() {
     // because of Flutter's `RTLD_LOCAL` behavior.
     // Therefore we cannot use the efficient `RustLibraryNew`.
     // - https://github.com/dart-lang/native/issues/923
-    return RustLibraryOld(lib);
+    return RustLibraryOld(lib: lib);
   } else {
     // Native library symbols are loaded in global space
     // thanks to Flutter's `RTLD_GLOBAL` behavior.
@@ -66,6 +66,20 @@ typedef SendDartSignalWrap = void Function(
   Pointer<Uint8>,
   int,
 );
+
+/// Abstract class for unifying the interface
+/// for calling native functions.
+abstract class RustLibrary {
+  void startRustLogic();
+  void stopRustLogic();
+  void prepareIsolate(int port);
+  void storeDartPostCObject(PostCObjectPtr postCObject);
+  void sendDartSignal(
+    int messageId,
+    Uint8List messageBytes,
+    Uint8List binary,
+  );
+}
 
 // Direct access to global function symbols loaded in the process.
 // These are available only if the native library is
@@ -111,25 +125,11 @@ external void sendDartSignalExtern(
   int binaryLength,
 );
 
-/// Abstract class for unifying the interface
-/// for calling native functions.
-abstract class RustLibrary {
-  void startRustLogic();
-  void stopRustLogic();
-  void prepareIsolate(int port);
-  void storeDartPostCObject(PostCObjectPtr postCObject);
-  void sendDartSignal(
-    int messageId,
-    Uint8List messageBytes,
-    Uint8List binary,
-  );
-}
-
 /// Class for global native library symbols loaded with `RTLD_GLOBAL`.
 /// This is the efficient and ideal way to call native code.
 /// `@Native` decorator with `isLeaf` parameter
 /// that enables the `Uint8List.address` syntax
-/// can only used on global native symbols.
+/// can only be used on globally loaded native symbols.
 /// - https://github.com/dart-lang/sdk/issues/44589
 class RustLibraryNew extends RustLibrary {
   void startRustLogic() {
@@ -167,7 +167,7 @@ class RustLibraryNew extends RustLibrary {
 /// This is relatively inefficient because `malloc.allocate` is required.
 /// It involves extra memory copy before sending the data to Rust.
 class RustLibraryOld extends RustLibrary {
-  late DynamicLibrary lib;
+  final DynamicLibrary lib;
   late void Function() startRustLogicExtern;
   late void Function() stopRustLogicExtern;
   late void Function(int) prepareIsolateExtern;
@@ -175,8 +175,7 @@ class RustLibraryOld extends RustLibrary {
   late void Function(int, Pointer<Uint8>, int, Pointer<Uint8>, int)
       sendDartSignalExtern;
 
-  RustLibraryOld(DynamicLibrary lib) {
-    this.lib = lib;
+  RustLibraryOld({required this.lib}) {
     this.startRustLogicExtern =
         lib.lookupFunction<Void Function(), void Function()>(
       'start_rust_logic_extern',
