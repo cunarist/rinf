@@ -55,7 +55,7 @@ typedef PostCObjectFn = NativeFunction<PostCObjectInner>;
 
 // Direct access to global function symbols loaded in the process.
 // These are available only if the native library is
-// loaded into global process with `RTLD_GLOBAL` configuration.
+// loaded into global space with `RTLD_GLOBAL` configuration.
 
 @Native<Void Function()>(
   isLeaf: true,
