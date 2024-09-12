@@ -120,6 +120,10 @@ abstract class RustLibrary {
 
 /// Class for global native library symbols loaded with `RTLD_GLOBAL`.
 /// This is the efficient and ideal way to call native code.
+/// `@Native` decorator with `isLeaf` parameter
+/// that enables the `Uint8List.address` syntax
+/// can only used on global native symbols.
+/// - https://github.com/dart-lang/sdk/issues/44589
 class RustLibraryNew extends RustLibrary {
   void startRustLogic() {
     startRustLogicExtern();
@@ -154,7 +158,6 @@ class RustLibraryNew extends RustLibrary {
 
 /// Class for local native library symbols loaded with `RTLD_LOCAL`.
 /// This is relatively inefficient because `malloc.allocate` is required.
-/// `@Native` attributes can only used on global native symbols.
 class RustLibraryOld extends RustLibrary {
   final DynamicLibrary lib;
   RustLibraryOld(this.lib);
