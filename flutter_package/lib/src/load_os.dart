@@ -67,6 +67,20 @@ typedef SendDartSignalWrap = void Function(
   int,
 );
 
+/// Abstract class for unifying the interface
+/// for calling native functions.
+abstract class RustLibrary {
+  void startRustLogic();
+  void stopRustLogic();
+  void prepareIsolate(int port);
+  void storeDartPostCObject(PostCObjectPtr postCObject);
+  void sendDartSignal(
+    int messageId,
+    Uint8List messageBytes,
+    Uint8List binary,
+  );
+}
+
 // Direct access to global function symbols loaded in the process.
 // These are available only if the native library is
 // loaded into global space with `RTLD_GLOBAL` configuration.
@@ -110,20 +124,6 @@ external void sendDartSignalExtern(
   Pointer<Uint8> binaryAddress,
   int binaryLength,
 );
-
-/// Abstract class for unifying the interface
-/// for calling native functions.
-abstract class RustLibrary {
-  void startRustLogic();
-  void stopRustLogic();
-  void prepareIsolate(int port);
-  void storeDartPostCObject(PostCObjectPtr postCObject);
-  void sendDartSignal(
-    int messageId,
-    Uint8List messageBytes,
-    Uint8List binary,
-  );
-}
 
 /// Class for global native library symbols loaded with `RTLD_GLOBAL`.
 /// This is the efficient and ideal way to call native code.
