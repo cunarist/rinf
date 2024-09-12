@@ -15,12 +15,9 @@ void setCompiledLibPathReal(String path) {
 Future<void> prepareInterfaceReal(
   AssignRustSignal assignRustSignal,
 ) async {
-  // Load the native library.
-  loadRustLibrary();
-
   /// This should be called once at startup
   /// to enable `allo_isolate` to send data from the Rust side.
-  storeDartPostCObjectReal(NativeApi.postCObject);
+  rustLibrary.storeDartPostCObject(NativeApi.postCObject);
 
   // Prepare ports for communication over isolates.
   final rustSignalPort = ReceivePort();
@@ -50,67 +47,21 @@ Future<void> prepareInterfaceReal(
   });
 
   // Make Rust prepare its isolate to send data to Dart.
-  prepareIsolateReal(rustSignalPort.sendPort.nativePort);
+  rustLibrary.prepareIsolate(rustSignalPort.sendPort.nativePort);
 }
 
-@Native<Void Function()>(
-  isLeaf: true,
-  symbol: 'start_rust_logic_extern',
-)
-external void startRustLogicReal();
+void startRustLogicReal() {
+  rustLibrary.startRustLogic();
+}
 
-@Native<Void Function()>(
-  isLeaf: true,
-  symbol: 'stop_rust_logic_extern',
-)
-external void stopRustLogicReal();
-
-typedef SendDartSignalReal = Void Function(
-  Int32,
-  Pointer<Uint8>,
-  UintPtr,
-  Pointer<Uint8>,
-  UintPtr,
-);
-@Native<SendDartSignalReal>(
-  isLeaf: true,
-  symbol: 'send_dart_signal_extern',
-)
-external void sendDartSignalExtern(
-  int messageId,
-  Pointer<Uint8> messageBytesAddress,
-  int messageBytesLength,
-  Pointer<Uint8> binaryAddress,
-  int binaryLength,
-);
+void stopRustLogicReal() {
+  rustLibrary.stopRustLogic();
+}
 
 void sendDartSignalReal(
   int messageId,
   Uint8List messageBytes,
   Uint8List binary,
 ) {
-  sendDartSignalExtern(
-    messageId,
-    messageBytes.address,
-    messageBytes.length,
-    binary.address,
-    binary.length,
-  );
+  rustLibrary.sendDartSignal(messageId, messageBytes, binary);
 }
-
-@Native<Void Function(Int64)>(
-  isLeaf: true,
-  symbol: 'prepare_isolate_extern',
-)
-external void prepareIsolateReal(
-  int port,
-);
-
-typedef InnerFunction = Int8 Function(Int64, Pointer<Dart_CObject>);
-@Native<Void Function(Pointer<NativeFunction<InnerFunction>>)>(
-  isLeaf: true,
-  symbol: 'store_dart_post_cobject',
-)
-external void storeDartPostCObjectReal(
-  Pointer<NativeFunction<InnerFunction>> postCObject,
-);
