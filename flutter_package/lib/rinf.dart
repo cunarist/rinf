@@ -1,10 +1,10 @@
 /// This module supports communication with Rust.
 library;
 
-import 'dart:typed_data';
-import 'src/exports.dart';
+import "dart:typed_data";
+import "src/exports.dart";
 
-export 'src/interface.dart' show RustSignal;
+export "src/interface.dart" show RustSignal;
 
 /// Starts the `main` function in Rust.
 Future<void> initializeRust(

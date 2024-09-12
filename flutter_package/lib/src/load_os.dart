@@ -1,7 +1,7 @@
-import 'dart:io' as io;
-import 'dart:ffi';
-import 'dart:typed_data';
-import 'package:ffi/ffi.dart';
+import "dart:io" as io;
+import "dart:ffi";
+import "dart:typed_data";
+import "package:ffi/ffi.dart";
 
 String? dynamicLibPath;
 
@@ -17,17 +17,17 @@ RustLibrary loadRustLibrary() {
   if (path != null) {
     lib = DynamicLibrary.open(path);
   } else if (io.Platform.isLinux) {
-    lib = DynamicLibrary.open('libhub.so');
+    lib = DynamicLibrary.open("libhub.so");
   } else if (io.Platform.isAndroid) {
-    lib = DynamicLibrary.open('libhub.so');
+    lib = DynamicLibrary.open("libhub.so");
   } else if (io.Platform.isWindows) {
-    lib = DynamicLibrary.open('hub.dll');
+    lib = DynamicLibrary.open("hub.dll");
   } else if (io.Platform.isIOS) {
-    lib = DynamicLibrary.open('rinf.framework/rinf');
+    lib = DynamicLibrary.open("rinf.framework/rinf");
   } else if (io.Platform.isMacOS) {
-    lib = DynamicLibrary.open('rinf.framework/rinf');
+    lib = DynamicLibrary.open("rinf.framework/rinf");
   } else {
-    throw UnsupportedError('This operating system is not supported.');
+    throw UnsupportedError("This operating system is not supported.");
   }
 
   if (io.Platform.isAndroid) {
@@ -87,19 +87,19 @@ abstract class RustLibrary {
 
 @Native<Void Function()>(
   isLeaf: true,
-  symbol: 'start_rust_logic_extern',
+  symbol: "start_rust_logic_extern",
 )
 external void startRustLogicExtern();
 
 @Native<Void Function()>(
   isLeaf: true,
-  symbol: 'stop_rust_logic_extern',
+  symbol: "stop_rust_logic_extern",
 )
 external void stopRustLogicExtern();
 
 @Native<Void Function(Int64)>(
   isLeaf: true,
-  symbol: 'prepare_isolate_extern',
+  symbol: "prepare_isolate_extern",
 )
 external void prepareIsolateExtern(
   int port,
@@ -107,7 +107,7 @@ external void prepareIsolateExtern(
 
 @Native<Void Function(PostCObjectPtr)>(
   isLeaf: true,
-  symbol: 'store_dart_post_cobject',
+  symbol: "store_dart_post_cobject",
 )
 external void storeDartPostCObjectExtern(
   PostCObjectPtr postCObject,
@@ -115,7 +115,7 @@ external void storeDartPostCObjectExtern(
 
 @Native<SendDartSignalExtern>(
   isLeaf: true,
-  symbol: 'send_dart_signal_extern',
+  symbol: "send_dart_signal_extern",
 )
 external void sendDartSignalExtern(
   int messageId,
@@ -178,23 +178,23 @@ class RustLibraryOld extends RustLibrary {
   RustLibraryOld({required this.lib}) {
     this.startRustLogicExtern =
         lib.lookupFunction<Void Function(), void Function()>(
-      'start_rust_logic_extern',
+      "start_rust_logic_extern",
     );
     this.stopRustLogicExtern =
         lib.lookupFunction<Void Function(), void Function()>(
-      'stop_rust_logic_extern',
+      "stop_rust_logic_extern",
     );
     this.prepareIsolateExtern =
         lib.lookupFunction<Void Function(Int64), void Function(int)>(
-      'prepare_isolate_extern',
+      "prepare_isolate_extern",
     );
     this.storeDartPostCObjectExtern = lib.lookupFunction<
         Void Function(PostCObjectPtr), void Function(PostCObjectPtr)>(
-      'store_dart_post_cobject',
+      "store_dart_post_cobject",
     );
     this.sendDartSignalExtern =
         lib.lookupFunction<SendDartSignalExtern, SendDartSignalWrap>(
-      'send_dart_signal_extern',
+      "send_dart_signal_extern",
     );
   }
 

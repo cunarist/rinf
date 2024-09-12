@@ -1,10 +1,10 @@
-import 'dart:ffi';
-import 'dart:typed_data';
-import 'load_os.dart';
-import 'dart:async';
-import 'dart:isolate';
-import 'interface.dart';
-import 'dart:convert';
+import "dart:ffi";
+import "dart:typed_data";
+import "load_os.dart";
+import "dart:async";
+import "dart:isolate";
+import "interface.dart";
+import "dart:convert";
 
 /// Sets the exact file path of the dynamic library
 /// compiled from the `hub` crate.

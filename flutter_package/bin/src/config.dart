@@ -1,5 +1,5 @@
-import 'dart:io';
-import 'package:yaml/yaml.dart';
+import "dart:io";
+import "package:yaml/yaml.dart";
 
 class RinfConfigMessage {
   final String inputDir;
@@ -42,11 +42,11 @@ class RinfConfigMessage {
 
   @override
   String toString() {
-    return '''message:
+    return """message:
     $KEY_INPUT_DIR: $inputDir
     $KEY_RUST_OUTPUT_DIR: $rustOutputDir
     $KEY_DART_OUTPUT_DIR: $dartOutputDir
-    $KEY_RUST_SERDE: $rustSerde''';
+    $KEY_RUST_SERDE: $rustSerde""";
   }
 
   static const KEY_INPUT_DIR = "input_dir";
@@ -95,9 +95,9 @@ class RinfConfig {
 
   @override
   String toString() {
-    return '''
+    return """
 rinf:
-  $message''';
+  $message""";
   }
 
   static const KEY_MESSAGE = "message";
@@ -122,7 +122,7 @@ rinf:
 /// ```
 Future<RinfConfig> loadVerifiedRinfConfig(String pubspecYamlFile) async {
   final pubspec = loadYaml(await File(pubspecYamlFile).readAsString());
-  final YamlMap? rinfConfig = pubspec['rinf'];
+  final YamlMap? rinfConfig = pubspec["rinf"];
   return rinfConfig == null
       ? RinfConfig.defaultConfig()
       : RinfConfig.fromYaml(rinfConfig);

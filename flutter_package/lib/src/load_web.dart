@@ -1,8 +1,8 @@
 // ignore_for_file: avoid_web_libraries_in_flutter
 
-import 'dart:js' as js;
-import 'dart:html';
-import 'dart:async';
+import "dart:js" as js;
+import "dart:html";
+import "dart:async";
 
 String? jsLibPath;
 
@@ -21,7 +21,7 @@ Future<void> loadJsFile() async {
   }
 
   final loadCompleter = Completer<void>();
-  js.context['completeRinfLoad'] = loadCompleter.complete;
+  js.context["completeRinfLoad"] = loadCompleter.complete;
 
   // Flutter app doesn't always have the top-level path of the domain.
   // Sometimes, the flutter app might be placed in a lower path.

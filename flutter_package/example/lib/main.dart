@@ -1,9 +1,9 @@
-import 'dart:ui';
-import 'package:flutter/material.dart';
-import 'package:rinf/rinf.dart';
-import './messages/generated.dart';
-import './messages/counter_number.pb.dart';
-import './messages/fractal_art.pb.dart';
+import "dart:ui";
+import "package:flutter/material.dart";
+import "package:rinf/rinf.dart";
+import "./messages/generated.dart";
+import "./messages/counter_number.pb.dart";
+import "./messages/fractal_art.pb.dart";
 
 void main() async {
   await initializeRust(assignRustSignal);
@@ -44,7 +44,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Rinf Demo',
+      title: "Rinf Demo",
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blueGrey,
@@ -76,7 +76,7 @@ class MyHomePage extends StatelessWidget {
             dummyThree: [4, 5, 6],
           ).sendSignalToRust();
         },
-        tooltip: 'Increment',
+        tooltip: "Increment",
         child: const Icon(Icons.add),
       ),
     );
@@ -134,11 +134,11 @@ class MyColumn extends StatelessWidget {
           // It's when the widget is being built for the first time.
           if (rustSignal == null) {
             // Return the initial widget if the snapshot data is null.
-            return Text('Initial value 0');
+            return Text("Initial value 0");
           }
           final sampleNumberOutput = rustSignal.message;
           final currentNumber = sampleNumberOutput.currentNumber;
-          return Text('Current value is $currentNumber');
+          return Text("Current value is $currentNumber");
         },
       ),
     ];

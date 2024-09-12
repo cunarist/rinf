@@ -1,7 +1,7 @@
-import 'src/config.dart';
-import 'src/helpers.dart';
-import 'src/message.dart';
-import 'src/internet.dart';
+import "src/config.dart";
+import "src/helpers.dart";
+import "src/message.dart";
+import "src/internet.dart";
 
 Future<void> main(List<String> args) async {
   if (args.isEmpty) {

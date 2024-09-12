@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+import "dart:typed_data";
 
 /// This type represents a function
 /// that can accept raw signal data from Rust
