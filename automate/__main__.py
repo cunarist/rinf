@@ -18,7 +18,7 @@ if len(sys.argv) == 1:
 elif sys.argv[1] == "cargokit-update":
     print("Updating CargoKit...")
     command = "git subtree pull"
-    command += " --prefix flutter_ffi_plugin/cargokit"
+    command += " --prefix flutter_package/cargokit"
     command += " https://github.com/irondash/cargokit.git"
     command += " main"
     os.system(command)
@@ -36,7 +36,7 @@ elif sys.argv[1] == "prepare-test-app":
 
     os.chdir("./test_app/")
 
-    command = "dart pub add \"rinf:{'path':'../flutter_ffi_plugin'}\""
+    command = "dart pub add \"rinf:{'path':'../flutter_package'}\""
     os.system(command)
     command = "rinf template"
     while os.system(command) != 0:
@@ -73,7 +73,7 @@ elif sys.argv[1] == "prepare-test-app":
 
     replace_text_in_file(
         "Cargo.toml",
-        "flutter_ffi_plugin/example/native/*",
+        "flutter_package/example/native/*",
         "test_app/native/*",
     )
 
@@ -127,7 +127,7 @@ elif sys.argv[1] == "prepare-user-app":
 
     replace_text_in_file(
         "Cargo.toml",
-        "flutter_ffi_plugin/example/native/*",
+        "flutter_package/example/native/*",
         "user_app/native/*",
     )
     replace_text_in_file(
@@ -137,7 +137,7 @@ elif sys.argv[1] == "prepare-user-app":
     )
 
 elif sys.argv[1] == "prepare-example-app":
-    os.chdir("./flutter_ffi_plugin/example")
+    os.chdir("./flutter_package/example")
 
     command = "rinf message"
     while os.system(command) != 0:

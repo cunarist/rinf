@@ -7,7 +7,7 @@ _Please mention issues fixed by this PR here, using format "Fixes #(Issue number
 _Please make sure that you've analyzed and formatted the files._
 
 ```
-dart analyze flutter_ffi_plugin --fatal-infos
+dart analyze flutter_package --fatal-infos
 dart format .
 cargo fmt
 cargo clippy --fix --allow-dirty

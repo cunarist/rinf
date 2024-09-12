@@ -47,11 +47,11 @@ jobs:
 
       - name: Fetch Flutter dependencies
         run: |
-          flutter pub get --directory flutter_ffi_plugin/
-          flutter pub get --directory flutter_ffi_plugin/cargokit/build_tool
+          flutter pub get --directory flutter_package/
+          flutter pub get --directory flutter_package/cargokit/build_tool
 
       - name: Generate message files
-        working-directory: flutter_ffi_plugin/example/
+        working-directory: flutter_package/example/
         run: rinf message
 
       # Targets are basically combinations of
@@ -74,7 +74,7 @@ jobs:
 
       - name: Analyze code
         run: |
-          dart analyze flutter_ffi_plugin --fatal-infos
+          dart analyze flutter_package --fatal-infos
 
       - name: Format code
         run: |

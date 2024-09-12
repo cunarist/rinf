@@ -1,11 +1,11 @@
 version: 2
 updates:
   - package-ecosystem: pub
-    directory: "flutter_ffi_plugin/"
+    directory: "flutter_package/"
     schedule:
       interval: daily
   - package-ecosystem: pub
-    directory: "flutter_ffi_plugin/example/"
+    directory: "flutter_package/example/"
     schedule:
       interval: daily
   - package-ecosystem: cargo
