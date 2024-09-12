@@ -15,14 +15,6 @@ if len(sys.argv) == 1:
     print("Automation option is not provided.")
     print("Use `python automate --help` to see all available operations.")
 
-elif sys.argv[1] == "cargokit-update":
-    print("Updating CargoKit...")
-    command = "git subtree pull"
-    command += " --prefix flutter_ffi_plugin/cargokit"
-    command += " https://github.com/irondash/cargokit.git"
-    command += " main"
-    os.system(command)
-
 elif sys.argv[1] == "prepare-test-app":
     filepath = ".gitignore"
     with open(filepath, mode="r", encoding="utf8") as file:
