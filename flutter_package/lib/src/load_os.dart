@@ -165,6 +165,7 @@ class RustLibraryNew extends RustLibrary {
 
 /// Class for local native library symbols loaded with `RTLD_LOCAL`.
 /// This is relatively inefficient because `malloc.allocate` is required.
+/// It involves extra memory copy before sending the data to Rust.
 class RustLibraryOld extends RustLibrary {
   late DynamicLibrary lib;
   late void Function() startRustLogicExtern;
