@@ -9,12 +9,3 @@ set_target_properties(
 
 target_compile_definitions(${BINARY_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
 target_link_libraries(${BINARY_NAME} PRIVATE flutter)
-
-include("../cargokit/cmake/cargokit.cmake")
-apply_cargokit(${BINARY_NAME} ${CMAKE_SOURCE_DIR}/../native/hub hub "")
-
-set(
-  rinf_bundled_libraries
-  "${${BINARY_NAME}_cargokit_lib}"
-  PARENT_SCOPE
-)

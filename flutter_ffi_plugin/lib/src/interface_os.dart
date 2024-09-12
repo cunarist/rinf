@@ -18,9 +18,6 @@ void setCompiledLibPathReal(String path) {
 Future<void> prepareInterfaceReal(
   AssignRustSignal assignRustSignal,
 ) async {
-  // Load the native library.
-  loadRustLibrary();
-
   /// This should be called once at startup
   /// to enable `allo_isolate` to send data from the Rust side.
   storeDartPostCObjectReal(NativeApi.postCObject);
