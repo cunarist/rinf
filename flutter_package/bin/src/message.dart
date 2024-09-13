@@ -329,7 +329,7 @@ impl ${normalizePascal(messageName)} {
             await insertTextToFile(
               dartPath,
               '''
-extension ${messageName}Extension on $messageName{
+extension ${messageName}Ext on $messageName{
   void sendSignalToRust() {
     sendDartSignal(
       ${markedMessage.id},
@@ -346,7 +346,7 @@ extension ${messageName}Extension on $messageName{
           await insertTextToFile(
             dartPath,
             '''
-extension ${messageName}Extension on $messageName{
+extension ${messageName}Ext on $messageName{
   void sendSignalToRust(Uint8List binary) {
     sendDartSignal(
       ${markedMessage.id},
