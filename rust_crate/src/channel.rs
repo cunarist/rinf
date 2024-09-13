@@ -107,6 +107,11 @@ impl<T> Future for RecvFuture<T> {
         // Only allow the current active receiver to receive messages
         if inner.active_receiver_id == self.receiver_id {
             if let Some(msg) = inner.queue.pop_front() {
+                // Check if more messages are in the queue
+                if !inner.queue.is_empty() {
+                    // If so, wake the current task immediately
+                    cx.waker().wake_by_ref();
+                }
                 Poll::Ready(Some(msg))
             } else {
                 inner.waker = Some(cx.waker().clone());
