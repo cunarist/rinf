@@ -315,7 +315,7 @@ In this case, you can specify a path that points to the compiled Rust library. S
 import './messages/exports.dart';
 
 async void main() {
-  await initializeRust(compiledLibPath: "/path/to/library/libhub.so");
+  await initializeRust(compiledLibPath: '/path/to/library/libhub.so');
 }
 ```
 
