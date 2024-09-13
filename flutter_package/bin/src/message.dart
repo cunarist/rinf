@@ -290,9 +290,9 @@ import 'package:rinf/rinf.dart';
 
 use prost::Message;
 use rinf::{
-    debug_print, message_channel, send_rust_signal,
-    DartSignal, MessageReceiver, MessageSender,
-    RinfError,
+    debug_print, send_rust_signal, signal_channel,
+    DartSignal, RinfError, SignalReceiver,
+    SignalSender,
 };
 use std::sync::LazyLock;
 
@@ -312,14 +312,14 @@ use std::sync::LazyLock;
             rustPath,
             '''
 type ${messageName}Cell = LazyLock<(
-    MessageSender<DartSignal<${normalizePascal(messageName)}>>,
-    MessageReceiver<DartSignal<${normalizePascal(messageName)}>>,
+    SignalSender<DartSignal<${normalizePascal(messageName)}>>,
+    SignalReceiver<DartSignal<${normalizePascal(messageName)}>>,
 )>;
 pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Cell =
-    LazyLock::new(message_channel);
+    LazyLock::new(signal_channel);
 
 impl ${normalizePascal(messageName)} {
-    pub fn get_dart_signal_receiver() -> MessageReceiver<DartSignal<Self>> {
+    pub fn get_dart_signal_receiver() -> SignalReceiver<DartSignal<Self>> {
         ${snakeName.toUpperCase()}_CHANNEL.1.clone()
     }
 }
@@ -424,7 +424,7 @@ impl ${normalizePascal(messageName)} {
 #![allow(unused_mut)]
 
 use prost::Message;
-use rinf::{debug_print, message_channel, DartSignal, RinfError};
+use rinf::{debug_print, signal_channel, DartSignal, RinfError};
 use std::collections::HashMap;
 use std::error::Error;
 use std::sync::OnceLock;
