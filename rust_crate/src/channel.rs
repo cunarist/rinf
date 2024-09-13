@@ -4,34 +4,34 @@ use std::pin::Pin;
 use std::sync::{Arc, Mutex};
 use std::task::{Context, Poll, Waker};
 
-/// The `MessageSender` is used to send messages into a shared message queue.
+/// The `SignalSender` is used to send messages into a shared message queue.
 /// It is clonable, and multiple senders can be created to send messages into
 /// the same queue. Each message is sent to a receiver, but only the currently
 /// active receiver can receive messages.
 #[derive(Clone)]
-pub struct MessageSender<T> {
-    inner: Arc<Mutex<MessageChannel<T>>>,
+pub struct SignalSender<T> {
+    inner: Arc<Mutex<SignalChannel<T>>>,
 }
 
-/// The `MessageReceiver` is used to asynchronously receive messages from the
+/// The `SignalReceiver` is used to asynchronously receive messages from the
 /// shared message queue. Only one receiver can be active at a time; new
 /// receivers are created by cloning the original. When a receiver is cloned,
 /// it becomes the active receiver, and the previous receiver will no longer
 /// receive messages.
-pub struct MessageReceiver<T> {
-    inner: Arc<Mutex<MessageChannel<T>>>,
+pub struct SignalReceiver<T> {
+    inner: Arc<Mutex<SignalChannel<T>>>,
     id: usize, // Each receiver has a unique ID
 }
 
 /// A channel holding a message queue and managing the current active receiver.
 /// Only the active receiver can receive messages.
-struct MessageChannel<T> {
+struct SignalChannel<T> {
     queue: VecDeque<T>,
     waker: Option<Waker>,
     active_receiver_id: usize, // Track the active receiver by ID
 }
 
-impl<T> MessageSender<T> {
+impl<T> SignalSender<T> {
     /// Sends a message to the shared queue. If a receiver is waiting for a
     /// message, it will be woken up. This method does not fail if the mutex
     /// is poisoned but simply ignores the failure.
@@ -50,7 +50,7 @@ impl<T> MessageSender<T> {
     }
 }
 
-impl<T> MessageReceiver<T> {
+impl<T> SignalReceiver<T> {
     /// Asynchronously receives the next message from the queue. Only the active
     /// receiver is allowed to receive messages. If there are no messages in the
     /// queue, the receiver will wait until a new message is sent. If this receiver
@@ -65,13 +65,13 @@ impl<T> MessageReceiver<T> {
 }
 
 // Automatically make the cloned receiver the active one
-impl<T> Clone for MessageReceiver<T> {
+impl<T> Clone for SignalReceiver<T> {
     /// Clones the receiver and makes the new receiver the active one. The
     /// original receiver will no longer receive messages after this clone.
     /// This ensures only the most recent receiver can access the message queue.
     fn clone(&self) -> Self {
         let mut inner = self.inner.lock().unwrap();
-        let new_receiver = MessageReceiver {
+        let new_receiver = SignalReceiver {
             inner: self.inner.clone(),
             id: inner.active_receiver_id + 1, // Increment ID for new receiver
         };
@@ -83,11 +83,11 @@ impl<T> Clone for MessageReceiver<T> {
     }
 }
 
-/// A future that represents the attempt of a `MessageReceiver` to receive a
+/// A future that represents the attempt of a `SignalReceiver` to receive a
 /// message. This future is only completed when the active receiver receives
 /// a message from the queue.
 struct RecvFuture<T> {
-    inner: Arc<Mutex<MessageChannel<T>>>,
+    inner: Arc<Mutex<SignalChannel<T>>>,
     receiver_id: usize, // Track which receiver is polling
 }
 
@@ -107,6 +107,11 @@ impl<T> Future for RecvFuture<T> {
         // Only allow the current active receiver to receive messages
         if inner.active_receiver_id == self.receiver_id {
             if let Some(msg) = inner.queue.pop_front() {
+                // Check if more messages are in the queue
+                if !inner.queue.is_empty() {
+                    // If so, wake the current task immediately
+                    cx.waker().wake_by_ref();
+                }
                 Poll::Ready(Some(msg))
             } else {
                 inner.waker = Some(cx.waker().clone());
@@ -122,17 +127,17 @@ impl<T> Future for RecvFuture<T> {
 /// used to send messages, and the receiver can be used to receive them
 /// asynchronously. Only one receiver is active at a time, and new receivers
 /// are created by cloning the original receiver.
-pub fn message_channel<T>() -> (MessageSender<T>, MessageReceiver<T>) {
-    let channel = Arc::new(Mutex::new(MessageChannel {
+pub fn signal_channel<T>() -> (SignalSender<T>, SignalReceiver<T>) {
+    let channel = Arc::new(Mutex::new(SignalChannel {
         queue: VecDeque::new(),
         waker: None,
         active_receiver_id: 0, // Start with receiver ID 0
     }));
 
-    let sender = MessageSender {
+    let sender = SignalSender {
         inner: channel.clone(),
     };
-    let receiver = MessageReceiver {
+    let receiver = SignalReceiver {
         inner: channel,
         id: 0,
     };

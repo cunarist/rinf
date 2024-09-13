@@ -139,9 +139,11 @@ Future<void> generateMessageCode({
   for (final entry in resourcesInFolders.entries) {
     final subPath = entry.key;
     final resourceNames = entry.value;
-    final modRsLines = resourceNames.map((resourceName) {
-      return 'pub mod $resourceName;';
-    }).toList();
+    final modRsLines = <String>[];
+    for (final resourceName in resourceNames) {
+      modRsLines.add('pub mod $resourceName;');
+      modRsLines.add('pub use $resourceName::*;');
+    }
     for (final otherSubPath in resourcesInFolders.keys) {
       if (otherSubPath != subPath && otherSubPath.contains(subPath)) {
         final subPathSplitted = subPath
@@ -173,10 +175,12 @@ Future<void> generateMessageCode({
         }
         final childName = otherSubPathSplitted.last;
         modRsLines.add('pub mod $childName;');
+        modRsLines.add('pub use $childName::*;');
       }
     }
     if (subPath == "/") {
       modRsLines.add("pub mod generated;");
+      modRsLines.add("pub use generated::*;");
     }
     final modRsContent = modRsLines.join('\n');
     await File.fromUri(rustOutputPath.join(subPath).join('mod.rs'))
@@ -232,6 +236,23 @@ Future<void> generateMessageCode({
     }
   }
 
+  // Generate `exports.dart` for `messages` module in Dart.
+  final exportsDartLines = <String>[];
+  exportsDartLines.add("export './generated.dart';");
+  for (final entry in resourcesInFolders.entries) {
+    var subPath = entry.key;
+    if (subPath == "/") {
+      subPath = "";
+    }
+    final resourceNames = entry.value;
+    for (final resourceName in resourceNames) {
+      exportsDartLines.add("export './$subPath$resourceName.pb.dart';");
+    }
+  }
+  final exportsDartContent = exportsDartLines.join('\n');
+  await File.fromUri(dartOutputPath.join('exports.dart'))
+      .writeAsString(exportsDartContent);
+
   // Prepare communication channels between Dart and Rust.
   for (final entry in markedMessagesAll.entries) {
     final subPath = entry.key;
@@ -268,9 +289,9 @@ import 'package:rinf/rinf.dart';
 
 use prost::Message;
 use rinf::{
-    debug_print, message_channel, send_rust_signal,
-    DartSignal, MessageReceiver, MessageSender,
-    RinfError,
+    debug_print, send_rust_signal, signal_channel,
+    DartSignal, RinfError, SignalReceiver,
+    SignalSender,
 };
 use std::sync::LazyLock;
 
@@ -289,15 +310,15 @@ use std::sync::LazyLock;
           await insertTextToFile(
             rustPath,
             '''
-type ${messageName}Cell = LazyLock<(
-    MessageSender<DartSignal<${normalizePascal(messageName)}>>,
-    MessageReceiver<DartSignal<${normalizePascal(messageName)}>>,
+type ${messageName}Channel = LazyLock<(
+    SignalSender<DartSignal<${normalizePascal(messageName)}>>,
+    SignalReceiver<DartSignal<${normalizePascal(messageName)}>>,
 )>;
-pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Cell =
-    LazyLock::new(message_channel);
+pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Channel =
+    LazyLock::new(signal_channel);
 
 impl ${normalizePascal(messageName)} {
-    pub fn get_dart_signal_receiver() -> MessageReceiver<DartSignal<Self>> {
+    pub fn get_dart_signal_receiver() -> SignalReceiver<DartSignal<Self>> {
         ${snakeName.toUpperCase()}_CHANNEL.1.clone()
     }
 }
@@ -307,7 +328,7 @@ impl ${normalizePascal(messageName)} {
             await insertTextToFile(
               dartPath,
               '''
-extension ${messageName}Extension on $messageName{
+extension ${messageName}Ext on $messageName{
   void sendSignalToRust() {
     sendDartSignal(
       ${markedMessage.id},
@@ -324,7 +345,7 @@ extension ${messageName}Extension on $messageName{
           await insertTextToFile(
             dartPath,
             '''
-extension ${messageName}Extension on $messageName{
+extension ${messageName}Ext on $messageName{
   void sendSignalToRust(Uint8List binary) {
     sendDartSignal(
       ${markedMessage.id},
@@ -402,7 +423,7 @@ impl ${normalizePascal(messageName)} {
 #![allow(unused_mut)]
 
 use prost::Message;
-use rinf::{debug_print, message_channel, DartSignal, RinfError};
+use rinf::{debug_print, signal_channel, DartSignal, RinfError};
 use std::collections::HashMap;
 use std::error::Error;
 use std::sync::OnceLock;
