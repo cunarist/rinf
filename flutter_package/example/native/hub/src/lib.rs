@@ -5,7 +5,6 @@ mod common;
 mod messages;
 mod sample_functions;
 
-// use tokio;
 use common::*;
 use tokio_with_wasm::alias as tokio;
 
