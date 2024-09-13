@@ -236,6 +236,24 @@ Future<void> generateMessageCode({
     }
   }
 
+  // Generate `exports.dart` for `messages` module in Dart.
+  final exportsDartLines = <String>[];
+  exportsDartLines.add("export './generated.dart';");
+  for (final entry in resourcesInFolders.entries) {
+    var subPath = entry.key;
+    if (subPath == "/") {
+      subPath = "";
+    }
+    final resourceNames = entry.value;
+    for (final resourceName in resourceNames) {
+      print(resourceName);
+      exportsDartLines.add("export './$subPath$resourceName.pb.dart';");
+    }
+  }
+  final exportsDartContent = exportsDartLines.join('\n');
+  await File.fromUri(dartOutputPath.join('exports.dart'))
+      .writeAsString(exportsDartContent);
+
   // Prepare communication channels between Dart and Rust.
   for (final entry in markedMessagesAll.entries) {
     final subPath = entry.key;
