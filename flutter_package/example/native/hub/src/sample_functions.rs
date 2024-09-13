@@ -1,7 +1,7 @@
 //! This crate is written for Rinf demonstrations.
 
 use crate::common::*;
-use crate::messages;
+use crate::messages::*;
 use crate::tokio;
 use rinf::debug_print;
 use std::time::Duration;
@@ -14,8 +14,6 @@ static IS_DEBUG_MODE: bool = false;
 
 // Business logic for the counter widget.
 pub async fn tell_numbers() {
-    use messages::counter_number::*;
-
     let mut vector = Vec::new();
 
     // Stream getter is generated from a marked Protobuf message.
@@ -44,9 +42,6 @@ pub async fn tell_numbers() {
 
 // Business logic for the fractal image.
 pub async fn stream_fractal() {
-    use messages::counter_number::*;
-    use messages::fractal_art::*;
-
     let mut current_scale: f64 = 1.0;
 
     let (sender, mut receiver) = tokio::sync::mpsc::channel(5);
@@ -103,13 +98,13 @@ pub async fn stream_fractal() {
 // A dummy function that uses sample messages to eliminate warnings.
 #[allow(dead_code)]
 async fn use_messages() {
-    use messages::sample_folder::sample_file::*;
     let _ = SampleInput::get_dart_signal_receiver();
     SampleOutput {
         kind: 3,
         oneof_input: Some(sample_output::OneofInput::Age(25)),
     }
     .send_signal_to_dart();
+    let _ = DeeperDummy {};
 }
 
 // Business logic for testing various crates.

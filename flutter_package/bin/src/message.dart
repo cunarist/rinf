@@ -139,9 +139,11 @@ Future<void> generateMessageCode({
   for (final entry in resourcesInFolders.entries) {
     final subPath = entry.key;
     final resourceNames = entry.value;
-    final modRsLines = resourceNames.map((resourceName) {
-      return 'pub mod $resourceName;';
-    }).toList();
+    final modRsLines = <String>[];
+    for (final resourceName in resourceNames) {
+      modRsLines.add('pub mod $resourceName;');
+      modRsLines.add('pub use $resourceName::*;');
+    }
     for (final otherSubPath in resourcesInFolders.keys) {
       if (otherSubPath != subPath && otherSubPath.contains(subPath)) {
         final subPathSplitted = subPath
@@ -173,10 +175,12 @@ Future<void> generateMessageCode({
         }
         final childName = otherSubPathSplitted.last;
         modRsLines.add('pub mod $childName;');
+        modRsLines.add('pub use $childName::*;');
       }
     }
     if (subPath == "/") {
       modRsLines.add("pub mod generated;");
+      modRsLines.add("pub use generated::*;");
     }
     final modRsContent = modRsLines.join('\n');
     await File.fromUri(rustOutputPath.join(subPath).join('mod.rs'))

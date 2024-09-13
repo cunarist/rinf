@@ -59,12 +59,10 @@ Let's listen to this message in Rust. This simple function will add one to each 
 
 ```rust title="native/hub/src/tutorial_functions.rs"
 use crate::common::*;
-use crate::messages;
+use crate::messages::*;
 use rinf::debug_print;
 
 pub async fn calculate_precious_data() {
-    use messages::tutorial_messages::*;
-
     let receiver = MyPreciousData::get_dart_signal_receiver(); // GENERATED
     while let Some(dart_signal) = receiver.recv().await {
         let my_precious_data = dart_signal.message;
@@ -124,12 +122,10 @@ tokio = { version = "1", features = ["sync", "rt", "time"] }
 ```
 
 ```rust title="native/hub/src/tutorial_functions.rs"
-use crate::messages;
+use crate::messages::*;
 use std::time::Duration;
 
 pub async fn stream_amazing_number() {
-    use messages::tutorial_messages::*;
-
     let mut current_number: i32 = 1;
     loop {
         tokio::time::sleep(Duration::from_secs(1)).await;
@@ -213,11 +209,9 @@ children: [
 
 ```rust title="native/hub/src/tutorial_functions.rs"
 use crate::common::*;
-use crate::messages;
+use crate::messages::*;
 
 pub async fn tell_treasure() {
-    use messages::tutorial_messages::*;
-
     let mut current_value: i32 = 1;
 
     let receiver = MyTreasureInput::get_dart_signal_receiver(); // GENERATED
