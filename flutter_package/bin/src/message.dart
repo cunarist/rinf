@@ -71,7 +71,7 @@ Future<void> generateMessageCode({
         final packagePattern = r'^package\s+[a-zA-Z_][a-zA-Z0-9_\.]*\s*[^=];$';
         if (RegExp(packagePattern).hasMatch(line.trim())) {
           continue;
-        } else if (line.trim().startsWith("syntax")) {
+        } else if (line.trim().startsWith('syntax')) {
           continue;
         } else {
           outputLines.add(line);
@@ -86,8 +86,8 @@ Future<void> generateMessageCode({
   // Generate Rust message files.
   if (isInternetConnected) {
     if (!silent) {
-      print("Ensuring `protoc-gen-prost` for Rust." +
-          "\nThis is done by installing it globally on the system.");
+      print('Ensuring `protoc-gen-prost` for Rust.' +
+          '\nThis is done by installing it globally on the system.');
     }
     final cargoInstallCommand = await Process.run('cargo', [
       'install',
@@ -100,7 +100,7 @@ Future<void> generateMessageCode({
     }
   } else {
     if (!silent) {
-      print("Skipping ensurement of `protoc-gen-prost` for Rust.");
+      print('Skipping ensurement of `protoc-gen-prost` for Rust.');
     }
   }
   for (final entry in resourcesInFolders.entries) {
@@ -148,13 +148,13 @@ Future<void> generateMessageCode({
       if (otherSubPath != subPath && otherSubPath.contains(subPath)) {
         final subPathSplitted = subPath
             .trim()
-            .split("/")
+            .split('/')
             .where(
               (element) => element.isNotEmpty,
             )
             .toList();
         final otherSubPathSplitted = otherSubPath
-            .split("/")
+            .split('/')
             .where(
               (element) => element.isNotEmpty,
             )
@@ -178,9 +178,9 @@ Future<void> generateMessageCode({
         modRsLines.add('pub use $childName::*;');
       }
     }
-    if (subPath == "/") {
-      modRsLines.add("pub mod generated;");
-      modRsLines.add("pub use generated::*;");
+    if (subPath == '/') {
+      modRsLines.add('pub mod generated;');
+      modRsLines.add('pub use generated::*;');
     }
     final modRsContent = modRsLines.join('\n');
     await File.fromUri(rustOutputPath.join(subPath).join('mod.rs'))
@@ -190,8 +190,8 @@ Future<void> generateMessageCode({
   // Generate Dart message files.
   if (isInternetConnected) {
     if (!silent) {
-      print("Ensuring `protoc_plugin` for Dart." +
-          "\nThis is done by installing it globally on the system.");
+      print('Ensuring `protoc_plugin` for Dart.' +
+          '\nThis is done by installing it globally on the system.');
     }
     final pubGlobalActivateCommand = await Process.run('dart', [
       'pub',
@@ -205,7 +205,7 @@ Future<void> generateMessageCode({
     }
   } else {
     if (!silent) {
-      print("Skipping ensurement of `protoc_plugin` for Dart.");
+      print('Skipping ensurement of `protoc_plugin` for Dart.');
     }
   }
   for (final entry in resourcesInFolders.entries) {
@@ -241,8 +241,8 @@ Future<void> generateMessageCode({
   exportsDartLines.add("export './generated.dart';");
   for (final entry in resourcesInFolders.entries) {
     var subPath = entry.key;
-    if (subPath == "/") {
-      subPath = "";
+    if (subPath == '/') {
+      subPath = '';
     }
     final resourceNames = entry.value;
     for (final resourceName in resourceNames) {
@@ -271,17 +271,17 @@ Future<void> generateMessageCode({
       if (!dartContent.contains("import 'dart:typed_data'")) {
         await insertTextToFile(
           dartPath,
-          '''
+          """
 // ignore_for_file: invalid_language_version_override
 
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
-''',
+""",
           atFront: true,
         );
       }
-      if (!rustContent.contains("use std::sync")) {
+      if (!rustContent.contains('use std::sync')) {
         await insertTextToFile(
           rustPath,
           '''
@@ -365,7 +365,7 @@ extension ${messageName}Ext on $messageName{
 static final rustSignalStream =
     ${camelName}Controller.stream.asBroadcastStream();
 ''',
-            after: "class $messageName extends \$pb.GeneratedMessage {",
+            after: 'class $messageName extends \$pb.GeneratedMessage {',
           );
           await insertTextToFile(
             dartPath,
@@ -417,7 +417,7 @@ impl ${normalizePascal(messageName)} {
   }
 
   // Get ready to handle received signals in Rust.
-  var rustReceiveScript = "";
+  var rustReceiveScript = '';
   rustReceiveScript += '''
 #![allow(unused_imports)]
 #![allow(unused_mut)]
@@ -452,8 +452,8 @@ pub fn assign_dart_signal(
             markType == MarkType.dartSignalBinary) {
           final messageName = markedMessage.name;
           final snakeName = pascalToSnake(messageName);
-          var modulePath = subpath.replaceAll("/", "::");
-          modulePath = modulePath == "::" ? "" : modulePath;
+          var modulePath = subpath.replaceAll('/', '::');
+          modulePath = modulePath == '::' ? '' : modulePath;
           rustReceiveScript += '''
 new_hash_map.insert(
     ${markedMessage.id},
@@ -490,15 +490,15 @@ new_hash_map.insert(
       .writeAsString(rustReceiveScript);
 
   // Get ready to handle received signals in Dart.
-  var dartReceiveScript = "";
-  dartReceiveScript += '''
+  var dartReceiveScript = '';
+  dartReceiveScript += """
 // ignore_for_file: unused_import
 
 import 'dart:typed_data';
 import 'package:rinf/rinf.dart';
 
 final rustSignalHandlers = <int, void Function(Uint8List, Uint8List)>{
-''';
+""";
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
     final files = entry.value;
@@ -511,13 +511,13 @@ final rustSignalHandlers = <int, void Function(Uint8List, Uint8List)>{
             markType == MarkType.rustSignalBinary) {
           final messageName = markedMessage.name;
           final camelName = pascalToCamel(messageName);
-          final importPath = subpath == "/"
+          final importPath = subpath == '/'
               ? '$filename.pb.dart'
               : '$subpath$filename.pb.dart';
           if (!dartReceiveScript.contains(importPath)) {
-            dartReceiveScript = '''
+            dartReceiveScript = """
 import './$importPath' as $filename;
-''' +
+""" +
                 dartReceiveScript;
           }
           dartReceiveScript += '''
@@ -546,14 +546,14 @@ void assignRustSignal(int messageId, Uint8List messageBytes, Uint8List binary) {
 
   // Notify that it's done
   if (!silent) {
-    print("🎉 Message code in Dart and Rust is now ready! 🎉");
+    print('🎉 Message code in Dart and Rust is now ready! 🎉');
   }
 }
 
 Future<void> watchAndGenerateMessageCode(
     {required RinfConfigMessage messageConfig}) async {
   final currentDirectory = Directory.current;
-  final messagesPath = join(currentDirectory.path, "messages");
+  final messagesPath = join(currentDirectory.path, 'messages');
   final messagesDirectory = Directory(messagesPath);
 
   // Listen to keystrokes in the CLI.
@@ -572,14 +572,14 @@ Future<void> watchAndGenerateMessageCode(
   // Watch `.proto` files.
   final watcher = PollingDirectoryWatcher(messagesDirectory.path);
   var generated = true;
-  print("Watching `.proto` files...");
-  print("Press `q` to stop watching.");
+  print('Watching `.proto` files...');
+  print('Press `q` to stop watching.');
   watcher.events.listen((event) {
-    if (event.path.endsWith(".proto") && generated) {
+    if (event.path.endsWith('.proto') && generated) {
       var eventType = event.type.toString();
       eventType = eventType[0].toUpperCase() + eventType.substring(1);
       final fileRelativePath = relative(event.path, from: messagesPath);
-      print("$eventType: $fileRelativePath");
+      print('$eventType: $fileRelativePath');
       generated = false;
     }
   });
@@ -591,7 +591,7 @@ Future<void> watchAndGenerateMessageCode(
     if (!generated) {
       try {
         await generateMessageCode(silent: true, messageConfig: messageConfig);
-        print("Message code generated.");
+        print('Message code generated.');
       } catch (error) {
         // When message code generation has failed
       }
@@ -624,7 +624,7 @@ Future<void> collectProtoFiles(
     }
   }
   var subPath = directory.path.replaceFirst(rootDirectory.path, '');
-  subPath = subPath.replaceAll("\\", "/"); // For Windows
+  subPath = subPath.replaceAll('\\', '/'); // For Windows
   subPath = '$subPath/'; // Indicate that it's a folder, not a file
   resourcesInFolders[subPath] = resources;
 }
@@ -692,11 +692,11 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
       );
       final content = await protoFile.readAsString();
       final regExp = RegExp(r'{[^}]*}');
-      final attrExp = RegExp(r"(?<=\[RINF:RUST-ATTRIBUTE\().*(?=\)\])");
+      final attrExp = RegExp(r'(?<=\[RINF:RUST-ATTRIBUTE\().*(?=\)\])');
 
       // Remove all { ... } blocks from the string
       final contentWithoutBlocks = content.replaceAll(regExp, ';');
-      final statements = contentWithoutBlocks.split(";");
+      final statements = contentWithoutBlocks.split(';');
       for (final statementRaw in statements) {
         final statement = statementRaw.trim();
         // To find "}\n\n// [RINF:RUST-SIGNAL]",
@@ -705,8 +705,8 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
         final lines = statement.split('\n');
         for (final line in lines) {
           final trimmed = line.trim();
-          if (trimmed.startsWith("message")) {
-            messageName = trimmed.replaceFirst("message", "").trim();
+          if (trimmed.startsWith('message')) {
+            messageName = trimmed.replaceFirst('message', '').trim();
           }
         }
         if (messageName == null) {
@@ -714,13 +714,13 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
           continue;
         }
         MarkType? markType = null;
-        if (statement.contains("[RINF:DART-SIGNAL]")) {
+        if (statement.contains('[RINF:DART-SIGNAL]')) {
           markType = MarkType.dartSignal;
-        } else if (statement.contains("[RINF:DART-SIGNAL-BINARY]")) {
+        } else if (statement.contains('[RINF:DART-SIGNAL-BINARY]')) {
           markType = MarkType.dartSignalBinary;
-        } else if (statement.contains("[RINF:RUST-SIGNAL]")) {
+        } else if (statement.contains('[RINF:RUST-SIGNAL]')) {
           markType = MarkType.rustSignal;
-        } else if (statement.contains("[RINF:RUST-SIGNAL-BINARY]")) {
+        } else if (statement.contains('[RINF:RUST-SIGNAL-BINARY]')) {
           markType = MarkType.rustSignalBinary;
         }
 
@@ -780,14 +780,14 @@ String snakeToCamel(String input) {
 /// Converts a string `HeLLLLLLLo` to `HeLlllllLo`,
 /// just like `protoc-gen-prost` does.
 String normalizePascal(String input) {
-  var upperStreak = "";
-  var result = "";
+  var upperStreak = '';
+  var result = '';
   for (final character in input.split('')) {
     if (character.toUpperCase() == character) {
       upperStreak += character;
     } else {
       final fixedUpperStreak = lowerBetween(upperStreak);
-      upperStreak = "";
+      upperStreak = '';
       result += fixedUpperStreak;
       result += character;
     }
