@@ -311,11 +311,11 @@ use std::sync::LazyLock;
           await insertTextToFile(
             rustPath,
             '''
-type ${messageName}Cell = LazyLock<(
+type ${messageName}Store = LazyLock<(
     SignalSender<DartSignal<${normalizePascal(messageName)}>>,
     SignalReceiver<DartSignal<${normalizePascal(messageName)}>>,
 )>;
-pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Cell =
+pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Store =
     LazyLock::new(signal_channel);
 
 impl ${normalizePascal(messageName)} {
