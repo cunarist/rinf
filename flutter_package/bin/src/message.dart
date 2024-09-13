@@ -246,7 +246,6 @@ Future<void> generateMessageCode({
     }
     final resourceNames = entry.value;
     for (final resourceName in resourceNames) {
-      print(resourceName);
       exportsDartLines.add("export './$subPath$resourceName.pb.dart';");
     }
   }
@@ -311,11 +310,11 @@ use std::sync::LazyLock;
           await insertTextToFile(
             rustPath,
             '''
-type ${messageName}Store = LazyLock<(
+type ${messageName}Channel = LazyLock<(
     SignalSender<DartSignal<${normalizePascal(messageName)}>>,
     SignalReceiver<DartSignal<${normalizePascal(messageName)}>>,
 )>;
-pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Store =
+pub static ${snakeName.toUpperCase()}_CHANNEL: ${messageName}Channel =
     LazyLock::new(signal_channel);
 
 impl ${normalizePascal(messageName)} {
