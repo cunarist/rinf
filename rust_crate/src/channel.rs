@@ -8,7 +8,6 @@ use std::task::{Context, Poll, Waker};
 /// It is clonable, and multiple senders can be created to send messages into
 /// the same queue. Each message is sent to a receiver, but only the currently
 /// active receiver can receive messages.
-#[derive(Clone)]
 pub struct SignalSender<T> {
     inner: Arc<Mutex<SignalChannel<T>>>,
 }
