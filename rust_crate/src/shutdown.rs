@@ -30,7 +30,7 @@ pub async fn dart_shutdown() {
 pub struct Event {
     flag: Arc<Mutex<bool>>,
     condvar: Arc<Condvar>,
-    wakers: Arc<Mutex<Vec<Waker>>>, // Store multiple wakers
+    wakers: Arc<Mutex<Vec<Waker>>>,
 }
 
 impl Event {
@@ -102,7 +102,7 @@ impl Event {
 /// Future that resolves when the `Event` flag is set to `true`.
 pub struct WaitFuture {
     flag: Arc<Mutex<bool>>,
-    wakers: Arc<Mutex<Vec<Waker>>>, // Store multiple wakers
+    wakers: Arc<Mutex<Vec<Waker>>>,
 }
 
 impl Future for WaitFuture {
