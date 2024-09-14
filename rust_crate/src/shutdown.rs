@@ -29,7 +29,7 @@ pub static SHUTDOWN_RECEIVER: ShutdownReceiverLock = Mutex::new(None);
 pub fn get_shutdown_receiver() -> Result<ShutdownReceiver, RinfError> {
     let mut reciver_lock = match SHUTDOWN_RECEIVER.lock() {
         Ok(inner) => inner,
-        Err(poisned) => poisned.into_inner(),
+        Err(poisoned) => poisoned.into_inner(),
     };
     reciver_lock.take().ok_or(RinfError::NoShutdownReceiver)
 }
@@ -41,7 +41,7 @@ pub fn create_shutdown_channel() -> Result<ShutdownReporter, RinfError> {
 
     let mut reciver_lock = match SHUTDOWN_RECEIVER.lock() {
         Ok(inner) => inner,
-        Err(poisned) => poisned.into_inner(),
+        Err(poisoned) => poisoned.into_inner(),
     };
     reciver_lock.replace(shutdown_receiver);
 
