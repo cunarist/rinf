@@ -61,7 +61,7 @@ where
 
     // Prepare the shutdown dropper that will notify the Rust async runtime
     // after Dart thread has exited.
-    // This function assumes that this is the main thread.
+    // This code assumes that this is the main thread.
     let thread_local = ThreadLocal::new(|| ShutdownDropper);
     let _ = SHUTDOWN_DROPPER.set(thread_local);
 
