@@ -42,7 +42,7 @@ impl Event {
     }
 
     /// Sets the flag to `true` and notifies all waiting threads.
-    /// This will wake up any threads waiting on the condition variable.
+    /// This will wake up any threads or async tasks.
     pub fn set(&self) {
         let mut inner = match self.inner.lock() {
             Ok(inner) => inner,
