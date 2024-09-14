@@ -28,32 +28,33 @@ pub async fn dart_shutdown() {
 /// Synchronization primitive that allows
 /// threads or async tasks to wait until a condition is met.
 pub struct Event {
-    flag: Arc<Mutex<bool>>,
+    flag: Arc<Mutex<(bool, usize)>>, // Tuple for flag and session count
     condvar: Arc<Condvar>,
     wakers: Arc<Mutex<Vec<Waker>>>, // Store multiple wakers
 }
 
 impl Event {
-    /// Creates a new `Event` with the initial state of the flag set to `false`.
+    /// Creates a new `Event` with the initial flag state.
     pub fn new() -> Self {
         Event {
-            flag: Arc::new(Mutex::new(false)),
+            flag: Arc::new(Mutex::new((false, 0))),
             condvar: Arc::new(Condvar::new()),
-            wakers: Arc::new(Mutex::new(Vec::new())), // Initialize as an empty Vec
+            wakers: Arc::new(Mutex::new(Vec::new())),
         }
     }
 
     /// Sets the flag to `true` and notifies all waiting threads.
     /// This will wake up any threads waiting on the condition variable.
     pub fn set(&self) {
-        let mut flag = match self.flag.lock() {
+        let mut state = match self.flag.lock() {
             Ok(inner) => inner,
             Err(poisoned) => poisoned.into_inner(),
         };
-        *flag = true;
-        self.condvar.notify_all();
+        state.0 = true; // Set the flag
+        state.1 += 1; // Increment the count
 
-        // Wake all wakers when the event is set
+        // Wake all threads and async tasks when the event is set
+        self.condvar.notify_all();
         let mut wakers = match self.wakers.lock() {
             Ok(inner) => inner,
             Err(poisoned) => poisoned.into_inner(),
@@ -71,7 +72,7 @@ impl Event {
             Ok(inner) => inner,
             Err(poisoned) => poisoned.into_inner(),
         };
-        *flag = false;
+        flag.0 = false; // Clear the flag
     }
 
     /// Blocks the current thread until the flag is set to `true`.
@@ -82,7 +83,7 @@ impl Event {
             Ok(inner) => inner,
             Err(poisoned) => poisoned.into_inner(),
         };
-        while !*flag {
+        while !flag.0 {
             flag = match self.condvar.wait(flag) {
                 Ok(inner) => inner,
                 Err(poisoned) => poisoned.into_inner(),
@@ -92,7 +93,13 @@ impl Event {
 
     /// Creates a future that will be resolved when the flag is set to `true`.
     pub fn wait_async(&self) -> WaitFuture {
+        let flag = match self.flag.lock() {
+            Ok(inner) => inner,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let started_session = flag.1;
         WaitFuture {
+            started_session,
             flag: self.flag.clone(),
             wakers: self.wakers.clone(),
         }
@@ -101,7 +108,8 @@ impl Event {
 
 /// Future that resolves when the `Event` flag is set to `true`.
 pub struct WaitFuture {
-    flag: Arc<Mutex<bool>>,
+    started_session: usize,
+    flag: Arc<Mutex<(bool, usize)>>,
     wakers: Arc<Mutex<Vec<Waker>>>, // Store multiple wakers
 }
 
@@ -109,20 +117,26 @@ impl Future for WaitFuture {
     type Output = ();
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+        // Lock the flag to get the current state and session count.
         let flag = match self.flag.lock() {
             Ok(inner) => inner,
             Err(poisoned) => poisoned.into_inner(),
         };
 
-        if *flag {
+        // Check if the flag is set or if the session count has changed.
+        // If the flag is true or the session count is different
+        // because a new event session has started, stop polling.
+        if flag.0 || self.started_session != flag.1 {
             Poll::Ready(())
         } else {
+            // Lock the wakers to manage the list of waiting wakers.
             let mut wakers = match self.wakers.lock() {
                 Ok(inner) => inner,
                 Err(poisoned) => poisoned.into_inner(),
             };
 
-            // Remember the current waker if not in the list
+            // Check if the current waker is already in the list of wakers.
+            // If the waker is unique (not already in the list), add it to the list.
             let waker = cx.waker();
             let is_unique = !wakers
                 .iter()
