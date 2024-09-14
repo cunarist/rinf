@@ -73,16 +73,8 @@ impl Event {
     /// If the flag is already set, this method will return immediately. Otherwise, it
     /// will block until `set` is called by another thread.
     pub fn wait(&self) {
-        let mut inner = match self.inner.lock() {
-            Ok(inner) => inner,
-            Err(poisoned) => poisoned.into_inner(),
-        };
-        while !inner.flag {
-            inner = match self.condvar.wait(inner) {
-                Ok(inner) => inner,
-                Err(poisoned) => poisoned.into_inner(),
-            };
-        }
+        let event_blocking = EventBlocking::new(self.inner.clone(), self.condvar.clone());
+        event_blocking.wait();
     }
 
     /// Creates a future that will be resolved when the flag is set to `true`.
@@ -111,6 +103,48 @@ impl EventInner {
             flag: false,
             session: 0,
             wakers: Vec::new(),
+        }
+    }
+}
+
+/// Struct to handle waiting with session tracking.
+struct EventBlocking {
+    inner: Arc<Mutex<EventInner>>,
+    condvar: Arc<Condvar>,
+    started_session: usize,
+}
+
+impl EventBlocking {
+    fn new(inner: Arc<Mutex<EventInner>>, condvar: Arc<Condvar>) -> Self {
+        let guard = match inner.lock() {
+            Ok(inner) => inner,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let start_session = guard.session;
+        EventBlocking {
+            inner: inner.clone(),
+            condvar,
+            started_session: start_session,
+        }
+    }
+
+    pub fn wait(&self) {
+        let mut guard;
+        // Lock the inner state
+        guard = match self.inner.lock() {
+            Ok(inner) => inner,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        loop {
+            // Wait on the condition variable and reassign the guard
+            guard = match self.condvar.wait(guard) {
+                Ok(inner) => inner,
+                Err(poisoned) => poisoned.into_inner(),
+            };
+            // Check if the condition is met
+            if guard.flag || guard.session != self.started_session {
+                break;
+            }
         }
     }
 }
