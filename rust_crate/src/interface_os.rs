@@ -11,11 +11,7 @@ pub extern "C" fn prepare_isolate_extern(port: i64) {
     let dart_isolate = Isolate::new(port);
     let mut guard = match DART_ISOLATE.lock() {
         Ok(inner) => inner,
-        Err(_) => {
-            let error = RinfError::LockDartIsolate;
-            println!("{error}");
-            return;
-        }
+        Err(poisoned) => poisoned.into_inner(),
     };
     guard.replace(dart_isolate);
 }
@@ -74,9 +70,10 @@ pub fn send_rust_signal_real(
 ) -> Result<(), RinfError> {
     // When `DART_ISOLATE` is not initialized, just return the error.
     // This can happen when running test code in Rust.
-    let guard = DART_ISOLATE
-        .lock()
-        .map_err(|_| RinfError::LockDartIsolate)?;
+    let guard = match DART_ISOLATE.lock() {
+        Ok(inner) => inner,
+        Err(poisoned) => poisoned.into_inner(),
+    };
     let dart_isolate = guard.as_ref().ok_or(RinfError::NoDartIsolate)?;
 
     // If a `Vec<u8>` is empty, we can't just simply send it to Dart

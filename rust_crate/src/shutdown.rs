@@ -27,9 +27,10 @@ pub static SHUTDOWN_RECEIVER: ShutdownReceiverLock = Mutex::new(None);
 /// is necessary to prevent the async runtime in Rust from
 /// finishing immediately.
 pub fn get_shutdown_receiver() -> Result<ShutdownReceiver, RinfError> {
-    let mut reciver_lock = SHUTDOWN_RECEIVER
-        .lock()
-        .map_err(|_| RinfError::LockShutdownReceiver)?;
+    let mut reciver_lock = match SHUTDOWN_RECEIVER.lock() {
+        Ok(inner) => inner,
+        Err(poisned) => poisned.into_inner(),
+    };
     reciver_lock.take().ok_or(RinfError::NoShutdownReceiver)
 }
 
@@ -38,9 +39,10 @@ pub fn create_shutdown_channel() -> Result<ShutdownReporter, RinfError> {
 
     SHUTDOWN_SENDER.with(|cell| cell.replace(Some(shutdown_sender)));
 
-    let mut reciver_lock = SHUTDOWN_RECEIVER
-        .lock()
-        .map_err(|_| RinfError::LockShutdownReceiver)?;
+    let mut reciver_lock = match SHUTDOWN_RECEIVER.lock() {
+        Ok(inner) => inner,
+        Err(poisned) => poisned.into_inner(),
+    };
     reciver_lock.replace(shutdown_receiver);
 
     Ok(shutdown_reporter)
