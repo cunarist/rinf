@@ -5,7 +5,7 @@ mod common;
 mod messages;
 
 use crate::common::*;
-use tokio; // Comment this line to target the web.
+use crate::messages::*;
 // use tokio_with_wasm::alias as tokio; // Uncomment this line to target the web.
 
 rinf::write_interface!();
@@ -29,8 +29,6 @@ async fn main() -> Result<()> {
 }
 
 async fn communicate() {
-    use messages::basic::*;
-
     // Send signals to Dart like below.
     SmallNumber { number: 7 }.send_signal_to_dart();
 

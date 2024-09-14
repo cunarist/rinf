@@ -9,7 +9,7 @@ mod interface_os;
 #[cfg(target_family = "wasm")]
 mod interface_web;
 
-pub use channel::{message_channel, MessageReceiver, MessageSender};
+pub use channel::{signal_channel, SignalReceiver, SignalSender};
 pub use error::RinfError;
 pub use interface::{send_rust_signal, start_rust_logic, DartSignal};
 pub use shutdown::get_shutdown_receiver;

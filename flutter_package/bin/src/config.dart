@@ -28,7 +28,7 @@ class RinfConfigMessage {
       if (!MESSAGE_CONFIG_KEYS.contains(key)) {
         throw Exception(
           "Unknown key '$key' in rinf message configuration.\n"
-          "Available keys are: $MESSAGE_CONFIG_KEYS",
+          'Available keys are: $MESSAGE_CONFIG_KEYS',
         );
       }
     }
@@ -49,14 +49,14 @@ class RinfConfigMessage {
     $KEY_RUST_SERDE: $rustSerde''';
   }
 
-  static const KEY_INPUT_DIR = "input_dir";
-  static const KEY_RUST_OUTPUT_DIR = "rust_output_dir";
-  static const KEY_DART_OUTPUT_DIR = "dart_output_dir";
-  static const KEY_RUST_SERDE = "rust_serde";
+  static const KEY_INPUT_DIR = 'input_dir';
+  static const KEY_RUST_OUTPUT_DIR = 'rust_output_dir';
+  static const KEY_DART_OUTPUT_DIR = 'dart_output_dir';
+  static const KEY_RUST_SERDE = 'rust_serde';
 
-  static const DEFAULT_INPUT_DIR = "messages/";
-  static const DEFAULT_RUST_OUTPUT_DIR = "native/hub/src/messages/";
-  static const DEFAULT_DART_OUTPUT_DIR = "lib/messages/";
+  static const DEFAULT_INPUT_DIR = 'messages/';
+  static const DEFAULT_RUST_OUTPUT_DIR = 'native/hub/src/messages/';
+  static const DEFAULT_DART_OUTPUT_DIR = 'lib/messages/';
   static const DEFAULT_RUST_SERDE = false;
 
   static const MESSAGE_CONFIG_KEYS = [
@@ -81,7 +81,7 @@ class RinfConfig {
       if (!RINF_CONFIG_KEYS.contains(key)) {
         throw Exception(
           "Unknown key '$key' in rinf configuration.\n"
-          "Available keys are: $RINF_CONFIG_KEYS",
+          'Available keys are: $RINF_CONFIG_KEYS',
         );
       }
     }
@@ -100,7 +100,7 @@ rinf:
   $message''';
   }
 
-  static const KEY_MESSAGE = "message";
+  static const KEY_MESSAGE = 'message';
   static const RINF_CONFIG_KEYS = [KEY_MESSAGE];
 }
 

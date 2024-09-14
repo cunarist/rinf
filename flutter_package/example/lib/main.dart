@@ -1,9 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:rinf/rinf.dart';
-import './messages/generated.dart';
-import './messages/counter_number.pb.dart';
-import './messages/fractal_art.pb.dart';
+import './messages/exports.dart';
 
 void main() async {
   await initializeRust(assignRustSignal);
@@ -67,7 +65,7 @@ class MyHomePage extends StatelessWidget {
           // The `sendSignalToRust` method is generated
           // from a marked Protobuf message.
           SampleNumberInput(
-            letter: "HELLO FROM DART!",
+            letter: 'HELLO FROM DART!',
             dummyOne: 25,
             dummyTwo: SampleSchema(
               sampleFieldOne: true,

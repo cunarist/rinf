@@ -9,7 +9,7 @@ String? jsLibPath;
 // When Dart performs hot restart,
 // the `rinf` object is already defined
 // as a global JavaScript variable.
-final wasAlreadyLoaded = js.context.hasProperty("rinf");
+final wasAlreadyLoaded = js.context.hasProperty('rinf');
 
 void setJsLibPath(String path) {
   jsLibPath = path;
@@ -29,11 +29,11 @@ Future<void> loadJsFile() async {
   final baseHref = Uri.base;
 
   // Use the default JavaScript path unless provided.
-  final path = jsLibPath ?? "pkg/hub.js";
+  final path = jsLibPath ?? 'pkg/hub.js';
 
   final fullUrl = baseHref.resolve(path);
   final scriptElement = ScriptElement();
-  scriptElement.type = "module";
+  scriptElement.type = 'module';
   scriptElement.innerHtml = '''
 import init, * as wasmBindings from "$fullUrl";
 await init();
