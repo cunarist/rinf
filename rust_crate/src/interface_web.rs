@@ -1,5 +1,4 @@
 use crate::error::RinfError;
-use crate::shutdown::create_shutdown_channel;
 use js_sys::Uint8Array;
 use wasm_bindgen::prelude::*;
 
@@ -14,9 +13,6 @@ where
             crate::debug_print!("A panic occurred in Rust.\n{panic_info}");
         }));
     }
-
-    // Prepare the channel to match the behavior of native platforms.
-    let _ = create_shutdown_channel();
 
     // Run the main function.
     main_fn();

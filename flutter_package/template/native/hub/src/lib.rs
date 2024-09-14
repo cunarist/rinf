@@ -5,7 +5,6 @@ mod common;
 mod messages;
 mod sample_functions;
 
-use common::*;
 // use tokio_with_wasm::alias as tokio; // Uncomment this line to target the web.
 
 rinf::write_interface!();
@@ -16,14 +15,10 @@ rinf::write_interface!();
 // If you really need to use blocking code,
 // use `tokio::task::spawn_blocking`.
 #[tokio::main(flavor = "current_thread")]
-async fn main() -> Result<()> {
+async fn main() {
     // Spawn the concurrent tasks.
     tokio::spawn(sample_functions::communicate());
 
-    // Get the shutdown receiver from Rinf.
-    // This receiver will await a signal from Dart shutdown.
-    let shutdown_receiver = rinf::get_shutdown_receiver()?;
-    shutdown_receiver.await;
-
-    Ok(())
+    // Keep the main function running until Dart shutdown.
+    rinf::dart_shutdown().await;
 }

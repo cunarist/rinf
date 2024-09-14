@@ -37,7 +37,7 @@ impl<T> SignalSender<T> {
     pub fn send(&self, msg: T) {
         let mut inner = match self.inner.lock() {
             Ok(inner) => inner,
-            Err(_) => return, // Do not consider poisoned mutex
+            Err(poisoned) => poisoned.into_inner(),
         };
 
         // Enqueue the message
@@ -69,7 +69,10 @@ impl<T> Clone for SignalReceiver<T> {
     /// original receiver will no longer receive messages after this clone.
     /// This ensures only the most recent receiver can access the message queue.
     fn clone(&self) -> Self {
-        let mut inner = self.inner.lock().unwrap();
+        let mut inner = match self.inner.lock() {
+            Ok(inner) => inner,
+            Err(poisoned) => poisoned.into_inner(),
+        };
         let new_receiver = SignalReceiver {
             inner: self.inner.clone(),
             id: inner.active_receiver_id + 1, // Increment ID for new receiver
@@ -100,7 +103,7 @@ impl<T> Future for RecvFuture<T> {
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
         let mut inner = match self.inner.lock() {
             Ok(inner) => inner,
-            Err(_) => return Poll::Ready(None), // Return None on poisoned mutex
+            Err(poisoned) => poisoned.into_inner(),
         };
 
         // Only allow the current active receiver to receive messages
@@ -117,7 +120,8 @@ impl<T> Future for RecvFuture<T> {
                 Poll::Pending
             }
         } else {
-            Poll::Ready(None) // Return None if this receiver is not the current active one
+            // Return None if this receiver is not the current active one
+            Poll::Ready(None)
         }
     }
 }
@@ -127,10 +131,12 @@ impl<T> Future for RecvFuture<T> {
 /// asynchronously. Only one receiver is active at a time, and new receivers
 /// are created by cloning the original receiver.
 pub fn signal_channel<T>() -> (SignalSender<T>, SignalReceiver<T>) {
+    let start_receiver_id = 0;
+
     let channel = Arc::new(Mutex::new(SignalChannel {
         queue: VecDeque::new(),
         waker: None,
-        active_receiver_id: 0, // Start with receiver ID 0
+        active_receiver_id: start_receiver_id,
     }));
 
     let sender = SignalSender {
@@ -138,7 +144,7 @@ pub fn signal_channel<T>() -> (SignalSender<T>, SignalReceiver<T>) {
     };
     let receiver = SignalReceiver {
         inner: channel,
-        id: 0,
+        id: start_receiver_id,
     };
     (sender, receiver)
 }
