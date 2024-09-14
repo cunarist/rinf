@@ -4,7 +4,7 @@ use std::cell::RefCell;
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Condvar, Mutex, OnceLock};
+use std::sync::{Arc, Condvar, LazyLock, Mutex};
 use std::task::{Context, Poll, Waker};
 
 // We use `os_thread_local` so that when the program fails
@@ -14,8 +14,9 @@ use std::task::{Context, Poll, Waker};
 // Without this solution,
 // zombie threads inside the async runtime might outlive the app.
 // This `ThreadLocal` is intended to be used only on the main thread.
-type ShutdownSenderLock = OnceLock<ThreadLocal<RefCell<Option<ShutdownSender>>>>;
-pub static SHUTDOWN_SENDER: ShutdownSenderLock = OnceLock::new();
+type ShutdownSenderLock = LazyLock<ThreadLocal<RefCell<Option<ShutdownSender>>>>;
+pub static SHUTDOWN_SENDER: ShutdownSenderLock =
+    LazyLock::new(|| ThreadLocal::new(|| RefCell::new(None)));
 
 type ShutdownReceiverLock = Mutex<Option<ShutdownReceiver>>;
 pub static SHUTDOWN_RECEIVER: ShutdownReceiverLock = Mutex::new(None);
@@ -35,8 +36,7 @@ pub fn get_shutdown_receiver() -> Result<ShutdownReceiver, RinfError> {
 pub fn create_shutdown_channel() -> Result<ShutdownReporter, RinfError> {
     let (shutdown_sender, shutdown_receiver, shutdown_reporter) = shutdown_channel();
 
-    let sender_lock = SHUTDOWN_SENDER.get_or_init(move || ThreadLocal::new(|| RefCell::new(None)));
-    sender_lock.with(|cell| cell.replace(Some(shutdown_sender)));
+    SHUTDOWN_SENDER.with(|cell| cell.replace(Some(shutdown_sender)));
 
     let mut reciver_lock = SHUTDOWN_RECEIVER
         .lock()

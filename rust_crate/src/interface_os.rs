@@ -1,8 +1,6 @@
 use crate::error::RinfError;
 use crate::shutdown::{create_shutdown_channel, SHUTDOWN_SENDER};
 use allo_isolate::{IntoDart, Isolate, ZeroCopyBuffer};
-use os_thread_local::ThreadLocal;
-use std::cell::RefCell;
 use std::sync::Mutex;
 use std::thread;
 
@@ -60,8 +58,7 @@ where
 
 #[no_mangle]
 pub extern "C" fn stop_rust_logic_extern() {
-    let sender_lock = SHUTDOWN_SENDER.get_or_init(move || ThreadLocal::new(|| RefCell::new(None)));
-    let sender_option = sender_lock.with(|cell| cell.take());
+    let sender_option = SHUTDOWN_SENDER.with(|cell| cell.take());
     if let Some(shutdown_sender) = sender_option {
         // Dropping the sender tells the async runtime to stop running.
         // Also, it blocks the main thread until
