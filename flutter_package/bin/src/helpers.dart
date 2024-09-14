@@ -25,7 +25,7 @@ Future<void> applyRustTemplate({
   final packagePath = package.root;
 
   // Check if current folder is a Flutter app project.
-  final specFile = File.fromUri(flutterProjectPath.join("pubspec.yaml"));
+  final specFile = File.fromUri(flutterProjectPath.join('pubspec.yaml'));
   final isFlutterProject = await specFile.exists();
   if (!isFlutterProject) {
     print("This folder doesn't look like a Flutter project.");
@@ -33,17 +33,17 @@ Future<void> applyRustTemplate({
   }
   final pubspec = loadYaml(await specFile.readAsString());
   final String? publishTo = pubspec['publish_to'];
-  if (publishTo != "none") {
-    print("Flutter package development is not supported by Rinf.");
+  if (publishTo != 'none') {
+    print('Flutter package development is not supported by Rinf.');
     return;
   }
 
   // Copy basic folders needed for Rust to work
-  final templateSource = packagePath.join("template/native/");
-  final templateDestination = flutterProjectPath.join("native/");
+  final templateSource = packagePath.join('template/native/');
+  final templateDestination = flutterProjectPath.join('native/');
   await copyDirectory(templateSource, templateDestination);
-  final messagesSource = packagePath.join("template/messages/");
-  final messagesDestination = flutterProjectPath.join("messages/");
+  final messagesSource = packagePath.join('template/messages/');
+  final messagesDestination = flutterProjectPath.join('messages/');
   await copyDirectory(messagesSource, messagesDestination);
 
   // Create workspace `Cargo.toml`
@@ -93,7 +93,7 @@ resolver = "2"
   var readmeSplitted = readmeContent.split('\n\n');
   readmeSplitted = readmeSplitted.map((s) => s.trim()).toList();
   if (!readmeContent.contains(guideSectionTitle)) {
-    final text = '''
+    final text = """
 $guideSectionTitle
 
 This project leverages Flutter for GUI and Rust for the backend logic,
@@ -135,7 +135,7 @@ flutter run
 
 For detailed instructions on writing Rust and Flutter together,
 please refer to Rinf's [documentation](https://rinf.cunarist.com).
-''';
+""";
     readmeSplitted.add(text);
   }
   await readmeFile.writeAsString(readmeSplitted.join('\n\n') + '\n');
@@ -144,12 +144,12 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
   await Process.run('dart', ['pub', 'add', 'protobuf']);
 
   // Modify `./lib/main.dart`
-  final mainFile = File.fromUri(flutterProjectPath.join("lib/main.dart"));
+  final mainFile = File.fromUri(flutterProjectPath.join('lib/main.dart'));
   if (await mainFile.exists()) {
     await Process.run('dart', ['format', './lib/main.dart']);
     var mainText = await mainFile.readAsString();
     if (!mainText.contains('messages/exports.dart')) {
-      final lines = mainText.split("\n");
+      final lines = mainText.split('\n');
       final lastImportIndex = lines.lastIndexWhere(
         (line) => line.startsWith('import '),
       );
@@ -161,7 +161,7 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
         lastImportIndex + 2,
         "import './messages/exports.dart';",
       );
-      mainText = lines.join("\n");
+      mainText = lines.join('\n');
     }
     if (!mainText.contains('initializeRust(assignRustSignal)')) {
       mainText = mainText.replaceFirst(
@@ -179,7 +179,7 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
 
   await generateMessageCode(silent: true, messageConfig: messageConfig);
 
-  print("🎉 Rust template is now ready! 🎉");
+  print('🎉 Rust template is now ready! 🎉');
 }
 
 Future<void> copyDirectory(Uri source, Uri destination) async {
@@ -204,38 +204,38 @@ Future<void> copyDirectory(Uri source, Uri destination) async {
 Future<void> buildWebassembly({bool isReleaseMode = false}) async {
   // Ensure Rust toolchain.
   if (isInternetConnected) {
-    print("Ensuring Rust toolchain for the web." +
-        "\nThis is done by installing it globally on the system.");
+    print('Ensuring Rust toolchain for the web.' +
+        '\nThis is done by installing it globally on the system.');
     final processResults = <ProcessResult>[];
-    processResults.add(await Process.run("rustup", [
-      "toolchain",
-      "install",
-      "nightly",
+    processResults.add(await Process.run('rustup', [
+      'toolchain',
+      'install',
+      'nightly',
     ]));
-    processResults.add(await Process.run("rustup", [
-      "+nightly",
-      "component",
-      "add",
-      "rust-src",
+    processResults.add(await Process.run('rustup', [
+      '+nightly',
+      'component',
+      'add',
+      'rust-src',
     ]));
-    processResults.add(await Process.run("rustup", [
-      "+nightly",
-      "target",
-      "add",
-      "wasm32-unknown-unknown",
+    processResults.add(await Process.run('rustup', [
+      '+nightly',
+      'target',
+      'add',
+      'wasm32-unknown-unknown',
     ])); // For actual compilation
-    processResults.add(await Process.run("rustup", [
-      "target",
-      "add",
-      "wasm32-unknown-unknown",
+    processResults.add(await Process.run('rustup', [
+      'target',
+      'add',
+      'wasm32-unknown-unknown',
     ])); // For Rust-analyzer
-    processResults.add(await Process.run("cargo", [
-      "install",
-      "wasm-pack",
+    processResults.add(await Process.run('cargo', [
+      'install',
+      'wasm-pack',
     ]));
-    processResults.add(await Process.run("cargo", [
-      "install",
-      "wasm-bindgen-cli",
+    processResults.add(await Process.run('cargo', [
+      'install',
+      'wasm-bindgen-cli',
     ]));
     processResults.forEach((processResult) {
       if (processResult.exitCode != 0) {
@@ -244,7 +244,7 @@ Future<void> buildWebassembly({bool isReleaseMode = false}) async {
       }
     });
   } else {
-    print("Skipping ensurement of Rust toolchain for the web.");
+    print('Skipping ensurement of Rust toolchain for the web.');
   }
 
   // Prepare the webassembly output path.
@@ -253,7 +253,7 @@ Future<void> buildWebassembly({bool isReleaseMode = false}) async {
   final outputPath = flutterProjectPath.uri.join(subPath);
 
   // Build the webassembly module.
-  print("Compiling Rust with `wasm-pack` to `web` target...");
+  print('Compiling Rust with `wasm-pack` to `web` target...');
   final compileCommand = await Process.run(
     'wasm-pack',
     [
@@ -278,19 +278,19 @@ Future<void> buildWebassembly({bool isReleaseMode = false}) async {
     print(compileCommand.stderr.toString().trim());
     throw Exception('Unable to compile Rust into webassembly');
   }
-  print("Saved `.wasm` and `.js` files to `$subPath`.");
+  print('Saved `.wasm` and `.js` files to `$subPath`.');
 
   // Guide the developer how to run Flutter web server with web headers.
-  print("To run the Flutter web server, use:");
+  print('To run the Flutter web server, use:');
   final commandLineDivider = await getCommandLineDivider();
   final commandLines = [
     'flutter run',
     '--web-header=Cross-Origin-Opener-Policy=same-origin',
     '--web-header=Cross-Origin-Embedder-Policy=require-corp'
   ];
-  print(commandLines.join(" ${commandLineDivider}\n"));
+  print(commandLines.join(' ${commandLineDivider}\n'));
 
-  print("🎉 Webassembly module is now ready! 🎉");
+  print('🎉 Webassembly module is now ready! 🎉');
 }
 
 Future<String> getCommandLineDivider({bool isReleaseMode = false}) async {
@@ -298,15 +298,15 @@ Future<String> getCommandLineDivider({bool isReleaseMode = false}) async {
     // Windows environment, check further for PowerShell or CMD
     if (Platform.environment['SHELL'] == null) {
       // Likely PowerShell environment
-      return "`";
+      return '`';
       // // Likely Command Prompt (cmd.exe)
       // return "^";
     } else {
       // Bash or some other shell
-      return "\\";
+      return '\\';
     }
   } else {
     // Bash or some other shell
-    return "\\";
+    return '\\';
   }
 }

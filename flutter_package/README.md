@@ -45,7 +45,7 @@ StreamBuilder(
   builder: (context, snapshot) {
     final rustSignal = snapshot.data;
     if (rustSignal == null) {
-      return Text("Nothing received yet");
+      return Text('Nothing received yet');
     }
     final myMessage = rustSignal.message;
     return Text(myMessage.currentNumber.toString());

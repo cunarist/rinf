@@ -49,7 +49,7 @@ child: Column(
           inputString: 'Zero-cost abstraction',
         ).sendSignalToRust(); // GENERATED
       },
-      child: Text("Send a Signal from Dart to Rust"),
+      child: Text('Send a Signal from Dart to Rust'),
     ),
   ]
 )
@@ -154,7 +154,7 @@ children: [
     builder: (context, snapshot) {
       final rustSignal = snapshot.data;
       if (rustSignal == null) {
-        return Text("Nothing received yet");
+        return Text('Nothing received yet');
       }
       final myAmazingNumber = rustSignal.message;
       final currentNumber = myAmazingNumber.currentNumber;

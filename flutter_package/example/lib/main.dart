@@ -65,7 +65,7 @@ class MyHomePage extends StatelessWidget {
           // The `sendSignalToRust` method is generated
           // from a marked Protobuf message.
           SampleNumberInput(
-            letter: "HELLO FROM DART!",
+            letter: 'HELLO FROM DART!',
             dummyOne: 25,
             dummyTwo: SampleSchema(
               sampleFieldOne: true,
