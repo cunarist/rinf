@@ -2,7 +2,7 @@
 
 use crate::messages::*;
 
-async fn communicate() {
+pub async fn communicate() {
     // Send signals to Dart like below.
     SmallNumber { number: 7 }.send_signal_to_dart();
 
