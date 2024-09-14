@@ -290,8 +290,7 @@ import 'package:rinf/rinf.dart';
 use prost::Message;
 use rinf::{
     debug_print, send_rust_signal, signal_channel,
-    DartSignal, RinfError, SignalReceiver,
-    SignalSender,
+    DartSignal, SignalReceiver, SignalSender,
 };
 use std::sync::LazyLock;
 
@@ -422,10 +421,10 @@ impl ${normalizePascal(messageName)} {
 #![allow(unused_imports)]
 #![allow(unused_mut)]
 
+use super::*;
 use prost::Message;
-use rinf::{debug_print, signal_channel, DartSignal, RinfError};
+use rinf::{DartSignal, RinfError};
 use std::collections::HashMap;
-use std::error::Error;
 use std::sync::LazyLock;
 
 type Handler = dyn Fn(&[u8], &[u8]) -> Result<(), RinfError> + Send + Sync;
@@ -437,7 +436,6 @@ static DART_SIGNAL_HANDLERS: LazyLock<DartSignalHandlers> = LazyLock::new(|| {
     final subpath = entry.key;
     final files = entry.value;
     for (final entry in files.entries) {
-      final filename = entry.key;
       final markedMessages = entry.value;
       for (final markedMessage in markedMessages) {
         final markType = markedMessage.markType;
@@ -451,7 +449,6 @@ static DART_SIGNAL_HANDLERS: LazyLock<DartSignalHandlers> = LazyLock::new(|| {
 hash_map.insert(
     ${markedMessage.id},
     Box::new(|message_bytes: &[u8], binary: &[u8]| {
-        use super::$modulePath$filename::*;
         let message =
             ${normalizePascal(messageName)}::decode(message_bytes)
             .map_err(|_| RinfError::DecodeMessage)?;
