@@ -1,7 +1,6 @@
 //! This `hub` crate is the
 //! entry point of the Rust logic.
 
-mod common;
 mod messages;
 mod sample_functions;
 
