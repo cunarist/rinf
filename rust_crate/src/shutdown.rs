@@ -79,12 +79,12 @@ impl Event {
 
     /// Creates a future that will be resolved when the flag is set to `true`.
     pub fn wait_async(&self) -> EventFuture {
-        let inner = match self.inner.lock() {
+        let guard = match self.inner.lock() {
             Ok(inner) => inner,
             Err(poisoned) => poisoned.into_inner(),
         };
         EventFuture {
-            started_session: inner.session,
+            started_session: guard.session,
             inner: self.inner.clone(),
         }
     }
@@ -120,11 +120,10 @@ impl EventBlocking {
             Ok(inner) => inner,
             Err(poisoned) => poisoned.into_inner(),
         };
-        let start_session = guard.session;
         EventBlocking {
             inner: inner.clone(),
             condvar,
-            started_session: start_session,
+            started_session: guard.session,
         }
     }
 
