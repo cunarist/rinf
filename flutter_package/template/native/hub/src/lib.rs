@@ -3,9 +3,9 @@
 
 mod common;
 mod messages;
+mod sample_functions;
 
-use crate::common::*;
-use crate::messages::*;
+use common::*;
 // use tokio_with_wasm::alias as tokio; // Uncomment this line to target the web.
 
 rinf::write_interface!();
@@ -18,7 +18,7 @@ rinf::write_interface!();
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<()> {
     // Spawn the concurrent tasks.
-    tokio::spawn(communicate());
+    tokio::spawn(sample_functions::communicate());
 
     // Get the shutdown receiver from Rinf.
     // This receiver will await a signal from Dart shutdown.
@@ -28,14 +28,3 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-async fn communicate() {
-    // Send signals to Dart like below.
-    SmallNumber { number: 7 }.send_signal_to_dart();
-
-    // Get receivers that listen to Dart signals like below.
-    let receiver = SmallText::get_dart_signal_receiver();
-    while let Some(dart_signal) = receiver.recv().await {
-        let message: SmallText = dart_signal.message;
-        rinf::debug_print!("{message:?}");
-    }
-}

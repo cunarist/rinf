@@ -1,4 +1,4 @@
-//! This crate is written for Rinf demonstrations.
+//! This module is written for Rinf demonstrations.
 
 use crate::common::*;
 use crate::messages::*;
