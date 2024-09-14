@@ -129,22 +129,21 @@ impl EventBlocking {
     }
 
     pub fn wait(&self) {
-        let mut guard;
-        // Lock the inner state
-        guard = match self.inner.lock() {
+        // Lock the inner state and wait on the condition variable
+        let mut guard = match self.inner.lock() {
             Ok(inner) => inner,
             Err(poisoned) => poisoned.into_inner(),
         };
         loop {
+            // Check if the condition is met
+            if guard.flag || guard.session != self.started_session {
+                break;
+            }
             // Wait on the condition variable and reassign the guard
             guard = match self.condvar.wait(guard) {
                 Ok(inner) => inner,
                 Err(poisoned) => poisoned.into_inner(),
             };
-            // Check if the condition is met
-            if guard.flag || guard.session != self.started_session {
-                break;
-            }
         }
     }
 }
