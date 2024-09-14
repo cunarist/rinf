@@ -43,6 +43,7 @@ impl Event {
 
     /// Sets the flag to `true` and notifies all waiting threads.
     /// This will wake up any threads or async tasks.
+    #[cfg(not(target_family = "wasm"))]
     pub fn set(&self) {
         let mut inner = match self.inner.lock() {
             Ok(inner) => inner,
@@ -61,6 +62,7 @@ impl Event {
     /// Clears the flag, setting it to `false`.
     /// This does not affect any waiting threads, but subsequent calls to `wait` will
     /// block until the flag is set again.
+    #[cfg(all(not(target_family = "wasm"), debug_assertions))]
     pub fn clear(&self) {
         let mut inner = match self.inner.lock() {
             Ok(inner) => inner,
@@ -72,6 +74,7 @@ impl Event {
     /// Blocks the current thread until the flag is set to `true`.
     /// If the flag is already set, this method will return immediately. Otherwise, it
     /// will block until `set` is called by another thread.
+    #[cfg(not(target_family = "wasm"))]
     pub fn wait(&self) {
         let event_blocking = EventBlocking::new(self.inner.clone(), self.condvar.clone());
         event_blocking.wait();
