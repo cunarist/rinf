@@ -1,0 +1,13 @@
+.md-header {
+  background-color: transparent !important;
+  position: static;
+  box-shadow: none;
+}
+
+.md-search {
+  padding: 4px;
+}
+
+.md-button {
+  border: 1px solid !important;
+}
