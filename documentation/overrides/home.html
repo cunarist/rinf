@@ -3,6 +3,12 @@
 
 {% block tabs %}
 <style>
+  [data-md-color-scheme="default"] {
+    --md-default-bg-color: #ffffff;
+  }
+  [data-md-color-scheme="slate"] {
+    --md-default-bg-color: #141414;
+  }
   .outermost {
     padding: 0px 24px 0px;
     text-align: center;
@@ -35,7 +41,7 @@
     box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.4);
     margin-bottom: 24px;
     width: 400px;
-    max-width: 50svw !important;
+    max-width: 72svw !important;
     outline: 1px solid rgba(122, 122, 122, 1);
     outline-offset: -1px;
     filter: grayscale();
@@ -48,6 +54,9 @@
   }
   .spacing {
     height: 40px;
+  }
+  .description-text {
+    padding: 0px 40px;
   }
   .guide-box {
     max-width: min(36em, 80svw);
@@ -98,7 +107,7 @@
 <div class="md-grid md-typeset outermost">
   <div class="front-panel">
     <div class="spacing"></div>
-    <div class="centered">
+    <div>
       <a
         href="https://rinf-demo.cunarist.com"
         target="_blank"
@@ -112,8 +121,8 @@
         />
       </a>
     </div>
-    <div class="centered">
-      <p class="semi-transparent">
+    <div>
+      <p class="semi-transparent description-text">
         Build beautiful and performant cross-platform apps
       </p>
       <p class="web-title">Rinf</p>
@@ -122,7 +131,7 @@
     <div class="spacing"></div>
   </div>
   <div class="spacing"></div>
-  <div class="centered">
+  <div>
     <h2>The Combination</h2>
     <div class="columns">
       <div class="guide-box">
@@ -178,7 +187,7 @@
     </div>
   </div>
   <div class="spacing"></div>
-  <div class="centered">
+  <div>
     <h2>Platform Support</h2>
     <div class="guide-box">
       <p>
@@ -201,7 +210,7 @@
     </div>
   </div>
   <div class="spacing"></div>
-  <div class="centered">
+  <div>
     <h2>Benefits</h2>
     <div class="columns">
       <div class="repeated-box">
