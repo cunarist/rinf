@@ -61,7 +61,8 @@ impl Event {
     }
 
     /// Clears the flag, setting it to `false`.
-    /// This does not affect any waiting threads, but subsequent calls to `wait` will
+    /// This does not affect any waiting threads,
+    /// but subsequent calls to `wait` will
     /// block until the flag is set again.
     #[cfg(all(not(target_family = "wasm"), debug_assertions))]
     pub fn clear(&self) {
@@ -73,8 +74,9 @@ impl Event {
     }
 
     /// Blocks the current thread until the flag is set to `true`.
-    /// If the flag is already set, this method will return immediately. Otherwise, it
-    /// will block until `set` is called by another thread.
+    /// If the flag is already set,
+    /// this method will return immediately.
+    /// Otherwise, it will block until `set` is called by another thread.
     #[cfg(not(target_family = "wasm"))]
     pub fn wait(&self) {
         let event_blocking =
@@ -82,7 +84,8 @@ impl Event {
         event_blocking.wait();
     }
 
-    /// Creates a future that will be resolved when the flag is set to `true`.
+    /// Creates a future that will be resolved
+    /// when the flag is set to `true`.
     pub fn wait_async(&self) -> EventFuture {
         let guard = match self.inner.lock() {
             Ok(inner) => inner,
@@ -174,7 +177,8 @@ impl Future for EventFuture {
             Poll::Ready(())
         } else {
             // Check if the current waker is already in the list of wakers.
-            // If the waker is unique (not already in the list), add it to the list.
+            // If the waker is unique (not already in the list),
+            // add it to the list.
             let waker = cx.waker();
             if !guard
                 .wakers
