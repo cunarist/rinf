@@ -23,7 +23,11 @@ where
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = rinf)]
-    pub fn send_rust_signal_extern(resource: i32, message_bytes: Uint8Array, binary: Uint8Array);
+    pub fn send_rust_signal_extern(
+        resource: i32,
+        message_bytes: Uint8Array,
+        binary: Uint8Array,
+    );
 }
 
 pub fn send_rust_signal_real(

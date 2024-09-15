@@ -4,10 +4,11 @@ use std::sync::{Arc, Condvar, LazyLock, Mutex};
 use std::task::{Context, Poll, Waker};
 
 type ShutdownEventsLock = LazyLock<ShutdownEvents>;
-pub static SHUTDOWN_EVENTS: ShutdownEventsLock = LazyLock::new(|| ShutdownEvents {
-    dart_stopped: Event::new(),
-    rust_stopped: Event::new(),
-});
+pub static SHUTDOWN_EVENTS: ShutdownEventsLock =
+    LazyLock::new(|| ShutdownEvents {
+        dart_stopped: Event::new(),
+        rust_stopped: Event::new(),
+    });
 
 /// A collection of shutdown events
 /// expected to occur one by one on app close.
@@ -76,7 +77,8 @@ impl Event {
     /// will block until `set` is called by another thread.
     #[cfg(not(target_family = "wasm"))]
     pub fn wait(&self) {
-        let event_blocking = EventBlocking::new(self.inner.clone(), self.condvar.clone());
+        let event_blocking =
+            EventBlocking::new(self.inner.clone(), self.condvar.clone());
         event_blocking.wait();
     }
 

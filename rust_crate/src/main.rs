@@ -15,8 +15,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .to_path_buf()
     } else {
         // Install Protobuf compiler and get the path.
-        let home_path =
-            home::home_dir().ok_or("Could not get home directory for `protoc` installation.")?;
+        let home_path = home::home_dir()
+            .ok_or("Could not get home directory for `protoc` installation.")?;
         let out_path = home_path.join(".local").join("bin");
         fs::create_dir_all(&out_path)?;
         env::set_var(

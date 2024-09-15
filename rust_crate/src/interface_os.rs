@@ -54,7 +54,9 @@ where
         {
             std::panic::set_hook(Box::new(|panic_info| {
                 let backtrace = backtrace::Backtrace::new();
-                crate::debug_print!("A panic occurred in Rust.\n{panic_info}\n{backtrace:?}");
+                crate::debug_print!(
+                    "A panic occurred in Rust.\n{panic_info}\n{backtrace:?}"
+                );
             }));
         }
     }
