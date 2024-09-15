@@ -130,6 +130,7 @@ impl<T> Future for RecvFuture<T> {
 /// used to send messages, and the receiver can be used to receive them
 /// asynchronously. Only one receiver is active at a time, and new receivers
 /// are created by cloning the original receiver.
+#[doc(hidden)]
 pub fn signal_channel<T>() -> (SignalSender<T>, SignalReceiver<T>) {
     let start_receiver_id = 0;
 

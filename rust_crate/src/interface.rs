@@ -25,6 +25,7 @@ pub struct DartSignal<T> {
 /// Even in a single-threaded (current-thread) runtime,
 /// the `Runtime` object itself might be moved between threads,
 /// along with all the tasks it manages.
+#[doc(hidden)]
 #[cfg(not(target_family = "wasm"))]
 pub fn start_rust_logic<F, T>(main_fn: F) -> Result<(), RinfError>
 where
@@ -45,6 +46,7 @@ where
 }
 
 /// Send a signal to Dart.
+#[doc(hidden)]
 pub fn send_rust_signal(
     message_id: i32,
     message_bytes: Vec<u8>,
