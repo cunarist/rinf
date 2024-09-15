@@ -1,6 +1,6 @@
 .md-header {
   background-color: transparent !important;
-  position: static;
+  position: relative;
   box-shadow: none;
 }
 
