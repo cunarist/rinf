@@ -27,3 +27,7 @@ backtrace = { version = "0.3.69", optional = true }
 js-sys = "0.3.70"
 wasm-bindgen = "0.2.93"
 wasm-bindgen-futures = "0.4.43"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
