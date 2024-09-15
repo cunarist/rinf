@@ -160,7 +160,7 @@ impl Future for EventFuture {
     type Output = ();
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        let mut inner = match self.inner.lock() {
+        let mut guard = match self.inner.lock() {
             Ok(inner) => inner,
             Err(poisoned) => poisoned.into_inner(),
         };
@@ -168,18 +168,18 @@ impl Future for EventFuture {
         // Check if the flag is set or if the session count has changed.
         // If the flag is true or the session count is different
         // because a new event session has started, stop polling.
-        if inner.flag || self.started_session != inner.session {
+        if guard.flag || guard.session != self.started_session {
             Poll::Ready(())
         } else {
             // Check if the current waker is already in the list of wakers.
             // If the waker is unique (not already in the list), add it to the list.
             let waker = cx.waker();
-            if !inner
+            if !guard
                 .wakers
                 .iter()
                 .any(|existing_waker| existing_waker.will_wake(waker))
             {
-                inner.wakers.push(waker.clone());
+                guard.wakers.push(waker.clone());
             }
 
             Poll::Pending
