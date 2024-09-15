@@ -9,7 +9,7 @@ theme:
   palette:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
-      primary: grey
+      primary: white
       scheme: default
       toggle:
         icon: material/brightness-7
