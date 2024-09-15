@@ -451,7 +451,7 @@ hash_map.insert(
     Box::new(|message_bytes: &[u8], binary: &[u8]| {
         let message =
             ${normalizePascal(messageName)}::decode(message_bytes)
-            .map_err(|_| RinfError::DecodeMessage)?;
+            .map_err(|_| RinfError::CannotDecodeMessage)?;
         let dart_signal = DartSignal {
             message,
             binary: binary.to_vec(),
