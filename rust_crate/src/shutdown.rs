@@ -88,7 +88,6 @@ impl Event {
     /// This does not affect any waiting threads,
     /// but subsequent calls to `wait` will
     /// block until the flag is set again.
-    #[cfg(debug_assertions)]
     pub fn clear(&self) {
         let mut guard = match self.inner.lock() {
             Ok(inner) => inner,
