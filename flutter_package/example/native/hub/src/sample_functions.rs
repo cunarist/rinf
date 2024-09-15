@@ -8,9 +8,9 @@ use std::time::Duration;
 
 // Using the `cfg` macro enables conditional statement.
 #[cfg(debug_assertions)]
-static IS_DEBUG_MODE: bool = true;
+const IS_DEBUG_MODE: bool = true;
 #[cfg(not(debug_assertions))]
-static IS_DEBUG_MODE: bool = false;
+const IS_DEBUG_MODE: bool = false;
 
 // Business logic for the counter widget.
 pub async fn tell_numbers() {
