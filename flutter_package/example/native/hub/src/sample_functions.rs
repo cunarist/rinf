@@ -193,7 +193,10 @@ pub async fn run_debug_tests() -> Result<()> {
                     prime_count += 1;
                 }
             }
-            format!("There are {prime_count} primes from {count_from} to {count_to}.")
+            format!(
+                "There are {} primes from {} to {}.",
+                prime_count, count_from, count_to,
+            )
         });
         join_handles.push(join_handle);
     }
