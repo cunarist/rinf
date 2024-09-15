@@ -45,16 +45,16 @@ impl Event {
     /// This will wake up any threads or async tasks.
     #[cfg(not(target_family = "wasm"))]
     pub fn set(&self) {
-        let mut inner = match self.inner.lock() {
+        let mut guard = match self.inner.lock() {
             Ok(inner) => inner,
             Err(poisoned) => poisoned.into_inner(),
         };
-        inner.flag = true; // Set the flag
-        inner.session += 1; // Increment the session count
+        guard.flag = true; // Set the flag
+        guard.session += 1; // Increment the session count
 
         // Wake all threads and async tasks when the event is set
         self.condvar.notify_all();
-        for waker in inner.wakers.drain(..) {
+        for waker in guard.wakers.drain(..) {
             waker.wake();
         }
     }
@@ -64,11 +64,11 @@ impl Event {
     /// block until the flag is set again.
     #[cfg(all(not(target_family = "wasm"), debug_assertions))]
     pub fn clear(&self) {
-        let mut inner = match self.inner.lock() {
+        let mut guard = match self.inner.lock() {
             Ok(inner) => inner,
             Err(poisoned) => poisoned.into_inner(),
         };
-        inner.flag = false; // Clear the flag
+        guard.flag = false; // Clear the flag
     }
 
     /// Blocks the current thread until the flag is set to `true`.

@@ -35,15 +35,15 @@ impl<T> SignalSender<T> {
     /// message, it will be woken up. This method does not fail if the mutex
     /// is poisoned but simply ignores the failure.
     pub fn send(&self, msg: T) {
-        let mut inner = match self.inner.lock() {
+        let mut guard = match self.inner.lock() {
             Ok(inner) => inner,
             Err(poisoned) => poisoned.into_inner(),
         };
 
         // Enqueue the message
-        inner.queue.push_back(msg);
+        guard.queue.push_back(msg);
         // Wake up the previous receiver making it receive `None`, if any
-        if let Some(waker) = inner.waker.take() {
+        if let Some(waker) = guard.waker.take() {
             waker.wake();
         }
     }
@@ -69,16 +69,16 @@ impl<T> Clone for SignalReceiver<T> {
     /// original receiver will no longer receive messages after this clone.
     /// This ensures only the most recent receiver can access the message queue.
     fn clone(&self) -> Self {
-        let mut inner = match self.inner.lock() {
+        let mut guard = match self.inner.lock() {
             Ok(inner) => inner,
             Err(poisoned) => poisoned.into_inner(),
         };
         let new_receiver = SignalReceiver {
             inner: self.inner.clone(),
-            id: inner.active_receiver_id + 1, // Increment ID for new receiver
+            id: guard.active_receiver_id + 1, // Increment ID for new receiver
         };
-        inner.active_receiver_id = new_receiver.id;
-        if let Some(waker) = inner.waker.take() {
+        guard.active_receiver_id = new_receiver.id;
+        if let Some(waker) = guard.waker.take() {
             waker.wake();
         }
         new_receiver
@@ -101,22 +101,22 @@ impl<T> Future for RecvFuture<T> {
     /// a message is sent. If this receiver is not the active receiver, it will
     /// return `None`.
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        let mut inner = match self.inner.lock() {
+        let mut guard = match self.inner.lock() {
             Ok(inner) => inner,
             Err(poisoned) => poisoned.into_inner(),
         };
 
         // Only allow the current active receiver to receive messages
-        if inner.active_receiver_id == self.receiver_id {
-            if let Some(msg) = inner.queue.pop_front() {
+        if guard.active_receiver_id == self.receiver_id {
+            if let Some(msg) = guard.queue.pop_front() {
                 // Check if more messages are in the queue
-                if !inner.queue.is_empty() {
+                if !guard.queue.is_empty() {
                     // If so, wake the current task immediately
                     cx.waker().wake_by_ref();
                 }
                 Poll::Ready(Some(msg))
             } else {
-                inner.waker = Some(cx.waker().clone());
+                guard.waker = Some(cx.waker().clone());
                 Poll::Pending
             }
         } else {
