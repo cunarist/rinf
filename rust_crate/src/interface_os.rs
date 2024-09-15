@@ -69,17 +69,15 @@ where
 
     // Spawn a new thread to run the async runtime.
     thread::spawn(move || {
-        // In debug mode, handle potential shutdown events
-        // caused by Dart's hot restart.
-        #[cfg(debug_assertions)]
-        {
-            // Notify that Dart has stopped
-            // to terminate previous async runtime threads.
-            SHUTDOWN_EVENTS.dart_stopped.set();
-            // Reset shutdown events to prepare for a fresh start.
-            SHUTDOWN_EVENTS.dart_stopped.clear();
-            SHUTDOWN_EVENTS.rust_stopped.clear();
-        }
+        // Notify that Dart has stopped
+        // to terminate the previous Rust async runtime threads.
+        // After Dart's hot restart or reopening the app,
+        // Previous Rust async runtime can be still running.
+        SHUTDOWN_EVENTS.dart_stopped.set();
+
+        // Clear shutdown events to prepare for a fresh start.
+        SHUTDOWN_EVENTS.dart_stopped.clear();
+        SHUTDOWN_EVENTS.rust_stopped.clear();
 
         // Execute the long-running function that will block the thread
         // for the entire lifecycle of the app.

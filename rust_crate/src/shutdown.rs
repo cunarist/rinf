@@ -1,12 +1,18 @@
 use std::future::Future;
 use std::pin::Pin;
-use std::sync::{Arc, Condvar, LazyLock, Mutex};
+use std::sync::{Arc, LazyLock, Mutex};
 use std::task::{Context, Poll, Waker};
+
+// Thread-blocking operations are possible
+// only on non-web platforms.
+#[cfg(not(target_family = "wasm"))]
+use std::sync::Condvar;
 
 type ShutdownEventsLock = LazyLock<ShutdownEvents>;
 pub static SHUTDOWN_EVENTS: ShutdownEventsLock =
     LazyLock::new(|| ShutdownEvents {
         dart_stopped: Event::new(),
+        #[cfg(not(target_family = "wasm"))]
         rust_stopped: Event::new(),
     });
 
@@ -14,6 +20,7 @@ pub static SHUTDOWN_EVENTS: ShutdownEventsLock =
 /// expected to occur one by one on app close.
 pub struct ShutdownEvents {
     pub dart_stopped: Event,
+    #[cfg(not(target_family = "wasm"))]
     pub rust_stopped: Event,
 }
 
@@ -30,6 +37,7 @@ pub async fn dart_shutdown() {
 /// threads or async tasks to wait until a condition is met.
 pub struct Event {
     inner: Arc<Mutex<EventInner>>,
+    #[cfg(not(target_family = "wasm"))]
     condvar: Arc<Condvar>,
 }
 
@@ -38,13 +46,29 @@ impl Event {
     pub fn new() -> Self {
         Event {
             inner: Arc::new(Mutex::new(EventInner::new())),
+            #[cfg(not(target_family = "wasm"))]
             condvar: Arc::new(Condvar::new()),
         }
     }
 
+    /// Creates a future that will be resolved
+    /// when the flag is set to `true`.
+    pub fn wait_async(&self) -> EventFuture {
+        let guard = match self.inner.lock() {
+            Ok(inner) => inner,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        EventFuture {
+            started_session: guard.session,
+            inner: self.inner.clone(),
+        }
+    }
+}
+
+#[cfg(not(target_family = "wasm"))]
+impl Event {
     /// Sets the flag to `true` and notifies all waiting threads.
     /// This will wake up any threads or async tasks.
-    #[cfg(not(target_family = "wasm"))]
     pub fn set(&self) {
         let mut guard = match self.inner.lock() {
             Ok(inner) => inner,
@@ -64,7 +88,7 @@ impl Event {
     /// This does not affect any waiting threads,
     /// but subsequent calls to `wait` will
     /// block until the flag is set again.
-    #[cfg(all(not(target_family = "wasm"), debug_assertions))]
+    #[cfg(debug_assertions)]
     pub fn clear(&self) {
         let mut guard = match self.inner.lock() {
             Ok(inner) => inner,
@@ -77,24 +101,10 @@ impl Event {
     /// If the flag is already set,
     /// this method will return immediately.
     /// Otherwise, it will block until `set` is called by another thread.
-    #[cfg(not(target_family = "wasm"))]
     pub fn wait(&self) {
         let event_blocking =
             EventBlocking::new(self.inner.clone(), self.condvar.clone());
         event_blocking.wait();
-    }
-
-    /// Creates a future that will be resolved
-    /// when the flag is set to `true`.
-    pub fn wait_async(&self) -> EventFuture {
-        let guard = match self.inner.lock() {
-            Ok(inner) => inner,
-            Err(poisoned) => poisoned.into_inner(),
-        };
-        EventFuture {
-            started_session: guard.session,
-            inner: self.inner.clone(),
-        }
     }
 }
 
@@ -116,12 +126,14 @@ impl EventInner {
 }
 
 /// Struct to handle waiting with session tracking.
+#[cfg(not(target_family = "wasm"))]
 struct EventBlocking {
     inner: Arc<Mutex<EventInner>>,
     condvar: Arc<Condvar>,
     started_session: usize,
 }
 
+#[cfg(not(target_family = "wasm"))]
 impl EventBlocking {
     fn new(inner: Arc<Mutex<EventInner>>, condvar: Arc<Condvar>) -> Self {
         let guard = match inner.lock() {
