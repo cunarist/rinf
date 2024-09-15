@@ -21,7 +21,6 @@ theme:
         icon: material/brightness-4
   features:
     - navigation.instant
-    - navigation.top
     - navigation.tracking
     - navigation.path
     - navigation.footer
