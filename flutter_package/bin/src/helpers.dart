@@ -8,6 +8,7 @@ import 'config.dart';
 import 'message.dart';
 import 'common.dart';
 import 'internet.dart';
+import 'progress.dart';
 
 /// Creates new folders and files to an existing Flutter project folder.
 Future<void> applyRustTemplate({
@@ -206,9 +207,12 @@ Future<void> copyDirectory(Uri source, Uri destination) async {
 
 Future<void> buildWebassembly(bool isReleaseMode) async {
   // Ensure Rust toolchain.
+  final fillingBar = ProgressBar(
+    total: 3,
+    width: 12,
+  );
   if (isInternetConnected) {
-    print('Ensuring Rust toolchain for the web.' +
-        '\nThis is done by installing it globally on the system.');
+    fillingBar.desc = 'Installing Rust toolchain for the web';
     final processResults = <ProcessResult>[];
     processResults.add(await Process.run('rustup', [
       'toolchain',
@@ -242,12 +246,11 @@ Future<void> buildWebassembly(bool isReleaseMode) async {
     ]));
     processResults.forEach((processResult) {
       if (processResult.exitCode != 0) {
-        print(processResult.stderr.toString().trim());
-        throw Exception('Cannot globally install Rust toolchain for the web.');
+        throw Exception(processResult.stderr);
       }
     });
   } else {
-    print('Skipping ensurement of Rust toolchain for the web.');
+    fillingBar.desc = 'Skipping ensurement of Rust toolchain for the web';
   }
 
   // Prepare the webassembly output path.
@@ -256,7 +259,8 @@ Future<void> buildWebassembly(bool isReleaseMode) async {
   final outputPath = flutterProjectPath.uri.join(subPath);
 
   // Build the webassembly module.
-  print('Compiling Rust with `wasm-pack` to `web` target...');
+  fillingBar.desc = 'Compiling Rust with `wasm-pack` to `web` target';
+  fillingBar.increment();
   final compileCommand = await Process.run(
     'wasm-pack',
     [
@@ -278,12 +282,13 @@ Future<void> buildWebassembly(bool isReleaseMode) async {
     },
   );
   if (compileCommand.exitCode != 0) {
-    print(compileCommand.stderr.toString().trim());
-    throw Exception('Unable to compile Rust into webassembly');
+    throw Exception(compileCommand.stderr);
   }
-  print('Saved `.wasm` and `.js` files to `$subPath`.');
+  fillingBar.desc = 'Saved `.wasm` and `.js` files to `$subPath`';
+  fillingBar.increment();
 
-  print('🎉 Webassembly module is now ready! 🎉');
+  fillingBar.desc = '🎉 Webassembly module is now ready! 🎉';
+  fillingBar.increment();
 
   // Guide the developer how to run Flutter web server with web headers.
   print('To run the Flutter web server, use:');
@@ -293,7 +298,7 @@ Future<void> buildWebassembly(bool isReleaseMode) async {
     '--web-header=Cross-Origin-Opener-Policy=same-origin',
     '--web-header=Cross-Origin-Embedder-Policy=require-corp'
   ];
-  print(commandLines.join(' ${commandLineDivider}\n').onGray);
+  print(commandLines.join(' ${commandLineDivider}\n').dim);
 }
 
 Future<String> getCommandLineDivider() async {
