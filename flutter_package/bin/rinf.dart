@@ -1,4 +1,5 @@
 import 'package:args/command_runner.dart';
+import 'package:chalkdart/chalkstrings.dart';
 
 import 'src/config.dart';
 import 'src/helpers.dart';
@@ -30,7 +31,7 @@ class ConfigCommand extends Command {
 
   Future<void> run() async {
     final rinfConfig = await loadVerifiedRinfConfig('pubspec.yaml');
-    print(rinfConfig);
+    print(rinfConfig.toString().dim);
   }
 }
 
