@@ -3,6 +3,7 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'common.dart';
 
 class ProgressBar {
   /// Total number of steps
@@ -142,7 +143,7 @@ class ProgressBar {
     final frameParts = [bar, '$_current/$_total', perc, timeStr, ':', _desc];
     final filteredParts = frameParts.where((v) => v.isNotEmpty).toList();
     final frame = filteredParts.join(' ');
-    stdout.write('\x1B[2K'); // Clear the line
+    clearCliLine();
     stdout.write('\r');
     stdout.write(frame);
     if (max == _progress) {
