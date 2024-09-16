@@ -1,6 +1,9 @@
 import 'dart:io';
+
 import 'package:package_config/package_config.dart';
 import 'package:yaml/yaml.dart';
+import 'package:chalkdart/chalkstrings.dart';
+
 import 'config.dart';
 import 'message.dart';
 import 'common.dart';
@@ -280,6 +283,8 @@ Future<void> buildWebassembly(bool isReleaseMode) async {
   }
   print('Saved `.wasm` and `.js` files to `$subPath`.');
 
+  print('🎉 Webassembly module is now ready! 🎉');
+
   // Guide the developer how to run Flutter web server with web headers.
   print('To run the Flutter web server, use:');
   final commandLineDivider = await getCommandLineDivider();
@@ -288,9 +293,7 @@ Future<void> buildWebassembly(bool isReleaseMode) async {
     '--web-header=Cross-Origin-Opener-Policy=same-origin',
     '--web-header=Cross-Origin-Embedder-Policy=require-corp'
   ];
-  print(commandLines.join(' ${commandLineDivider}\n'));
-
-  print('🎉 Webassembly module is now ready! 🎉');
+  print(commandLines.join(' ${commandLineDivider}\n').onGray);
 }
 
 Future<String> getCommandLineDivider() async {
