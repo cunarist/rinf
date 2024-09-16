@@ -142,8 +142,7 @@ class ProgressBar {
     final frameParts = [bar, '$_current/$_total', perc, timeStr, ':', _desc];
     final filteredParts = frameParts.where((v) => v.isNotEmpty).toList();
     final frame = filteredParts.join(' ');
-    stdout.write('\r');
-    stdout.write(' ' * 200);
+    stdout.write('\x1B[2K'); // Clear the line
     stdout.write('\r');
     stdout.write(frame);
     if (max == _progress) {
