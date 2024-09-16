@@ -20,7 +20,9 @@ void clearCliLine() {
 }
 
 /// Removes an existing line from the CLI.
-void removeCliLine() {
-  stdout.write('\x1B[1A'); // Move the cursor up one line
-  clearCliLine();
+void removeCliLines(int lines) {
+  for (var i = 0; i < lines; i++) {
+    stdout.write('\x1B[1A'); // Move the cursor up one line
+    clearCliLine();
+  }
 }

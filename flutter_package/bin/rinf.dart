@@ -12,8 +12,7 @@ Future<void> main(List<String> args) async {
   // Unnecessary two lines of
   //`Building package executable...\nBuilt rinf:rinf.` appear.
   // Remove those before proceeding.
-  removeCliLine();
-  removeCliLine();
+  removeCliLines(2);
 
   // Check the internet connection status and rembember it.
   await checkConnectivity();
