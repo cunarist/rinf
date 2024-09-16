@@ -201,7 +201,7 @@ Future<void> copyDirectory(Uri source, Uri destination) async {
   }
 }
 
-Future<void> buildWebassembly({bool isReleaseMode = false}) async {
+Future<void> buildWebassembly(bool isReleaseMode) async {
   // Ensure Rust toolchain.
   if (isInternetConnected) {
     print('Ensuring Rust toolchain for the web.' +
@@ -293,7 +293,7 @@ Future<void> buildWebassembly({bool isReleaseMode = false}) async {
   print('🎉 Webassembly module is now ready! 🎉');
 }
 
-Future<String> getCommandLineDivider({bool isReleaseMode = false}) async {
+Future<String> getCommandLineDivider() async {
   if (Platform.isWindows) {
     // Windows environment, check further for PowerShell or CMD
     if (Platform.environment['SHELL'] == null) {

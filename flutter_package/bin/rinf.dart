@@ -1,55 +1,96 @@
+import 'package:args/command_runner.dart';
+
 import 'src/config.dart';
 import 'src/helpers.dart';
 import 'src/message.dart';
 import 'src/internet.dart';
 
 Future<void> main(List<String> args) async {
-  if (args.isEmpty) {
-    print('No operation is provided.');
-    print('Use `rinf --help` to see all available operations.');
-    return;
-  }
-
-  final rinfConfig = await loadVerifiedRinfConfig('pubspec.yaml');
   await checkConnectivity();
 
-  switch (args[0]) {
-    case 'config':
-      print(rinfConfig);
-      break;
-    case 'template':
-      await applyRustTemplate(messageConfig: rinfConfig.message);
-      break;
-    case 'message':
-      if (args.contains('--watch') || args.contains('-w')) {
-        await watchAndGenerateMessageCode(messageConfig: rinfConfig.message);
-      } else {
-        await generateMessageCode(messageConfig: rinfConfig.message);
-      }
-      break;
-    case 'wasm':
-      if (args.contains('--release') || args.contains('-r')) {
-        await buildWebassembly(isReleaseMode: true);
-      } else {
-        await buildWebassembly();
-      }
-      break;
-    case '--help':
-    case '-h':
-      print('Usage: rinf [arguments]');
-      print('Arguments:');
-      print('  -h, --help        Shows this usage information.');
-      print('  config            Shows current Rinf configuration'
-          '\n                    resolved from `pubspec.yaml`'
-          '\n                    with defaults applied.');
-      print('  template          Applies Rust template'
-          '\n                    to current Flutter project.');
-      print('  message           Generates message code from `.proto` files.');
-      print('    -w, --watch     Continuously watches `.proto` files.');
-      print('  wasm              Builds webassembly module.');
-      print('    -r, --release   Builds in release mode.');
-    default:
-      print('No such operation is available.');
-      print('Use `rinf --help` to see all available operations.');
+  final runner = CommandRunner(
+    'rinf',
+    'Helper commands for building apps with Rust in Flutter.',
+    usageLineLength: 80,
+  )
+    ..addCommand(ConfigCommand())
+    ..addCommand(TemplateCommand())
+    ..addCommand(MessageCommand())
+    ..addCommand(WasmCommand());
+
+  await runner.run(args);
+}
+
+class ConfigCommand extends Command {
+  final name = 'config';
+  final description = 'Shows current Rinf configuration' +
+      ' resolved from `pubspec.yaml` with defaults applied.';
+
+  ConfigCommand() {}
+
+  Future<void> run() async {
+    final rinfConfig = await loadVerifiedRinfConfig('pubspec.yaml');
+    print(rinfConfig);
+  }
+}
+
+class TemplateCommand extends Command {
+  final name = 'template';
+  final description = 'Applies Rust template to the current Flutter project.';
+
+  TemplateCommand() {}
+
+  Future<void> run() async {
+    final rinfConfig = await loadVerifiedRinfConfig('pubspec.yaml');
+    await applyRustTemplate(messageConfig: rinfConfig.message);
+  }
+}
+
+class MessageCommand extends Command {
+  final name = 'message';
+  final description = 'Generates message code from `.proto` files.';
+
+  MessageCommand() {
+    argParser.addFlag(
+      'watch',
+      abbr: 'w',
+      help: 'Continuously watches `.proto` files.',
+    );
+  }
+
+  Future<void> run() async {
+    final results = argResults;
+    if (results == null) {
+      return;
+    }
+    final watch = results.flag('watch');
+    final rinfConfig = await loadVerifiedRinfConfig('pubspec.yaml');
+    if (watch) {
+      await watchAndGenerateMessageCode(messageConfig: rinfConfig.message);
+    } else {
+      await generateMessageCode(messageConfig: rinfConfig.message);
+    }
+  }
+}
+
+class WasmCommand extends Command {
+  final name = 'wasm';
+  final description = 'Builds the webassembly module for the web.';
+
+  WasmCommand() {
+    argParser.addFlag(
+      'release',
+      abbr: 'r',
+      help: 'Builds in release mode.',
+    );
+  }
+
+  Future<void> run() async {
+    final results = argResults;
+    if (results == null) {
+      return;
+    }
+    final release = results.flag('release');
+    await buildWebassembly(release);
   }
 }
