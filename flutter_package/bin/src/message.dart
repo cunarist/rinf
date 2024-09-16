@@ -689,14 +689,14 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
       );
       final content = await protoFile.readAsString();
       final regExp = RegExp(r'{[^}]*}');
-      final attrExp = RegExp(r'(?<=\[RINF:RUST-ATTRIBUTE\().*(?=\)\])');
+      final attrExp = RegExp(r'(?<=\[RUST-ATTRIBUTE\().*(?=\)\])');
 
       // Remove all { ... } blocks from the string
       final contentWithoutBlocks = content.replaceAll(regExp, ';');
       final statements = contentWithoutBlocks.split(';');
       for (final statementRaw in statements) {
         final statement = statementRaw.trim();
-        // To find "}\n\n// [RINF:RUST-SIGNAL]",
+        // To find "}\n\n// [RUST-SIGNAL]",
         // `contains` is used instead of `startsWith`
         String? messageName = null;
         final lines = statement.split('\n');
@@ -711,17 +711,17 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
           continue;
         }
         MarkType? markType = null;
-        if (statement.contains('[RINF:DART-SIGNAL]')) {
+        if (statement.contains('[DART-SIGNAL]')) {
           markType = MarkType.dartSignal;
-        } else if (statement.contains('[RINF:DART-SIGNAL-BINARY]')) {
+        } else if (statement.contains('[DART-SIGNAL-BINARY]')) {
           markType = MarkType.dartSignalBinary;
-        } else if (statement.contains('[RINF:RUST-SIGNAL]')) {
+        } else if (statement.contains('[RUST-SIGNAL]')) {
           markType = MarkType.rustSignal;
-        } else if (statement.contains('[RINF:RUST-SIGNAL-BINARY]')) {
+        } else if (statement.contains('[RUST-SIGNAL-BINARY]')) {
           markType = MarkType.rustSignalBinary;
         }
 
-        // find [RINF:RUST-ATTRIBUTE(...)]
+        // find [RUST-ATTRIBUTE(...)]
         var attr = attrExp.stringMatch(statement);
         if (attr != null) {
           markedMessages[subPath]![filename]!.add(MarkedMessage(
