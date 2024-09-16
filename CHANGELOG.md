@@ -1,3 +1,7 @@
+## 7.0.0-alpha
+
+- This is an alpha version.
+
 ## 6.15.0
 
 - Now it's possible to add attributes to generated message structs in Rust. Thanks @H2Sxxa!

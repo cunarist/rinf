@@ -12,7 +12,7 @@ edition = "2021"
 crate-type = ["lib", "cdylib", "staticlib"]
 
 [dependencies]
-rinf = "6.15.0"
+rinf = "7.0.0-alpha"
 prost = "0.13.0"
 tokio = { version = "1", features = ["rt", "sync", "time", "macros"] }
 tokio_with_wasm = { version = "0.7.1", features = [
