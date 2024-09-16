@@ -6,6 +6,7 @@ import 'package:watcher/watcher.dart';
 import 'config.dart';
 import 'common.dart';
 import 'internet.dart';
+import 'progress.dart';
 
 enum MarkType {
   dartSignal,
@@ -30,6 +31,11 @@ Future<void> generateMessageCode({
   bool silent = false,
   required RinfConfigMessage messageConfig,
 }) async {
+  final fillingBar = ProgressBar(
+    total: 8,
+    width: 16,
+    silent: silent,
+  );
   // Prepare paths.
   final flutterProjectPath = Directory.current;
   final protoPath = flutterProjectPath.uri.join(messageConfig.inputDir);
@@ -43,23 +49,25 @@ Future<void> generateMessageCode({
   await emptyDirectory(dartOutputPath);
 
   // Get the list of `.proto` files.
+  // Also, analyze marked messages in `.proto` files.
+  fillingBar.desc = 'Collecting Protobuf files';
   final resourcesInFolders = <String, List<String>>{};
   await collectProtoFiles(
     Directory.fromUri(protoPath),
     Directory.fromUri(protoPath),
     resourcesInFolders,
   );
-
-  // Analyze marked messages in `.proto` files.
   final markedMessagesAll = await analyzeMarkedMessages(
     protoPath,
     resourcesInFolders,
   );
+  fillingBar.increment();
 
   // Include `package` statement in `.proto` files.
   // Package name should be the same as the filename
   // because Rust filenames are written with package name
   // and Dart filenames are written with the `.proto` filename.
+  fillingBar.desc = 'Normalizing Protobuf files';
   for (final entry in resourcesInFolders.entries) {
     final subPath = entry.key;
     final resourceNames = entry.value;
@@ -84,25 +92,18 @@ Future<void> generateMessageCode({
       await protoFile.writeAsString(outputLines.join('\n') + '\n');
     }
   }
+  fillingBar.increment();
 
   // Generate Rust message files.
+  fillingBar.desc = 'Generating Rust message files';
   if (isInternetConnected) {
-    if (!silent) {
-      print('Ensuring `protoc-gen-prost` for Rust.' +
-          '\nThis is done by installing it globally on the system.');
-    }
     final cargoInstallCommand = await Process.run('cargo', [
       'install',
       'protoc-gen-prost',
       ...(messageConfig.rustSerde ? ['protoc-gen-prost-serde'] : [])
     ]);
     if (cargoInstallCommand.exitCode != 0) {
-      print(cargoInstallCommand.stderr.toString().trim());
-      throw Exception('Cannot globally install `protoc-gen-prost` Rust crate');
-    }
-  } else {
-    if (!silent) {
-      print('Skipping ensurement of `protoc-gen-prost` for Rust.');
+      throw Exception(cargoInstallCommand.stderr);
     }
   }
   for (final entry in resourcesInFolders.entries) {
@@ -132,12 +133,13 @@ Future<void> generateMessageCode({
       })
     ]);
     if (protocRustResult.exitCode != 0) {
-      print(protocRustResult.stderr.toString().trim());
-      throw Exception('Could not compile `.proto` files into Rust');
+      throw Exception(protocRustResult.stderr);
     }
   }
+  fillingBar.increment();
 
   // Generate `mod.rs` for `messages` module in Rust.
+  fillingBar.desc = 'Writing `mod.rs` files';
   for (final entry in resourcesInFolders.entries) {
     final subPath = entry.key;
     final resourceNames = entry.value;
@@ -188,13 +190,11 @@ Future<void> generateMessageCode({
     await File.fromUri(rustOutputPath.join(subPath).join('mod.rs'))
         .writeAsString(modRsContent);
   }
+  fillingBar.increment();
 
   // Generate Dart message files.
+  fillingBar.desc = 'Generating Dart message files';
   if (isInternetConnected) {
-    if (!silent) {
-      print('Ensuring `protoc_plugin` for Dart.' +
-          '\nThis is done by installing it globally on the system.');
-    }
     final pubGlobalActivateCommand = await Process.run('dart', [
       'pub',
       'global',
@@ -202,12 +202,7 @@ Future<void> generateMessageCode({
       'protoc_plugin',
     ]);
     if (pubGlobalActivateCommand.exitCode != 0) {
-      print(pubGlobalActivateCommand.stderr.toString().trim());
-      throw Exception('Cannot globally install `protoc_plugin` Dart package');
-    }
-  } else {
-    if (!silent) {
-      print('Skipping ensurement of `protoc_plugin` for Dart.');
+      throw Exception(pubGlobalActivateCommand.stderr);
     }
   }
   for (final entry in resourcesInFolders.entries) {
@@ -233,12 +228,13 @@ Future<void> generateMessageCode({
       ],
     );
     if (protocDartResult.exitCode != 0) {
-      print(protocDartResult.stderr.toString().trim());
-      throw Exception('Could not compile `.proto` files into Dart');
+      throw Exception(protocDartResult.stderr);
     }
   }
+  fillingBar.increment();
 
   // Generate `exports.dart` for `messages` module in Dart.
+  fillingBar.desc = 'Writing `exports.dart` file';
   final exportsDartLines = <String>[];
   exportsDartLines.add("export './generated.dart';");
   for (final entry in resourcesInFolders.entries) {
@@ -254,8 +250,10 @@ Future<void> generateMessageCode({
   final exportsDartContent = exportsDartLines.join('\n');
   await File.fromUri(dartOutputPath.join('exports.dart'))
       .writeAsString(exportsDartContent);
+  fillingBar.increment();
 
   // Prepare communication channels between Dart and Rust.
+  fillingBar.desc = 'Writing communication channels and streams';
   for (final entry in markedMessagesAll.entries) {
     final subPath = entry.key;
     final filesAndMarks = entry.value;
@@ -540,11 +538,11 @@ void assignRustSignal(int messageId, Uint8List messageBytes, Uint8List binary) {
 ''';
   await File.fromUri(dartOutputPath.join('generated.dart'))
       .writeAsString(dartReceiveScript);
+  fillingBar.increment();
 
   // Notify that it's done
-  if (!silent) {
-    print('🎉 Message code in Dart and Rust is now ready! 🎉');
-  }
+  fillingBar.desc = '🎉 Message code in Dart and Rust is now ready! 🎉';
+  fillingBar.increment();
 }
 
 Future<void> watchAndGenerateMessageCode(

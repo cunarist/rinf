@@ -38,6 +38,9 @@ class ProgressBar {
   /// Width of the bar
   int? width;
 
+  /// Whether the instance should print nothing
+  bool silent;
+
   int get total => _total;
   String get desc => _desc;
 
@@ -60,16 +63,17 @@ class ProgressBar {
   /// - percentage : Toggle percentage display (default : false)
   /// - scale : Scale of the bar relative to width (between: 0 and 1, default: 0.5, Irrelavant if width is specified)
   /// - width : Width of the bar drawn in the CLI
-  ProgressBar(
-      {required int total,
-      String desc = '',
-      this.space = '.',
-      this.fill = '█',
-      this.time = false,
-      this.percentage = false,
-      this.scale = 0.5,
-      this.width = 40})
-      : _desc = desc,
+  ProgressBar({
+    required int total,
+    String desc = '',
+    this.space = '.',
+    this.fill = '█',
+    this.time = false,
+    this.percentage = false,
+    this.scale = 0.5,
+    this.width = 40,
+    this.silent = false,
+  })  : _desc = desc,
         _total = total {
     // Handles width of the bar, throws an error if it's not specified and the terminal width is not available
     try {
@@ -110,6 +114,9 @@ class ProgressBar {
 
   /// Renders a frame of the bar
   void _render() {
+    if (silent) {
+      return;
+    }
     _progress = ((_current / _total) * max).toInt();
     if (_progress >= max) {
       _progress = max;
@@ -136,8 +143,9 @@ class ProgressBar {
     final filteredParts = frameParts.where((v) => v.isNotEmpty).toList();
     final frame = filteredParts.join(' ');
     stdout.write('\r');
+    stdout.write(' ' * 200);
+    stdout.write('\r');
     stdout.write(frame);
-    stdout.write(' ' * 100);
     if (max == _progress) {
       stdout.write('\r\n');
     }

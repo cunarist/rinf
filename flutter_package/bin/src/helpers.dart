@@ -206,11 +206,11 @@ Future<void> copyDirectory(Uri source, Uri destination) async {
 }
 
 Future<void> buildWebassembly(bool isReleaseMode) async {
-  // Ensure Rust toolchain.
   final fillingBar = ProgressBar(
     total: 3,
     width: 12,
   );
+  // Ensure Rust toolchain.
   if (isInternetConnected) {
     fillingBar.desc = 'Installing Rust toolchain for the web';
     final processResults = <ProcessResult>[];
