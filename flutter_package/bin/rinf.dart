@@ -5,10 +5,20 @@ import 'src/config.dart';
 import 'src/helpers.dart';
 import 'src/message.dart';
 import 'src/internet.dart';
+import 'src/common.dart';
 
 Future<void> main(List<String> args) async {
+  // After running `dart run rinf`,
+  // Unnecessary two lines of
+  //`Building package executable...\nBuilt rinf:rinf.` appear.
+  // Remove those before proceeding.
+  removeCliLine();
+  removeCliLine();
+
+  // Check the internet connection status and rembember it.
   await checkConnectivity();
 
+  // Parse CLI arguments and run the corresponding function.
   final runner = CommandRunner(
     'rinf',
     'Helper commands for building apps with Rust in Flutter.',
