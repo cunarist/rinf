@@ -144,10 +144,9 @@ class ProgressBar {
     final filteredParts = frameParts.where((v) => v.isNotEmpty).toList();
     final frame = filteredParts.join(' ');
     clearCliLine();
-    stdout.write('\r');
     stdout.write(frame);
     if (max == _progress) {
-      stdout.write('\r\n');
+      stdout.write('\n');
     }
   }
 }

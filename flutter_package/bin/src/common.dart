@@ -17,6 +17,7 @@ extension UriJoin on Uri {
 
 void clearCliLine() {
   stdout.write('\x1B[2K'); // Clear the line
+  stdout.write('\r'); // Return the cursor
 }
 
 /// Removes an existing line from the CLI.
