@@ -290,8 +290,7 @@ import 'package:rinf/rinf.dart';
 use prost::Message;
 use rinf::{
     debug_print, send_rust_signal, signal_channel,
-    DartSignal, RinfError, SignalReceiver,
-    SignalSender,
+    DartSignal, SignalReceiver, SignalSender,
 };
 use std::sync::LazyLock;
 
@@ -422,29 +421,21 @@ impl ${normalizePascal(messageName)} {
 #![allow(unused_imports)]
 #![allow(unused_mut)]
 
+use super::*;
 use prost::Message;
-use rinf::{debug_print, signal_channel, DartSignal, RinfError};
+use rinf::{DartSignal, RinfError};
 use std::collections::HashMap;
-use std::error::Error;
-use std::sync::OnceLock;
+use std::sync::LazyLock;
 
 type Handler = dyn Fn(&[u8], &[u8]) -> Result<(), RinfError> + Send + Sync;
 type DartSignalHandlers = HashMap<i32, Box<Handler>>;
-static DART_SIGNAL_HANDLERS: OnceLock<DartSignalHandlers> = OnceLock::new();
-
-pub fn assign_dart_signal(
-    message_id: i32,
-    message_bytes: &[u8],
-    binary: &[u8]
-) -> Result<(), RinfError> {    
-    let hash_map = DART_SIGNAL_HANDLERS.get_or_init(|| {
-        let mut new_hash_map: DartSignalHandlers = HashMap::new();
+static DART_SIGNAL_HANDLERS: LazyLock<DartSignalHandlers> = LazyLock::new(|| {
+    let mut hash_map: DartSignalHandlers = HashMap::new();
 ''';
   for (final entry in markedMessagesAll.entries) {
     final subpath = entry.key;
     final files = entry.value;
     for (final entry in files.entries) {
-      final filename = entry.key;
       final markedMessages = entry.value;
       for (final markedMessage in markedMessages) {
         final markType = markedMessage.markType;
@@ -455,13 +446,12 @@ pub fn assign_dart_signal(
           var modulePath = subpath.replaceAll('/', '::');
           modulePath = modulePath == '::' ? '' : modulePath;
           rustReceiveScript += '''
-new_hash_map.insert(
+hash_map.insert(
     ${markedMessage.id},
     Box::new(|message_bytes: &[u8], binary: &[u8]| {
-        use super::$modulePath$filename::*;
         let message =
             ${normalizePascal(messageName)}::decode(message_bytes)
-            .map_err(|_| RinfError::DecodeMessage)?;
+            .map_err(|_| RinfError::CannotDecodeMessage)?;
         let dart_signal = DartSignal {
             message,
             binary: binary.to_vec(),
@@ -476,10 +466,15 @@ new_hash_map.insert(
     }
   }
   rustReceiveScript += '''
-        new_hash_map
-    });
+    hash_map
+});
 
-    let signal_handler = match hash_map.get(&message_id) {
+pub fn assign_dart_signal(
+    message_id: i32,
+    message_bytes: &[u8],
+    binary: &[u8]
+) -> Result<(), RinfError> {
+    let signal_handler = match DART_SIGNAL_HANDLERS.get(&message_id) {
         Some(inner) => inner,
         None => return Err(RinfError::NoSignalHandler),
     };

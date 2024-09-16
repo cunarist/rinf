@@ -1,11 +1,9 @@
 //! This `hub` crate is the
 //! entry point of the Rust logic.
 
-mod common;
 mod messages;
+mod sample_functions;
 
-use crate::common::*;
-use crate::messages::*;
 // use tokio_with_wasm::alias as tokio; // Uncomment this line to target the web.
 
 rinf::write_interface!();
@@ -16,26 +14,10 @@ rinf::write_interface!();
 // If you really need to use blocking code,
 // use `tokio::task::spawn_blocking`.
 #[tokio::main(flavor = "current_thread")]
-async fn main() -> Result<()> {
+async fn main() {
     // Spawn the concurrent tasks.
-    tokio::spawn(communicate());
+    tokio::spawn(sample_functions::communicate());
 
-    // Get the shutdown receiver from Rinf.
-    // This receiver will await a signal from Dart shutdown.
-    let shutdown_receiver = rinf::get_shutdown_receiver()?;
-    shutdown_receiver.await;
-
-    Ok(())
-}
-
-async fn communicate() {
-    // Send signals to Dart like below.
-    SmallNumber { number: 7 }.send_signal_to_dart();
-
-    // Get receivers that listen to Dart signals like below.
-    let receiver = SmallText::get_dart_signal_receiver();
-    while let Some(dart_signal) = receiver.recv().await {
-        let message: SmallText = dart_signal.message;
-        rinf::debug_print!("{message:?}");
-    }
+    // Keep the main function running until Dart shutdown.
+    rinf::dart_shutdown().await;
 }

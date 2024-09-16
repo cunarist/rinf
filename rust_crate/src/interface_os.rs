@@ -1,9 +1,9 @@
 use crate::error::RinfError;
-use crate::shutdown::{create_shutdown_channel, SHUTDOWN_SENDER};
+use crate::shutdown::SHUTDOWN_EVENTS;
 use allo_isolate::{IntoDart, Isolate, ZeroCopyBuffer};
 use os_thread_local::ThreadLocal;
-use std::cell::RefCell;
 use std::sync::Mutex;
+use std::sync::OnceLock;
 use std::thread;
 
 static DART_ISOLATE: Mutex<Option<Isolate>> = Mutex::new(None);
@@ -13,20 +13,35 @@ pub extern "C" fn prepare_isolate_extern(port: i64) {
     let dart_isolate = Isolate::new(port);
     let mut guard = match DART_ISOLATE.lock() {
         Ok(inner) => inner,
-        Err(_) => {
-            let error = RinfError::LockDartIsolate;
-            println!("{error}");
-            return;
-        }
+        Err(poisoned) => poisoned.into_inner(),
     };
     guard.replace(dart_isolate);
+}
+
+// We use `os_thread_local` so that when the program fails
+// and the main thread exits unexpectedly,
+// the whole Rust async runtime shuts down accordingly.
+// Without this solution,
+// zombie threads inside the Rust async runtime might outlive the app.
+// This `ThreadLocal` is intended to be used only on the main thread,
+type ShutdownDropperLock = OnceLock<ThreadLocal<ShutdownDropper>>;
+static SHUTDOWN_DROPPER: ShutdownDropperLock = OnceLock::new();
+
+/// Notifies Rust that Dart thread has exited when dropped.
+pub struct ShutdownDropper;
+
+impl Drop for ShutdownDropper {
+    fn drop(&mut self) {
+        SHUTDOWN_EVENTS.dart_stopped.set();
+        SHUTDOWN_EVENTS.rust_stopped.wait();
+    }
 }
 
 pub fn start_rust_logic_real<F, T>(main_fn: F) -> Result<(), RinfError>
 where
     F: Fn() -> T + Send + 'static,
 {
-    // Enable backtrace output for panics.
+    // Enable console output for panics.
     #[cfg(debug_assertions)]
     {
         #[cfg(not(feature = "backtrace"))]
@@ -39,20 +54,40 @@ where
         {
             std::panic::set_hook(Box::new(|panic_info| {
                 let backtrace = backtrace::Backtrace::new();
-                crate::debug_print!("A panic occurred in Rust.\n{panic_info}\n{backtrace:?}");
+                crate::debug_print!(
+                    "A panic occurred in Rust.\n{panic_info}\n{backtrace:?}"
+                );
             }));
         }
     }
 
-    // Prepare the channel that will help notify async runtime to shutdown
-    // after the main Dart thread has gone.
-    let shutdown_reporter = create_shutdown_channel()?;
+    // Prepare the shutdown dropper that will notify the Rust async runtime
+    // after Dart thread has exited.
+    // This code assumes that this is the main thread.
+    let thread_local = ThreadLocal::new(|| ShutdownDropper);
+    let _ = SHUTDOWN_DROPPER.set(thread_local);
 
-    // Run the async runtime.
+    // Spawn a new thread to run the async runtime.
     thread::spawn(move || {
+        // Notify that Dart has stopped
+        // to terminate the previous Rust async runtime threads.
+        // After Dart's hot restart or reopening the app,
+        // Previous Rust async runtime can be still running.
+        SHUTDOWN_EVENTS.dart_stopped.set();
+
+        // Clear shutdown events to prepare for a fresh start.
+        SHUTDOWN_EVENTS.dart_stopped.clear();
+        SHUTDOWN_EVENTS.rust_stopped.clear();
+
+        // Execute the long-running function that will block the thread
+        // for the entire lifecycle of the app.
+        // This function runs the async Rust runtime.
         main_fn();
-        // After the runtime is closed, tell the main thread to stop waiting.
-        drop(shutdown_reporter);
+
+        // After the Rust async runtime is closed,
+        // notify the main Dart thread to stop blocking
+        // and allow the application to exit.
+        SHUTDOWN_EVENTS.rust_stopped.set();
     });
 
     Ok(())
@@ -60,14 +95,7 @@ where
 
 #[no_mangle]
 pub extern "C" fn stop_rust_logic_extern() {
-    let sender_lock = SHUTDOWN_SENDER.get_or_init(move || ThreadLocal::new(|| RefCell::new(None)));
-    let sender_option = sender_lock.with(|cell| cell.take());
-    if let Some(shutdown_sender) = sender_option {
-        // Dropping the sender tells the async runtime to stop running.
-        // Also, it blocks the main thread until
-        // it gets the report that async runtime is dropped.
-        drop(shutdown_sender);
-    }
+    SHUTDOWN_EVENTS.dart_stopped.set();
 }
 
 pub fn send_rust_signal_real(
@@ -77,9 +105,10 @@ pub fn send_rust_signal_real(
 ) -> Result<(), RinfError> {
     // When `DART_ISOLATE` is not initialized, just return the error.
     // This can happen when running test code in Rust.
-    let guard = DART_ISOLATE
-        .lock()
-        .map_err(|_| RinfError::LockDartIsolate)?;
+    let guard = match DART_ISOLATE.lock() {
+        Ok(inner) => inner,
+        Err(poisoned) => poisoned.into_inner(),
+    };
     let dart_isolate = guard.as_ref().ok_or(RinfError::NoDartIsolate)?;
 
     // If a `Vec<u8>` is empty, we can't just simply send it to Dart

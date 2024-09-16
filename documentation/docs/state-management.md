@@ -16,7 +16,7 @@ Several crates on `crates.io` provide building blocks for implementing the actor
 
 Here’s a basic example using the [`actix`](https://github.com/actix/actix) crate, a popular choice for the actor model:
 
-```rust
+```rust title="Rust"
 use actix::prelude::*;
 
 // this is our Message

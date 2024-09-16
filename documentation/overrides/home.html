@@ -1,8 +1,14 @@
-{% extends "main.html" %}
+{% extends "base.html" %}
 <!-- END OF BLOCK -->
 
 {% block tabs %}
 <style>
+  [data-md-color-scheme="default"] {
+    --md-default-bg-color: #ffffff;
+  }
+  [data-md-color-scheme="slate"] {
+    --md-default-bg-color: #141414;
+  }
   .outermost {
     padding: 0px 24px 0px;
     text-align: center;
@@ -35,7 +41,7 @@
     box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.4);
     margin-bottom: 24px;
     width: 400px;
-    max-width: 50svw !important;
+    max-width: 72svw !important;
     outline: 1px solid rgba(122, 122, 122, 1);
     outline-offset: -1px;
     filter: grayscale();
@@ -49,24 +55,31 @@
   .spacing {
     height: 40px;
   }
+  .description-text {
+    padding: 0px 40px;
+  }
   .guide-box {
     max-width: min(36em, 80svw);
-    min-width: 14em;
+    min-width: 18em;
     margin: 0em auto 0em;
-    padding: 8px;
+    padding: 16px;
     text-align: left;
     flex: 1;
   }
   .repeated-box {
-    max-width: 14em;
-    min-width: 14em;
+    width: 14em;
+    height: 28em;
     margin: 8px;
     padding: 24px;
     text-align: left;
     background-color: rgba(127, 127, 127, 0.08);
     border-radius: 4px;
-    height: 30em;
-    flex: 1;
+  }
+  @media (max-width: 40em) {
+    .repeated-box {
+      width: 100%;
+      height: fit-content;
+    }
   }
   .lang-icon {
     margin-top: 30px;
@@ -94,18 +107,23 @@
 <div class="md-grid md-typeset outermost">
   <div class="front-panel">
     <div class="spacing"></div>
-    <div class="centered">
-      <img
-        src="assets/preview.webp"
-        loop
-        class="preview-image"
-        draggable="false"
-      />
+    <div>
+      <a
+        href="https://rinf-demo.cunarist.com"
+        target="_blank"
+        title="Visit demo"
+      >
+        <img
+          src="assets/preview.webp"
+          loop
+          class="preview-image"
+          draggable="false"
+        />
+      </a>
     </div>
-    <div class="centered">
-      <p class="semi-transparent">
-        Production-ready framework for creating beautiful and performant
-        cross-platform apps
+    <div>
+      <p class="semi-transparent description-text">
+        Build beautiful and performant cross-platform apps
       </p>
       <p class="web-title">Rinf</p>
       <p class="semi-transparent"><strong>RUST IN FLUTTER</strong></p>
@@ -113,22 +131,7 @@
     <div class="spacing"></div>
   </div>
   <div class="spacing"></div>
-  <div class="centered">
-    <h2>Quick Start</h2>
-    <div class="spacing"></div>
-    <a href="{{ page.next_page.url | url }}" class="md-button fixed-button">
-      Read the Docs
-    </a>
-    <a
-      href="https://rinf-demo.cunarist.com"
-      class="md-button fixed-button"
-      target="_blank"
-    >
-      Visit demo
-    </a>
-  </div>
-  <div class="spacing"></div>
-  <div class="centered">
+  <div>
     <h2>The Combination</h2>
     <div class="columns">
       <div class="guide-box">
@@ -184,7 +187,7 @@
     </div>
   </div>
   <div class="spacing"></div>
-  <div class="centered">
+  <div>
     <h2>Platform Support</h2>
     <div class="guide-box">
       <p>
@@ -207,7 +210,7 @@
     </div>
   </div>
   <div class="spacing"></div>
-  <div class="centered">
+  <div>
     <h2>Benefits</h2>
     <div class="columns">
       <div class="repeated-box">
@@ -274,6 +277,7 @@
       </div>
     </div>
   </div>
+  <div class="spacing"></div>
 </div>
 {% endblock %}
 <!-- END OF BLOCK -->

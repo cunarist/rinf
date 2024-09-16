@@ -1,5 +1,5 @@
 #[cfg(not(target_family = "wasm"))]
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<(), String> {
     use std::env;
     use std::fs;
     use std::path;
@@ -15,10 +15,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .to_path_buf()
     } else {
         // Install Protobuf compiler and get the path.
-        let home_path =
-            home::home_dir().ok_or("Could not get home directory for `protoc` installation.")?;
+        let home_path = home::home_dir()
+            .ok_or("Could not get home directory for `protoc` installation.")?;
         let out_path = home_path.join(".local").join("bin");
-        fs::create_dir_all(&out_path)?;
+        fs::create_dir_all(&out_path).map_err(|_| {
+            "Could not create the folder for `protoc` installation."
+        })?;
         env::set_var(
             "OUT_DIR",
             out_path
@@ -41,14 +43,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Find the path where Dart executables are located.
     #[cfg(target_family = "windows")]
-    let pub_cache_bin_path = path::PathBuf::from(env::var("LOCALAPPDATA")?)
-        .join("Pub")
-        .join("Cache")
-        .join("bin");
+    let pub_cache_bin_path = path::PathBuf::from(
+        env::var("LOCALAPPDATA")
+            .map_err(|_| "Could not get `LOCALAPPDATA` path.")?,
+    )
+    .join("Pub")
+    .join("Cache")
+    .join("bin");
     #[cfg(target_family = "unix")]
-    let pub_cache_bin_path = path::PathBuf::from(env::var("HOME")?)
-        .join(".pub-cache")
-        .join("bin");
+    let pub_cache_bin_path = path::PathBuf::from(
+        env::var("HOME").map_err(|_| "Could get find `HOME` path.")?,
+    )
+    .join(".pub-cache")
+    .join("bin");
 
     // Add some folders to PATH for various commands to work correctly.
     let mut path_var = match env::var_os("PATH") {
@@ -57,23 +64,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
     path_var.push(protoc_path);
     path_var.push(pub_cache_bin_path);
-    env::set_var("PATH", env::join_paths(path_var)?);
+    env::set_var(
+        "PATH",
+        env::join_paths(path_var)
+            .map_err(|_| "Could not push required values to `PATH`.")?,
+    );
 
     // Get command-line arguments excluding the program name.
     let dart_command_args: Vec<String> = env::args().skip(1).collect();
 
     // Run the Dart script.
-    let dart_path = which::which("dart")?;
+    let dart_path = which::which("dart")
+        .map_err(|_| "Could not find where Dart is located.")?;
     let mut command = process::Command::new(dart_path);
     command.args(["run", "rinf"]);
     command.args(&dart_command_args);
-    command.status()?;
+    command.status().map_err(|_| "Rinf command has failed.")?;
 
     Ok(())
 }
 
 #[cfg(target_family = "wasm")]
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<(), String> {
     // Dummy function to make the linter happy.
     Ok(())
 }

@@ -1,148 +1,205 @@
-use crate::error::RinfError;
-use os_thread_local::ThreadLocal;
-use std::cell::RefCell;
 use std::future::Future;
 use std::pin::Pin;
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Condvar, Mutex, OnceLock};
+use std::sync::{Arc, LazyLock, Mutex};
 use std::task::{Context, Poll, Waker};
 
-// We use `os_thread_local` so that when the program fails
-// and the main thread exits unexpectedly,
-// the whole async runtime can shut down as well
-// by receiving a signal via the shutdown channel.
-// Without this solution,
-// zombie threads inside the async runtime might outlive the app.
-// This `ThreadLocal` is intended to be used only on the main thread.
-type ShutdownSenderLock = OnceLock<ThreadLocal<RefCell<Option<ShutdownSender>>>>;
-pub static SHUTDOWN_SENDER: ShutdownSenderLock = OnceLock::new();
+// Thread-blocking operations are possible
+// only on non-web platforms.
+#[cfg(not(target_family = "wasm"))]
+use std::sync::Condvar;
 
-type ShutdownReceiverLock = Mutex<Option<ShutdownReceiver>>;
-pub static SHUTDOWN_RECEIVER: ShutdownReceiverLock = Mutex::new(None);
+type ShutdownEventsLock = LazyLock<ShutdownEvents>;
+pub static SHUTDOWN_EVENTS: ShutdownEventsLock =
+    LazyLock::new(|| ShutdownEvents {
+        dart_stopped: Event::new(),
+        #[cfg(not(target_family = "wasm"))]
+        rust_stopped: Event::new(),
+    });
+
+/// A collection of shutdown events
+/// expected to occur one by one on app close.
+pub struct ShutdownEvents {
+    pub dart_stopped: Event,
+    #[cfg(not(target_family = "wasm"))]
+    pub rust_stopped: Event,
+}
 
 /// Retrieves the shutdown receiver that listens for
 /// the Dart runtime's closure.
 /// Awaiting this receiver in the async main Rust function
 /// is necessary to prevent the async runtime in Rust from
 /// finishing immediately.
-pub fn get_shutdown_receiver() -> Result<ShutdownReceiver, RinfError> {
-    let mut reciver_lock = SHUTDOWN_RECEIVER
-        .lock()
-        .map_err(|_| RinfError::LockShutdownReceiver)?;
-    reciver_lock.take().ok_or(RinfError::NoShutdownReceiver)
+pub async fn dart_shutdown() {
+    SHUTDOWN_EVENTS.dart_stopped.wait_async().await;
 }
 
-pub fn create_shutdown_channel() -> Result<ShutdownReporter, RinfError> {
-    let (shutdown_sender, shutdown_receiver, shutdown_reporter) = shutdown_channel();
-
-    let sender_lock = SHUTDOWN_SENDER.get_or_init(move || ThreadLocal::new(|| RefCell::new(None)));
-    sender_lock.with(|cell| cell.replace(Some(shutdown_sender)));
-
-    let mut reciver_lock = SHUTDOWN_RECEIVER
-        .lock()
-        .map_err(|_| RinfError::LockShutdownReceiver)?;
-    reciver_lock.replace(shutdown_receiver);
-
-    Ok(shutdown_reporter)
+/// Synchronization primitive that allows
+/// threads or async tasks to wait until a condition is met.
+pub struct Event {
+    inner: Arc<Mutex<EventInner>>,
+    #[cfg(not(target_family = "wasm"))]
+    condvar: Arc<Condvar>,
 }
 
-type ChannelTuple = (ShutdownSender, ShutdownReceiver, ShutdownReporter);
-fn shutdown_channel() -> ChannelTuple {
-    let should_shutdown = Arc::new(AtomicBool::new(false));
-    let waker = Arc::new(Mutex::new(None));
-    let did_shutdown = Arc::new(Mutex::new(false));
-    let is_done = Arc::new(Condvar::new());
-
-    let sender = ShutdownSender {
-        should_shutdown: should_shutdown.clone(),
-        waker: waker.clone(),
-        did_shutdown: did_shutdown.clone(),
-        is_done: is_done.clone(),
-    };
-    let receiver = ShutdownReceiver {
-        should_shutdown,
-        waker,
-    };
-    let reporter = ShutdownReporter {
-        did_shutdown,
-        is_done,
-    };
-
-    (sender, receiver, reporter)
-}
-
-pub struct ShutdownSender {
-    should_shutdown: Arc<AtomicBool>,
-    waker: Arc<Mutex<Option<Waker>>>,
-    did_shutdown: Arc<Mutex<bool>>,
-    is_done: Arc<Condvar>,
-}
-
-impl Drop for ShutdownSender {
-    fn drop(&mut self) {
-        self.should_shutdown.store(true, Ordering::SeqCst);
-        if let Ok(mut guard) = self.waker.lock() {
-            if let Some(waker) = guard.take() {
-                waker.wake();
-            }
+impl Event {
+    /// Creates a new `Event` with the initial flag state.
+    pub fn new() -> Self {
+        Event {
+            inner: Arc::new(Mutex::new(EventInner::new())),
+            #[cfg(not(target_family = "wasm"))]
+            condvar: Arc::new(Condvar::new()),
         }
-        while let Ok(guard) = self.did_shutdown.lock() {
-            if *guard {
+    }
+
+    /// Creates a future that will be resolved
+    /// when the flag is set to `true`.
+    pub fn wait_async(&self) -> EventFuture {
+        let guard = match self.inner.lock() {
+            Ok(inner) => inner,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        EventFuture {
+            started_session: guard.session,
+            inner: self.inner.clone(),
+        }
+    }
+}
+
+#[cfg(not(target_family = "wasm"))]
+impl Event {
+    /// Sets the flag to `true` and notifies all waiting threads.
+    /// This will wake up any threads or async tasks.
+    pub fn set(&self) {
+        let mut guard = match self.inner.lock() {
+            Ok(inner) => inner,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        guard.flag = true; // Set the flag
+        guard.session += 1; // Increment the session count
+
+        // Wake all threads and async tasks when the event is set
+        self.condvar.notify_all();
+        for waker in guard.wakers.drain(..) {
+            waker.wake();
+        }
+    }
+
+    /// Clears the flag, setting it to `false`.
+    /// This does not affect any waiting threads,
+    /// but subsequent calls to `wait` will
+    /// block until the flag is set again.
+    pub fn clear(&self) {
+        let mut guard = match self.inner.lock() {
+            Ok(inner) => inner,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        guard.flag = false; // Clear the flag
+    }
+
+    /// Blocks the current thread until the flag is set to `true`.
+    /// If the flag is already set,
+    /// this method will return immediately.
+    /// Otherwise, it will block until `set` is called by another thread.
+    pub fn wait(&self) {
+        let event_blocking =
+            EventBlocking::new(self.inner.clone(), self.condvar.clone());
+        event_blocking.wait();
+    }
+}
+
+/// Internal state for the `Event` synchronization primitive.
+struct EventInner {
+    flag: bool,         // Current flag state
+    session: usize,     // Session count to detect changes
+    wakers: Vec<Waker>, // List of wakers to be notified
+}
+
+impl EventInner {
+    fn new() -> Self {
+        EventInner {
+            flag: false,
+            session: 0,
+            wakers: Vec::new(),
+        }
+    }
+}
+
+/// Struct to handle waiting with session tracking.
+#[cfg(not(target_family = "wasm"))]
+struct EventBlocking {
+    inner: Arc<Mutex<EventInner>>,
+    condvar: Arc<Condvar>,
+    started_session: usize,
+}
+
+#[cfg(not(target_family = "wasm"))]
+impl EventBlocking {
+    fn new(inner: Arc<Mutex<EventInner>>, condvar: Arc<Condvar>) -> Self {
+        let guard = match inner.lock() {
+            Ok(inner) => inner,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        EventBlocking {
+            inner: inner.clone(),
+            condvar,
+            started_session: guard.session,
+        }
+    }
+
+    pub fn wait(&self) {
+        // Lock the inner state and wait on the condition variable
+        let mut guard = match self.inner.lock() {
+            Ok(inner) => inner,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        loop {
+            // Check if the condition is met
+            if guard.flag || guard.session != self.started_session {
                 break;
-            } else {
-                let _unused = self.is_done.wait(guard);
             }
+            // Wait on the condition variable and reassign the guard
+            guard = match self.condvar.wait(guard) {
+                Ok(inner) => inner,
+                Err(poisoned) => poisoned.into_inner(),
+            };
         }
     }
 }
 
-pub struct ShutdownReceiver {
-    should_shutdown: Arc<AtomicBool>,
-    waker: Arc<Mutex<Option<Waker>>>,
+/// Future that resolves when the `Event` flag is set to `true`.
+pub struct EventFuture {
+    started_session: usize,
+    inner: Arc<Mutex<EventInner>>, // Use the combined inner state
 }
 
-impl Future for ShutdownReceiver {
+impl Future for EventFuture {
     type Output = ();
+
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        if !self.should_shutdown.load(Ordering::SeqCst) {
-            if let Ok(mut guard) = self.waker.lock() {
-                guard.replace(cx.waker().clone());
-            }
-            Poll::Pending
-        } else {
+        let mut guard = match self.inner.lock() {
+            Ok(inner) => inner,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+
+        // Check if the flag is set or if the session count has changed.
+        // If the flag is true or the session count is different
+        // because a new event session has started, stop polling.
+        if guard.flag || guard.session != self.started_session {
             Poll::Ready(())
-        }
-    }
-}
+        } else {
+            // Check if the current waker is already in the list of wakers.
+            // If the waker is unique (not already in the list),
+            // add it to the list.
+            let waker = cx.waker();
+            if !guard
+                .wakers
+                .iter()
+                .any(|existing_waker| existing_waker.will_wake(waker))
+            {
+                guard.wakers.push(waker.clone());
+            }
 
-pub struct ShutdownReporter {
-    did_shutdown: Arc<Mutex<bool>>,
-    is_done: Arc<Condvar>,
-}
-
-impl Drop for ShutdownReporter {
-    fn drop(&mut self) {
-        if let Ok(mut guard) = self.did_shutdown.lock() {
-            *guard = true;
-        }
-        self.is_done.notify_all();
-    }
-}
-
-// `os_thread_local` is only available on native platforms,
-// Let's simply mimic `ThreadLocal` on the web.
-#[cfg(target_family = "wasm")]
-mod os_thread_local {
-    pub struct ThreadLocal<T> {
-        inner: T,
-    }
-    unsafe impl<T> Sync for ThreadLocal<T> {}
-    impl<T> ThreadLocal<T> {
-        pub fn new<F: Fn() -> T>(inner: F) -> ThreadLocal<T> {
-            ThreadLocal { inner: inner() }
-        }
-        pub fn with<R, F: FnOnce(&T) -> R>(&self, f: F) {
-            f(&self.inner);
+            Poll::Pending
         }
     }
 }

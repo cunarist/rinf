@@ -16,14 +16,18 @@ bevy = ["bevy_ecs"]
 bevy_ecs = { version = "0.14", optional = true }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
+allo-isolate = "0.1.25"
 os-thread-local = "0.1.3"
-backtrace = { version = "0.3.69", optional = true }
 protoc-prebuilt = "0.3.0"
 home = "0.5.9"
 which = "6.0.0"
-allo-isolate = "0.1.25"
+backtrace = { version = "0.3.69", optional = true }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3.70"
 wasm-bindgen = "0.2.93"
 wasm-bindgen-futures = "0.4.43"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"

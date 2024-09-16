@@ -33,7 +33,13 @@ pub fn draw_fractal_image(scale: f64) -> Result<Vec<u8>, ExampleError> {
     }
 }
 
-fn render(buffer: &mut [u8], height: u32, point_x: f64, point_y: f64, scale: f64) {
+fn render(
+    buffer: &mut [u8],
+    height: u32,
+    point_x: f64,
+    point_y: f64,
+    scale: f64,
+) {
     for y in 0..height {
         let (line, line_number) = render_line(y, point_x, point_y, scale);
         write_line(buffer, &line, line_number);
@@ -42,20 +48,30 @@ fn render(buffer: &mut [u8], height: u32, point_x: f64, point_y: f64, scale: f64
 
 fn write_line(buffer: &mut [u8], line: &[u8], line_number: u32) {
     for i in 0..WIDTH {
-        buffer[(((line_number * WIDTH) + i) * 3) as usize] = line[(i * 3) as usize];
-        buffer[((((line_number * WIDTH) + i) * 3) + 1) as usize] = line[((i * 3) + 1) as usize];
-        buffer[((((line_number * WIDTH) + i) * 3) + 2) as usize] = line[((i * 3) + 2) as usize];
+        buffer[(((line_number * WIDTH) + i) * 3) as usize] =
+            line[(i * 3) as usize];
+        buffer[((((line_number * WIDTH) + i) * 3) + 1) as usize] =
+            line[((i * 3) + 1) as usize];
+        buffer[((((line_number * WIDTH) + i) * 3) + 2) as usize] =
+            line[((i * 3) + 2) as usize];
     }
 }
 
-fn render_line(line_number: u32, px: f64, py: f64, scale: f64) -> (Vec<u8>, u32) {
+fn render_line(
+    line_number: u32,
+    px: f64,
+    py: f64,
+    scale: f64,
+) -> (Vec<u8>, u32) {
     let line_size = WIDTH * 3;
     let mut line: Vec<u8> = vec![0; line_size as usize];
 
     for x in 0..WIDTH {
         // Calculate the offset from the center for x and y
-        let center_offset_x = (x as f64 - WIDTH as f64 / 2.0) / (WIDTH as f64 / 2.0);
-        let center_offset_y = (line_number as f64 - HEIGHT as f64 / 2.0) / (HEIGHT as f64 / 2.0);
+        let center_offset_x =
+            (x as f64 - WIDTH as f64 / 2.0) / (WIDTH as f64 / 2.0);
+        let center_offset_y =
+            (line_number as f64 - HEIGHT as f64 / 2.0) / (HEIGHT as f64 / 2.0);
 
         let (nx, ny) = (
             SIZE * center_offset_x * scale + px,
