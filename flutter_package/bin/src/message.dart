@@ -575,7 +575,6 @@ Future<void> watchAndGenerateMessageCode(
       var eventType = event.type.toString();
       eventType = eventType[0].toUpperCase() + eventType.substring(1);
       final fileRelativePath = relative(event.path, from: messagesPath);
-      removeCliLines(1);
       final now = DateTime.now();
       final formattedTime =
           "${now.year}-${now.month.toString().padLeft(2, '0')}-"
@@ -583,6 +582,7 @@ Future<void> watchAndGenerateMessageCode(
           "${now.hour.toString().padLeft(2, '0')}:"
           "${now.minute.toString().padLeft(2, '0')}:"
           "${now.second.toString().padLeft(2, '0')}";
+      removeCliLines(1);
       print('$eventType: $fileRelativePath ($formattedTime)'.dim);
       generated = false;
     }
@@ -596,7 +596,8 @@ Future<void> watchAndGenerateMessageCode(
       try {
         await generateMessageCode(silent: true, messageConfig: messageConfig);
       } catch (error) {
-        // Do nothing when message code generation has failed
+        removeCliLines(1);
+        print(error.toString().trim().red);
       }
       generated = true;
     }
