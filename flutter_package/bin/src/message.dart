@@ -542,7 +542,7 @@ void assignRustSignal(int messageId, Uint8List messageBytes, Uint8List binary) {
   fillingBar.increment();
 
   // Notify that it's done
-  fillingBar.desc = '🎉 Message code in Dart and Rust is now ready! 🎉';
+  fillingBar.desc = 'Message code in Dart and Rust is now ready 🎉';
   fillingBar.increment();
 }
 

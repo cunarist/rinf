@@ -87,7 +87,9 @@ class ProgressBar {
       _clock.start();
       scheduleMicrotask(autoRender);
     }
-    print('');
+    if (!silent) {
+      print('');
+    }
     _render();
   }
 

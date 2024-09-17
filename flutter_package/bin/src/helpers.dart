@@ -178,7 +178,7 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
 
   await generateMessageCode(silent: true, messageConfig: messageConfig);
 
-  print('🎉 Rust template is now ready! 🎉');
+  print('Rust template is now ready 🎉');
 }
 
 Future<void> copyDirectory(Uri source, Uri destination) async {
@@ -282,7 +282,7 @@ Future<void> buildWebassembly(bool isReleaseMode) async {
   fillingBar.desc = 'Saved `.wasm` and `.js` files to `$subPath`';
   fillingBar.increment();
 
-  fillingBar.desc = '🎉 Webassembly module is now ready! 🎉';
+  fillingBar.desc = 'Webassembly module is now ready 🎉';
   fillingBar.increment();
 
   // Guide the developer how to run Flutter web server with web headers.
