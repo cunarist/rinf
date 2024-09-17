@@ -17,11 +17,11 @@ enum MarkType {
   rustAttribute,
 }
 
-class MarkedMessage {
+class MessageMark {
   MarkType markType;
   String name;
   int id;
-  MarkedMessage(
+  MessageMark(
     this.markType,
     this.name,
     this.id,
@@ -672,19 +672,19 @@ Future<void> insertTextToFile(
   await file.writeAsString(fileContent);
 }
 
-Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
+Future<Map<String, Map<String, List<MessageMark>>>> analyzeMarkedMessages(
   Uri protoPath,
   Map<String, List<String>> resourcesInFolders,
 ) async {
-  final markedMessages = <String, Map<String, List<MarkedMessage>>>{};
+  final messageMarks = <String, Map<String, List<MessageMark>>>{};
   for (final entry in resourcesInFolders.entries) {
     final subpath = entry.key;
     final filenames = entry.value;
-    final markedMessagesInFiles = <String, List<MarkedMessage>>{};
+    final markedMessagesInFiles = <String, List<MessageMark>>{};
     for (final filename in filenames) {
       markedMessagesInFiles[filename] = [];
     }
-    markedMessages[subpath] = markedMessagesInFiles;
+    messageMarks[subpath] = markedMessagesInFiles;
   }
   int messageId = 0;
   for (final entry in resourcesInFolders.entries) {
@@ -716,21 +716,51 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
           // When the statement is not a message
           continue;
         }
-        MarkType? markType = null;
+
+        // Find [DART-SIGNAL]
         if (statement.contains('[DART-SIGNAL]')) {
-          markType = MarkType.dartSignal;
+          if (statement.contains('DART-SIGNAL-BINARY')) {
+            throw Exception(
+              '`DART-SIGNAL` and `DART-SIGNAL-BINARY` cannot be used together',
+            );
+          }
+          messageMarks[subPath]![filename]!.add(MessageMark(
+            MarkType.dartSignal,
+            messageName,
+            messageId,
+          ));
         } else if (statement.contains('[DART-SIGNAL-BINARY]')) {
-          markType = MarkType.dartSignalBinary;
-        } else if (statement.contains('[RUST-SIGNAL]')) {
-          markType = MarkType.rustSignal;
-        } else if (statement.contains('[RUST-SIGNAL-BINARY]')) {
-          markType = MarkType.rustSignalBinary;
+          messageMarks[subPath]![filename]!.add(MessageMark(
+            MarkType.dartSignalBinary,
+            messageName,
+            messageId,
+          ));
         }
 
-        // find [RUST-ATTRIBUTE(...)]
+        // Find [RUST-SIGNAL]
+        if (statement.contains('[RUST-SIGNAL]')) {
+          if (statement.contains('RUST-SIGNAL-BINARY')) {
+            throw Exception(
+              '`RUST-SIGNAL` and `RUST-SIGNAL-BINARY` cannot be used together',
+            );
+          }
+          messageMarks[subPath]![filename]!.add(MessageMark(
+            MarkType.rustSignal,
+            messageName,
+            messageId,
+          ));
+        } else if (statement.contains('[RUST-SIGNAL-BINARY]')) {
+          messageMarks[subPath]![filename]!.add(MessageMark(
+            MarkType.rustSignalBinary,
+            messageName,
+            messageId,
+          ));
+        }
+
+        // Find [RUST-ATTRIBUTE(...)]
         var attr = attrExp.stringMatch(statement);
         if (attr != null) {
-          markedMessages[subPath]![filename]!.add(MarkedMessage(
+          messageMarks[subPath]![filename]!.add(MessageMark(
             MarkType.rustAttribute,
             "--prost_opt=type_attribute=$filename.$messageName=${attr.replaceAll(",", "\\,")}",
             -1,
@@ -738,20 +768,11 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
           continue;
         }
 
-        if (markType == null) {
-          // If there's no mark in the message, just ignore it
-          continue;
-        }
-        markedMessages[subPath]![filename]!.add(MarkedMessage(
-          markType,
-          messageName,
-          messageId,
-        ));
         messageId += 1;
       }
     }
   }
-  return markedMessages;
+  return messageMarks;
 }
 
 String pascalToCamel(String input) {
