@@ -30,11 +30,6 @@ Future<void> applyRustTemplate({
 
   // Check if current folder is a Flutter app project.
   final specFile = File.fromUri(flutterProjectPath.join('pubspec.yaml'));
-  final isFlutterProject = await specFile.exists();
-  if (!isFlutterProject) {
-    print("This folder doesn't look like a Flutter project.");
-    return;
-  }
   final pubspec = loadYaml(await specFile.readAsString());
   final String? publishTo = pubspec['publish_to'];
   if (publishTo != 'none') {

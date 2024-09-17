@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:path/path.dart';
 import 'package:watcher/watcher.dart';
+import 'package:chalkdart/chalkstrings.dart';
 
 import 'config.dart';
 import 'common.dart';
@@ -569,12 +570,21 @@ Future<void> watchAndGenerateMessageCode(
   var generated = true;
   print('Watching `.proto` files...');
   print('Press `q` to stop watching.');
+  print('Nothing changed yet'.dim);
   watcher.events.listen((event) {
     if (event.path.endsWith('.proto') && generated) {
       var eventType = event.type.toString();
       eventType = eventType[0].toUpperCase() + eventType.substring(1);
       final fileRelativePath = relative(event.path, from: messagesPath);
-      print('$eventType: $fileRelativePath');
+      removeCliLines(1);
+      final now = DateTime.now();
+      final formattedTime =
+          "${now.year}-${now.month.toString().padLeft(2, '0')}-"
+          "${now.day.toString().padLeft(2, '0')} "
+          "${now.hour.toString().padLeft(2, '0')}:"
+          "${now.minute.toString().padLeft(2, '0')}:"
+          "${now.second.toString().padLeft(2, '0')}";
+      print('$eventType: $fileRelativePath ($formattedTime)'.dim);
       generated = false;
     }
   });
@@ -586,9 +596,8 @@ Future<void> watchAndGenerateMessageCode(
     if (!generated) {
       try {
         await generateMessageCode(silent: true, messageConfig: messageConfig);
-        print('Message code generated.');
       } catch (error) {
-        // When message code generation has failed
+        // Do nothing when message code generation has failed
       }
       generated = true;
     }
