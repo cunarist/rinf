@@ -28,7 +28,12 @@ Future<void> main(List<String> args) async {
     ..addCommand(MessageCommand())
     ..addCommand(WasmCommand());
 
-  await runner.run(args);
+  try {
+    await runner.run(args);
+  } catch (error) {
+    // Print the error gracefully without backtrace.
+    print(error.toString().trim().red);
+  }
 }
 
 class ConfigCommand extends Command {
