@@ -15,15 +15,11 @@ extension UriJoin on Uri {
   }
 }
 
-void clearCliLine() {
-  stdout.write('\x1B[2K'); // Clear the line
-  stdout.write('\r'); // Return the cursor
-}
-
 /// Removes an existing line from the CLI.
 void removeCliLines(int lines) {
   for (var i = 0; i < lines; i++) {
     stdout.write('\x1B[1A'); // Move the cursor up one line
-    clearCliLine();
+    stdout.write('\x1B[2K'); // Clear the line
+    stdout.write('\r'); // Return the cursor to the front
   }
 }

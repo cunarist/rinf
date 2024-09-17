@@ -87,6 +87,7 @@ class ProgressBar {
       _clock.start();
       scheduleMicrotask(autoRender);
     }
+    print('');
     _render();
   }
 
@@ -143,10 +144,7 @@ class ProgressBar {
     final frameParts = [bar, '$_current/$_total', perc, timeStr, ':', _desc];
     final filteredParts = frameParts.where((v) => v.isNotEmpty).toList();
     final frame = filteredParts.join(' ');
-    clearCliLine();
-    stdout.write(frame);
-    if (max == _progress) {
-      stdout.write('\n');
-    }
+    removeCliLines(1);
+    print(frame);
   }
 }
