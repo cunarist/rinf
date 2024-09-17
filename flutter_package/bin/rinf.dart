@@ -1,55 +1,111 @@
+import 'package:args/command_runner.dart';
+import 'package:chalkdart/chalkstrings.dart';
+
 import 'src/config.dart';
 import 'src/helpers.dart';
 import 'src/message.dart';
 import 'src/internet.dart';
+import 'src/common.dart';
 
 Future<void> main(List<String> args) async {
-  if (args.isEmpty) {
-    print('No operation is provided.');
-    print('Use `rinf --help` to see all available operations.');
-    return;
-  }
+  // After running `dart run rinf`,
+  // Unnecessary two lines of
+  //`Building package executable...\nBuilt rinf:rinf.` appear.
+  // Remove those before proceeding.
+  removeCliLines(2);
 
-  final rinfConfig = await loadVerifiedRinfConfig('pubspec.yaml');
+  // Check the internet connection status and rembember it.
   await checkConnectivity();
 
-  switch (args[0]) {
-    case 'config':
-      print(rinfConfig);
-      break;
-    case 'template':
-      await applyRustTemplate(messageConfig: rinfConfig.message);
-      break;
-    case 'message':
-      if (args.contains('--watch') || args.contains('-w')) {
-        await watchAndGenerateMessageCode(messageConfig: rinfConfig.message);
-      } else {
-        await generateMessageCode(messageConfig: rinfConfig.message);
-      }
-      break;
-    case 'wasm':
-      if (args.contains('--release') || args.contains('-r')) {
-        await buildWebassembly(isReleaseMode: true);
-      } else {
-        await buildWebassembly();
-      }
-      break;
-    case '--help':
-    case '-h':
-      print('Usage: rinf [arguments]');
-      print('Arguments:');
-      print('  -h, --help        Shows this usage information.');
-      print('  config            Shows current Rinf configuration'
-          '\n                    resolved from `pubspec.yaml`'
-          '\n                    with defaults applied.');
-      print('  template          Applies Rust template'
-          '\n                    to current Flutter project.');
-      print('  message           Generates message code from `.proto` files.');
-      print('    -w, --watch     Continuously watches `.proto` files.');
-      print('  wasm              Builds webassembly module.');
-      print('    -r, --release   Builds in release mode.');
-    default:
-      print('No such operation is available.');
-      print('Use `rinf --help` to see all available operations.');
+  // Parse CLI arguments and run the corresponding function.
+  final runner = CommandRunner(
+    'rinf',
+    'Helper commands for building apps with Rust in Flutter.',
+    usageLineLength: 80,
+  )
+    ..addCommand(ConfigCommand())
+    ..addCommand(TemplateCommand())
+    ..addCommand(MessageCommand())
+    ..addCommand(WasmCommand());
+
+  try {
+    await runner.run(args);
+  } catch (error) {
+    // Print the error gracefully without backtrace.
+    print(error.toString().trim().red);
+  }
+}
+
+class ConfigCommand extends Command {
+  final name = 'config';
+  final description = 'Shows current Rinf configuration' +
+      ' resolved from `pubspec.yaml` with defaults applied.';
+
+  ConfigCommand() {}
+
+  Future<void> run() async {
+    final rinfConfig = await loadVerifiedRinfConfig('pubspec.yaml');
+    print(rinfConfig.toString().dim);
+  }
+}
+
+class TemplateCommand extends Command {
+  final name = 'template';
+  final description = 'Applies Rust template to the current Flutter project.';
+
+  TemplateCommand() {}
+
+  Future<void> run() async {
+    final rinfConfig = await loadVerifiedRinfConfig('pubspec.yaml');
+    await applyRustTemplate(messageConfig: rinfConfig.message);
+  }
+}
+
+class MessageCommand extends Command {
+  final name = 'message';
+  final description = 'Generates message code from `.proto` files.';
+
+  MessageCommand() {
+    argParser.addFlag(
+      'watch',
+      abbr: 'w',
+      help: 'Continuously watches `.proto` files.',
+    );
+  }
+
+  Future<void> run() async {
+    final results = argResults;
+    if (results == null) {
+      return;
+    }
+    final watch = results.flag('watch');
+    final rinfConfig = await loadVerifiedRinfConfig('pubspec.yaml');
+    if (watch) {
+      await watchAndGenerateMessageCode(messageConfig: rinfConfig.message);
+    } else {
+      await generateMessageCode(messageConfig: rinfConfig.message);
+    }
+  }
+}
+
+class WasmCommand extends Command {
+  final name = 'wasm';
+  final description = 'Builds the webassembly module for the web.';
+
+  WasmCommand() {
+    argParser.addFlag(
+      'release',
+      abbr: 'r',
+      help: 'Builds in release mode.',
+    );
+  }
+
+  Future<void> run() async {
+    final results = argResults;
+    if (results == null) {
+      return;
+    }
+    final release = results.flag('release');
+    await buildWebassembly(release);
   }
 }

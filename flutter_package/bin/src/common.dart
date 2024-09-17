@@ -1,3 +1,5 @@
+import 'dart:io';
+
 extension UriJoin on Uri {
   Uri join(String path) {
     if (path.isEmpty || path == '/') {
@@ -10,5 +12,14 @@ extension UriJoin on Uri {
       // `resolve` method should handle things properly.
       return this.resolve(path);
     }
+  }
+}
+
+/// Removes an existing line from the CLI.
+void removeCliLines(int lines) {
+  for (var i = 0; i < lines; i++) {
+    stdout.write('\x1B[1A'); // Move the cursor up one line
+    stdout.write('\x1B[2K'); // Clear the line
+    stdout.write('\r'); // Return the cursor to the front
   }
 }

@@ -188,13 +188,13 @@ However, if you really need to store some state in a Flutter widget, you can ach
 syntax = "proto3";
 package tutorial_resource;
 
-// [RINF:DART-SIGNAL]
+// [DART-SIGNAL]
 message MyUniqueInput {
   int32 interaction_id = 1;
   int32 before_number = 2;
 }
 
-// [RINF:RUST-SIGNAL]
+// [RUST-SIGNAL]
 message MyUniqueOutput {
   int32 interaction_id = 1;
   int32 after_number = 2;

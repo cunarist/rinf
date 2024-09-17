@@ -1,9 +1,13 @@
 import 'dart:io';
+
 import 'package:path/path.dart';
 import 'package:watcher/watcher.dart';
+import 'package:chalkdart/chalkstrings.dart';
+
 import 'config.dart';
 import 'common.dart';
 import 'internet.dart';
+import 'progress.dart';
 
 enum MarkType {
   dartSignal,
@@ -13,11 +17,11 @@ enum MarkType {
   rustAttribute,
 }
 
-class MarkedMessage {
+class MessageMark {
   MarkType markType;
   String name;
   int id;
-  MarkedMessage(
+  MessageMark(
     this.markType,
     this.name,
     this.id,
@@ -28,6 +32,11 @@ Future<void> generateMessageCode({
   bool silent = false,
   required RinfConfigMessage messageConfig,
 }) async {
+  final fillingBar = ProgressBar(
+    total: 8,
+    width: 16,
+    silent: silent,
+  );
   // Prepare paths.
   final flutterProjectPath = Directory.current;
   final protoPath = flutterProjectPath.uri.join(messageConfig.inputDir);
@@ -41,23 +50,25 @@ Future<void> generateMessageCode({
   await emptyDirectory(dartOutputPath);
 
   // Get the list of `.proto` files.
+  // Also, analyze marked messages in `.proto` files.
+  fillingBar.desc = 'Collecting Protobuf files';
   final resourcesInFolders = <String, List<String>>{};
   await collectProtoFiles(
     Directory.fromUri(protoPath),
     Directory.fromUri(protoPath),
     resourcesInFolders,
   );
-
-  // Analyze marked messages in `.proto` files.
   final markedMessagesAll = await analyzeMarkedMessages(
     protoPath,
     resourcesInFolders,
   );
+  fillingBar.increment();
 
   // Include `package` statement in `.proto` files.
   // Package name should be the same as the filename
   // because Rust filenames are written with package name
   // and Dart filenames are written with the `.proto` filename.
+  fillingBar.desc = 'Normalizing Protobuf files';
   for (final entry in resourcesInFolders.entries) {
     final subPath = entry.key;
     final resourceNames = entry.value;
@@ -82,25 +93,18 @@ Future<void> generateMessageCode({
       await protoFile.writeAsString(outputLines.join('\n') + '\n');
     }
   }
+  fillingBar.increment();
 
   // Generate Rust message files.
+  fillingBar.desc = 'Generating Rust message files';
   if (isInternetConnected) {
-    if (!silent) {
-      print('Ensuring `protoc-gen-prost` for Rust.' +
-          '\nThis is done by installing it globally on the system.');
-    }
     final cargoInstallCommand = await Process.run('cargo', [
       'install',
       'protoc-gen-prost',
       ...(messageConfig.rustSerde ? ['protoc-gen-prost-serde'] : [])
     ]);
     if (cargoInstallCommand.exitCode != 0) {
-      print(cargoInstallCommand.stderr.toString().trim());
-      throw Exception('Cannot globally install `protoc-gen-prost` Rust crate');
-    }
-  } else {
-    if (!silent) {
-      print('Skipping ensurement of `protoc-gen-prost` for Rust.');
+      throw Exception(cargoInstallCommand.stderr);
     }
   }
   for (final entry in resourcesInFolders.entries) {
@@ -130,12 +134,13 @@ Future<void> generateMessageCode({
       })
     ]);
     if (protocRustResult.exitCode != 0) {
-      print(protocRustResult.stderr.toString().trim());
-      throw Exception('Could not compile `.proto` files into Rust');
+      throw Exception(protocRustResult.stderr);
     }
   }
+  fillingBar.increment();
 
   // Generate `mod.rs` for `messages` module in Rust.
+  fillingBar.desc = 'Writing `mod.rs` files';
   for (final entry in resourcesInFolders.entries) {
     final subPath = entry.key;
     final resourceNames = entry.value;
@@ -186,13 +191,11 @@ Future<void> generateMessageCode({
     await File.fromUri(rustOutputPath.join(subPath).join('mod.rs'))
         .writeAsString(modRsContent);
   }
+  fillingBar.increment();
 
   // Generate Dart message files.
+  fillingBar.desc = 'Generating Dart message files';
   if (isInternetConnected) {
-    if (!silent) {
-      print('Ensuring `protoc_plugin` for Dart.' +
-          '\nThis is done by installing it globally on the system.');
-    }
     final pubGlobalActivateCommand = await Process.run('dart', [
       'pub',
       'global',
@@ -200,12 +203,7 @@ Future<void> generateMessageCode({
       'protoc_plugin',
     ]);
     if (pubGlobalActivateCommand.exitCode != 0) {
-      print(pubGlobalActivateCommand.stderr.toString().trim());
-      throw Exception('Cannot globally install `protoc_plugin` Dart package');
-    }
-  } else {
-    if (!silent) {
-      print('Skipping ensurement of `protoc_plugin` for Dart.');
+      throw Exception(pubGlobalActivateCommand.stderr);
     }
   }
   for (final entry in resourcesInFolders.entries) {
@@ -231,12 +229,13 @@ Future<void> generateMessageCode({
       ],
     );
     if (protocDartResult.exitCode != 0) {
-      print(protocDartResult.stderr.toString().trim());
-      throw Exception('Could not compile `.proto` files into Dart');
+      throw Exception(protocDartResult.stderr);
     }
   }
+  fillingBar.increment();
 
   // Generate `exports.dart` for `messages` module in Dart.
+  fillingBar.desc = 'Writing `exports.dart` file';
   final exportsDartLines = <String>[];
   exportsDartLines.add("export './generated.dart';");
   for (final entry in resourcesInFolders.entries) {
@@ -252,8 +251,10 @@ Future<void> generateMessageCode({
   final exportsDartContent = exportsDartLines.join('\n');
   await File.fromUri(dartOutputPath.join('exports.dart'))
       .writeAsString(exportsDartContent);
+  fillingBar.increment();
 
   // Prepare communication channels between Dart and Rust.
+  fillingBar.desc = 'Writing communication channels and streams';
   for (final entry in markedMessagesAll.entries) {
     final subPath = entry.key;
     final filesAndMarks = entry.value;
@@ -538,11 +539,11 @@ void assignRustSignal(int messageId, Uint8List messageBytes, Uint8List binary) {
 ''';
   await File.fromUri(dartOutputPath.join('generated.dart'))
       .writeAsString(dartReceiveScript);
+  fillingBar.increment();
 
   // Notify that it's done
-  if (!silent) {
-    print('🎉 Message code in Dart and Rust is now ready! 🎉');
-  }
+  fillingBar.desc = 'Message code in Dart and Rust is now ready 🎉';
+  fillingBar.increment();
 }
 
 Future<void> watchAndGenerateMessageCode(
@@ -567,14 +568,22 @@ Future<void> watchAndGenerateMessageCode(
   // Watch `.proto` files.
   final watcher = PollingDirectoryWatcher(messagesDirectory.path);
   var generated = true;
-  print('Watching `.proto` files...');
-  print('Press `q` to stop watching.');
+  print('Watching `.proto` files, press `q` to stop watching');
+  print('Nothing changed yet'.dim);
   watcher.events.listen((event) {
     if (event.path.endsWith('.proto') && generated) {
       var eventType = event.type.toString();
       eventType = eventType[0].toUpperCase() + eventType.substring(1);
       final fileRelativePath = relative(event.path, from: messagesPath);
-      print('$eventType: $fileRelativePath');
+      final now = DateTime.now();
+      final formattedTime =
+          "${now.year}-${now.month.toString().padLeft(2, '0')}-"
+          "${now.day.toString().padLeft(2, '0')} "
+          "${now.hour.toString().padLeft(2, '0')}:"
+          "${now.minute.toString().padLeft(2, '0')}:"
+          "${now.second.toString().padLeft(2, '0')}";
+      removeCliLines(1);
+      print('$eventType: $fileRelativePath ($formattedTime)'.dim);
       generated = false;
     }
   });
@@ -586,9 +595,9 @@ Future<void> watchAndGenerateMessageCode(
     if (!generated) {
       try {
         await generateMessageCode(silent: true, messageConfig: messageConfig);
-        print('Message code generated.');
       } catch (error) {
-        // When message code generation has failed
+        removeCliLines(1);
+        print(error.toString().trim().red);
       }
       generated = true;
     }
@@ -664,19 +673,19 @@ Future<void> insertTextToFile(
   await file.writeAsString(fileContent);
 }
 
-Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
+Future<Map<String, Map<String, List<MessageMark>>>> analyzeMarkedMessages(
   Uri protoPath,
   Map<String, List<String>> resourcesInFolders,
 ) async {
-  final markedMessages = <String, Map<String, List<MarkedMessage>>>{};
+  final messageMarks = <String, Map<String, List<MessageMark>>>{};
   for (final entry in resourcesInFolders.entries) {
     final subpath = entry.key;
     final filenames = entry.value;
-    final markedMessagesInFiles = <String, List<MarkedMessage>>{};
+    final markedMessagesInFiles = <String, List<MessageMark>>{};
     for (final filename in filenames) {
       markedMessagesInFiles[filename] = [];
     }
-    markedMessages[subpath] = markedMessagesInFiles;
+    messageMarks[subpath] = markedMessagesInFiles;
   }
   int messageId = 0;
   for (final entry in resourcesInFolders.entries) {
@@ -687,14 +696,14 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
       );
       final content = await protoFile.readAsString();
       final regExp = RegExp(r'{[^}]*}');
-      final attrExp = RegExp(r'(?<=\[RINF:RUST-ATTRIBUTE\().*(?=\)\])');
+      final attrExp = RegExp(r'(?<=\[RUST-ATTRIBUTE\().*(?=\)\])');
 
       // Remove all { ... } blocks from the string
       final contentWithoutBlocks = content.replaceAll(regExp, ';');
       final statements = contentWithoutBlocks.split(';');
       for (final statementRaw in statements) {
         final statement = statementRaw.trim();
-        // To find "}\n\n// [RINF:RUST-SIGNAL]",
+        // To find "}\n\n// [RUST-SIGNAL]",
         // `contains` is used instead of `startsWith`
         String? messageName = null;
         final lines = statement.split('\n');
@@ -708,21 +717,51 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
           // When the statement is not a message
           continue;
         }
-        MarkType? markType = null;
-        if (statement.contains('[RINF:DART-SIGNAL]')) {
-          markType = MarkType.dartSignal;
-        } else if (statement.contains('[RINF:DART-SIGNAL-BINARY]')) {
-          markType = MarkType.dartSignalBinary;
-        } else if (statement.contains('[RINF:RUST-SIGNAL]')) {
-          markType = MarkType.rustSignal;
-        } else if (statement.contains('[RINF:RUST-SIGNAL-BINARY]')) {
-          markType = MarkType.rustSignalBinary;
+
+        // Find [DART-SIGNAL]
+        if (statement.contains('[DART-SIGNAL]')) {
+          if (statement.contains('DART-SIGNAL-BINARY')) {
+            throw Exception(
+              '`DART-SIGNAL` and `DART-SIGNAL-BINARY` cannot be used together',
+            );
+          }
+          messageMarks[subPath]![filename]!.add(MessageMark(
+            MarkType.dartSignal,
+            messageName,
+            messageId,
+          ));
+        } else if (statement.contains('[DART-SIGNAL-BINARY]')) {
+          messageMarks[subPath]![filename]!.add(MessageMark(
+            MarkType.dartSignalBinary,
+            messageName,
+            messageId,
+          ));
         }
 
-        // find [RINF:RUST-ATTRIBUTE(...)]
+        // Find [RUST-SIGNAL]
+        if (statement.contains('[RUST-SIGNAL]')) {
+          if (statement.contains('RUST-SIGNAL-BINARY')) {
+            throw Exception(
+              '`RUST-SIGNAL` and `RUST-SIGNAL-BINARY` cannot be used together',
+            );
+          }
+          messageMarks[subPath]![filename]!.add(MessageMark(
+            MarkType.rustSignal,
+            messageName,
+            messageId,
+          ));
+        } else if (statement.contains('[RUST-SIGNAL-BINARY]')) {
+          messageMarks[subPath]![filename]!.add(MessageMark(
+            MarkType.rustSignalBinary,
+            messageName,
+            messageId,
+          ));
+        }
+
+        // Find [RUST-ATTRIBUTE(...)]
         var attr = attrExp.stringMatch(statement);
         if (attr != null) {
-          markedMessages[subPath]![filename]!.add(MarkedMessage(
+          messageMarks[subPath]![filename]!.add(MessageMark(
             MarkType.rustAttribute,
             "--prost_opt=type_attribute=$filename.$messageName=${attr.replaceAll(",", "\\,")}",
             -1,
@@ -730,20 +769,11 @@ Future<Map<String, Map<String, List<MarkedMessage>>>> analyzeMarkedMessages(
           continue;
         }
 
-        if (markType == null) {
-          // If there's no mark in the message, just ignore it
-          continue;
-        }
-        markedMessages[subPath]![filename]!.add(MarkedMessage(
-          markType,
-          messageName,
-          messageId,
-        ));
         messageId += 1;
       }
     }
   }
-  return markedMessages;
+  return messageMarks;
 }
 
 String pascalToCamel(String input) {

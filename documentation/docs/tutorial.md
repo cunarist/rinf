@@ -15,13 +15,13 @@ child: Column(
 
 Let's say that you want to create a new button in Dart that sends an array of numbers and a string to Rust. We need a signal to notify Rust that a user event has occurred.
 
-Write a new `.proto` file in the `./messages` directory with a new message. Note that the message should have the comment `[RINF:DART-SIGNAL]` above it.
+Write a new `.proto` file in the `./messages` directory with a new message. Note that the message should have the comment `[DART-SIGNAL]` above it.
 
 ```proto title="messages/tutorial_messages.proto"
 syntax = "proto3";
 package tutorial_messages;
 
-// [RINF:DART-SIGNAL]
+// [DART-SIGNAL]
 message MyPreciousData {
   repeated int32 input_numbers = 1;
   string input_string = 2;
@@ -99,13 +99,13 @@ flutter: ZERO-COST ABSTRACTION
 
 Let's say that you want to send increasing numbers every second from Rust to Dart.
 
-Define the message. Note that the message should have the comment `[RINF:RUST-SIGNAL]` above it.
+Define the message. Note that the message should have the comment `[RUST-SIGNAL]` above it.
 
 ```proto title="messages/tutorial_messages.proto"
 syntax = "proto3";
 package tutorial_messages;
 
-// [RINF:RUST-SIGNAL]
+// [RUST-SIGNAL]
 message MyAmazingNumber { int32 current_number = 1; }
 ```
 
@@ -172,10 +172,10 @@ You can easily show the updated state on the screen by combining those two ways 
 syntax = "proto3";
 package tutorial_messages;
 
-// [RINF:DART-SIGNAL]
+// [DART-SIGNAL]
 message MyTreasureInput {}
 
-// [RINF:RUST-SIGNAL]
+// [RUST-SIGNAL]
 message MyTreasureOutput { int32 current_value = 1; }
 ```
 

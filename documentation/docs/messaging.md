@@ -4,10 +4,10 @@ There are special comments that you can mark messages with.
 
 ## 📢 Channels
 
-`[RINF:RUST-SIGNAL]` generates a message channel from Rust to Dart.
+`[RUST-SIGNAL]` generates a message channel from Rust to Dart.
 
 ```proto title="Protobuf"
-// [RINF:RUST-SIGNAL]
+// [RUST-SIGNAL]
 message MyDataOutput { ... }
 ```
 
@@ -29,10 +29,10 @@ StreamBuilder(
 )
 ```
 
-Use `[RINF:RUST-SIGNAL-BINARY]` to include binary data without the overhead of serialization.
+Use `[RUST-SIGNAL-BINARY]` to include binary data without the overhead of serialization.
 
 ```proto title="Protobuf"
-// [RINF:RUST-SIGNAL-BINARY]
+// [RUST-SIGNAL-BINARY]
 message MyDataOutput { ... }
 ```
 
@@ -56,10 +56,10 @@ StreamBuilder(
 )
 ```
 
-`[RINF:DART-SIGNAL]` generates a message channel from Dart to Rust.
+`[DART-SIGNAL]` generates a message channel from Dart to Rust.
 
 ```proto title="Protobuf"
-// [RINF:DART-SIGNAL]
+// [DART-SIGNAL]
 message MyDataInput { ... }
 ```
 
@@ -75,10 +75,10 @@ while let Some(dart_signal) = receiver.recv().await {
 }
 ```
 
-Use `[RINF:DART-SIGNAL-BINARY]` to include binary data without the overhead of serialization.
+Use `[DART-SIGNAL-BINARY]` to include binary data without the overhead of serialization.
 
 ```proto title="Protobuf"
-// [RINF:DART-SIGNAL-BINARY]
+// [DART-SIGNAL-BINARY]
 message MyDataInput { ... }
 ```
 
@@ -98,9 +98,9 @@ while let Some(dart_signal) = receiver.recv().await {
 
 ## 🔖 Attributes
 
-`[RINF:RUST-ATTRIBUTE(...)]` writes an attribute above the generated message struct in Rust. This is useful when you want to automatically implement a trait for the message struct in Rust.
+`[RUST-ATTRIBUTE(...)]` writes an attribute above the generated message struct in Rust. This is useful when you want to automatically implement a trait for the message struct in Rust.
 
 ```proto title="Protobuf"
-// [RINF:RUST-ATTRIBUTE(#[derive(Hash)])]
+// [RUST-ATTRIBUTE(#[derive(Hash)])]
 message MyDataInput { ... }
 ```

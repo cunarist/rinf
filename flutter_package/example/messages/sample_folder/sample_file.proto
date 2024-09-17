@@ -6,7 +6,7 @@ enum Kind {
   two = 1;
 }
 
-// [RINF:DART-SIGNAL]
+// [DART-SIGNAL]
 message SampleInput {
   Kind kind = 1;
   oneof oneof_input {
@@ -15,7 +15,7 @@ message SampleInput {
   }
 }
 
-// [RINF:RUST-SIGNAL]
+// [RUST-SIGNAL]
 message SampleOutput {
   Kind kind = 1;
   oneof oneof_input {
@@ -24,7 +24,5 @@ message SampleOutput {
   }
 }
 
-// [RINF:RUST-ATTRIBUTE(#[derive(Hash)])]
-message WithRustAttribute {
-  bool dummy = 1;
-}
+// [RUST-ATTRIBUTE(#[derive(Hash)])]
+message WithRustAttribute { bool dummy = 1; }

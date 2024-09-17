@@ -1,10 +1,14 @@
 import 'dart:io';
+
 import 'package:package_config/package_config.dart';
 import 'package:yaml/yaml.dart';
+import 'package:chalkdart/chalkstrings.dart';
+
 import 'config.dart';
 import 'message.dart';
 import 'common.dart';
 import 'internet.dart';
+import 'progress.dart';
 
 /// Creates new folders and files to an existing Flutter project folder.
 Future<void> applyRustTemplate({
@@ -26,11 +30,6 @@ Future<void> applyRustTemplate({
 
   // Check if current folder is a Flutter app project.
   final specFile = File.fromUri(flutterProjectPath.join('pubspec.yaml'));
-  final isFlutterProject = await specFile.exists();
-  if (!isFlutterProject) {
-    print("This folder doesn't look like a Flutter project.");
-    return;
-  }
   final pubspec = loadYaml(await specFile.readAsString());
   final String? publishTo = pubspec['publish_to'];
   if (publishTo != 'none') {
@@ -179,7 +178,7 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
 
   await generateMessageCode(silent: true, messageConfig: messageConfig);
 
-  print('🎉 Rust template is now ready! 🎉');
+  print('Rust template is now ready 🎉');
 }
 
 Future<void> copyDirectory(Uri source, Uri destination) async {
@@ -201,11 +200,14 @@ Future<void> copyDirectory(Uri source, Uri destination) async {
   }
 }
 
-Future<void> buildWebassembly({bool isReleaseMode = false}) async {
+Future<void> buildWebassembly(bool isReleaseMode) async {
+  final fillingBar = ProgressBar(
+    total: 3,
+    width: 12,
+  );
   // Ensure Rust toolchain.
   if (isInternetConnected) {
-    print('Ensuring Rust toolchain for the web.' +
-        '\nThis is done by installing it globally on the system.');
+    fillingBar.desc = 'Installing Rust toolchain for the web';
     final processResults = <ProcessResult>[];
     processResults.add(await Process.run('rustup', [
       'toolchain',
@@ -239,12 +241,11 @@ Future<void> buildWebassembly({bool isReleaseMode = false}) async {
     ]));
     processResults.forEach((processResult) {
       if (processResult.exitCode != 0) {
-        print(processResult.stderr.toString().trim());
-        throw Exception('Cannot globally install Rust toolchain for the web.');
+        throw Exception(processResult.stderr);
       }
     });
   } else {
-    print('Skipping ensurement of Rust toolchain for the web.');
+    fillingBar.desc = 'Skipping ensurement of Rust toolchain for the web';
   }
 
   // Prepare the webassembly output path.
@@ -253,7 +254,8 @@ Future<void> buildWebassembly({bool isReleaseMode = false}) async {
   final outputPath = flutterProjectPath.uri.join(subPath);
 
   // Build the webassembly module.
-  print('Compiling Rust with `wasm-pack` to `web` target...');
+  fillingBar.desc = 'Compiling Rust with `wasm-pack` to `web` target';
+  fillingBar.increment();
   final compileCommand = await Process.run(
     'wasm-pack',
     [
@@ -275,10 +277,13 @@ Future<void> buildWebassembly({bool isReleaseMode = false}) async {
     },
   );
   if (compileCommand.exitCode != 0) {
-    print(compileCommand.stderr.toString().trim());
-    throw Exception('Unable to compile Rust into webassembly');
+    throw Exception(compileCommand.stderr);
   }
-  print('Saved `.wasm` and `.js` files to `$subPath`.');
+  fillingBar.desc = 'Saved `.wasm` and `.js` files to `$subPath`';
+  fillingBar.increment();
+
+  fillingBar.desc = 'Webassembly module is now ready 🎉';
+  fillingBar.increment();
 
   // Guide the developer how to run Flutter web server with web headers.
   print('To run the Flutter web server, use:');
@@ -288,12 +293,10 @@ Future<void> buildWebassembly({bool isReleaseMode = false}) async {
     '--web-header=Cross-Origin-Opener-Policy=same-origin',
     '--web-header=Cross-Origin-Embedder-Policy=require-corp'
   ];
-  print(commandLines.join(' ${commandLineDivider}\n'));
-
-  print('🎉 Webassembly module is now ready! 🎉');
+  print(commandLines.join(' ${commandLineDivider}\n').dim);
 }
 
-Future<String> getCommandLineDivider({bool isReleaseMode = false}) async {
+Future<String> getCommandLineDivider() async {
   if (Platform.isWindows) {
     // Windows environment, check further for PowerShell or CMD
     if (Platform.environment['SHELL'] == null) {
