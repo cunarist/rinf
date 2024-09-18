@@ -31,3 +31,4 @@ wasm-bindgen-futures = "0.4.43"
 [lints.clippy]
 unwrap_used = "deny"
 expect_used = "deny"
+indexing_slicing = "deny"
