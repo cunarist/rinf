@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:package_config/package_config.dart';
 import 'package:yaml/yaml.dart';
-import 'package:chalkdart/chalkstrings.dart';
 
 import 'config.dart';
 import 'message.dart';
@@ -286,30 +285,5 @@ Future<void> buildWebassembly(bool isReleaseMode) async {
   fillingBar.increment();
 
   // Guide the developer how to run Flutter web server with web headers.
-  print('To run the Flutter web server, use:');
-  final commandLineDivider = await getCommandLineDivider();
-  final commandLines = [
-    'flutter run',
-    '--web-header=Cross-Origin-Opener-Policy=same-origin',
-    '--web-header=Cross-Origin-Embedder-Policy=require-corp'
-  ];
-  print(commandLines.join(' ${commandLineDivider}\n').dim);
-}
-
-Future<String> getCommandLineDivider() async {
-  if (Platform.isWindows) {
-    // Windows environment, check further for PowerShell or CMD
-    if (Platform.environment['SHELL'] == null) {
-      // Likely PowerShell environment
-      return '`';
-      // // Likely Command Prompt (cmd.exe)
-      // return "^";
-    } else {
-      // Bash or some other shell
-      return '\\';
-    }
-  } else {
-    // Bash or some other shell
-    return '\\';
-  }
+  print('To get the Flutter web server command, run `rinf server`');
 }

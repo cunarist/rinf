@@ -8,7 +8,7 @@ import 'src/internet.dart';
 import 'src/common.dart';
 
 Future<void> main(List<String> args) async {
-  // After running `dart run rinf`,
+  // When running `dart run rinf`,
   // Unnecessary two lines of
   //`Building package executable...\nBuilt rinf:rinf.` appear.
   // Remove those before proceeding.
@@ -20,13 +20,14 @@ Future<void> main(List<String> args) async {
   // Parse CLI arguments and run the corresponding function.
   final runner = CommandRunner(
     'rinf',
-    'Helper commands for building apps with Rust in Flutter.',
+    'Helper commands for building apps with Rust in Flutter',
     usageLineLength: 80,
   )
     ..addCommand(ConfigCommand())
     ..addCommand(TemplateCommand())
     ..addCommand(MessageCommand())
-    ..addCommand(WasmCommand());
+    ..addCommand(WasmCommand())
+    ..addCommand(ServerCommand());
 
   try {
     await runner.run(args);
@@ -38,8 +39,7 @@ Future<void> main(List<String> args) async {
 
 class ConfigCommand extends Command {
   final name = 'config';
-  final description = 'Shows current Rinf configuration' +
-      ' resolved from `pubspec.yaml` with defaults applied.';
+  final description = 'Shows Rinf configuration resolved from `pubspec.yaml`';
 
   ConfigCommand() {}
 
@@ -51,7 +51,7 @@ class ConfigCommand extends Command {
 
 class TemplateCommand extends Command {
   final name = 'template';
-  final description = 'Applies Rust template to the current Flutter project.';
+  final description = 'Applies Rust template to the current Flutter project';
 
   TemplateCommand() {}
 
@@ -63,13 +63,13 @@ class TemplateCommand extends Command {
 
 class MessageCommand extends Command {
   final name = 'message';
-  final description = 'Generates message code from `.proto` files.';
+  final description = 'Generates message code from `.proto` files';
 
   MessageCommand() {
     argParser.addFlag(
       'watch',
       abbr: 'w',
-      help: 'Continuously watches `.proto` files.',
+      help: 'Continuously watches `.proto` files',
     );
   }
 
@@ -90,13 +90,14 @@ class MessageCommand extends Command {
 
 class WasmCommand extends Command {
   final name = 'wasm';
-  final description = 'Builds the webassembly module for the web.';
+  final description = 'Builds the webassembly module for the web'
+      ' with `wasm-pack`';
 
   WasmCommand() {
     argParser.addFlag(
       'release',
       abbr: 'r',
-      help: 'Builds in release mode.',
+      help: 'Builds in release mode',
     );
   }
 
@@ -107,5 +108,21 @@ class WasmCommand extends Command {
     }
     final release = results.flag('release');
     await buildWebassembly(release);
+  }
+}
+
+class ServerCommand extends Command {
+  final name = 'server';
+  final description = 'Shows how to run Flutter web server with web headers';
+
+  ServerCommand() {}
+
+  Future<void> run() async {
+    final commandLines = [
+      'flutter run',
+      '--web-header=Cross-Origin-Opener-Policy=same-origin',
+      '--web-header=Cross-Origin-Embedder-Policy=require-corp'
+    ];
+    print(commandLines.join(' ').dim);
   }
 }
