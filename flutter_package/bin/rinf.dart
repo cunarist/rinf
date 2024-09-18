@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:args/command_runner.dart';
 import 'package:chalkdart/chalkstrings.dart';
 
@@ -10,7 +12,7 @@ import 'src/common.dart';
 Future<void> main(List<String> args) async {
   // When running `dart run rinf`,
   // Unnecessary two lines of
-  //`Building package executable...\nBuilt rinf:rinf.` appear.
+  // `Building package executable...\nBuilt rinf:rinf.` appear.
   // Remove those before proceeding.
   removeCliLines(2);
 
@@ -34,6 +36,8 @@ Future<void> main(List<String> args) async {
   } catch (error) {
     // Print the error gracefully without backtrace.
     print(error.toString().trim().red);
+    // Exit code 1 is assigned to Rust-side wrapper executable.
+    exit(2);
   }
 }
 

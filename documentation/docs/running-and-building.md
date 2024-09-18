@@ -29,8 +29,8 @@ To serve[^3] the web application:
 [^3]: Note that Flutter apps in debug mode are known to be quite slow on the web. It is recommended to use release mode when testing on a web browser. Debug mode can be used if you need to analyze the code more deeply, without the `--release` argument.
 
 ```bash title="CLI"
-rinf wasm --release
-flutter run --release  # Choose a browser
+rinf wasm
+flutter run --web-header=Cross-Origin-Opener-Policy=same-origin --web-header=Cross-Origin-Embedder-Policy=require-corp
 ```
 
 To build the optimized release version of the web application[^4]:
@@ -40,6 +40,12 @@ To build the optimized release version of the web application[^4]:
 ```bash title="CLI"
 rinf wasm --release
 flutter build web
+```
+
+Since repeatedly writing web header arguments during development can be overwhelming, Rinf provides a convenient command that prints the full Flutter web command.
+
+```bash title="CLI"
+rinf server
 ```
 
 When deploying your web app on a web server, ensure that your web server is configured to include cross-origin-related HTTP headers in its responses. These headers enable web browsers using your website to gain access to `SharedArrayBuffer` web API, which is something similar to shared memory on the web.
