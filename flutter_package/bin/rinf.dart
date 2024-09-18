@@ -20,7 +20,7 @@ Future<void> main(List<String> args) async {
   // Parse CLI arguments and run the corresponding function.
   final commandRunner = CommandRunner(
     'rinf',
-    'Helper commands for building apps with Rust in Flutter',
+    'Helper commands for building apps using Rust in Flutter.',
     usageLineLength: 80,
   );
   commandRunner.addCommand(ConfigCommand());
