@@ -118,12 +118,12 @@ class ServerCommand extends Command {
   ServerCommand() {}
 
   Future<void> run() async {
-    final commandLines = [
+    final commandParts = [
       'flutter',
       'run',
       '--web-header=Cross-Origin-Opener-Policy=same-origin',
       '--web-header=Cross-Origin-Embedder-Policy=require-corp'
     ];
-    print(commandLines.join(' ').dim);
+    print(commandParts.join(' ').dim);
   }
 }
