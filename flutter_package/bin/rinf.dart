@@ -39,7 +39,7 @@ Future<void> main(List<String> args) async {
 
 class ConfigCommand extends Command {
   final name = 'config';
-  final description = 'Shows Rinf configuration resolved from `pubspec.yaml`';
+  final description = 'Show Rinf configuration resolved from `pubspec.yaml`.';
 
   ConfigCommand() {}
 
@@ -51,7 +51,7 @@ class ConfigCommand extends Command {
 
 class TemplateCommand extends Command {
   final name = 'template';
-  final description = 'Applies Rust template to the current Flutter project';
+  final description = 'Apply Rust template to the current Flutter project.';
 
   TemplateCommand() {}
 
@@ -63,7 +63,7 @@ class TemplateCommand extends Command {
 
 class MessageCommand extends Command {
   final name = 'message';
-  final description = 'Generates message code from `.proto` files';
+  final description = 'Generate message code from `.proto` files.';
 
   MessageCommand() {
     argParser.addFlag(
@@ -90,8 +90,7 @@ class MessageCommand extends Command {
 
 class WasmCommand extends Command {
   final name = 'wasm';
-  final description = 'Builds the webassembly module for the web'
-      ' with `wasm-pack`';
+  final description = 'Build the webassembly module for the web.';
 
   WasmCommand() {
     argParser.addFlag(
@@ -113,7 +112,7 @@ class WasmCommand extends Command {
 
 class ServerCommand extends Command {
   final name = 'server';
-  final description = 'Shows how to run Flutter web server with web headers';
+  final description = 'Show how to run Flutter web server with web headers.';
 
   ServerCommand() {}
 
