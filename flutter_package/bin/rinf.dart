@@ -18,19 +18,19 @@ Future<void> main(List<String> args) async {
   await checkConnectivity();
 
   // Parse CLI arguments and run the corresponding function.
-  final runner = CommandRunner(
+  final commandRunner = CommandRunner(
     'rinf',
     'Helper commands for building apps with Rust in Flutter',
     usageLineLength: 80,
-  )
-    ..addCommand(ConfigCommand())
-    ..addCommand(TemplateCommand())
-    ..addCommand(MessageCommand())
-    ..addCommand(WasmCommand())
-    ..addCommand(ServerCommand());
+  );
+  commandRunner.addCommand(ConfigCommand());
+  commandRunner.addCommand(TemplateCommand());
+  commandRunner.addCommand(MessageCommand());
+  commandRunner.addCommand(WasmCommand());
+  commandRunner.addCommand(ServerCommand());
 
   try {
-    await runner.run(args);
+    await commandRunner.run(args);
   } catch (error) {
     // Print the error gracefully without backtrace.
     print(error.toString().trim().red);
