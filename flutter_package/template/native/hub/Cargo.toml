@@ -12,7 +12,7 @@ edition = "2021"
 crate-type = ["lib", "cdylib", "staticlib"]
 
 [dependencies]
-rinf = "7.0.0-alpha"
+rinf = "7.0.0-beta"
 prost = "0.13.0"
 tokio = { version = "1", features = ["rt", "macros"] }
 
