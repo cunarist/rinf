@@ -33,7 +33,7 @@ fn main() -> Result<(), String> {
         )?;
         protoc_binary_path
             .parent()
-            .ok_or("Could not get the parent of newly installed `protoc` path")?
+            .ok_or("Could not get the parent of newly-installed `protoc` path")?
             .to_path_buf()
     };
 
