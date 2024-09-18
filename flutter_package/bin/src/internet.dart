@@ -1,7 +1,14 @@
-import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'dart:io';
 
 var isInternetConnected = false;
 
 Future<void> checkConnectivity() async {
-  isInternetConnected = await InternetConnectionChecker().hasConnection;
+  try {
+    final result = await InternetAddress.lookup('pub.dev');
+    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+      isInternetConnected = true;
+    }
+  } on SocketException catch (_) {
+    isInternetConnected = false;
+  }
 }
