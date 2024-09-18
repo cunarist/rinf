@@ -12,7 +12,7 @@ import 'src/common.dart';
 Future<void> main(List<String> args) async {
   // When running `dart run rinf`,
   // Unnecessary two lines of
-  //`Building package executable...\nBuilt rinf:rinf.` appear.
+  // `Building package executable...\nBuilt rinf:rinf.` appear.
   // Remove those before proceeding.
   removeCliLines(2);
 
