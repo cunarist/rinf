@@ -88,39 +88,40 @@ class MyColumn extends StatelessWidget {
       // `StreamBuilder` listens to a stream
       // and rebuilds the widget accordingly.
       StreamBuilder(
-          stream: SampleFractal.rustSignalStream,
-          builder: (context, snapshot) {
-            final rustSignal = snapshot.data;
-            if (rustSignal == null) {
-              return Container(
-                margin: const EdgeInsets.all(20),
-                width: 256,
-                height: 256,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(24.0),
-                  color: Colors.black,
-                ),
-              );
-            }
-            final imageData = rustSignal.binary;
+        stream: SampleFractal.rustSignalStream,
+        builder: (context, snapshot) {
+          final rustSignal = snapshot.data;
+          if (rustSignal == null) {
             return Container(
               margin: const EdgeInsets.all(20),
               width: 256,
               height: 256,
-              child: ClipRRect(
+              decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(24.0),
-                child: FittedBox(
-                  fit: BoxFit.contain,
-                  child: Image.memory(
-                    imageData,
-                    width: 256,
-                    height: 256,
-                    gaplessPlayback: true,
-                  ),
-                ),
+                color: Colors.black,
               ),
             );
-          }),
+          }
+          final imageData = rustSignal.binary;
+          return Container(
+            margin: const EdgeInsets.all(20),
+            width: 256,
+            height: 256,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24.0),
+              child: FittedBox(
+                fit: BoxFit.contain,
+                child: Image.memory(
+                  imageData,
+                  width: 256,
+                  height: 256,
+                  gaplessPlayback: true,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
       StreamBuilder(
         // This stream is generated from a marked Protobuf message.
         stream: SampleNumberOutput.rustSignalStream,
