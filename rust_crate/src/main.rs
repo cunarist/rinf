@@ -28,7 +28,7 @@ fn main() -> Result<(), String> {
                 .ok_or("Could not set the path for `protoc` installation")?,
         );
         let install_result = protoc_prebuilt::init("25.2");
-        let (protoc_binary_path, _) = install_result.map_err(|_| 
+        let (protoc_binary_path, _) = install_result.map_err(|_|
             "Automatic installation of `protoc` failed, try installing it manually"
         )?;
         protoc_binary_path
@@ -75,8 +75,11 @@ fn main() -> Result<(), String> {
     let mut command = process::Command::new(dart_path);
     command.args(["run", "rinf"]);
     command.args(&dart_command_args);
-    let exit_status = command.status().map_err(|_| "Could not run Rinf command")?;
-    let exit_code = exit_status.code().ok_or("Could not get Rinf command exit code")?;
+    let exit_status =
+        command.status().map_err(|_| "Could not run Rinf command")?;
+    let exit_code = exit_status
+        .code()
+        .ok_or("Could not get Rinf command exit code")?;
     if exit_code != 0 {
         process::exit(exit_code);
     }
