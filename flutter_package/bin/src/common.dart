@@ -20,6 +20,6 @@ void removeCliLines(int lines) {
   for (var i = 0; i < lines; i++) {
     stdout.write('\x1B[1A'); // Move the cursor up one line
     stdout.write('\x1B[2K'); // Clear the line
-    stdout.write('\r'); // Return the cursor to the front
+    stdout.write('\r'); // Move the cursor to the front
   }
 }
