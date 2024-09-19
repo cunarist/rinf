@@ -86,4 +86,5 @@ It's important to remember that destructors of static variables implemented by t
 There are also alternatives. Choose the one that you think is most appropriate for your needs:
 
 - [`std::sync::LazyLock`](https://doc.rust-lang.org/std/sync/struct.LazyLock.html)
+- [`tokio::sync::Mutex`](https://docs.rs/tokio/latest/tokio/sync/struct.Mutex.html)
 - [`tokio::sync::RwLock`](https://docs.rs/tokio/latest/tokio/sync/struct.RwLock.html)
