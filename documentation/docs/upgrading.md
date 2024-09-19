@@ -6,7 +6,7 @@ Whenever upgrading Rinf, please ensure that the Rinf versions in `pubspec.yaml` 
 
 ## 7️⃣ Migrating from 6 to 7
 
-The overall usage remains the same, but some changes have been made to the API to improve code readability and maintainability.
+The overall usage remains the same, but some changes have been made to the API to improve code readability and flexibility.
 
 Explicitly bind the `main` function in Rust with the async runtime of your choice. Also, don't forget to await the `dart_shutdown` future provided by Rinf in the `main` function.
 
