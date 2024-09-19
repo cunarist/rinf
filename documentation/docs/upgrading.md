@@ -6,9 +6,9 @@ Whenever upgrading Rinf, please ensure that the Rinf versions in `pubspec.yaml` 
 
 ## 7️⃣ Migrating from 6 to 7
 
-The overall usage remains the same, but some changes were made to the API to make the code more readable and maintainable.
+The overall usage remains the same, but some changes have been made to the API to improve code readability and maintainability.
 
-Explicitly bind the main function in Rust with the async runtime you choose to use. Also, don't forget to await for the `dart_shutdown` future provided by Rinf in the main function.
+Explicitly bind the `main` function in Rust with the async runtime of your choice. Also, don't forget to await the `dart_shutdown` future provided by Rinf in the `main` function.
 
 ```rust title="Rust"
 [tokio::main]
@@ -25,7 +25,7 @@ Remove `RINF:` from Protobuf message annotations. For example, `[RINF:DART-SIGNA
 message SomeMessage {}
 ```
 
-Import messages from the root `messages` module, not the inner module where it's declared.
+Import messages from the root `messages` module, not from the inner module where they are declared.
 
 ```dart title="Dart"
 import './messages/all.dart';
@@ -35,7 +35,7 @@ import './messages/all.dart';
 use crate::messages::*;
 ```
 
-When you need to run a Flutter web server, use `rinf server` to get the whole Flutter command with necessary arguments
+When you need to run a Flutter web server, use `rinf server` to get the complete Flutter command with the necessary arguments.
 
 ```bash title="CLI"
 rinf server
