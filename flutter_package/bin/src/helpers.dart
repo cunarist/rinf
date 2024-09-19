@@ -146,7 +146,7 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
   if (await mainFile.exists()) {
     await Process.run('dart', ['format', './lib/main.dart']);
     var mainText = await mainFile.readAsString();
-    if (!mainText.contains('messages/exports.dart')) {
+    if (!mainText.contains('messages/all.dart')) {
       final lines = mainText.split('\n');
       final lastImportIndex = lines.lastIndexWhere(
         (line) => line.startsWith('import '),
@@ -157,7 +157,7 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
       );
       lines.insert(
         lastImportIndex + 2,
-        "import './messages/exports.dart';",
+        "import './messages/all.dart';",
       );
       mainText = lines.join('\n');
     }
