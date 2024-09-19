@@ -19,6 +19,8 @@ Here’s a basic example using the [`actix`](https://github.com/actix/actix) cra
 ```rust title="Rust"
 use actix::prelude::*;
 
+rinf::write_interface!()
+
 // this is our Message
 // we have to define the response type (rtype)
 #[derive(Message)]
