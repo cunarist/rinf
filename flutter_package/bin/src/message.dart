@@ -146,7 +146,7 @@ Future<void> generateMessageCode({
     final resourceNames = entry.value;
     final modRsLines = <String>[];
     for (final resourceName in resourceNames) {
-      modRsLines.add('pub mod $resourceName;');
+      modRsLines.add('mod $resourceName;');
       modRsLines.add('pub use $resourceName::*;');
     }
     for (final otherSubPath in resourcesInFolders.keys) {
@@ -179,12 +179,12 @@ Future<void> generateMessageCode({
           continue;
         }
         final childName = otherSubPathSplitted.last;
-        modRsLines.add('pub mod $childName;');
+        modRsLines.add('mod $childName;');
         modRsLines.add('pub use $childName::*;');
       }
     }
     if (subPath == '/') {
-      modRsLines.add('pub mod generated;');
+      modRsLines.add('mod generated;');
       modRsLines.add('pub use generated::*;');
     }
     final modRsContent = modRsLines.join('\n');
@@ -234,8 +234,8 @@ Future<void> generateMessageCode({
   }
   fillingBar.increment();
 
-  // Generate `exports.dart` for `messages` module in Dart.
-  fillingBar.desc = 'Writing `exports.dart` file';
+  // Generate `all.dart` for `messages` module in Dart.
+  fillingBar.desc = 'Writing `all.dart` file';
   final exportsDartLines = <String>[];
   exportsDartLines.add("export './generated.dart';");
   for (final entry in resourcesInFolders.entries) {
@@ -249,7 +249,7 @@ Future<void> generateMessageCode({
     }
   }
   final exportsDartContent = exportsDartLines.join('\n');
-  await File.fromUri(dartOutputPath.join('exports.dart'))
+  await File.fromUri(dartOutputPath.join('all.dart'))
       .writeAsString(exportsDartContent);
   fillingBar.increment();
 
