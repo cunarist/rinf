@@ -37,7 +37,7 @@ rinf message
 Create a button widget in Dart that accepts the user input.
 
 ```dart title="lib/main.dart"
-import 'package:test_app/messages/exports.dart';
+import 'package:test_app/messages/all.dart';
 
 child: Column(
   mainAxisAlignment: MainAxisAlignment.center,
@@ -146,7 +146,7 @@ async fn main() {
 Finally, receive the signals in Dart with `StreamBuilder` and rebuild the widget accordingly.
 
 ```dart title="lib/main.dart"
-import 'package:test_app/messages/exports.dart';
+import 'package:test_app/messages/all.dart';
 
 children: [
   StreamBuilder(
@@ -184,7 +184,7 @@ rinf message
 ```
 
 ```dart title="lib/main.dart"
-import 'package:test_app/messages/exports.dart';
+import 'package:test_app/messages/all.dart';
 
 children: [
   StreamBuilder(

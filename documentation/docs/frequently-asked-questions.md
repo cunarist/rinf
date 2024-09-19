@@ -203,7 +203,7 @@ message MyUniqueOutput {
 
 ```dart title="lib/main.dart"
 import 'dart:async';
-import 'package:example_app/messages/exports.dart';
+import 'package:example_app/messages/all.dart';
 
 var currentInteractionId = 0;
 final myUniqueOutputs = Map<int, Completer<MyUniqueOutput>>();
@@ -218,7 +218,7 @@ void main() async {
 
 ```dart title="lib/main.dart"
 import 'dart:async';
-import 'package:example_app/messages/exports.dart';
+import 'package:example_app/messages/all.dart';
 
 onPressed: () async {
   final completer = Completer<MyUniqueOutput>();
@@ -312,7 +312,7 @@ Failed to load dynamic library 'libhub.so': libhub.so: cannot open shared object
 In this case, you can specify a path that points to the compiled Rust library. Simply provide a string path to your dynamic library file.
 
 ```dart title="lib/main.dart"
-import './messages/exports.dart';
+import './messages/all.dart';
 
 async void main() {
   await initializeRust(compiledLibPath: '/path/to/library/libhub.so');

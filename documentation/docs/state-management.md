@@ -16,8 +16,10 @@ Several crates on `crates.io` provide building blocks for implementing the actor
 
 Here’s a basic example using the [`actix`](https://github.com/actix/actix) crate, a popular choice for the actor model:
 
-```rust title="Rust"
+```rust title="native/hub/src/lib.rs"
 use actix::prelude::*;
+
+rinf::write_interface!()
 
 // this is our Message
 // we have to define the response type (rtype)
