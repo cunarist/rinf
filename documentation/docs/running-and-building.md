@@ -24,28 +24,24 @@ You need to manually build webassembly module from Rust before running or buildi
 
 [^2]: Internally, Rinf uses `wasm-bindgen` and `wasm-pack` with the `web` [target](https://rustwasm.github.io/docs/wasm-pack/commands/build.html#target).
 
-To serve[^3] the web application:
+To serve[^3] the web application[^4]:
 
-[^3]: Note that Flutter apps in debug mode are known to be quite slow on the web. It is recommended to use release mode when testing on a web browser. Debug mode can be used if you need to analyze the code more deeply, without the `--release` argument.
+[^3]: Note that Flutter apps in debug mode are known to be quite slow on the web. It is recommended to use profile mode when testing on a web browser.
+
+[^4]: Since repeatedly writing web header arguments during development can be overwhelming, Rinf provides a convenient command `rinf server` that prints the full Flutter web command.
 
 ```bash title="CLI"
 rinf wasm
 flutter run --web-header=Cross-Origin-Opener-Policy=same-origin --web-header=Cross-Origin-Embedder-Policy=require-corp
 ```
 
-To build the optimized release version of the web application[^4]:
+To build the optimized release version of the web application[^5]:
 
-[^4]: Rinf supports hosting a Flutter app at a [non-root location](https://docs.flutter.dev/ui/navigation/url-strategies#hosting-a-flutter-app-at-a-non-root-location). For example, you can place your Flutter app in `https://mywebsite.com/subpath/deeperpath/`.
+[^5]: Rinf supports hosting a Flutter app at a [non-root location](https://docs.flutter.dev/ui/navigation/url-strategies#hosting-a-flutter-app-at-a-non-root-location). For example, you can place your Flutter app in `https://mywebsite.com/subpath/deeperpath/`.
 
 ```bash title="CLI"
 rinf wasm --release
 flutter build web
-```
-
-Since repeatedly writing web header arguments during development can be overwhelming, Rinf provides a convenient command that prints the full Flutter web command.
-
-```bash title="CLI"
-rinf server
 ```
 
 When deploying your web app on a web server, ensure that your web server is configured to include cross-origin-related HTTP headers in its responses. These headers enable web browsers using your website to gain access to `SharedArrayBuffer` web API, which is something similar to shared memory on the web.
