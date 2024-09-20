@@ -8,14 +8,13 @@ mod sample_functions;
 
 rinf::write_interface!();
 
-// Use `tokio::spawn` to run concurrent tasks.
-// Always use non-blocking async functions
-// such as `tokio::fs::File::open`.
-// If you really need to use blocking code,
-// use `tokio::task::spawn_blocking`.
+// You can go with any async runtime, not just tokio's.
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
-    // Spawn the concurrent tasks.
+    // Spawn concurrent tasks.
+    // Always use non-blocking async functions like `tokio::fs::File::open`.
+    // If you must use blocking code, use `tokio::task::spawn_blocking`
+    // or the equivalent provided by your async library.
     tokio::spawn(sample_functions::communicate());
 
     // Keep the main function running until Dart shutdown.
