@@ -27,7 +27,7 @@ fn main() -> Result<(), String> {
                 .to_str()
                 .ok_or("Could not set the path for `protoc` installation")?,
         );
-        let install_result = protoc_prebuilt::init("25.2");
+        let install_result = protoc_prebuilt::init("28.2");
         let (protoc_binary_path, _) = install_result.map_err(|_|
             "Automatic installation of `protoc` failed, try installing it manually"
         )?;
