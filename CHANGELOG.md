@@ -1,3 +1,12 @@
+## 7.0.0
+
+- To migrate from Rinf version 6, please refer to [this section](https://rinf.cunarist.com/upgrading/) in the documentation.
+- Rinf no longer relies on `tokio`. While it is provided by default in the template, you can now choose whichever async runtime you prefer.
+- The CLI output is now more compact and includes animations.
+- The full `flutter run` command with the necessary arguments can now be obtained by running `rinf server`.
+- It is now recommended to import compiled message classes and structs from the root messages module.
+- Memory copying for messages sent from Dart to Rust has been reduced. This was achieved using Dart's FFI feature called 'leaf calls.'
+
 ## 7.0.0-beta
 
 - This is a beta version.
