@@ -1,6 +1,6 @@
 # State Management
 
-This section provides a general guide on effectively managing application state while using Rinf. It is not an introduction to a specific feature of Rinf.
+This section offers a general guide to managing application state effectively with Rinf, rather than introducing a specific Rinf feature.
 
 Rinf performs best when the application logic is written entirely in Rust, with Flutter used solely for the GUI. Given that, you might want to store the application state in Rust.
 
