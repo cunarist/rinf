@@ -2,7 +2,7 @@
 
 This section provides a general guide on effectively managing application state while using Rinf. It is not an introduction to a specific feature of Rinf.
 
-Rinf performs best when the application logic is written entirely in Rust, with Flutter used solely for the GUI. In such cases, you might want to store the application state in Rust.
+Rinf performs best when the application logic is written entirely in Rust, with Flutter used solely for the GUI. Given that, you might want to store the application state in Rust.
 
 ## 💥 Actor Model
 
