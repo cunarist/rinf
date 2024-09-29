@@ -17,7 +17,7 @@ pub fn get_hardward_id() -> Result<String, ExampleError> {
         .add_component(machineid_rs::HWIDComponent::CPUCores);
     let hwid = builder
         .build("mykey")
-        .map_err(|error| ExampleError(error.into()))?;
+        .map_err(|_| ExampleError::HardwareId)?;
     Ok(hwid)
 }
 #[cfg(not(any(
@@ -39,9 +39,9 @@ pub fn get_current_time() -> DateTime<offset::Local> {
 pub async fn fetch_from_web_api(url: &str) -> Result<String, ExampleError> {
     let fetched = reqwest::get(url)
         .await
-        .map_err(|error| ExampleError(error.into()))?
+        .map_err(|_| ExampleError::WebApi)?
         .text()
         .await
-        .map_err(|error| ExampleError(error.into()))?;
+        .map_err(|_| ExampleError::WebApi)?;
     Ok(fetched)
 }

@@ -8,45 +8,47 @@ Rinf performs best when the application logic is written entirely in Rust, with 
 
 The actor model is highly recommended for managing asynchronous state in Rust. By encapsulating state and behavior within actor structs, which maintain ownership and handle their own async tasks, the actor model provides a scalable and modular way to manage complex state interactions.
 
-1. **Encapsulation**: Actors encapsulate state and behavior, allowing for modular and maintainable code.
-2. **Concurrency**: Each actor operates independently, making it easier to handle concurrent tasks without manual synchronization.
-3. **Scalability**: Actors are well-suited for scalable systems where tasks and state management need to be handled in parallel.
-
-Several crates on `crates.io` provide building blocks for implementing the actor model in Rust. Although Rinf uses `tokio` by default, you can choose any async Rust runtime that fits your needs. Consider exploring these crates to find one that aligns with your requirements.
-
-Here’s a basic example using the [`actix`](https://github.com/actix/actix) crate, a popular choice for the actor model:
+Here’s a basic example using the [`messages`](https://crates.io/crates/messages) crate, which is a flexible and runtime-agnostic actor library that works nicely with Rinf.
 
 ```rust title="native/hub/src/lib.rs"
-use actix::prelude::*;
+use messages::prelude::*;
 
-rinf::write_interface!()
+rinf::write_interface!();
 
-// this is our Message
-// we have to define the response type (rtype)
-#[derive(Message)]
-#[rtype(usize)]
+// Represents a message to calculate the sum of two numbers.
 struct Sum(usize, usize);
 
-// Actor definition
+// Actor definition that will hold state in real apps.
 struct Calculator;
 
-impl Actor for Calculator {
-    type Context = Context<Self>;
-}
+// Implement `Actor` trait for `Calculator`.
+impl Actor for Calculator {}
 
-// now we need to implement `Handler` on `Calculator` for the `Sum` message.
+// Implement `Handler` for `Calculator` to handle `Sum` messages.
+#[async_trait]
 impl Handler<Sum> for Calculator {
-    type Result = usize; // <- Message response type
-
-    fn handle(&mut self, msg: Sum, _ctx: &mut Context<Self>) -> Self::Result {
+    type Result = usize;
+    async fn handle(&mut self, msg: Sum, _: &Context<Self>) -> Self::Result {
         msg.0 + msg.1
     }
 }
 
-#[actix::main] // <- starts the system and block until future resolves
+// Implement the start method for `Calculator`.
+impl Calculator {
+    pub fn start() -> Address<Self> {
+        let context = Context::new();
+        let actor = Self {};
+        let addr = context.address();
+        tokio::spawn(context.run(actor));
+        addr
+    }
+}
+
+// Main function to start the business logic.
+#[tokio::main]
 async fn main() {
-    let addr = Calculator.start();
-    let res = addr.send(Sum(10, 5)).await; // <- send message and get future for result
+    let mut addr = Calculator::start();
+    let res = addr.send(Sum(10, 5)).await;
 
     match res {
         Ok(result) => println!("SUM: {}", result),
@@ -54,6 +56,10 @@ async fn main() {
     }
 }
 ```
+
+Several crates on `crates.io` provide building blocks for implementing the actor model in Rust. Consider exploring these crates to find one that aligns with your requirements.
+
+Please refer to the [example code](https://github.com/cunarist/rinf/tree/main/flutter_package/example) for detailed usage.
 
 ## 🧱 Static Variables
 

@@ -4,11 +4,12 @@
 mod messages;
 mod sample_functions;
 
-// use tokio_with_wasm::alias as tokio; // Uncomment this line to target the web.
+// Uncomment below to target the web.
+// use tokio_with_wasm::alias as tokio;
 
 rinf::write_interface!();
 
-// You can go with any async runtime, not just tokio's.
+// You can go with any async library, not just `tokio`.
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
     // Spawn concurrent tasks.

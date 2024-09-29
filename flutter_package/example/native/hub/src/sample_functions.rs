@@ -2,7 +2,6 @@
 
 use crate::common::*;
 use crate::messages::*;
-use crate::tokio;
 use rinf::debug_print;
 use std::time::Duration;
 
@@ -12,34 +11,6 @@ const IS_DEBUG_MODE: bool = true;
 #[cfg(not(debug_assertions))]
 const IS_DEBUG_MODE: bool = false;
 
-// Business logic for the counter widget.
-pub async fn tell_numbers() {
-    let mut vector = Vec::new();
-
-    // Stream getter is generated from a marked Protobuf message.
-    let receiver = SampleNumberInput::get_dart_signal_receiver();
-    while let Some(dart_signal) = receiver.recv().await {
-        // Extract values from the message received from Dart.
-        // This message is a type that's declared in its Protobuf file.
-        let number_input = dart_signal.message;
-        let letter = number_input.letter;
-        debug_print!("{letter}");
-
-        // Perform a simple calculation.
-        vector.push(true);
-        let current_number = (vector.len() as i32) * 7;
-
-        // The send method is generated from a marked Protobuf message.
-        SampleNumberOutput {
-            current_number,
-            dummy_one: number_input.dummy_one,
-            dummy_two: number_input.dummy_two,
-            dummy_three: number_input.dummy_three,
-        }
-        .send_signal_to_dart();
-    }
-}
-
 // Business logic for the fractal image.
 pub async fn stream_fractal() {
     let mut current_scale: f64 = 1.0;
@@ -47,7 +18,7 @@ pub async fn stream_fractal() {
     let (sender, mut receiver) = tokio::sync::mpsc::channel(5);
 
     // Send frame join handles in order.
-    tokio::spawn(async move {
+    spawn(async move {
         loop {
             // Wait for 40 milliseconds on each frame
             tokio::time::sleep(Duration::from_millis(40)).await;
@@ -62,7 +33,7 @@ pub async fn stream_fractal() {
 
             // Calculate the fractal image
             // parallelly in a separate thread pool.
-            let join_handle = tokio::task::spawn_blocking(move || {
+            let join_handle = spawn_blocking(move || {
                 sample_crate::draw_fractal_image(current_scale)
             });
             let _ = sender.send(join_handle).await;
@@ -70,7 +41,7 @@ pub async fn stream_fractal() {
     });
 
     // Receive frame join handles in order.
-    tokio::spawn(async move {
+    spawn(async move {
         loop {
             let join_handle = match receiver.recv().await {
                 Some(inner) => inner,
@@ -93,18 +64,6 @@ pub async fn stream_fractal() {
             };
         }
     });
-}
-
-// A dummy function that uses sample messages to eliminate warnings.
-#[allow(dead_code)]
-async fn use_messages() {
-    let _ = SampleInput::get_dart_signal_receiver();
-    SampleOutput {
-        kind: 3,
-        oneof_input: Some(sample_output::OneofInput::Age(25)),
-    }
-    .send_signal_to_dart();
-    let _ = DeeperDummy {};
 }
 
 // Business logic for testing various crates.
@@ -170,7 +129,7 @@ pub async fn run_debug_tests() -> Result<()> {
     let mut join_handles = Vec::new();
     let chunk_size = 10_i32.pow(6);
     for level in 0..10 {
-        let join_handle = tokio::task::spawn_blocking(move || {
+        let join_handle = spawn_blocking(move || {
             let mut prime_count = 0;
             let count_from = level * chunk_size + 1;
             let count_to = (level + 1) * chunk_size;
@@ -208,7 +167,7 @@ pub async fn run_debug_tests() -> Result<()> {
 
     debug_print!("Debug tests completed!");
 
-    tokio::spawn(async {
+    spawn(async {
         // Panic in a separate task
         // to avoid memory leak on the web.
         // On the web (`wasm32-unknown-unknown`),
@@ -218,4 +177,16 @@ pub async fn run_debug_tests() -> Result<()> {
     });
 
     Ok(())
+}
+
+// A dummy function that uses sample messages to eliminate warnings.
+#[allow(dead_code)]
+async fn use_messages() {
+    let _ = SampleInput::get_dart_signal_receiver();
+    SampleOutput {
+        kind: 3,
+        oneof_input: Some(sample_output::OneofInput::Age(25)),
+    }
+    .send_signal_to_dart();
+    let _ = DeeperDummy {};
 }

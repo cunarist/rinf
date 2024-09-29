@@ -2,17 +2,26 @@ use std::error::Error;
 use std::fmt;
 
 #[derive(Debug)]
-pub struct ExampleError(pub Box<dyn Error + Send + Sync>);
+pub enum ExampleError {
+    Fractal,
+    HardwareId,
+    WebApi,
+}
 
 impl fmt::Display for ExampleError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let source = self.0.as_ref();
-        write!(f, "An error occured inside the example code.\n{source}")
+        match self {
+            Self::Fractal => {
+                write!(f, "Failed to generate fractal")
+            }
+            Self::HardwareId => {
+                write!(f, "Unable to retrieve hardware ID")
+            }
+            Self::WebApi => {
+                write!(f, "Web API call failed")
+            }
+        }
     }
 }
 
-impl Error for ExampleError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        Some(self.0.as_ref())
-    }
-}
+impl Error for ExampleError {}

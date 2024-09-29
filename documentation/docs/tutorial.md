@@ -83,6 +83,7 @@ pub async fn calculate_precious_data() {
 ```rust title="native/hub/src/lib.rs"
 mod tutorial_functions;
 
+#[tokio::main]
 async fn main() {
     tokio::spawn(tutorial_functions::calculate_precious_data());
 }
@@ -138,6 +139,7 @@ pub async fn stream_amazing_number() {
 ```rust title="native/hub/src/lib.rs"
 mod tutorial_functions;
 
+#[tokio::main]
 async fn main() {
     tokio::spawn(tutorial_functions::stream_amazing_number());
 }
@@ -226,6 +228,7 @@ pub async fn tell_treasure() {
 ```rust title="native/hub/src/lib.rs"
 mod tutorial_functions;
 
+#[tokio::main]
 async fn main() {
     tokio::spawn(tutorial_functions::tell_treasure());
 }

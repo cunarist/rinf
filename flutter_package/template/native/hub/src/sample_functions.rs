@@ -13,3 +13,9 @@ pub async fn communicate() {
         rinf::debug_print!("{message:?}");
     }
 }
+
+// Though async tasks work, using the actor model
+// is highly recommended for state management
+// to achieve modularity and scalability in your app.
+// To understand how to use the actor model,
+// refer to the Rinf documentation.
