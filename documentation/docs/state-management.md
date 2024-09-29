@@ -59,6 +59,8 @@ async fn main() {
 
 Several crates on `crates.io` provide building blocks for implementing the actor model in Rust. Consider exploring these crates to find one that aligns with your requirements.
 
+Please refer to the [example code](https://github.com/cunarist/rinf/tree/main/flutter_package/example) for detailed usage.
+
 ## 🧱 Static Variables
 
 Generally, it's advisable to avoid static variables due to their characteristics, which can lead to issues such as difficulties in testing and managing lifetimes. If you must use static variables, you can declare them as shown below, ensuring they span the entire duration of the app.
