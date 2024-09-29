@@ -15,7 +15,7 @@ use messages::prelude::*;
 
 rinf::write_interface!();
 
-/// Represents a message to calculate the sum of two numbers.
+// Represents a message to calculate the sum of two numbers.
 struct Sum(usize, usize);
 
 // Actor definition.
