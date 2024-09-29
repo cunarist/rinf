@@ -21,10 +21,10 @@ struct Sum(usize, usize);
 // Actor definition.
 struct Calculator;
 
-// Implement Actor trait for Calculator.
+// Implement `Actor` trait for `Calculator`.
 impl Actor for Calculator {}
 
-// Implement Handler for Calculator to handle Sum messages.
+// Implement `Handler` for `Calculator` to handle `Sum` messages.
 #[async_trait]
 impl Handler<Sum> for Calculator {
     type Result = usize;
@@ -33,7 +33,7 @@ impl Handler<Sum> for Calculator {
     }
 }
 
-// Implement the start method for Calculator
+// Implement the start method for `Calculator`.
 impl Calculator {
     pub fn start() -> Address<Self> {
         let context = Context::new();
@@ -44,7 +44,7 @@ impl Calculator {
     }
 }
 
-// Main function to start the business logic
+// Main function to start the business logic.
 #[tokio::main]
 async fn main() {
     let mut addr = Calculator::start();
