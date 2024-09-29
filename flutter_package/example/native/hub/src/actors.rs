@@ -44,15 +44,15 @@ pub async fn create_actors() -> Result<()> {
 
 /// Message types that actors can handle.
 mod letters {
-    pub struct SampleLetterOne;
-    pub struct SampleLetterTwo;
+    pub struct LetterOne;
+    pub struct LetterTwo;
 }
 
 use sample_actor_one::SampleActorOne;
 use sample_actor_two::SampleActorTwo;
 
 mod sample_actor_one {
-    use crate::actors::letters::{SampleLetterOne, SampleLetterTwo};
+    use crate::actors::letters::{LetterOne, LetterTwo};
     use crate::actors::Addresses;
     use crate::common::*;
     use messages::prelude::*;
@@ -77,7 +77,7 @@ mod sample_actor_one {
         }
 
         pub async fn _send_to_actor_two(&mut self) {
-            let _ = self._addresses._two_addr.send(SampleLetterOne).await;
+            let _ = self._addresses._two_addr.send(LetterOne).await;
         }
     }
 
@@ -86,34 +86,22 @@ mod sample_actor_one {
     impl Actor for SampleActorOne {}
 
     #[async_trait]
-    impl Handler<SampleLetterOne> for SampleActorOne {
-        type Result = Result<()>;
+    impl Handler<LetterOne> for SampleActorOne {
+        type Result = ();
         /// Handles messages received by the actor.
-        async fn handle(
-            &mut self,
-            _msg: SampleLetterOne,
-            _context: &Context<Self>,
-        ) -> Result<()> {
-            Ok(())
-        }
+        async fn handle(&mut self, _msg: LetterOne, _context: &Context<Self>) {}
     }
 
     #[async_trait]
-    impl Handler<SampleLetterTwo> for SampleActorOne {
-        type Result = Result<()>;
+    impl Handler<LetterTwo> for SampleActorOne {
+        type Result = ();
         /// Handles messages received by the actor.
-        async fn handle(
-            &mut self,
-            _msg: SampleLetterTwo,
-            _context: &Context<Self>,
-        ) -> Result<()> {
-            Ok(())
-        }
+        async fn handle(&mut self, _msg: LetterTwo, _context: &Context<Self>) {}
     }
 }
 
 mod sample_actor_two {
-    use crate::actors::letters::{SampleLetterOne, SampleLetterTwo};
+    use crate::actors::letters::{LetterOne, LetterTwo};
     use crate::actors::Addresses;
     use crate::common::*;
     use messages::prelude::*;
@@ -138,7 +126,7 @@ mod sample_actor_two {
         }
 
         pub async fn _send_to_actor_one(&mut self) {
-            let _ = self._addresses._one_addr.send(SampleLetterOne).await;
+            let _ = self._addresses._one_addr.send(LetterOne).await;
         }
     }
 
@@ -147,28 +135,16 @@ mod sample_actor_two {
     impl Actor for SampleActorTwo {}
 
     #[async_trait]
-    impl Handler<SampleLetterOne> for SampleActorTwo {
-        type Result = Result<()>;
+    impl Handler<LetterOne> for SampleActorTwo {
+        type Result = ();
         /// Handles messages received by the actor.
-        async fn handle(
-            &mut self,
-            _msg: SampleLetterOne,
-            _context: &Context<Self>,
-        ) -> Result<()> {
-            Ok(())
-        }
+        async fn handle(&mut self, _msg: LetterOne, _context: &Context<Self>) {}
     }
 
     #[async_trait]
-    impl Handler<SampleLetterTwo> for SampleActorTwo {
-        type Result = Result<()>;
+    impl Handler<LetterTwo> for SampleActorTwo {
+        type Result = ();
         /// Handles messages received by the actor.
-        async fn handle(
-            &mut self,
-            _msg: SampleLetterTwo,
-            _context: &Context<Self>,
-        ) -> Result<()> {
-            Ok(())
-        }
+        async fn handle(&mut self, _msg: LetterTwo, _context: &Context<Self>) {}
     }
 }
