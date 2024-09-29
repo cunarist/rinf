@@ -7,7 +7,6 @@ mod messages;
 mod sample_functions;
 
 use common::*;
-use tokio_with_wasm::alias as tokio;
 
 rinf::write_interface!();
 

@@ -1,5 +1,9 @@
 use std::error::Error;
 
+// `tokio_with_wasm` enables `tokio` code
+// to run directly on the web.
+use tokio_with_wasm::alias as tokio;
+
 /// This `Result` type alias allows handling any error type
 /// that implements the `Error` trait.
 /// In practice, it is recommended to use custom solutions
@@ -11,4 +15,4 @@ pub type Result<T> = std::result::Result<T, Box<dyn Error + Send + Sync>>;
 
 /// Because spawn functions are used very often,
 /// we make them accessible from everywhere.
-pub use crate::tokio::task::{spawn, spawn_blocking};
+pub use tokio::task::{spawn, spawn_blocking};
