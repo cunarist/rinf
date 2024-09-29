@@ -10,17 +10,17 @@ use crate::messages::*;
 use messages::prelude::*;
 use rinf::debug_print;
 
-/// The letter type for communicating with an actor.
+// The letter type for communicating with an actor.
 pub struct ClickedLetter;
 
-/// The actor that holds the counter state and handles messages.
+// The actor that holds the counter state and handles messages.
 pub struct CountingActor {
-    /// The counter number.
+    // The counter number.
     count: i32,
 }
 
-/// Implementing the `Actor` trait for `CountingActor`.
-/// This defines `CountingActor` as an actor in the async system.
+// Implementing the `Actor` trait for `CountingActor`.
+// This defines `CountingActor` as an actor in the async system.
 impl Actor for CountingActor {}
 
 impl CountingActor {
@@ -46,7 +46,7 @@ impl CountingActor {
 #[async_trait]
 impl Handler<ClickedLetter> for CountingActor {
     type Result = ();
-    /// Handles messages received by the actor.
+    // Handles messages received by the actor.
     async fn handle(&mut self, _msg: ClickedLetter, _context: &Context<Self>) {
         // Increase the counter number.
         let new_number = self.count + 7;
@@ -63,7 +63,7 @@ impl Handler<ClickedLetter> for CountingActor {
     }
 }
 
-/// Creates and spawns the actors in the async system.
+// Creates and spawns the actors in the async system.
 pub async fn create_actors() -> Result<()> {
     // Create actor contexts.
     let counting_context = Context::new();
