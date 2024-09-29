@@ -29,7 +29,7 @@ pub fn draw_fractal_image(scale: f64) -> Result<Vec<u8>, ExampleError> {
 
     match result {
         Ok(_) => Ok(image_data),
-        Err(error) => Err(ExampleError(error.into())),
+        Err(_) => Err(ExampleError::Fractal),
     }
 }
 
