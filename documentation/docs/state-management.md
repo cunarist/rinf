@@ -8,10 +8,6 @@ Rinf performs best when the application logic is written entirely in Rust, with 
 
 The actor model is highly recommended for managing asynchronous state in Rust. By encapsulating state and behavior within actor structs, which maintain ownership and handle their own async tasks, the actor model provides a scalable and modular way to manage complex state interactions.
 
-1. **Encapsulation**: Actors encapsulate state and behavior, allowing for modular and maintainable code.
-2. **Concurrency**: Each actor operates independently, making it easier to handle concurrent tasks without manual synchronization.
-3. **Scalability**: Actors are well-suited for scalable systems where tasks and state management need to be handled in parallel.
-
 Here’s a basic example using the [`messages`](https://crates.io/crates/messages) crate, which is a flexible and runtime-agnostic actor library that works nicely with Rinf.
 
 ```rust title="native/hub/src/lib.rs"
