@@ -28,7 +28,6 @@ impl Actor for Calculator {}
 #[async_trait]
 impl Handler<Sum> for Calculator {
     type Result = usize;
-
     async fn handle(&mut self, msg: Sum, _: &Context<Self>) -> Self::Result {
         msg.0 + msg.1
     }
