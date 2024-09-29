@@ -18,7 +18,7 @@ rinf::write_interface!();
 // Represents a message to calculate the sum of two numbers.
 struct Sum(usize, usize);
 
-// Actor definition.
+// Actor definition that will hold state in real apps.
 struct Calculator;
 
 // Implement `Actor` trait for `Calculator`.
