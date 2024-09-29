@@ -49,11 +49,11 @@ impl Calculator {
 async fn main() {
     let mut addr = Calculator::start();
     let res = addr.send(Sum(10, 5)).await;
-
     match res {
         Ok(result) => println!("SUM: {}", result),
         _ => println!("Communication to the actor has failed"),
     }
+    rinf::dart_shutdown().await;
 }
 ```
 
