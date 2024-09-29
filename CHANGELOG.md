@@ -1,3 +1,7 @@
+## 7.0.1
+
+- The initial template and example code has been improved.
+
 ## 7.0.0
 
 - To migrate from Rinf version 6, please refer to [this section](https://rinf.cunarist.com/upgrading/) in the documentation.
@@ -77,7 +81,7 @@
 
 ## 6.9.0
 
-- This version supports Flutter 3.22
+- This version supports Flutter 3.22.
 - The new version of Flutter has a little different way of resolving paths. This release adapts to this change.
 
 ## 6.8.0
