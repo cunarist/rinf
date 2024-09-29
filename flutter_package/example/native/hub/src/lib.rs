@@ -18,7 +18,6 @@ async fn main() {
     // Always use non-blocking async functions like `tokio::fs::File::open`.
     // If you must use blocking code, use `tokio::task::spawn_blocking`
     // or the equivalent provided by your async library.
-    spawn(sample_functions::tell_numbers());
     spawn(sample_functions::stream_fractal());
     spawn(sample_functions::run_debug_tests());
     spawn(actors::create_actors());
