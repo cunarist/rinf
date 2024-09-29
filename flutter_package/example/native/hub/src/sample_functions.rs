@@ -47,7 +47,7 @@ pub async fn stream_fractal() {
     let (sender, mut receiver) = tokio::sync::mpsc::channel(5);
 
     // Send frame join handles in order.
-    tokio::spawn(async move {
+    spawn(async move {
         loop {
             // Wait for 40 milliseconds on each frame
             tokio::time::sleep(Duration::from_millis(40)).await;
@@ -62,7 +62,7 @@ pub async fn stream_fractal() {
 
             // Calculate the fractal image
             // parallelly in a separate thread pool.
-            let join_handle = tokio::task::spawn_blocking(move || {
+            let join_handle = spawn_blocking(move || {
                 sample_crate::draw_fractal_image(current_scale)
             });
             let _ = sender.send(join_handle).await;
@@ -70,7 +70,7 @@ pub async fn stream_fractal() {
     });
 
     // Receive frame join handles in order.
-    tokio::spawn(async move {
+    spawn(async move {
         loop {
             let join_handle = match receiver.recv().await {
                 Some(inner) => inner,
@@ -170,7 +170,7 @@ pub async fn run_debug_tests() -> Result<()> {
     let mut join_handles = Vec::new();
     let chunk_size = 10_i32.pow(6);
     for level in 0..10 {
-        let join_handle = tokio::task::spawn_blocking(move || {
+        let join_handle = spawn_blocking(move || {
             let mut prime_count = 0;
             let count_from = level * chunk_size + 1;
             let count_to = (level + 1) * chunk_size;
@@ -208,7 +208,7 @@ pub async fn run_debug_tests() -> Result<()> {
 
     debug_print!("Debug tests completed!");
 
-    tokio::spawn(async {
+    spawn(async {
         // Panic in a separate task
         // to avoid memory leak on the web.
         // On the web (`wasm32-unknown-unknown`),
