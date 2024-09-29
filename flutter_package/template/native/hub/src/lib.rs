@@ -4,7 +4,8 @@
 mod messages;
 mod sample_functions;
 
-// use tokio_with_wasm::alias as tokio; // Uncomment this line to target the web.
+// Uncomment below to target the web.
+// use tokio_with_wasm::alias as tokio;
 
 rinf::write_interface!();
 
