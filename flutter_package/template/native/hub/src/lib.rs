@@ -9,7 +9,7 @@ mod sample_functions;
 
 rinf::write_interface!();
 
-// You can go with any async runtime, not just tokio's.
+// You can go with any async library, not just `tokio`.
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
     // Spawn concurrent tasks.
