@@ -3,17 +3,23 @@
 //! especially when your app has a lot of shared state.
 //! This module demonstrates how to use actors
 //! within the async system in Rust.
-//! - https://doc.rust-lang.org/beta/book/ch16-02-message-passing.html
+//! To build a solid app, do not communicate by sharing memory;
+//! instead, share memory by communicating.
 
 use crate::common::*;
 use messages::prelude::*;
 
+/// Holds the addresses of two actors.
+/// This struct is used to enable communication between the two actors.
 #[derive(Clone)]
 pub struct Addresses {
+    /// Address of `SampleActorOne`.
     pub _one_addr: Address<SampleActorOne>,
+    /// Address of `SampleActorTwo`.
     pub _two_addr: Address<SampleActorTwo>,
 }
 
+/// Creates and spawns the actors in the async system.
 pub async fn create_actors() -> Result<()> {
     // Create actor contexts.
     let one_context = Context::new();
@@ -36,6 +42,7 @@ pub async fn create_actors() -> Result<()> {
     Ok(())
 }
 
+/// Message types that actors can handle.
 mod letters {
     pub struct SampleLetterOne;
     pub struct SampleLetterTwo;
@@ -50,14 +57,17 @@ mod sample_actor_one {
     use crate::common::*;
     use messages::prelude::*;
 
+    /// An actor that manages its state and handles messages.
+    /// It can send and receive messages to interact with other actors.
     pub struct SampleActorOne {
+        /// Holds the addresses of other actors for communication.
         _addresses: Addresses,
+        /// A dummy field to demonstrate actor state management.
         _dummy_field: i32,
     }
 
     impl SampleActorOne {
         pub async fn new(addresses: Addresses) -> Result<Self> {
-            // Create the actor.
             let actor = SampleActorOne {
                 _addresses: addresses,
                 _dummy_field: 3,
@@ -66,16 +76,19 @@ mod sample_actor_one {
             Ok(actor)
         }
 
-        async fn _send_to_actor_two(&mut self) {
+        pub async fn _send_to_actor_two(&mut self) {
             let _ = self._addresses._two_addr.send(SampleLetterOne).await;
         }
     }
 
+    /// Implementing the `Actor` trait for `SampleActorOne`.
+    /// This defines `SampleActorOne` as an actor in the async system.
     impl Actor for SampleActorOne {}
 
     #[async_trait]
     impl Handler<SampleLetterOne> for SampleActorOne {
         type Result = Result<()>;
+        /// Handles messages received by the actor.
         async fn handle(
             &mut self,
             _msg: SampleLetterOne,
@@ -88,6 +101,7 @@ mod sample_actor_one {
     #[async_trait]
     impl Handler<SampleLetterTwo> for SampleActorOne {
         type Result = Result<()>;
+        /// Handles messages received by the actor.
         async fn handle(
             &mut self,
             _msg: SampleLetterTwo,
@@ -104,14 +118,17 @@ mod sample_actor_two {
     use crate::common::*;
     use messages::prelude::*;
 
+    /// An actor that manages its state and handles messages.
+    /// It can send and receive messages to interact with other actors.
     pub struct SampleActorTwo {
+        /// Holds the addresses of other actors for communication.
         _addresses: Addresses,
+        /// A dummy field to demonstrate actor state management.
         _dummy_field: i32,
     }
 
     impl SampleActorTwo {
         pub async fn new(addresses: Addresses) -> Result<Self> {
-            // Create the actor.
             let actor = SampleActorTwo {
                 _addresses: addresses,
                 _dummy_field: 3,
@@ -120,16 +137,19 @@ mod sample_actor_two {
             Ok(actor)
         }
 
-        async fn _send_to_actor_one(&mut self) {
+        pub async fn _send_to_actor_one(&mut self) {
             let _ = self._addresses._one_addr.send(SampleLetterOne).await;
         }
     }
 
+    /// Implementing the `Actor` trait for `SampleActorTwo`.
+    /// This defines `SampleActorOne` as an actor in the async system.
     impl Actor for SampleActorTwo {}
 
     #[async_trait]
     impl Handler<SampleLetterOne> for SampleActorTwo {
         type Result = Result<()>;
+        /// Handles messages received by the actor.
         async fn handle(
             &mut self,
             _msg: SampleLetterOne,
@@ -142,6 +162,7 @@ mod sample_actor_two {
     #[async_trait]
     impl Handler<SampleLetterTwo> for SampleActorTwo {
         type Result = Result<()>;
+        /// Handles messages received by the actor.
         async fn handle(
             &mut self,
             _msg: SampleLetterTwo,
