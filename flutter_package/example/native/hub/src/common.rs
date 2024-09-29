@@ -1,17 +1,12 @@
-use std::error::Error;
-
 // `tokio_with_wasm` enables `tokio` code
 // to run directly on the web.
 use tokio_with_wasm::alias as tokio;
 
-/// This `Result` type alias allows handling any error type
-/// that implements the `Error` trait.
-/// In practice, it is recommended to use custom solutions
-/// or crates like `anyhow` dedicated to error handling.
-/// Building an app differs from writing a library, as apps
-/// may encounter numerous error situations, which is why
-/// a single, flexible error type is needed.
-pub type Result<T> = std::result::Result<T, Box<dyn Error + Send + Sync>>;
+/// This `Result` type alias unifies the error type.
+/// Building an app differs from writing a library,
+/// as app may encounter numerous error situations.
+/// Therefore, a single, flexible error type is recommended.
+pub type Result<T> = anyhow::Result<T>;
 
 /// Because spawn functions are used very often,
 /// we make them accessible from everywhere.
