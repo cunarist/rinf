@@ -12,6 +12,7 @@ Here’s a basic example using the [`messages`](https://crates.io/crates/message
 
 ```rust title="native/hub/src/lib.rs"
 use messages::prelude::*;
+use rinf::debug_print;
 
 rinf::write_interface!();
 
@@ -48,12 +49,12 @@ impl Calculator {
 #[tokio::main]
 async fn main() {
     let mut addr = Calculator::start();
-    let res = addr.send(Sum(10, 5)).await;
-
-    match res {
-        Ok(result) => println!("SUM: {}", result),
-        _ => println!("Communication to the actor has failed"),
+    let result = addr.send(Sum(10, 5)).await;
+    match result {
+        Ok(inner) => debug_print!("SUM: {}", inner),
+        _ => debug_print!("Communication to the actor has failed"),
     }
+    rinf::dart_shutdown().await;
 }
 ```
 

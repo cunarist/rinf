@@ -86,6 +86,7 @@ mod tutorial_functions;
 #[tokio::main]
 async fn main() {
     tokio::spawn(tutorial_functions::calculate_precious_data());
+    rinf::dart_shutdown().await;
 }
 ```
 
@@ -142,6 +143,7 @@ mod tutorial_functions;
 #[tokio::main]
 async fn main() {
     tokio::spawn(tutorial_functions::stream_amazing_number());
+    rinf::dart_shutdown().await;
 }
 ```
 
@@ -231,5 +233,6 @@ mod tutorial_functions;
 #[tokio::main]
 async fn main() {
     tokio::spawn(tutorial_functions::tell_treasure());
+    rinf::dart_shutdown().await;
 }
 ```

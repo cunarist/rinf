@@ -252,6 +252,7 @@ pub async fn respond() {
 #[tokio::main]
 async fn main() {
     tokio::spawn(sample_functions::respond());
+    rinf::dart_shutdown().await;
 }
 ```
 
