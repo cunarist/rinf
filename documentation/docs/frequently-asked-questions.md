@@ -249,6 +249,7 @@ pub async fn respond() {
 ```
 
 ```rust title="native/hub/src/lib.rs"
+#[tokio::main]
 async fn main() {
     tokio::spawn(sample_functions::respond());
 }
