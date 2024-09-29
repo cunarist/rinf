@@ -1,6 +1,6 @@
 // `tokio_with_wasm` enables `tokio` code
 // to run directly on the web.
-use tokio_with_wasm::alias as tokio;
+pub use tokio_with_wasm::alias as tokio;
 
 /// This `Result` type alias unifies the error type.
 /// Building an app differs from writing a library,
