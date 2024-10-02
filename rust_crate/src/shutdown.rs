@@ -29,8 +29,8 @@ pub struct ShutdownEvents {
 /// Awaiting this receiver in the async main Rust function
 /// is necessary to prevent the async runtime in Rust from
 /// finishing immediately.
-pub async fn dart_shutdown() {
-    SHUTDOWN_EVENTS.dart_stopped.wait_async().await;
+pub fn dart_shutdown() -> impl Future<Output = ()> {
+    SHUTDOWN_EVENTS.dart_stopped.wait_async()
 }
 
 /// Synchronization primitive that allows
