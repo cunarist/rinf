@@ -1,3 +1,7 @@
+## 7.0.2
+
+- Optimized certain async APIs in the `rinf` crate for better performance.
+
 ## 7.0.1
 
 - The initial template and example code has been improved.
