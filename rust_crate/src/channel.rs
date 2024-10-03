@@ -52,8 +52,8 @@ impl<T> SignalSender<T> {
 impl<T> SignalReceiver<T> {
     /// Asynchronously receives the next message from the queue. Only the active
     /// receiver is allowed to receive messages. If there are no messages in the
-    /// queue, the receiver will wait until a new message is sent. If this receiver
-    /// is not active, it will return `None`.
+    /// queue, the receiver will wait until a new message is sent.
+    /// If this receiver is not active, the future will return `None`.
     pub fn recv(&self) -> impl Future<Output = Option<T>> {
         RecvFuture {
             inner: self.inner.clone(),
