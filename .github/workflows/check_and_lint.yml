@@ -10,8 +10,8 @@ jobs:
   Flutter:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 #v2.7.0
-      - uses: dart-lang/setup-dart@b64355ae6ca0b5d484f0106a033dd1388965d06d #1.6.0
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # 4.1.0
+      - uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1 # 2.16.0
       - name: Pub Get
         run: dart pub get --no-precompile
         working-directory: build_tool
@@ -22,5 +22,5 @@ jobs:
         run: dart analyze
         working-directory: build_tool
       - name: Test
-        run: dart test
+        run: flutter test
         working-directory: build_tool
