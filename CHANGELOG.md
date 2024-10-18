@@ -1,3 +1,7 @@
+## 7.0.3
+
+- Fixed a problem where generated Rust message structs were unable to import other messages.
+
 ## 7.0.2
 
 - Optimized certain async APIs in the `rinf` crate for better performance.
