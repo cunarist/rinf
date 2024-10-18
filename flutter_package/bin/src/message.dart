@@ -146,7 +146,7 @@ Future<void> generateMessageCode({
     final resourceNames = entry.value;
     final modRsLines = <String>[];
     for (final resourceName in resourceNames) {
-      modRsLines.add('mod $resourceName;');
+      modRsLines.add('pub mod $resourceName;');
       modRsLines.add('pub use $resourceName::*;');
     }
     for (final otherSubPath in resourcesInFolders.keys) {
