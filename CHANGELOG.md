@@ -1,3 +1,7 @@
+## 7.0.4
+
+- Upgraded `allo-isolate` to fix crashes on Android.
+
 ## 7.0.3
 
 - Fixed a problem where generated Rust message structs were unable to import other messages.
