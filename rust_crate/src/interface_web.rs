@@ -22,12 +22,12 @@ where
 
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(js_namespace = rinf)]
-    pub fn send_rust_signal_extern(
+    #[wasm_bindgen(js_namespace = rinf, catch)]
+    fn send_rust_signal_extern(
         resource: i32,
         message_bytes: Uint8Array,
         binary: Uint8Array,
-    );
+    ) -> Result<(), JsValue>; // catch the JS exception
 }
 
 pub fn send_rust_signal_real(
@@ -35,10 +35,14 @@ pub fn send_rust_signal_real(
     message_bytes: Vec<u8>,
     binary: Vec<u8>,
 ) -> Result<(), RinfError> {
-    send_rust_signal_extern(
+    match send_rust_signal_extern(
         message_id,
         js_sys::Uint8Array::from(message_bytes.as_slice()),
         js_sys::Uint8Array::from(binary.as_slice()),
-    );
-    Ok(())
+    ) {
+        Ok(_) => Ok(()),
+        Err(e) => {
+            Err(RinfError::NoSignalHandler)
+        }
+    }
 }
