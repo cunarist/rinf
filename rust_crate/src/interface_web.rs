@@ -41,6 +41,9 @@ pub fn send_rust_signal_real(
         js_sys::Uint8Array::from(binary.as_slice()),
     ) {
         Ok(_) => Ok(()),
-        Err(e) => Err(RinfError::NoSignalHandler),
+        Err(e) => {
+            crate::debug_print!("An error occured during the launch: {e:?}");
+            Err(RinfError::NoSignalHandler)
+        }
     }
 }
