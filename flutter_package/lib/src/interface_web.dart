@@ -13,13 +13,22 @@ void setCompiledLibPathReal(String path) {
   setJsLibPath(path);
 }
 
+// When Dart performs hot restart,
+// the `rinf` object is already defined
+// as a global JavaScript variable.
+final wasAlreadyLoaded = js.context.hasProperty('rinf');
+
 Future<void> prepareInterfaceReal(
   AssignRustSignal assignRustSignal,
 ) async {
-  await loadJsFile();
+  if (wasAlreadyLoaded) {
+    return;
+  }
+
+  final jsObject = js.JsObject.jsify({});
+  js.context['rinf'] = jsObject;
 
   // Listen to Rust via JavaScript
-  final jsObject = js.context['rinf'] as js.JsObject;
   jsObject['send_rust_signal_extern'] = (
     int messageId,
     Uint8List messageBytes,
@@ -33,6 +42,9 @@ Future<void> prepareInterfaceReal(
     }
     assignRustSignal(messageId, messageBytes, binary);
   };
+
+  // Load the JavaScript module.
+  await loadJsFile();
 }
 
 void startRustLogicReal() {

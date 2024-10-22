@@ -6,20 +6,11 @@ import 'dart:async';
 
 String? jsLibPath;
 
-// When Dart performs hot restart,
-// the `rinf` object is already defined
-// as a global JavaScript variable.
-final wasAlreadyLoaded = js.context.hasProperty('rinf');
-
 void setJsLibPath(String path) {
   jsLibPath = path;
 }
 
 Future<void> loadJsFile() async {
-  if (wasAlreadyLoaded) {
-    return;
-  }
-
   final loadCompleter = Completer<void>();
   js.context['completeRinfLoad'] = loadCompleter.complete;
 
@@ -36,8 +27,8 @@ Future<void> loadJsFile() async {
   scriptElement.type = 'module';
   scriptElement.innerHtml = '''
 import init, * as wasmBindings from "$fullUrl";
+Object.assign(rinf, wasmBindings);
 await init();
-window.rinf = { ...wasmBindings };
 completeRinfLoad();
 delete window.completeRinfLoad;
 ''';
