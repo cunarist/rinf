@@ -11,30 +11,20 @@ void setJsLibPath(String path) {
 }
 
 bool wasAlreadyLoaded = false;
-js.JsObject rinfBindingsObject = getRinfBindingsObject();
+js.JsObject rinfBindingsObject = js.context['rinfBindings'];
 js.JsObject wasmBindingsObject = js.context['wasmBindings'];
 
-/// When Dart performs hot restart,
-/// the `rinfBindings` JavaScript object is already defined
-/// as a global JavaScript variable.
 void checkIfAlreadyLoaded() {
+  // When Dart performs hot restart,
+  // the `rinfBindings` JavaScript object is already defined
+  // as a global JavaScript variable.
   wasAlreadyLoaded = js.context.hasProperty('rinfBindings');
-}
-
-/// Create the namespace JavaScript object.
-/// This namespace object is used by Rust
-/// to call functions defined in Dart.
-js.JsObject getRinfBindingsObject() {
-  // Create a new `rinfBindings` JavaScript object if not present.
-  // Otherwise, return the existing one.
-  final js.JsObject jsObject;
-  if (wasAlreadyLoaded) {
-    jsObject = js.context['rinfBindings'];
-  } else {
-    jsObject = js.JsObject.jsify({});
-    js.context['rinfBindings'] = jsObject;
+  if (!wasAlreadyLoaded) {
+    // Create the namespace JavaScript object.
+    // This namespace object is used by Rust
+    // to call functions defined in Dart.
+    js.context['rinfBindings'] = js.JsObject.jsify({});
   }
-  return jsObject;
 }
 
 Future<void> loadJsFile() async {
@@ -43,7 +33,7 @@ Future<void> loadJsFile() async {
   }
 
   final loadCompleter = Completer<void>();
-  js.context['completeRinfLoad'] = loadCompleter.complete;
+  rinfBindingsObject['completeRinfLoad'] = loadCompleter.complete;
 
   // Flutter app doesn't always have the top-level path of the domain.
   // Sometimes, the flutter app might be placed in a lower path.
@@ -60,8 +50,8 @@ Future<void> loadJsFile() async {
 import init, * as wasmBindings from "$fullUrl";
 globalThis.wasmBindings = wasmBindings;
 await init();
-completeRinfLoad();
-delete window.completeRinfLoad;
+rinfBindings.completeRinfLoad();
+delete rinfBindings.completeRinfLoad;
 ''';
   document.head!.append(scriptElement);
 
