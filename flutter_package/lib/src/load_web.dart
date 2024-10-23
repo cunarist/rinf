@@ -10,13 +10,31 @@ void setJsLibPath(String path) {
   jsLibPath = path;
 }
 
-// When Dart performs hot restart,
-// the `rinfBindings` object is already defined
-// as a global JavaScript variable.
 bool wasAlreadyLoaded = false;
+js.JsObject rinfBindingsObject = createRinfBindingsObject();
+js.JsObject wasmBindingsObject = js.context['wasmBindings'];
 
+/// When Dart performs hot restart,
+/// the `rinfBindings` JavaScript object is already defined
+/// as a global JavaScript variable.
 void checkIfAlreadyLoaded() {
   wasAlreadyLoaded = js.context.hasProperty('rinfBindings');
+}
+
+/// Create the namespace JavaScript object.
+/// This namespace object is used by Rust
+/// to call functions defined in Dart.
+js.JsObject createRinfBindingsObject() {
+  // Create a new `rinfBindings` JavaScript object if not present.
+  // Otherwise, return the existing one.
+  final js.JsObject jsObject;
+  if (wasAlreadyLoaded) {
+    jsObject = js.context['rinfBindings'];
+  } else {
+    jsObject = js.JsObject.jsify({});
+    js.context['rinfBindings'] = jsObject;
+  }
+  return jsObject;
 }
 
 Future<void> loadJsFile() async {

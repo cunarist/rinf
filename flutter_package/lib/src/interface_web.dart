@@ -2,7 +2,6 @@
 
 import 'load_web.dart';
 import 'dart:typed_data';
-import 'dart:js' as js;
 import 'interface.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -16,15 +15,12 @@ void setCompiledLibPathReal(String path) {
 Future<void> prepareInterfaceReal(
   AssignRustSignal assignRustSignal,
 ) async {
-  // Check if this is a fresh webpage load.
+  // Check and create the namespace JavaScript object.
   checkIfAlreadyLoaded();
-
-  // Create the namespace JavaScript object.
-  final jsObject = js.JsObject.jsify({});
-  js.context['rinfBindings'] = jsObject;
+  createRinfBindingsObject();
 
   // Listen to Rust via JavaScript.
-  jsObject['send_rust_signal_extern'] = (
+  rinfBindingsObject['send_rust_signal_extern'] = (
     int messageId,
     Uint8List messageBytes,
     Uint8List binary,
@@ -46,8 +42,7 @@ void startRustLogicReal() {
   if (wasAlreadyLoaded) {
     return;
   }
-  final jsObject = js.context['wasmBindings'] as js.JsObject;
-  jsObject.callMethod('start_rust_logic_extern', []);
+  wasmBindingsObject.callMethod('start_rust_logic_extern', []);
 }
 
 void stopRustLogicReal() {
@@ -59,8 +54,7 @@ void sendDartSignalReal(
   Uint8List messageBytes,
   Uint8List binary,
 ) {
-  final jsObject = js.context['wasmBindings'] as js.JsObject;
-  jsObject.callMethod('send_dart_signal_extern', [
+  wasmBindingsObject.callMethod('send_dart_signal_extern', [
     messageId,
     messageBytes,
     binary,
