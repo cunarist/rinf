@@ -41,12 +41,10 @@ pub fn send_rust_signal_real(
     message_bytes: Vec<u8>,
     binary: Vec<u8>,
 ) -> Result<(), RinfError> {
-    match send_rust_signal_extern(
+    let result = send_rust_signal_extern(
         message_id,
         js_sys::Uint8Array::from(message_bytes.as_slice()),
         js_sys::Uint8Array::from(binary.as_slice()),
-    ) {
-        Ok(_) => Ok(()),
-        Err(_) => Err(RinfError::NoBindings),
-    }
+    );
+    result.map_err(|_| RinfError::NoBindings)
 }
