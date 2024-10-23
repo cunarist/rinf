@@ -1,3 +1,8 @@
+## 7.1.0
+
+- Fixed JavaScript bindings on the web, resolving errors related to the missing `rinf` JavaScript object in web workers.
+- Cleaned up the usage of the global JavaScript namespace on the web.
+
 ## 7.0.4
 
 - Upgraded `allo-isolate` to fix crashes on Android.
