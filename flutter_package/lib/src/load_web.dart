@@ -6,22 +6,33 @@ import 'dart:async';
 
 String? jsLibPath;
 
-// When Dart performs hot restart,
-// the `rinf` object is already defined
-// as a global JavaScript variable.
-final wasAlreadyLoaded = js.context.hasProperty('rinf');
-
 void setJsLibPath(String path) {
   jsLibPath = path;
 }
 
+bool wasAlreadyLoaded = false;
+js.JsObject rinfBindingsObject = js.context['rinfBindings'];
+js.JsObject wasmBindingsObject = js.context['wasmBindings'];
+
 Future<void> loadJsFile() async {
+  // When Dart performs hot restart,
+  // the `rinfBindings` JavaScript object is already defined
+  // as a global JavaScript variable.
+  wasAlreadyLoaded = js.context.hasProperty('rinfBindings');
+
+  // Stop loading if it already has been done.
   if (wasAlreadyLoaded) {
     return;
   }
 
+  // Create the namespace JavaScript object.
+  // This namespace object is used by Rust
+  // to call functions defined in Dart.
+  js.context['rinfBindings'] = js.JsObject.jsify({});
+
+  // Prepare to await the module load.
   final loadCompleter = Completer<void>();
-  js.context['completeRinfLoad'] = loadCompleter.complete;
+  rinfBindingsObject['completeRinfLoad'] = loadCompleter.complete;
 
   // Flutter app doesn't always have the top-level path of the domain.
   // Sometimes, the flutter app might be placed in a lower path.
@@ -36,10 +47,10 @@ Future<void> loadJsFile() async {
   scriptElement.type = 'module';
   scriptElement.innerHtml = '''
 import init, * as wasmBindings from "$fullUrl";
+globalThis.wasmBindings = wasmBindings;
 await init();
-window.rinf = { ...wasmBindings };
-completeRinfLoad();
-delete window.completeRinfLoad;
+rinfBindings.completeRinfLoad();
+delete rinfBindings.completeRinfLoad;
 ''';
   document.head!.append(scriptElement);
 

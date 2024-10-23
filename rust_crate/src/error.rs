@@ -6,6 +6,7 @@ pub enum RinfError {
     NoDartIsolate,
     CannotDecodeMessage,
     NoSignalHandler,
+    NoBindings,
 }
 
 impl fmt::Display for RinfError {
@@ -19,6 +20,9 @@ impl fmt::Display for RinfError {
             }
             Self::NoSignalHandler => {
                 write!(f, "Could not find the handler for Dart signal")
+            }
+            Self::NoBindings => {
+                write!(f, "Rinf bindings are not ready")
             }
         }
     }
