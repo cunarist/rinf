@@ -13,9 +13,18 @@ void setCompiledLibPathReal(String path) {
   setJsLibPath(path);
 }
 
+// When Dart performs hot restart,
+// the `rinfBindings` object is already defined
+// as a global JavaScript variable.
+final wasAlreadyLoaded = js.context.hasProperty('rinfBindings');
+
 Future<void> prepareInterfaceReal(
   AssignRustSignal assignRustSignal,
 ) async {
+  if (wasAlreadyLoaded) {
+    return;
+  }
+
   final jsObject = js.JsObject.jsify({});
   js.context['rinfBindings'] = jsObject;
 
