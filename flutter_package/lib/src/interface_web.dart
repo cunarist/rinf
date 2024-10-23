@@ -15,8 +15,8 @@ void setCompiledLibPathReal(String path) {
 Future<void> prepareInterfaceReal(
   AssignRustSignal assignRustSignal,
 ) async {
-  // Prepare JavaScript bindings.
-  prepareBindings();
+  // Load the JavaScript module.
+  await loadJsFile();
 
   // Listen to Rust via JavaScript.
   rinfBindingsObject['send_rust_signal_extern'] = (
@@ -32,9 +32,6 @@ Future<void> prepareInterfaceReal(
     }
     assignRustSignal(messageId, messageBytes, binary);
   };
-
-  // Load the JavaScript module.
-  await loadJsFile();
 }
 
 void startRustLogicReal() {

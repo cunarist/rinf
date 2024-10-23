@@ -14,22 +14,19 @@ bool wasAlreadyLoaded = false;
 js.JsObject rinfBindingsObject = js.context['rinfBindings'];
 js.JsObject wasmBindingsObject = js.context['wasmBindings'];
 
-void prepareBindings() {
+Future<void> loadJsFile() async {
   // When Dart performs hot restart,
   // the `rinfBindings` JavaScript object is already defined
   // as a global JavaScript variable.
   wasAlreadyLoaded = js.context.hasProperty('rinfBindings');
-  if (!wasAlreadyLoaded) {
+
+  if (wasAlreadyLoaded) {
+    return;
+  } else {
     // Create the namespace JavaScript object.
     // This namespace object is used by Rust
     // to call functions defined in Dart.
     js.context['rinfBindings'] = js.JsObject.jsify({});
-  }
-}
-
-Future<void> loadJsFile() async {
-  if (wasAlreadyLoaded) {
-    return;
   }
 
   final loadCompleter = Completer<void>();
