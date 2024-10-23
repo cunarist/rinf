@@ -15,9 +15,8 @@ void setCompiledLibPathReal(String path) {
 Future<void> prepareInterfaceReal(
   AssignRustSignal assignRustSignal,
 ) async {
-  // Check if the web app was already loaded.
-  // This step is important because of Dart's hot restart.
-  checkIfAlreadyLoaded();
+  // Prepare JavaScript bindings.
+  prepareBindings();
 
   // Listen to Rust via JavaScript.
   rinfBindingsObject['send_rust_signal_extern'] = (

@@ -14,7 +14,7 @@ bool wasAlreadyLoaded = false;
 js.JsObject rinfBindingsObject = js.context['rinfBindings'];
 js.JsObject wasmBindingsObject = js.context['wasmBindings'];
 
-void checkIfAlreadyLoaded() {
+void prepareBindings() {
   // When Dart performs hot restart,
   // the `rinfBindings` JavaScript object is already defined
   // as a global JavaScript variable.
