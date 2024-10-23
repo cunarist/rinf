@@ -22,12 +22,18 @@ where
 
 #[wasm_bindgen]
 extern "C" {
+    // The reason this extern function is marked `catch`
+    // and returns a `Result` is that the
+    // `rinfBindings` JavaScript object created by Dart
+    // does not exist in web workers; it is only available
+    // in the main JavaScript thread. Loading the function
+    // fails in web workers.
     #[wasm_bindgen(js_namespace = rinfBindings, catch)]
     pub fn send_rust_signal_extern(
         resource: i32,
         message_bytes: Uint8Array,
         binary: Uint8Array,
-    ) -> Result<(), JsValue>; // catch the JS exception
+    ) -> Result<(), JsValue>;
 }
 
 pub fn send_rust_signal_real(
@@ -41,9 +47,6 @@ pub fn send_rust_signal_real(
         js_sys::Uint8Array::from(binary.as_slice()),
     ) {
         Ok(_) => Ok(()),
-        Err(e) => {
-            crate::debug_print!("An error occured during the launch: {e:?}");
-            Err(RinfError::NoSignalHandler)
-        }
+        Err(_) => Err(RinfError::NoBindings),
     }
 }
