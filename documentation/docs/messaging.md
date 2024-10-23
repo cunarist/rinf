@@ -8,8 +8,6 @@ There are special comments that you can mark messages with.
 
 [^1]: It’s important to note that when using `StreamBuilder`, it may only process the latest message from the stream to trigger a widget rebuild on the next render frame. Since widget builders are primarily focused on building widgets, they might skip some messages if multiple messages arrive within a single frame, typically around 16 milliseconds. To ensure that all messages from the stream are handled, you should consider using the `Stream.listen` method instead.
 
-This version maintains your key points while enhancing readability.
-
 ```proto title="Protobuf"
 // [RUST-SIGNAL]
 message MyDataOutput { ... }
