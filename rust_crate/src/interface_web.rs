@@ -22,7 +22,7 @@ where
 
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(js_namespace = rinf)]
+    #[wasm_bindgen(js_namespace = rinfBindings)]
     pub fn send_rust_signal_extern(
         resource: i32,
         message_bytes: Uint8Array,

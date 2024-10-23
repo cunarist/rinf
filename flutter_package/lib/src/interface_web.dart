@@ -14,9 +14,9 @@ void setCompiledLibPathReal(String path) {
 }
 
 // When Dart performs hot restart,
-// the `rinf` object is already defined
+// the `rinfBindings` object is already defined
 // as a global JavaScript variable.
-final wasAlreadyLoaded = js.context.hasProperty('rinf');
+final wasAlreadyLoaded = js.context.hasProperty('rinfBindings');
 
 Future<void> prepareInterfaceReal(
   AssignRustSignal assignRustSignal,
@@ -26,7 +26,7 @@ Future<void> prepareInterfaceReal(
   }
 
   final jsObject = js.JsObject.jsify({});
-  js.context['rinf'] = jsObject;
+  js.context['rinfBindings'] = jsObject;
 
   // Listen to Rust via JavaScript
   jsObject['send_rust_signal_extern'] = (
@@ -51,7 +51,7 @@ void startRustLogicReal() {
   if (wasAlreadyLoaded) {
     return;
   }
-  final jsObject = js.context['rinf'] as js.JsObject;
+  final jsObject = js.context['wasmBindings'] as js.JsObject;
   jsObject.callMethod('start_rust_logic_extern', []);
 }
 
@@ -64,7 +64,7 @@ void sendDartSignalReal(
   Uint8List messageBytes,
   Uint8List binary,
 ) {
-  final jsObject = js.context['rinf'] as js.JsObject;
+  final jsObject = js.context['wasmBindings'] as js.JsObject;
   jsObject.callMethod('send_dart_signal_extern', [
     messageId,
     messageBytes,

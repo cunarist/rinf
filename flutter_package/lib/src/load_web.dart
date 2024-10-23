@@ -27,7 +27,7 @@ Future<void> loadJsFile() async {
   scriptElement.type = 'module';
   scriptElement.innerHtml = '''
 import init, * as wasmBindings from "$fullUrl";
-Object.assign(rinf, wasmBindings);
+globalThis.wasmBindings = wasmBindings;
 await init();
 completeRinfLoad();
 delete window.completeRinfLoad;
