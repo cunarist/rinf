@@ -11,7 +11,7 @@ void setJsLibPath(String path) {
 }
 
 bool wasAlreadyLoaded = false;
-js.JsObject rinfBindingsObject = createRinfBindingsObject();
+js.JsObject rinfBindingsObject = getRinfBindingsObject();
 js.JsObject wasmBindingsObject = js.context['wasmBindings'];
 
 /// When Dart performs hot restart,
@@ -24,7 +24,7 @@ void checkIfAlreadyLoaded() {
 /// Create the namespace JavaScript object.
 /// This namespace object is used by Rust
 /// to call functions defined in Dart.
-js.JsObject createRinfBindingsObject() {
+js.JsObject getRinfBindingsObject() {
   // Create a new `rinfBindings` JavaScript object if not present.
   // Otherwise, return the existing one.
   final js.JsObject jsObject;

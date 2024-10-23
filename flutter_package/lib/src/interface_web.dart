@@ -15,9 +15,9 @@ void setCompiledLibPathReal(String path) {
 Future<void> prepareInterfaceReal(
   AssignRustSignal assignRustSignal,
 ) async {
-  // Check and create the namespace JavaScript object.
+  // Check if the web app was already loaded.
+  // This step is important because Dart has hot restart.
   checkIfAlreadyLoaded();
-  createRinfBindingsObject();
 
   // Listen to Rust via JavaScript.
   rinfBindingsObject['send_rust_signal_extern'] = (
