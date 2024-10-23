@@ -30,6 +30,7 @@ Future<void> loadJsFile() async {
   // to call functions defined in Dart.
   js.context['rinfBindings'] = js.JsObject.jsify({});
 
+  // Prepare to await for the module load.
   final loadCompleter = Completer<void>();
   rinfBindingsObject['completeRinfLoad'] = loadCompleter.complete;
 
