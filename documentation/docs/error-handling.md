@@ -16,7 +16,7 @@ We recommend that you _not_ write panicking code at all, since Rust has the idio
 
 To manage Rust errors effectively, using a flexible error type is beneficial.
 
-Developing an app differs from creating a library, as an app may encounter a wide range of error situations. Declaring distinct error types for hundreds of potential errors can be overwhelming. Therefore, it is advisable to utilize a single, flexible error type.
+Developing an app differs from creating a library, as an app may encounter a wide range of error situations. Declaring distinct error types for hundreds of potential failures can be overwhelming. Therefore, it is advisable to utilize a single, flexible error type.
 
 You can define your own custom error type or simply use one from `crates.io`:
 
