@@ -7,6 +7,7 @@ nav:
   - tutorial.md
   - detailed-techniques.md
   - state-management.md
+  - error-handling.md
   - printing-for-debugging.md
   - graceful-shutdown.md
   - configuration.md
