@@ -10,7 +10,7 @@ There are recommended practices for managing errors in real-world applications.
 
 ## 🌪️ No Panicking
 
-We recommend that you _not_ write panicking code at all, since Rust has the idiomatic `Result<T, E>`. Additionally, Rust _cannot_ catch panics on the web platform (`wasm32-unknown-unknown`), which can cause callers to wait indefinitely.
+We recommend that you _not_ write panicking code at all, since Rust has the idiomatic `Result<T, E>`. Additionally, Rust _cannot_ catch panics on the web platform (`wasm32-unknown-unknown`), which can cause callers to wait forever.
 
 ```rust title="Rust"
 fn not_good() {
