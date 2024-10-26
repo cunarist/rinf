@@ -15,7 +15,7 @@ We recommend that you _not_ write panicking code at all, since Rust has the idio
 ```rust title="Rust"
 fn not_good() {
     let option = get_option();
-    let value_a = option.unwrap();
+    let value_a = option.unwrap(); // This code can panic
     let result = get_result();
     let value_b = result.expect("This code can panic");
 }
