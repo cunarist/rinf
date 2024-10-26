@@ -109,7 +109,7 @@ async fn main_task() {
 }
 ```
 
-This is how to use a top-level async function to report the propagated error. You will almost always use the `.report()` method because Rust automatically warns you about unused `Result`s.
+This is how to use a top-level function to report the propagated error. You will almost always use the `.report()` method because Rust automatically warns you about unused `Result`s.
 
 ## 🧾 Logging
 
