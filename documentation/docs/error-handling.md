@@ -12,6 +12,24 @@ There are recommended practices for managing errors in real-world applications.
 
 We recommend that you _not_ write panicking code at all, since Rust has the idiomatic `Result<T, E>`. Additionally, Rust _cannot_ catch panics on the web platform (`wasm32-unknown-unknown`), which can cause callers to wait indefinitely.
 
+```rust title="Rust"
+fn not_good() {
+    let option = get_option();
+    let value_a = option.unwrap();
+    let result = get_result();
+    let value_b = result.expect("This code can panic");
+}
+
+fn good() -> Result<(), SomeError> {
+    let option = get_option();
+    let value_a = option?;
+    let result = get_result();
+    let value_b = result?;
+}
+```
+
+As the Rust documentation states, [most errors aren't serious enough](https://doc.rust-lang.org/book/ch09-02-recoverable-errors-with-result.html) to require the program or task to stop entirely.
+
 ## 🌈 Flexible Error Type
 
 To manage Rust errors effectively, using a flexible error type is beneficial.
