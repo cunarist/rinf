@@ -2,11 +2,11 @@
 
 Effective error handling is crucial in applications to ensure a smooth user experience and predictable application behavior.
 
-Rinf expects developers to use Flutter exclusively for the UI layer while keeping all business logic in Rust. This approach encourages handling errors and logging directly in Rust without crossing the language boundary.
+Rinf expects developers to use Flutter exclusively for the UI layer while keeping all business logic in Rust. This approach encourages handling errors and logging directly in Rust without crossing the language boundary.[^1]
 
-Rinf doesn't automatically handle Rust errors for you. By explicitly managing these errors, you can make your app clearer and more robust. Rinf was designed to be a reliable framework without excessive abstractions or implicit behaviors.
+[^1]: Rinf doesn't automatically handle Rust errors for you. By explicitly managing these errors, you can make your app clearer and more robust. Rinf was designed to be a reliable framework without excessive abstractions or implicit behaviors.
 
-However, there are recommended practices for managing errors in real-world applications.
+There are recommended practices for managing errors in real-world applications.
 
 ## 🌪️ No Panicking
 
