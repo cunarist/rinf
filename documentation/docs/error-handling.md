@@ -34,9 +34,9 @@ As the Rust documentation states, [most errors aren't serious enough](https://do
 
 To manage Rust errors effectively, using a flexible error type is beneficial.
 
-Developing an app differs from creating a library, as an app may encounter a wide range of error situations. Declaring distinct error types for hundreds of potential failures can be overwhelming. Therefore, it is advisable to utilize a single, flexible error type.
+Developing an app differs from creating a library, as an app may encounter a wide range of error situations. Declaring a distinct error type for each potential failure can be overwhelming, unless the error cases are simple enough.
 
-You can define your own custom error type or simply use one from `crates.io`:
+Therefore, it is advisable to utilize a single, flexible error type. You can define your own or simply use one from `crates.io`:
 
 - [anyhow](https://crates.io/crates/anyhow)
 
@@ -44,6 +44,8 @@ You can define your own custom error type or simply use one from `crates.io`:
 use anyhow::Result;
 
 fn get_cluster_info() -> Result<ClusterMap> {
+    // `anyhow::Error` can be created from any error type.
+    // By using the `?` operator, the conversion happens automatically.
     let config = std::fs::read_to_string("cluster.json")?;
     let map: ClusterMap = serde_json::from_str(&config)?;
     Ok(map)
