@@ -96,14 +96,14 @@ async fn make_http_request() -> Result<MyResponse> {
     // It can be any kind of failable function.
 }
 
-async fn do_work() -> Result<()> {
+async fn top_level() -> Result<()> {
     let my_response = make_http_request().await?;
     // Do something with `my_response`.
     // Additional processing may be written here.
     Ok(())
 }
 
-async fn top_level() {
+async fn main_task() {
     let result = do_work().await;
     result.report();
 }
