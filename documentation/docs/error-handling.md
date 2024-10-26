@@ -104,7 +104,7 @@ async fn top_level() -> Result<()> {
 }
 
 async fn main_task() {
-    let result = do_work().await;
+    let result = top_level().await;
     result.report();
 }
 ```
