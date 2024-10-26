@@ -103,7 +103,7 @@ async fn do_work() -> Result<()> {
     Ok(())
 }
 
-async fn main_task() {
+async fn top_level() {
     let result = do_work().await;
     result.report();
 }
