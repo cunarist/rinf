@@ -1,6 +1,6 @@
 # Error Handling
 
-Effective error handling is crucial in applications to ensure a smooth user experience and predictable application behavior.
+Effective error handling is crucial in applications to ensure predictable application behavior.
 
 Rinf expects developers to use Flutter exclusively for the UI layer while keeping all business logic in Rust. This approach encourages handling errors and logging directly in Rust without crossing the language boundary.[^1]
 
@@ -22,9 +22,10 @@ fn not_good() {
 
 fn good() -> Result<(), SomeError> {
     let option = get_option();
-    let value_a = option?;
+    let value_a = option.ok_or(SomeError)?;
     let result = get_result();
     let value_b = result?;
+    Ok(())
 }
 ```
 
