@@ -8,7 +8,7 @@ Activate test server during development.
 uv run mkdocs serve
 ```
 
-Activate test server during development.
+Build the documentation.
 
 ```shell
 uv run mkdocs build
