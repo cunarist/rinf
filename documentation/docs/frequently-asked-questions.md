@@ -95,7 +95,7 @@ Ensure that you import the necessary well-known type(s) at the beginning of your
 
 Open your terminal and navigate to the root directory of your Dart project. Then, use the `protoc` command to compile the well-known type to Dart. For example, to compile the `Timestamp` type, you can run the following command:
 
-```bash title="CLI"
+```shell title="CLI"
 protoc --dart_out=./lib/messages google/protobuf/timestamp.proto
 ```
 
@@ -161,7 +161,7 @@ Exception: Unable to generate build files
 
 This error can simply be fixed with the command below.
 
-```bash title="CLI"
+```shell title="CLI"
 flutter clean
 cargo clean
 ```

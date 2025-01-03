@@ -37,6 +37,6 @@ use crate::messages::*;
 
 When you need to run a Flutter web server, use `rinf server` to get the complete Flutter command with the necessary arguments.
 
-```bash title="CLI"
+```shell title="CLI"
 rinf server
 ```

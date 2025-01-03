@@ -6,7 +6,7 @@ To get started, you need to have [Flutter SDK](https://docs.flutter.dev/get-star
 
 Once you're done with the installations, verify your system's readiness with the following commands. Make sure you have installed all the subcomponents that Flutter suggests. If there are no issues in the output, you are good to go onto the next step!
 
-```bash title="CLI"
+```shell title="CLI"
 rustc --version
 flutter doctor
 ```

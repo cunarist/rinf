@@ -30,7 +30,7 @@ message MyPreciousData {
 
 Next, generate Dart and Rust message code from `.proto` files.
 
-```bash title="CLI"
+```shell title="CLI"
 rinf message
 ```
 
@@ -113,7 +113,7 @@ message MyAmazingNumber { int32 current_number = 1; }
 
 Generate Dart and Rust message code from `.proto` files.
 
-```bash title="CLI"
+```shell title="CLI"
 rinf message
 ```
 
@@ -183,7 +183,7 @@ message MyTreasureInput {}
 message MyTreasureOutput { int32 current_value = 1; }
 ```
 
-```bash title="CLI"
+```shell title="CLI"
 rinf message
 ```
 

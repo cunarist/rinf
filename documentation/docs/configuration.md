@@ -15,7 +15,7 @@ rinf:
 
 You can check the current configuration status by running the command below in the CLI.
 
-```bash title="CLI"
+```shell title="CLI"
 rinf config
 ```
 
