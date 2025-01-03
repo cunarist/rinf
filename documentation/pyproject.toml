@@ -1,10 +1,11 @@
-[tool.poetry]
-package-mode = false
-
-[tool.poetry.dependencies]
-python = "^3.10"
-mkdocs = "^1.6.1"
-mkdocs-material = "^9.5.34"
-mkdocs-awesome-pages-plugin = "^2.9.3"
-mkdocs-glightbox = "^0.4.0"
-mkdocs-git-revision-date-localized-plugin = "^1.2.9"
+[project]
+name = "rinf-documentation"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "mkdocs~=1.6.1",
+    "mkdocs-material~=9.5.34",
+    "mkdocs-awesome-pages-plugin~=2.9.3",
+    "mkdocs-glightbox~=0.4.0",
+    "mkdocs-git-revision-date-localized-plugin~=1.2.9",
+]

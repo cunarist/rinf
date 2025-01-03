@@ -1,27 +1,15 @@
 # Documentation
 
-In order to preview and build this documentation, you need to have Python and [Poetry](https://python-poetry.org/docs/) installed on your system.
+In order to preview and build this documentation, ensure you have [`uv`](https://docs.astral.sh/uv/getting-started/installation/), the modern Python package manager, installed on your system.
 
-Activate the virtual environment.
+Activate test server during development.
 
-```bash
-poetry shell
-```
-
-Install Python dependencies.
-
-```bash
-poetry install
+```shell
+uv run mkdocs serve
 ```
 
 Activate test server during development.
 
-```bash
-mkdocs serve
-```
-
-Activate test server during development.
-
-```bash
-mkdocs build
+```shell
+uv run mkdocs build
 ```

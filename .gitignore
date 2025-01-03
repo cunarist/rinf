@@ -34,3 +34,4 @@ target/
 # Others
 *.lock
 /documentation/site/
+.python-version

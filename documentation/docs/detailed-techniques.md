@@ -11,7 +11,6 @@ We've covered how to pass signals[^1] between Dart and Rust in the previous tuto
 It's important to note that creating a Protobuf `message` larger than a few megabytes is not recommended. For large data, split them into multiple signals, or use the `binary` field instead.[^2]
 
 [^1]: Rinf relies solely on native FFI for communication, avoiding the use of web protocols or hidden threads. The goal is to minimize performance overhead as much as possible.
-
 [^2]: Sending a serialized message or binary data is a zero-copy operation from Rust to Dart, while it involves a copy operation from Dart to Rust in memory. Keep in mind that Protobuf's serialization and deserialization does involve memory copy.
 
 ## 🗃️ Generation Path
@@ -26,7 +25,7 @@ When you generate message code using the `rinf message` command, the resulting D
 
 If you add the optional argument `-w` or `--watch` to the `rinf message` command, the message code will be automatically generated when `.proto` files are modified. If you add this argument, the command will not exit on its own.
 
-```bash title="CLI"
+```shell title="CLI"
 rinf message --watch
 ```
 
