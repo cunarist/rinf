@@ -33,5 +33,6 @@ target/
 
 # Others
 *.lock
-/documentation/site/
 .python-version
+/documentation/site/
+/documentation/*.egg-info/
