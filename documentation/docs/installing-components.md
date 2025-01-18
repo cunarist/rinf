@@ -1,8 +1,14 @@
 # Installing Components
 
-To get started, you need to have [Flutter SDK](https://docs.flutter.dev/get-started/install)[^1] and [Rust toolchain](https://www.rust-lang.org/tools/install) installed on your system.
+[flutter-install-steps]: https://docs.flutter.dev/get-started/install
 
-[^1]: If you're working on Linux, do not install Flutter from `snap`. Flutter from `snap` comes with its own binary linker called `ld`, which is fundamentally incompatible with Rust. Instead, follow the manual installation method as written in the Flutter docs.
+To get started, you need to have [Flutter SDK][flutter-install-steps] and [Rust toolchain](https://www.rust-lang.org/tools/install) installed on your system.
+
+!!! warning "Flutter SDK snap package will not work"
+
+    If you're working on Linux, do not install Flutter from `snap`. Flutter from `snap` comes with its own binary linker called `ld`, which is fundamentally incompatible with Rust. Instead, follow the [manual installation steps per the Flutter docs][flutter-install-steps].
+
+    Typically, the Flutter SDK package found in Debian-based Linux distributions' app store (under the name "Flutter") is a snap package.
 
 Once you're done with the installations, verify your system's readiness with the following commands. Make sure you have installed all the subcomponents that Flutter suggests. If there are no issues in the output, you are good to go onto the next step!
 
