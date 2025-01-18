@@ -15,6 +15,6 @@ flutter doctor
 
     If you're working on Linux, it is recommended to install Flutter manually. Do not install Flutter from `snap`.
 
-    Flutter from `snap` comes with its own binary linker called `ld`, which is fundamentally incompatible with Rust. Instead, follow the [manual installation steps per the Flutter docs](https://docs.flutter.dev/get-started/install/linux).
+    Flutter from `snap` comes with its own binary linker called `ld`, which is fundamentally incompatible with Rust. Instead, follow the [manual installation steps per the Flutter docs][flutter-install-steps].
 
     Typically, the Flutter SDK package found in Debian-based Linux distributions' app store (under the name "Flutter") is a `snap` package.
