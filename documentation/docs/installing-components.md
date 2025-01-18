@@ -1,6 +1,8 @@
 # Installing Components
 
-To get started, you need to have [Flutter SDK](https://docs.flutter.dev/get-started/install) and [Rust toolchain](https://www.rust-lang.org/tools/install) installed on your system.
+[flutter-install-steps]: https://docs.flutter.dev/get-started/install
+
+To get started, you need to have [Flutter SDK][flutter-install-steps] and [Rust toolchain](https://www.rust-lang.org/tools/install) installed on your system.
 
 Once you're done with the installations, verify your system's readiness with the following commands. Make sure you have installed all the subcomponents that Flutter suggests. If there are no issues in the output, you are good to go onto the next step!
 
