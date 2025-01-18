@@ -33,8 +33,6 @@ target/
 
 # Others
 *.lock
-/documentation/site/
 .python-version
-
-# editable python install artifacts
-documentation/*.egg-info/
+/documentation/site/
+/documentation/*.egg-info/
