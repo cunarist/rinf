@@ -191,6 +191,7 @@ Future<void> generateMessageCode({
     await File.fromUri(rustOutputPath.join(subPath).join('mod.rs'))
         .writeAsString(modRsContent);
   }
+
   fillingBar.increment();
 
   // Generate Dart message files.
@@ -484,6 +485,15 @@ pub fn assign_dart_signal(
 ''';
   await File.fromUri(rustOutputPath.join('generated.rs'))
       .writeAsString(rustReceiveScript);
+
+  // format rust code
+  var rustFiles = resourcesInFolders.keys.toList();
+  rustFiles.addAll(['generated.rs', 'mod.rs']);
+  rustFiles = rustFiles
+      .map((rsFile) => rustOutputPath.join(rsFile).toFilePath())
+      .toList();
+  await Process.run(
+      'cargo', ['fmt', '--', for (final rsFile in rustFiles) rsFile]);
 
   // Get ready to handle received signals in Dart.
   var dartReceiveScript = '';
