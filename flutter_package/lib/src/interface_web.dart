@@ -1,10 +1,12 @@
 // ignore_for_file: avoid_web_libraries_in_flutter
 
-import 'load_web.dart';
-import 'dart:typed_data';
-import 'interface.dart';
 import 'dart:async';
+import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
+import 'dart:typed_data';
 import 'dart:convert';
+import 'load_web.dart';
+import 'interface.dart';
 
 /// Sets the path to the JavaScript module
 /// that needs to be loaded.
@@ -31,14 +33,14 @@ Future<void> prepareInterfaceReal(
       return;
     }
     assignRustSignal(messageId, messageBytes, binary);
-  };
+  }.jsify();
 }
 
 void startRustLogicReal() {
   if (wasAlreadyLoaded) {
     return;
   }
-  wasmBindingsObject.callMethod('start_rust_logic_extern', []);
+  wasmBindingsObject.callMethod('start_rust_logic_extern'.toJS);
 }
 
 void stopRustLogicReal() {
@@ -50,9 +52,10 @@ void sendDartSignalReal(
   Uint8List messageBytes,
   Uint8List binary,
 ) {
-  wasmBindingsObject.callMethod('send_dart_signal_extern', [
-    messageId,
-    messageBytes,
-    binary,
-  ]);
+  wasmBindingsObject.callMethod(
+    'send_dart_signal_extern'.toJS,
+    messageId.toJS,
+    messageBytes.toJS,
+    binary.toJS,
+  );
 }
