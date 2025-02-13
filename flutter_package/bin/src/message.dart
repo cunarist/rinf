@@ -487,13 +487,18 @@ pub fn assign_dart_signal(
       .writeAsString(rustReceiveScript);
 
   // format rust code
-  var rustFiles = resourcesInFolders.keys.toList();
-  rustFiles.addAll(['generated.rs', 'mod.rs']);
-  rustFiles = rustFiles
-      .map((rsFile) => rustOutputPath.join(rsFile).toFilePath())
-      .toList();
-  await Process.run(
-      'cargo', ['fmt', '--', for (final rsFile in rustFiles) rsFile]);
+  var rustFiles = <String>[];
+  for (final entry in resourcesInFolders.entries) {
+    for (final file in entry.value) {
+      rustFiles.add(
+        rustOutputPath.join(entry.key).join('$file.rs').toFilePath(),
+      );
+    }
+  }
+  for (final rootMod in ['generated.rs', 'mod.rs']) {
+    rustFiles.add(rustOutputPath.join(rootMod).toFilePath());
+  }
+  await Process.run('rustfmt', rustFiles);
 
   // Get ready to handle received signals in Dart.
   var dartReceiveScript = '';
