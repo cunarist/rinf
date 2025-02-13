@@ -15,3 +15,8 @@ set_target_properties(rinf PROPERTIES
 )
 
 target_compile_definitions(rinf PUBLIC DART_SHARED_LIB)
+
+if (ANDROID)
+  # Support Android 15 16k page size.
+  target_link_options(rinf PRIVATE "-Wl,-z,max-page-size=16384")
+endif()
