@@ -1,3 +1,8 @@
+## 7.1.1
+
+- Now, generated Rust message files are automatically formatted. Thanks @2bndy5!
+- Deprecated `dart:js` and `dart:html` have been replaced with `dart:js_interop` and `package:web`.
+
 ## 7.1.0
 
 - Fixed JavaScript bindings on the web, resolving errors related to the missing `rinf` JavaScript object in web workers.
