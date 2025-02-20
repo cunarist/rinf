@@ -15,7 +15,7 @@ crate-type = ["lib", "cdylib", "staticlib"]
 rinf = "7.1.1"
 prost = "0.13.0"
 tokio = { version = "1", features = ["rt", "sync", "time", "macros"] }
-tokio_with_wasm = { version = "0.7.2", features = [
+tokio_with_wasm = { version = "0.8.1", features = [
     "rt",
     "sync",
     "time",
