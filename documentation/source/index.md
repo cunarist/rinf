@@ -1,12 +1,12 @@
-# Rinf Documentation
-
-Welcome to the Rinf documentation.
-
-## Contents
+```{eval-rst}
+.. raw:: html
+   :file: _templates/landing.html
+```
 
 ```{eval-rst}
 .. toctree::
    :maxdepth: 1
+   :hidden:
 
    installing-components.md
    applying-template.md
