@@ -1,5 +1,7 @@
 # FAQ
 
+## Question Lists
+
 ### Where should I ask for help?
 
 If you encounter any problems, feel free to visit [the discussions page](https://github.com/cunarist/rinf/discussions) and open a Q&A thread for assistance.
@@ -20,7 +22,8 @@ All build settings of Rinf ensures that all library files compiled from Rust cra
 
 The NDK version that your project expects is specified in `./android/app/build.gradle` file as `ndkVersion` variable inside `android` block. The value of this `ndkVersion` should be `flutter.ndkVersion` and you should be using Flutter SDK [3.10 or higher](https://docs.flutter.dev/release/release-notes/release-notes-3.10.0). However, `ndkVersion` can be absent if you've created your Flutter project with Flutter SDK 3.7 and earlier. If `ndkVersion` is not defined in your `./android/app/build.gradle` file, go ahead and write one yourself.
 
-```gradle title="android/app/build.gradle"
+```{code-block} none
+:caption: android/app/build.gradle
 ..
 android {
     namespace "com.cunarist.rinf_example"
@@ -58,7 +61,8 @@ On native platforms, Dart's hot restart makes the Rust logic restart, in other w
 
 In order to use nightly Rust, you need to add a cargokit configuration file. Cargokit is the build connector between Dart and Rust used by this framework.
 
-```yaml title="native/hub/cargokit.yaml"
+```{code-block} yaml
+:caption: native/hub/cargokit.yaml
 cargo:
   debug:
     toolchain: nightly
@@ -82,7 +86,8 @@ If you still need to use well-known Protobuf types like `Timestamp` in your Dart
 
 Start by creating a `.proto` descriptor file that contains the definition of the well-known type you want to use. For example, if you want to use the `Timestamp` type, your proto file might look like this:
 
-```protobuf title="Protobuf"
+```{code-block} protobuf
+:caption: Protobuf
 syntax = "proto3";
 package my_resource_name;
 
@@ -95,7 +100,8 @@ Ensure that you import the necessary well-known type(s) at the beginning of your
 
 Open your terminal and navigate to the root directory of your Dart project. Then, use the `protoc` command to compile the well-known type to Dart. For example, to compile the `Timestamp` type, you can run the following command:
 
-```shell title="CLI"
+```{code-block} shell
+:caption: CLI
 protoc --dart_out=./lib/messages google/protobuf/timestamp.proto
 ```
 
@@ -103,7 +109,8 @@ Be sure to compile to `./lib/messages` because `rinf message` compiles everythin
 
 After running the `protoc` command, you'll find the generated Dart files in the specified output directory. You can now integrate these generated files into your Dart project like any other Dart module.
 
-```dart title="Dart"
+```{code-block} dart
+:caption: Dart
 // In your Dart code, you can import and use the well-known type:
 import 'package:my_app/messages/google/protobuf/timestamp.pb.dart';
 ```
@@ -129,7 +136,8 @@ A Rust panic doesn't crash the app; it simply cancels the spawned async task. Yo
 
 There might be various Rust codes with these attribute above:
 
-```rust title="Rust"
+```{code-block} rust
+:caption: Rust
 #[cfg(target_family = "wasm")]
 {}
 #[cfg(not(target_family = "wasm"))]
@@ -140,7 +148,8 @@ Since the environments of the web and native platforms are so different, there a
 
 By default, Rust-analyzer runs in native mode. To make it run in webassembly mode, create the configuration file:
 
-```toml title=".cargo/config.toml"
+```{code-block} toml
+:caption: .cargo/config.toml
 [build]
 # Uncomment the line below to switch Rust-analyzer to perform
 # type checking and linting in webassembly mode, for the web target.
@@ -152,7 +161,8 @@ You need to restart Rust language server for this to take effect.
 
 ### CMake cache is broken after I moved the app folder
 
-```title="Output"
+```{code-block} none
+:caption: Output
 CMake Error: The current CMakeCache.txt directory C:/.../CMakeCache.txt is different than the directory C:/... where CMakeCache.txt was created. This may result in binaries being created in the wrong place. If you are not sure, reedit the CMakeCache.txt
 CMake Error: The source "C:/.../CMakeLists.txt" does not match the source "C:/.../CMakeLists.txt" used to generate cache.  Re-run cmake with a different source directory.
 Building Windows application...                                     80ms
@@ -161,7 +171,8 @@ Exception: Unable to generate build files
 
 This error can simply be fixed with the command below.
 
-```shell title="CLI"
+```{code-block} shell
+:caption: CLI
 flutter clean
 cargo clean
 ```
@@ -172,7 +183,8 @@ If you are using older Android versions, you may encounter errors due to issues 
 
 To address this, you can modify `AndroidManifest.xml` files under `./android/app/src/` as follows.
 
-```xml title="android/app/src/**/AndroidManifest.xml"
+```xml
+:caption: android/app/src/**/AndroidManifest.xml
 <application
     android:extractNativeLibs="true"
 >
@@ -184,7 +196,8 @@ Please note that it's recommended to use Flutter only to show widgets on the scr
 
 However, if you really need to store some state in a Flutter widget, you can achieve something like a request-response pattern by providing a unique ID.
 
-```proto title="messages/tutorial_resource.proto"
+```{code-block} proto
+:caption: messages/tutorial_resource.proto
 syntax = "proto3";
 package tutorial_resource;
 
@@ -201,7 +214,8 @@ message MyUniqueOutput {
 }
 ```
 
-```dart title="lib/main.dart"
+```{code-block} dart
+:caption: lib/main.dart
 import 'dart:async';
 import 'package:example_app/messages/all.dart';
 
@@ -216,7 +230,8 @@ void main() async {
 }
 ```
 
-```dart title="lib/main.dart"
+```{code-block} dart
+:caption: lib/main.dart
 import 'dart:async';
 import 'package:example_app/messages/all.dart';
 
@@ -232,7 +247,8 @@ onPressed: () async {
 },
 ```
 
-```rust title="native/hub/src/sample_functions.rs"
+```{code-block} rust
+:caption: native/hub/src/sample_functions.rs
 use crate::messages::*;
 
 pub async fn respond() {
@@ -248,7 +264,8 @@ pub async fn respond() {
 }
 ```
 
-```rust title="native/hub/src/lib.rs"
+```{code-block} rust
+:caption: native/hub/src/lib.rs
 #[tokio::main]
 async fn main() {
     tokio::spawn(sample_functions::respond());
@@ -270,7 +287,8 @@ Here are the current constraints of the `wasm32-unknown-unknown` target:
 
 ### My app failed to load dynamic library
 
-```title="Output"
+```{code-block} none
+:caption: Output
 Exception has occurred.
 ArgumentError (Invalid argument(s): Failed to load dynamic library 'libhub.so': dlopen failed: cannot locate symbol "..." referenced by ...
 ```
@@ -279,7 +297,8 @@ This happens when one or some of your Rust dependencies expect to have C or C++ 
 
 To make `cargo` link those C or C++ libraries to your native library, create your `build.rs` file like below.
 
-```rust title="native/hub/build.rs"
+```{code-block} rust
+:caption: native/hub/build.rs
 use std::env;
 
 fn main() {
@@ -313,7 +332,8 @@ Failed to load dynamic library 'libhub.so': libhub.so: cannot open shared object
 
 In this case, you can specify a path that points to the compiled Rust library. Simply provide a string path to your dynamic library file.
 
-```dart title="lib/main.dart"
+```{code-block} dart
+:caption: lib/main.dart
 import './messages/all.dart';
 
 async void main() {

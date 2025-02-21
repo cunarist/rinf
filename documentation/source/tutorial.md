@@ -4,20 +4,22 @@ To grasp the basic concepts, it's beneficial to follow a step-by-step tutorial.
 
 Before we start, make sure that there's a `Column` somewhere in your widget tree. This will contain our tutorial widgets.
 
-```dart title="lib/main.dart"
+```{code-block} dart
+:caption: lib/main.dart
 child: Column(
   mainAxisAlignment: MainAxisAlignment.center,
   children: [],
 )
 ```
 
-## 🚨 From Dart to Rust
+## From Dart to Rust
 
 Let's say that you want to create a new button in Dart that sends an array of numbers and a string to Rust. We need a signal to notify Rust that a user event has occurred.
 
 Write a new `.proto` file in the `./messages` directory with a new message. Note that the message should have the comment `[DART-SIGNAL]` above it.
 
-```proto title="messages/tutorial_messages.proto"
+```{code-block} proto
+:caption: messages/tutorial_messages.proto
 syntax = "proto3";
 package tutorial_messages;
 
@@ -30,13 +32,15 @@ message MyPreciousData {
 
 Next, generate Dart and Rust message code from `.proto` files.
 
-```shell title="CLI"
+```{code-block} shell
+:caption: CLI
 rinf message
 ```
 
 Create a button widget in Dart that accepts the user input.
 
-```dart title="lib/main.dart"
+```{code-block} dart
+:caption: lib/main.dart
 import 'package:test_app/messages/all.dart';
 
 child: Column(
@@ -57,7 +61,8 @@ child: Column(
 
 Let's listen to this message in Rust. This simple function will add one to each element in the array and capitalize all letters in the string.
 
-```rust title="native/hub/src/tutorial_functions.rs"
+```{code-block} rust
+:caption: native/hub/src/tutorial_functions.rs
 use crate::common::*;
 use crate::messages::*;
 use rinf::debug_print;
@@ -80,7 +85,8 @@ pub async fn calculate_precious_data() {
 }
 ```
 
-```rust title="native/hub/src/lib.rs"
+```{code-block} rust
+:caption: native/hub/src/lib.rs
 mod tutorial_functions;
 
 #[tokio::main]
@@ -92,18 +98,20 @@ async fn main() {
 
 Now run the app with `flutter run`. We can see the printed output in the command-line when clicking the button!
 
-```title="Output"
+```{code-block} none
+:caption: Output
 flutter: [4, 5, 6]
 flutter: ZERO-COST ABSTRACTION
 ```
 
-## 📡 From Rust to Dart
+## From Rust to Dart
 
 Let's say that you want to send increasing numbers every second from Rust to Dart.
 
 Define the message. Note that the message should have the comment `[RUST-SIGNAL]` above it.
 
-```proto title="messages/tutorial_messages.proto"
+```{code-block} proto
+:caption: messages/tutorial_messages.proto
 syntax = "proto3";
 package tutorial_messages;
 
@@ -113,17 +121,20 @@ message MyAmazingNumber { int32 current_number = 1; }
 
 Generate Dart and Rust message code from `.proto` files.
 
-```shell title="CLI"
+```{code-block} shell
+:caption: CLI
 rinf message
 ```
 
 Define an async Rust function that runs forever, sending numbers to Dart every second.
 
-```toml title="native/hub/Cargo.toml"
+```{code-block} toml
+:caption: "native/hub/Cargo.toml"
 tokio = { version = "1", features = ["sync", "rt", "time"] }
 ```
 
-```rust title="native/hub/src/tutorial_functions.rs"
+```{code-block} rust
+:caption: native/hub/src/tutorial_functions.rs
 use crate::messages::*;
 use std::time::Duration;
 
@@ -137,7 +148,8 @@ pub async fn stream_amazing_number() {
 }
 ```
 
-```rust title="native/hub/src/lib.rs"
+```{code-block} rust
+:caption: native/hub/src/lib.rs
 mod tutorial_functions;
 
 #[tokio::main]
@@ -149,7 +161,8 @@ async fn main() {
 
 Finally, receive the signals in Dart with `StreamBuilder` and rebuild the widget accordingly.
 
-```dart title="lib/main.dart"
+```{code-block} dart
+:caption: lib/main.dart
 import 'package:test_app/messages/all.dart';
 
 children: [
@@ -168,11 +181,12 @@ children: [
 ]
 ```
 
-## 🤝 Back and Forth
+## Back and Forth
 
 You can easily show the updated state on the screen by combining those two ways of message passing.
 
-```proto title="messages/tutorial_messages.proto"
+```{code-block} proto
+:caption: messages/tutorial_messages.proto
 syntax = "proto3";
 package tutorial_messages;
 
@@ -183,11 +197,13 @@ message MyTreasureInput {}
 message MyTreasureOutput { int32 current_value = 1; }
 ```
 
-```shell title="CLI"
+```{code-block} shell
+:caption: CLI
 rinf message
 ```
 
-```dart title="lib/main.dart"
+```{code-block} dart
+:caption: lib/main.dart
 import 'package:test_app/messages/all.dart';
 
 children: [
@@ -212,7 +228,8 @@ children: [
 ]
 ```
 
-```rust title="native/hub/src/tutorial_functions.rs"
+```{code-block} rust
+:caption: native/hub/src/tutorial_functions.rs
 use crate::common::*;
 use crate::messages::*;
 
@@ -227,7 +244,8 @@ pub async fn tell_treasure() {
 }
 ```
 
-```rust title="native/hub/src/lib.rs"
+```{code-block} rust
+:caption: native/hub/src/lib.rs
 mod tutorial_functions;
 
 #[tokio::main]

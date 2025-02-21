@@ -1,6 +1,6 @@
 # Contribution
 
-## 👥 Contribution
+## Contribution
 
 If Rinf has been helpful, please consider giving a star to our [GitHub repository](https://github.com/cunarist/rinf) and a like to our [Pub package](https://pub.dev/packages/rinf). You can also support us by spreading the word and sharing this framework online.
 
@@ -8,7 +8,7 @@ We appreciate your contribution to the development of this project! We're always
 
 [![GitHub contributors](https://contrib.rocks/image?repo=cunarist/rinf)](https://github.com/cunarist/rinf/graphs/contributors)
 
-## 🏦 Credits
+## Credits
 
 Rinf was not made alone. There were pioneers that gave inspiration to the structure of this package. Credits to these wonderful efforts!
 

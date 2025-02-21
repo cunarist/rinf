@@ -1,6 +1,6 @@
 # Running and Building
 
-## 📱 For Native Platforms
+## For Native Platforms
 
 The following commands are just enough to run and build apps for native platforms. It's that simple.[^1]
 
@@ -8,17 +8,19 @@ The following commands are just enough to run and build apps for native platform
 
 To run the app:
 
-```shell title="CLI"
+```{code-block} shell
+:caption: CLI
 flutter run
 ```
 
 To build the app for a specific platform:
 
-```shell title="CLI"
+```{code-block} shell
+:caption: CLI
 flutter build [platform] # Replace it with a platform name
 ```
 
-## 🌍 For the Web
+## For the Web
 
 You need to manually build webassembly module from Rust before running or building the app for the web.[^2]
 
@@ -30,7 +32,8 @@ To serve[^3] the web application[^4]:
 
 [^4]: Since repeatedly writing web header arguments during development can be overwhelming, Rinf provides a convenient command `rinf server` that prints the full Flutter web command.
 
-```shell title="CLI"
+```{code-block} shell
+:caption: CLI
 rinf wasm
 flutter run --web-header=Cross-Origin-Opener-Policy=same-origin --web-header=Cross-Origin-Embedder-Policy=require-corp
 ```
@@ -39,7 +42,8 @@ To build the optimized release version of the web application[^5]:
 
 [^5]: Rinf supports hosting a Flutter app at a [non-root location](https://docs.flutter.dev/ui/navigation/url-strategies#hosting-a-flutter-app-at-a-non-root-location). For example, you can place your Flutter app in `https://mywebsite.com/subpath/deeperpath/`.
 
-```shell title="CLI"
+```{code-block} shell
+:caption: CLI
 rinf wasm --release
 flutter build web
 ```

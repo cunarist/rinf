@@ -8,11 +8,12 @@ Rinf expects developers to use Flutter exclusively for the UI layer while keepin
 
 There are recommended practices for managing errors in real-world applications.
 
-## 🌪️ No Panicking
+## No Panicking
 
 We recommend that you _not_ write panicking code at all, since Rust has the idiomatic `Result<T, E>`. Additionally, Rust _cannot_ catch panics on the web platform (`wasm32-unknown-unknown`), which can cause callers to wait forever.
 
-```rust title="Rust"
+```{code-block} rust
+:caption: Rust
 fn not_good() {
     let option = get_option();
     let value_a = option.unwrap(); // This code can panic
@@ -31,7 +32,7 @@ fn good() -> Result<(), SomeError> {
 
 As the Rust documentation states, [most errors aren't serious enough](https://doc.rust-lang.org/book/ch09-02-recoverable-errors-with-result.html) to require the program or task to stop entirely.
 
-## 🌈 Flexible Error Type
+## Flexible Error Type
 
 To manage Rust errors effectively, using a flexible error type is beneficial.
 
@@ -41,7 +42,7 @@ Therefore, it is advisable to utilize a single, flexible error type. You can def
 
 - [anyhow](https://crates.io/crates/anyhow)
 
-```rust
+```{code-block} rust
 use anyhow::Result;
 
 fn get_cluster_info() -> Result<ClusterMap> {
@@ -53,11 +54,12 @@ fn get_cluster_info() -> Result<ClusterMap> {
 }
 ```
 
-## ⚠️ Reporting to Dart
+## Reporting to Dart
 
 You might need to notify the user through the UI that an error occurred in Rust, providing hints on how to mitigate the problem, such as checking the network connection, trying again later, or verifying the username and password. The code below can serve as a good starting point for reporting Rust errors to Dart.
 
-```proto title="Protobuf"
+```{code-block} proto
+:caption: Protobuf
 // [RUST-SIGNAL]
 // Your implementation of an error.
 // It might include a message, an error code, etc.
@@ -67,7 +69,8 @@ message ErrorReport  {
 }
 ```
 
-```rust title="Rust"
+```{code-block} rust
+:caption: Rust
 use anyhow::Result;
 use crate::messages::*;
 
@@ -112,7 +115,7 @@ async fn main_task() {
 
 This is how to use a top-level function to report the propagated error. You will almost always use the `.report()` method because Rust automatically warns you about unused `Result`s.
 
-## 🧾 Logging
+## Logging
 
 You may want to log errors to the console or a file. Several crates can help with this process:
 

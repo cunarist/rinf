@@ -1,12 +1,13 @@
 # Applying Rust Template
 
-!!! note
-
-    This section assumes that you've already created a Flutter project with `flutter create [my_app_name]`. You can get further guidance from [this awesome Flutter tutorial](https://docs.flutter.dev/get-started/codelab).
+```{note}
+This section assumes that you've already created a Flutter project with `flutter create [my_app_name]`. You can get further guidance from [this awesome Flutter tutorial](https://docs.flutter.dev/get-started/codelab).
+```
 
 First of all, add this framework to your Flutter project.
 
-```shell title="CLI"
+```{code-block} shell
+:caption: CLI
 flutter pub add rinf
 ```
 
@@ -14,7 +15,8 @@ Now install the command executable to easily run Rinf commands in the CLI.[^1]
 
 [^1]: If you're curious about all the available commands, use `rinf --help`.
 
-```shell title="CLI"
+```{code-block} shell
+:caption: CLI
 cargo install rinf
 ```
 
@@ -22,13 +24,15 @@ Then, simply run this in the command-line[^2] from your Flutter project's direct
 
 [^2]: If you encounter issues with the automated `protoc` installation, likely due to GitHub API access restrictions, you can [manually install it](https://grpc.io/docs/protoc-installation/) on your machine and add it to PATH. You can verify the installation by running the command `protoc --version` to ensure that the Protobuf compiler is ready on your machine. Rinf will detect and use the manually installed `protoc` if it exists.
 
-```shell title="CLI"
+```{code-block} shell
+:caption: CLI
 rinf template
 ```
 
 After running the command, you'll have new files and folders as your starter Rust template.
 
-```diff title="Folder Tree"
+```{code-block} diff
+:caption: Folder Tree
     my_flutter_project/
     ├── android/
     ├── ios/
@@ -61,6 +65,6 @@ Now, by heading over to `./native/hub/src/lib.rs`, you can start writing Rust!
 
 Example code for guidance can be found [here](https://github.com/cunarist/rinf/tree/main/flutter_package/example).
 
-!!! info
-
-    Rinf expects that the application's main logic is written in Rust, with Flutter solely serving the purpose of managing the GUI
+```{important}
+Rinf expects that the application's main logic is written in Rust, with Flutter solely serving the purpose of managing the GUI
+```

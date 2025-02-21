@@ -1,18 +1,19 @@
-{% extends "base.html" %}
-<!-- END OF BLOCK -->
-
-{% block htmltitle %}
 <title>Rinf</title>
-{% endblock %}
-<!-- END OF BLOCK -->
-
-{% block tabs %}
 <style>
-  [data-md-color-scheme="default"] {
-    --md-default-bg-color: #ffffff;
+  .content {
+    margin: auto;
   }
-  [data-md-color-scheme="slate"] {
-    --md-default-bg-color: #141414;
+  .mobile-header {
+    position: absolute;
+    visibility: hidden;
+  }
+  .sidebar-drawer {
+    position: absolute;
+    visibility: hidden;
+  }
+  .toc-drawer {
+    position: absolute;
+    visibility: hidden;
   }
   .outermost {
     padding: 0px 24px 0px;
@@ -50,6 +51,7 @@
     outline: 1px solid rgba(122, 122, 122, 1);
     outline-offset: -1px;
     filter: grayscale();
+    margin: 24px 0px;
   }
   .web-title {
     font-weight: bold;
@@ -58,33 +60,40 @@
     font-weight: 200;
   }
   .spacing {
-    height: 40px;
-  }
-  .description-text {
-    padding: 0px 40px;
+    height: 120px;
   }
   .guide-box {
     max-width: min(36em, 80svw);
     min-width: 18em;
-    margin: 0em auto 0em;
+    margin: 0em auto;
     padding: 16px;
     text-align: left;
     flex: 1;
   }
+  .platform-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    max-width: 500px;
+    gap: 8px;
+    margin: 0px auto;
+    padding: 4px;
+  }
+  .platform-box {
+    height: fit-content;
+    margin: 4px;
+    padding: 16px;
+    background-color: rgba(127, 127, 127, 0.08);
+    border-radius: 4px;
+    text-align: left;
+  }
   .repeated-box {
-    width: 14em;
-    height: 28em;
+    width: 100%;
+    height: fit-content;
     margin: 8px;
-    padding: 24px;
+    padding: 24px 40px;
     text-align: left;
     background-color: rgba(127, 127, 127, 0.08);
     border-radius: 4px;
-  }
-  @media (max-width: 40em) {
-    .repeated-box {
-      width: 100%;
-      height: fit-content;
-    }
   }
   .lang-icon {
     margin-top: 30px;
@@ -93,23 +102,9 @@
     background-color: rgba(127, 127, 127, 0.08);
     border-radius: 4px;
   }
-  .fixed-button {
-    width: 12em;
-    margin: 4px;
-  }
-  @media screen and (min-width: 60em) {
-    .md-sidebar--secondary {
-      display: none;
-    }
-  }
-  @media screen and (min-width: 76.25em) {
-    .md-sidebar--primary {
-      display: none;
-    }
-  }
 </style>
 
-<div class="md-grid md-typeset outermost">
+<div class="outermost">
   <div class="front-panel">
     <div class="spacing"></div>
     <div>
@@ -119,7 +114,7 @@
         title="Visit demo"
       >
         <img
-          src="assets/preview.webp"
+          src="_static/preview.webp"
           loop
           class="preview-image"
           draggable="false"
@@ -127,9 +122,6 @@
       </a>
     </div>
     <div>
-      <p class="semi-transparent description-text">
-        Build beautiful and performant cross-platform apps
-      </p>
       <p class="web-title">Rinf</p>
       <p class="semi-transparent"><strong>RUST IN FLUTTER</strong></p>
     </div>
@@ -137,11 +129,10 @@
   </div>
   <div class="spacing"></div>
   <div>
-    <h2>The Combination</h2>
     <div class="columns">
       <div class="guide-box">
-        <img class="lang-icon" src="assets/flutter_icon.svg" />
-        <h3>Flutter for Aesthetics</h3>
+        <img class="lang-icon" src="_static/flutter_icon.svg" />
+        <h4>Flutter for Aesthetics</h4>
         <p>
           While Rust is a powerful language for high-performance native
           programming, its ecosystem for building graphical user interfaces is
@@ -159,13 +150,12 @@
         </p>
       </div>
       <div class="guide-box">
-        <img class="lang-icon" src="assets/rust_icon.svg" />
-        <h3>Rust for Performance</h3>
+        <img class="lang-icon" src="_static/rust_icon.svg" />
+        <h4>Rust for Performance</h4>
         <p>
           While Dart excels as an amazing object-oriented language for GUI apps,
-          its non-native garbage collection may not always meet demanding
-          performance requirements, and it may lack advanced data manipulation
-          packages. This is where
+          it may not always meet demanding performance requirements, and it may
+          lack advanced data manipulation packages. This is where
           <a
             href="https://programming-language-benchmarks.vercel.app/dart-vs-rust"
             >Rust</a
@@ -174,56 +164,41 @@
           faster than Dart, alongside the ability to leverage multiple threads
           and various crates that get the job done.
         </p>
-
         <p>
           Rust has garnered a devoted following, being
           <a
             href="https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages"
             >the most loved programming language</a
           >
-          on Stack Overflow. Its native performance, thanks to the zero-cost
-          abstraction philosophy, ensures high productivity. Many developers
-          foresee Rust potentially replacing C++ in the future. Rust's
-          simplicity, memory safety, superior performance in various scenarios,
-          vibrant community, and robust tooling support contribute to its
-          growing popularity.
+          on Stack Overflow. Rust's simplicity, memory safety, superior
+          performance, vibrant community, and robust tooling support contribute
+          to its growing popularity and ensures high productivity.
         </p>
       </div>
     </div>
   </div>
   <div class="spacing"></div>
   <div>
-    <h2>Platform Support</h2>
-    <div class="guide-box">
-      <p>
-        All platforms available with Flutter are
-        <a
-          href="https://github.com/cunarist/rinf/actions/workflows/test_app.yaml?query=branch%3Amain"
-          >tested</a
-        >
-        and supported. Challenging build settings are automatically handled by
-        this framework.
-      </p>
-      <ul>
-        <li>✅ Linux: Tested and supported</li>
-        <li>✅ Android: Tested and supported</li>
-        <li>✅ Windows: Tested and supported</li>
-        <li>✅ macOS: Tested and supported</li>
-        <li>✅ iOS: Tested and supported</li>
-        <li>✅ Web: Tested and supported</li>
-      </ul>
+    <h4>Cross-platform</h4>
+    <div class="platform-grid">
+      <div class="platform-box"><h6>✅ Linux</h6></div>
+      <div class="platform-box"><h6>✅ Android</h6></div>
+      <div class="platform-box"><h6>✅ Windows</h6></div>
+      <div class="platform-box"><h6>✅ macOS</h6></div>
+      <div class="platform-box"><h6>✅ iOS</h6></div>
+      <div class="platform-box"><h6>✅ Web</h6></div>
     </div>
   </div>
   <div class="spacing"></div>
   <div>
-    <h2>Benefits</h2>
+    <h4>Streamlined</h4>
     <div class="columns">
       <div class="repeated-box">
-        <h3>Truly easy</h3>
+        <h6>Truly easy</h6>
         <p>It only takes about a minute or two to fully setup your app.</p>
       </div>
       <div class="repeated-box">
-        <h3>Efficient</h3>
+        <h6>Efficient</h6>
         <p>
           All communication occurs solely through native FFI. There are no
           webviews, web servers, hidden threads, or unnecessary memory copying
@@ -232,7 +207,7 @@
         </p>
       </div>
       <div class="repeated-box">
-        <h3>Minimal</h3>
+        <h6>Minimal</h6>
         <p>
           This is not a bulky framework that requires you to install so many
           dependencies and use complicated CLI commands. Just focus on your code
@@ -240,7 +215,7 @@
         </p>
       </div>
       <div class="repeated-box">
-        <h3>Scalable</h3>
+        <h6>Scalable</h6>
         <p>
           Creating hundreds or even thousands of message APIs between Dart and
           Rust feels smooth and clean. Additionally, you have the flexibility to
@@ -249,14 +224,14 @@
         </p>
       </div>
       <div class="repeated-box">
-        <h3>High-level interface</h3>
+        <h6>High-level interface</h6>
         <p>
           No messing with sensitive build files, no concerns about memory
           safety. Stay with Dart and Rust that you're familiar with.
         </p>
       </div>
       <div class="repeated-box">
-        <h3>Well maintained</h3>
+        <h6>Well maintained</h6>
         <p>
           Our automated workflows including build tests are always kept passing,
           thanks to the main branch protection rule. Also, the number of
@@ -265,7 +240,7 @@
         </p>
       </div>
       <div class="repeated-box">
-        <h3>Convenient debugging</h3>
+        <h6>Convenient debugging</h6>
         <p>
           All the debugging functionalities are provided by default, without the
           need for dealing with browsers or mobile emulators. Also, the whole
@@ -273,7 +248,7 @@
         </p>
       </div>
       <div class="repeated-box">
-        <h3>Reliable</h3>
+        <h6>Reliable</h6>
         <p>
           Each component is supported by huge communities, ensuring a strong
           emphasis on future safety. You can easily assure your team of
@@ -284,8 +259,3 @@
   </div>
   <div class="spacing"></div>
 </div>
-{% endblock %}
-<!-- END OF BLOCK -->
-
-{% block content %}{% endblock %}
-<!-- END OF BLOCK -->
