@@ -23,7 +23,7 @@ exclude_patterns = []
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "furo"
-html_title = "Rinf 7.1.1"
+html_title = "Rinf"
 html_favicon = "_static/logo.png"
 html_static_path = ["_static"]
 html_show_sphinx = False
