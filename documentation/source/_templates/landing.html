@@ -63,17 +63,19 @@
   }
   .platform-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     max-width: 500px;
     gap: 8px;
     margin: 0px auto;
+    padding: 4px;
   }
   .platform-box {
     height: fit-content;
     margin: 4px;
-    padding: 24px 0px;
+    padding: 16px;
     background-color: rgba(127, 127, 127, 0.08);
     border-radius: 4px;
+    text-align: left;
   }
   .repeated-box {
     width: 100%;
@@ -186,11 +188,11 @@
   <div>
     <div class="columns">
       <div class="repeated-box">
-        <h4>Truly easy</h4>
+        <h6>Truly easy</h6>
         <p>It only takes about a minute or two to fully setup your app.</p>
       </div>
       <div class="repeated-box">
-        <h4>Efficient</h4>
+        <h6>Efficient</h6>
         <p>
           All communication occurs solely through native FFI. There are no
           webviews, web servers, hidden threads, or unnecessary memory copying
@@ -199,7 +201,7 @@
         </p>
       </div>
       <div class="repeated-box">
-        <h4>Minimal</h4>
+        <h6>Minimal</h6>
         <p>
           This is not a bulky framework that requires you to install so many
           dependencies and use complicated CLI commands. Just focus on your code
@@ -207,7 +209,7 @@
         </p>
       </div>
       <div class="repeated-box">
-        <h4>Scalable</h4>
+        <h6>Scalable</h6>
         <p>
           Creating hundreds or even thousands of message APIs between Dart and
           Rust feels smooth and clean. Additionally, you have the flexibility to
@@ -216,14 +218,14 @@
         </p>
       </div>
       <div class="repeated-box">
-        <h4>High-level interface</h4>
+        <h6>High-level interface</h6>
         <p>
           No messing with sensitive build files, no concerns about memory
           safety. Stay with Dart and Rust that you're familiar with.
         </p>
       </div>
       <div class="repeated-box">
-        <h4>Well maintained</h4>
+        <h6>Well maintained</h6>
         <p>
           Our automated workflows including build tests are always kept passing,
           thanks to the main branch protection rule. Also, the number of
@@ -232,7 +234,7 @@
         </p>
       </div>
       <div class="repeated-box">
-        <h4>Convenient debugging</h4>
+        <h6>Convenient debugging</h6>
         <p>
           All the debugging functionalities are provided by default, without the
           need for dealing with browsers or mobile emulators. Also, the whole
@@ -240,7 +242,7 @@
         </p>
       </div>
       <div class="repeated-box">
-        <h4>Reliable</h4>
+        <h6>Reliable</h6>
         <p>
           Each component is supported by huge communities, ensuring a strong
           emphasis on future safety. You can easily assure your team of
