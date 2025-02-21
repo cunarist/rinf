@@ -1,7 +1,19 @@
 <title>Rinf</title>
 <style>
-  html {
-    overflow-y: scroll;
+  .content {
+    margin: auto;
+  }
+  .mobile-header {
+    position: absolute;
+    visibility: hidden;
+  }
+  .sidebar-drawer {
+    position: absolute;
+    visibility: hidden;
+  }
+  .toc-drawer {
+    position: absolute;
+    visibility: hidden;
   }
   .outermost {
     padding: 0px 24px 0px;
@@ -39,6 +51,7 @@
     outline: 1px solid rgba(122, 122, 122, 1);
     outline-offset: -1px;
     filter: grayscale();
+    margin: 24px 0px;
   }
   .web-title {
     font-weight: bold;
@@ -47,11 +60,7 @@
     font-weight: 200;
   }
   .spacing {
-    height: 40px;
-  }
-  .description-text {
-    font-size: small;
-    padding: 0px 40px;
+    height: 120px;
   }
   .guide-box {
     max-width: min(36em, 80svw);
@@ -92,10 +101,6 @@
     padding: 16px;
     background-color: rgba(127, 127, 127, 0.08);
     border-radius: 4px;
-  }
-  .fixed-button {
-    width: 12em;
-    margin: 4px;
   }
 </style>
 
