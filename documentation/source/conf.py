@@ -27,3 +27,4 @@ html_title = "Rinf"
 html_favicon = "_static/logo.png"
 html_static_path = ["_static"]
 html_show_sphinx = False
+html_show_sourcelink = False
