@@ -4,7 +4,8 @@ You might be used to `println!` macro in Rust. However, using that macro isn't a
 
 When writing Rust code in the `hub` crate, you can simply print your debug message with the `debug_print!` macro provided by this framework like below. Once you use this macro, Flutter will take care of the rest.
 
-```rust title="Rust"
+```{code-block} rust
+:caption: Rust
 use rinf::debug_print;
 debug_print!("My object is {my_object:?}");
 ```

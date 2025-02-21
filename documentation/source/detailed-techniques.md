@@ -1,6 +1,6 @@
 # Detailed Techniques
 
-## 🏷️ Signal Members
+## Signal Members
 
 We've covered how to pass signals[^1] between Dart and Rust in the previous tutorial section. Now Let's delve into the meaning of each field of a signal.
 
@@ -11,10 +11,9 @@ We've covered how to pass signals[^1] between Dart and Rust in the previous tuto
 It's important to note that creating a Protobuf `message` larger than a few megabytes is not recommended. For large data, split them into multiple signals, or use the `binary` field instead.[^2]
 
 [^1]: Rinf relies solely on native FFI for communication, avoiding the use of web protocols or hidden threads. The goal is to minimize performance overhead as much as possible.
-
 [^2]: Sending a serialized message or binary data is a zero-copy operation from Rust to Dart, while it involves a copy operation from Dart to Rust in memory. Keep in mind that Protobuf's serialization and deserialization does involve memory copy.
 
-## 🗃️ Generation Path
+## Generation Path
 
 When you generate message code using the `rinf message` command, the resulting Dart and Rust modules' names and subpaths will precisely correspond to those of the `.proto` files.
 
@@ -22,19 +21,21 @@ When you generate message code using the `rinf message` command, the resulting D
 - `./lib/messages` : The generated Dart code will be placed here.
 - `./native/hub/src/messages` : The generated Rust code will be placed here.
 
-## 🕶️ Continuous Watching
+## Continuous Watching
 
 If you add the optional argument `-w` or `--watch` to the `rinf message` command, the message code will be automatically generated when `.proto` files are modified. If you add this argument, the command will not exit on its own.
 
-```shell title="CLI"
+```{code-block} shell
+:caption: CLI
 rinf message --watch
 ```
 
-## 💬 Comments
+## Comments
 
 It is possible to add comments like this.[^3]
 
-```proto title="Protobuf"
+```{code-block} proto
+:caption: Protobuf
 // This is a video data sample of...
 // contains...
 // responsible for...
@@ -45,7 +46,8 @@ message SomeData { ... }
 
 This applies same to marked Protobuf messages.
 
-```proto title="Protobuf"
+```{code-block} proto
+:caption: Protobuf
 // [DART-SIGNAL]
 // This is an audio data sample of...
 // contains...

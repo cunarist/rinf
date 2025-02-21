@@ -4,13 +4,14 @@ This section offers a general guide to managing application state effectively wi
 
 Rinf performs best when the application logic is written entirely in Rust, with Flutter used solely for the GUI. Given that, you might want to store the application state in Rust.
 
-## 💥 Actor Model
+## Actor Model
 
 The actor model is highly recommended for managing asynchronous state in Rust. By encapsulating state and behavior within actor structs, which maintain ownership and handle their own async tasks, the actor model provides a scalable and modular way to manage complex state interactions.
 
 Here’s a basic example using the [`messages`](https://crates.io/crates/messages) crate, which is a flexible and runtime-agnostic actor library that works nicely with Rinf.
 
-```rust title="native/hub/src/lib.rs"
+```{code-block} rust
+:caption: native/hub/src/lib.rs
 use messages::prelude::*;
 use rinf::debug_print;
 
@@ -62,11 +63,12 @@ Several crates on `crates.io` provide building blocks for implementing the actor
 
 Please refer to the [example code](https://github.com/cunarist/rinf/tree/main/flutter_package/example) for detailed usage.
 
-## 🧱 Static Variables
+## Static Variables
 
 Generally, it's advisable to avoid static variables due to their characteristics, which can lead to issues such as difficulties in testing and managing lifetimes. If you must use static variables, you can declare them as shown below, ensuring they span the entire duration of the app.
 
-```rust title="Rust"
+```{code-block} rust
+:caption: Rust
 use rinf::debug_print;
 use tokio::sync::Mutex;
 

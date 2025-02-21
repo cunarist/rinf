@@ -1,15 +1,15 @@
 # Documentation
 
-In order to preview and build this documentation, ensure you have [`uv`](https://docs.astral.sh/uv/getting-started/installation/), the modern Python package manager, installed on your system.
+In order to preview and build this documentation, you need to have [uv](https://docs.astral.sh/uv/getting-started/installation/) installed on your system.
 
-Activate test server during development.
+Generate the static documentation files for publication on the web.
 
-```shell
-uv run mkdocs serve
+```{code-block} shell
+uv run sphinx-build -M dirhtml source dist
 ```
 
-Build the documentation.
+Activate a test server.
 
-```shell
-uv run mkdocs build
+```{code-block} shell
+uv run -m http.server 8000 --directory dist/dirhtml
 ```

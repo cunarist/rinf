@@ -10,7 +10,7 @@ _Please describe the exact steps to reproduce the error._
 
 _Please provide the output from the command below, using markdown codeblock syntax._
 
-```shell
+```{code-block} shell
 rustc --version
 flutter doctor
 ```

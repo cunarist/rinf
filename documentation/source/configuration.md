@@ -1,10 +1,11 @@
 # Configuration
 
-## 📋 YAML File
+## YAML File
 
 You can customize the behavior of Rinf CLI commands by configuring the `pubspec.yaml` file. All fields are optional and it's not necessary to write them.
 
-```yaml title="pubspec.yaml"
+```{code-block} yaml
+:caption: pubspec.yaml
 rinf:
   message:
     input_dir: messages/
@@ -15,15 +16,17 @@ rinf:
 
 You can check the current configuration status by running the command below in the CLI.
 
-```shell title="CLI"
+```{code-block} shell
+:caption: CLI
 rinf config
 ```
 
-## 📦 Crate Features
+## Crate Features
 
 Customizing the behavior of the Rinf crate is possible through its crate features.
 
-```toml title="native/hub/Cargo.toml"
+```{code-block} toml
+:caption: native/hub/Cargo.toml
 rinf = { version = "0.0.0", features = ["feature-name"] }
 ```
 
