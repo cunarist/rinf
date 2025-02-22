@@ -42,7 +42,7 @@ RustLibrary loadRustLibrary() {
   if (Platform.isLinux || isTest) {
     // On Linux, `RTLD_LOCAL` behavior is required in tests
     // due to symbol resolution behavior observed across all distributions.
-    // Symbols cannot be found with `RTLD_GLOBAL`.
+    // With `RTLD_GLOBAL`, symbols cannot be found.
     return RustLibraryOld(lib: lib);
   }
 
