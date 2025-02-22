@@ -1,3 +1,7 @@
+## 7.2.0
+
+- Flutter tests now run on Linux, just as they do on other platforms.
+
 ## 7.1.1
 
 - Now, generated Rust message files are automatically formatted. Thanks @2bndy5!
