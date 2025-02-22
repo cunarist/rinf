@@ -1,4 +1,4 @@
-import 'dart:io' as io;
+import 'dart:io';
 import 'dart:ffi';
 import 'dart:typed_data';
 import 'package:ffi/ffi.dart';
@@ -16,23 +16,22 @@ RustLibrary loadRustLibrary() {
   DynamicLibrary lib;
   if (path != null) {
     lib = DynamicLibrary.open(path);
-  } else if (io.Platform.isLinux) {
+  } else if (Platform.isLinux) {
     lib = DynamicLibrary.open('libhub.so');
-  } else if (io.Platform.isAndroid) {
+  } else if (Platform.isAndroid) {
     lib = DynamicLibrary.open('libhub.so');
-  } else if (io.Platform.isWindows) {
+  } else if (Platform.isWindows) {
     lib = DynamicLibrary.open('hub.dll');
-  } else if (io.Platform.isIOS) {
+  } else if (Platform.isIOS) {
     lib = DynamicLibrary.open('rinf.framework/rinf');
-  } else if (io.Platform.isMacOS) {
+  } else if (Platform.isMacOS) {
     lib = DynamicLibrary.open('rinf.framework/rinf');
   } else {
     throw UnsupportedError('This operating system is not supported.');
   }
 
-  if (io.Platform.isAndroid ||
-      (io.Platform.isLinux &&
-          io.Platform.environment.containsKey('FLUTTER_TEST'))) {
+  final isTest = Platform.environment.containsKey('FLUTTER_TEST');
+  if (Platform.isAndroid || (Platform.isLinux && isTest)) {
     // On Android, native library symbols are loaded in local space
     // because of Flutter's `RTLD_LOCAL` behavior.
     // Therefore we cannot use the efficient `RustLibraryNew`.
