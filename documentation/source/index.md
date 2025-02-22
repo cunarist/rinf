@@ -8,6 +8,7 @@
    :maxdepth: 1
    :hidden:
 
+   introduction.md
    installing-components.md
    applying-template.md
    running-and-building.md
