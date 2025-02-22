@@ -51,12 +51,11 @@ RustLibrary loadRustLibrary() {
   return RustLibraryGlobal();
 }
 
-// The central interface for calling native function.
-
+/// The central interface for calling native function.
 final rustLibrary = loadRustLibrary();
 
 // Common type aliases.
-// This is for better readability of the code.
+// These exist for better readability of the code.
 
 typedef PostCObjectInner = Int8 Function(Int64, Pointer<Dart_CObject>);
 typedef PostCObjectPtr = Pointer<NativeFunction<PostCObjectInner>>;
