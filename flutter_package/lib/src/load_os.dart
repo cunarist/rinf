@@ -33,9 +33,9 @@ RustLibrary loadRustLibrary() {
   if (Platform.isAndroid) {
     // On Android, native library symbols are loaded in local space
     // because of Flutter's `RTLD_LOCAL` behavior.
-    // Therefore we cannot use the efficient `RustLibraryNew`.
+    // Therefore we cannot use the efficient `RustLibraryGlobal`.
     // - https://github.com/dart-lang/native/issues/923
-    return RustLibraryOld(lib: lib);
+    return RustLibraryLocal(lib: lib);
   }
 
   final isTest = Platform.environment.containsKey('FLUTTER_TEST');
@@ -43,12 +43,12 @@ RustLibrary loadRustLibrary() {
     // On Linux, `RTLD_LOCAL` behavior is required in tests
     // due to symbol resolution behavior observed across all distributions.
     // With `RTLD_GLOBAL`, symbols cannot be found.
-    return RustLibraryOld(lib: lib);
+    return RustLibraryLocal(lib: lib);
   }
 
   // Native library symbols are loaded in global space
   // thanks to Flutter's `RTLD_GLOBAL` behavior.
-  return RustLibraryNew();
+  return RustLibraryGlobal();
 }
 
 // The central interface for calling native function.
@@ -139,7 +139,7 @@ external void sendDartSignalExtern(
 /// that enables the `Uint8List.address` syntax
 /// can only be used on globally loaded native symbols.
 /// - https://github.com/dart-lang/sdk/issues/44589
-class RustLibraryNew extends RustLibrary {
+class RustLibraryGlobal extends RustLibrary {
   void startRustLogic() {
     startRustLogicExtern();
   }
@@ -174,7 +174,7 @@ class RustLibraryNew extends RustLibrary {
 /// Class for local native library symbols loaded with `RTLD_LOCAL`.
 /// This is relatively inefficient because `malloc.allocate` is required.
 /// It involves extra memory copy before sending the data to Rust.
-class RustLibraryOld extends RustLibrary {
+class RustLibraryLocal extends RustLibrary {
   final DynamicLibrary lib;
   late void Function() startRustLogicExtern;
   late void Function() stopRustLogicExtern;
@@ -183,7 +183,7 @@ class RustLibraryOld extends RustLibrary {
   late void Function(int, Pointer<Uint8>, int, Pointer<Uint8>, int)
       sendDartSignalExtern;
 
-  RustLibraryOld({required this.lib}) {
+  RustLibraryLocal({required this.lib}) {
     this.startRustLogicExtern =
         lib.lookupFunction<Void Function(), void Function()>(
       'start_rust_logic_extern',
