@@ -30,7 +30,9 @@ RustLibrary loadRustLibrary() {
     throw UnsupportedError('This operating system is not supported.');
   }
 
-  if (io.Platform.isAndroid) {
+  if (io.Platform.isAndroid ||
+      (io.Platform.isLinux &&
+          io.Platform.environment.containsKey('FLUTTER_TEST'))) {
     // On Android, native library symbols are loaded in local space
     // because of Flutter's `RTLD_LOCAL` behavior.
     // Therefore we cannot use the efficient `RustLibraryNew`.
