@@ -39,7 +39,7 @@ RustLibrary loadRustLibrary() {
   }
 
   final isTest = Platform.environment.containsKey('FLUTTER_TEST');
-  if (Platform.isLinux || isTest) {
+  if (Platform.isLinux && isTest) {
     // On Linux, `RTLD_LOCAL` behavior is required in tests
     // due to symbol resolution behavior observed across all distributions.
     // With `RTLD_GLOBAL`, symbols cannot be found.
