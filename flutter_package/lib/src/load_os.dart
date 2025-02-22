@@ -30,19 +30,19 @@ RustLibrary loadRustLibrary() {
     throw UnsupportedError('This operating system is not supported.');
   }
 
+  // On Android, native library symbols are loaded in local space
+  // because of Flutter's `RTLD_LOCAL` behavior.
+  // Therefore we cannot use the efficient `RustLibraryGlobal`.
+  // - https://github.com/dart-lang/native/issues/923
   if (Platform.isAndroid) {
-    // On Android, native library symbols are loaded in local space
-    // because of Flutter's `RTLD_LOCAL` behavior.
-    // Therefore we cannot use the efficient `RustLibraryGlobal`.
-    // - https://github.com/dart-lang/native/issues/923
     return RustLibraryLocal(lib: lib);
   }
 
+  // On Linux, `RTLD_LOCAL` behavior is required in tests
+  // due to symbol resolution behavior observed across all distributions.
+  // With `RTLD_GLOBAL`, symbols cannot be found.
   final isTest = Platform.environment.containsKey('FLUTTER_TEST');
   if (Platform.isLinux && isTest) {
-    // On Linux, `RTLD_LOCAL` behavior is required in tests
-    // due to symbol resolution behavior observed across all distributions.
-    // With `RTLD_GLOBAL`, symbols cannot be found.
     return RustLibraryLocal(lib: lib);
   }
 
