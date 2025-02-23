@@ -44,9 +44,13 @@ While Dart is excellent for UI, Rust excels in performance-critical tasks. Rust 
 
 Rinf enables seamless development across major platforms:
 
-- ✅ Linux
-- ✅ Android
-- ✅ Windows
-- ✅ macOS
-- ✅ iOS
-- ✅ Web
+- ✅ Linux: Tested and supported
+- ✅ Android: Tested and supported
+- ✅ Windows: Tested and supported
+- ✅ macOS: Tested and supported
+- ✅ iOS: Tested and supported
+- ✅ Web: Tested and supported
+
+```{important}
+Rinf expects that the application's main logic is written in Rust, with Flutter solely serving the purpose of managing the GUI
+```
