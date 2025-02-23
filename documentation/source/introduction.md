@@ -52,6 +52,8 @@ Rinf enables seamless development across major platforms:
 - ✅ iOS: Tested and supported
 - ✅ Web: Tested and supported
 
-```{important}
-Rinf expects that the application's main logic is written in Rust, with Flutter solely serving the purpose of managing the GUI
-```
+## Design
+
+Rinf expects the application's main logic to be written in Rust, with Flutter solely managing the GUI.
+
+Rather than relying on function calls, Rinf adopts a stream-based message-passing mechanism. This decouples the business logic from the UI, ensuring a clear separation of concerns.
