@@ -56,4 +56,6 @@ Rinf enables seamless development across major platforms:
 
 Rinf expects the application's main logic to be written in Rust, with Flutter solely managing the GUI.
 
-Rather than relying on function calls, Rinf adopts a stream-based message-passing mechanism. This decouples the business logic from the UI, ensuring a clear separation of concerns.
+Rather than relying on function calls, Rinf adopts a two-way, stream-based message-passing mechanism. This decouples the business logic from the UI, ensuring a clear separation of concerns.
+
+It is recommended to use actors on the Rust side and tree-based state management techniques such as `InheritedWidget` or `provider` in Flutter to effectively propagate state changes.
