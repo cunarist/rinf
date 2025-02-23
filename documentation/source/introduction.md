@@ -1,6 +1,6 @@
 # Introduction
 
-## Why Rinf?
+## About Rinf
 
 Rinf combines Flutter's UI ease with Rust's speed, enabling efficient, scalable cross-platform apps.
 
