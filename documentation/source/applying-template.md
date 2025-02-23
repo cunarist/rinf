@@ -64,7 +64,3 @@ If you already have a Rust crate that you want to use here, just put it inside `
 Now, by heading over to `./native/hub/src/lib.rs`, you can start writing Rust!
 
 Example code for guidance can be found [here](https://github.com/cunarist/rinf/tree/main/flutter_package/example).
-
-```{important}
-Rinf expects that the application's main logic is written in Rust, with Flutter solely serving the purpose of managing the GUI
-```
