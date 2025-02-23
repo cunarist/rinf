@@ -34,6 +34,7 @@ While Dart is excellent for UI, Rust excels in performance-critical tasks. Rust 
 - **Easy setup** – Setup takes only a minute or two.
 - **Efficient** – Uses native FFI with no webviews, servers, or extra memory copying.
 - **Minimal** – No bulky framework, just Flutter and Rust with minimal dependencies.
+- **Event-driven** – Async-first, concurrency-oriented design.
 - **Scalable** – Easily handle hundreds or thousands of message APIs.
 - **High-level interface** – No need to modify build files or worry about memory safety.
 - **Well maintained** – Automated tests, low dependencies, and clear documentation.
