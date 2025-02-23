@@ -17,9 +17,9 @@ Rinf expects the application's main logic to be written in Rust, with Flutter so
 
 Rinf uses a two-way, stream-based message-passing mechanism instead of function calls. This decouples the business logic from the UI, ensuring a clear separation of concerns.
 
-Actors in Rust should hold the state, while Flutter widgets receive only the view data needed to update the UI.
-
 It is recommended to use the actor model on the Rust side and tree-based state management techniques such as `InheritedWidget` or `provider` in Flutter for efficient state propagation.
+
+Actors in Rust should hold the state, while Flutter widgets receive only the view data needed to update the UI.
 
 ## Cross-Platform Compatibility
 
