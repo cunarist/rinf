@@ -59,6 +59,8 @@ final rustLibrary = loadRustLibrary();
 
 typedef PostCObjectInner = Int8 Function(Int64, Pointer<Dart_CObject>);
 typedef PostCObjectPtr = Pointer<NativeFunction<PostCObjectInner>>;
+typedef PrepareIsolateExtern = Void Function(PostCObjectPtr, Int64);
+typedef PrepareIsolateWrap = void Function(PostCObjectPtr, int);
 typedef SendDartSignalExtern = Void Function(
   Int32,
   Pointer<Uint8>,
@@ -79,8 +81,7 @@ typedef SendDartSignalWrap = void Function(
 abstract class RustLibrary {
   void startRustLogic();
   void stopRustLogic();
-  void prepareIsolate(int port);
-  void storeDartPostCObject(PostCObjectPtr postCObject);
+  void prepareIsolate(PostCObjectPtr storePostObject, int port);
   void sendDartSignal(
     int messageId,
     Uint8List messageBytes,
@@ -104,20 +105,13 @@ external void startRustLogicExtern();
 )
 external void stopRustLogicExtern();
 
-@Native<Void Function(Int64)>(
+@Native<Void Function(PostCObjectPtr, Int64)>(
   isLeaf: true,
   symbol: 'prepare_isolate_extern',
 )
 external void prepareIsolateExtern(
+  PostCObjectPtr storePostObject,
   int port,
-);
-
-@Native<Void Function(PostCObjectPtr)>(
-  isLeaf: true,
-  symbol: 'store_dart_post_cobject',
-)
-external void storeDartPostCObjectExtern(
-  PostCObjectPtr postCObject,
 );
 
 @Native<SendDartSignalExtern>(
@@ -147,12 +141,8 @@ class RustLibraryGlobal extends RustLibrary {
     stopRustLogicExtern();
   }
 
-  void prepareIsolate(int port) {
-    prepareIsolateExtern(port);
-  }
-
-  void storeDartPostCObject(PostCObjectPtr postCObject) {
-    storeDartPostCObjectExtern(postCObject);
+  void prepareIsolate(PostCObjectPtr storePostObject, int port) {
+    prepareIsolateExtern(storePostObject, port);
   }
 
   void sendDartSignal(
@@ -177,8 +167,7 @@ class RustLibraryLocal extends RustLibrary {
   final DynamicLibrary lib;
   late void Function() startRustLogicExtern;
   late void Function() stopRustLogicExtern;
-  late void Function(int) prepareIsolateExtern;
-  late void Function(PostCObjectPtr) storeDartPostCObjectExtern;
+  late void Function(PostCObjectPtr, int) prepareIsolateExtern;
   late void Function(int, Pointer<Uint8>, int, Pointer<Uint8>, int)
       sendDartSignalExtern;
 
@@ -192,12 +181,8 @@ class RustLibraryLocal extends RustLibrary {
       'stop_rust_logic_extern',
     );
     this.prepareIsolateExtern =
-        lib.lookupFunction<Void Function(Int64), void Function(int)>(
+        lib.lookupFunction<PrepareIsolateExtern, PrepareIsolateWrap>(
       'prepare_isolate_extern',
-    );
-    this.storeDartPostCObjectExtern = lib.lookupFunction<
-        Void Function(PostCObjectPtr), void Function(PostCObjectPtr)>(
-      'store_dart_post_cobject',
     );
     this.sendDartSignalExtern =
         lib.lookupFunction<SendDartSignalExtern, SendDartSignalWrap>(
@@ -213,12 +198,8 @@ class RustLibraryLocal extends RustLibrary {
     stopRustLogicExtern();
   }
 
-  void prepareIsolate(int port) {
-    prepareIsolateExtern(port);
-  }
-
-  void storeDartPostCObject(PostCObjectPtr postCObject) {
-    storeDartPostCObjectExtern(postCObject);
+  void prepareIsolate(PostCObjectPtr storePostObject, int port) {
+    prepareIsolateExtern(storePostObject, port);
   }
 
   void sendDartSignal(int messageId, Uint8List messageBytes, Uint8List binary) {
