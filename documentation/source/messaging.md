@@ -21,7 +21,7 @@ MyDataOutput { my_field: true }.send_signal_to_dart();
 
 ```{code-block} dart
 :caption: Dart
-// Rebuild from Rust signals on each render frame.
+// Rebuild the widget from Rust signals on each render frame.
 // Some Rust signals between frames may be ignored.
 StreamBuilder(
   stream: MyDataOutput.rustSignalStream,
