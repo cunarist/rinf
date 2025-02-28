@@ -12,13 +12,11 @@ use std::thread;
 static DART_ISOLATE: Mutex<Option<Isolate>> = Mutex::new(None);
 
 #[no_mangle]
-pub extern "C" fn prepare_isolate_extern(
+pub unsafe extern "C" fn prepare_isolate_extern(
     store_post_object: DartPostCObjectFnType,
     port: i64,
 ) {
-    unsafe {
-        store_dart_post_cobject(store_post_object);
-    }
+    store_dart_post_cobject(store_post_object);
     let dart_isolate = Isolate::new(port);
     let mut guard = match DART_ISOLATE.lock() {
         Ok(inner) => inner,
