@@ -33,9 +33,8 @@ macro_rules! write_interface {
             binary_size: usize,
         ) {
             use std::slice::from_raw_parts;
-            let message_bytes =
-                unsafe { from_raw_parts(message_pointer, message_size) };
-            let binary = unsafe { from_raw_parts(binary_pointer, binary_size) };
+            let message_bytes = from_raw_parts(message_pointer, message_size);
+            let binary = from_raw_parts(binary_pointer, binary_size);
             let result =
                 messages::assign_dart_signal(message_id, message_bytes, binary);
             if let Err(error) = result {
