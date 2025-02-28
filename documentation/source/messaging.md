@@ -21,6 +21,8 @@ MyDataOutput { ... }.send_signal_to_dart();
 
 ```{code-block} dart
 :caption: Dart
+// Rebuild from Rust signals on each render frame.
+// Some Rust signals between frames may be ignored.
 StreamBuilder(
   stream: MyDataOutput.rustSignalStream,
   builder: (context, snapshot) {
@@ -33,7 +35,12 @@ StreamBuilder(
     Uint8List binary = rustSignal.binary;
     // Return a filled widget.
   },
-)
+);
+
+// Alternatively, handle every Rust signal.
+MyDataOutput.rustSignalStream.listen((rustSignal) {
+  MyDataOutput message = rustSignal.message;
+})
 ```
 
 `[DART-SIGNAL]` generates a message channel from Dart to Rust. Use `[DART-SIGNAL-BINARY]` to include binary data without the overhead of serialization.
