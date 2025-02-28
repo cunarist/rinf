@@ -11,12 +11,12 @@ There are special comments that you can mark messages with.
 ```{code-block} proto
 :caption: Protobuf
 // [RUST-SIGNAL]
-message MyDataOutput { ... }
+message MyDataOutput { bool my_field = 1; }
 ```
 
 ```{code-block} rust
 :caption: Rust
-MyDataOutput { ... }.send_signal_to_dart();
+MyDataOutput { my_field: true }.send_signal_to_dart();
 ```
 
 ```{code-block} dart
@@ -48,12 +48,12 @@ MyDataOutput.rustSignalStream.listen((rustSignal) {
 ```{code-block} proto
 :caption: Protobuf
 // [DART-SIGNAL]
-message MyDataInput { ... }
+message MyDataInput { bool my_field = 1; }
 ```
 
 ```{code-block} dart
 :caption: Dart
-MyDataInput( ... ).sendSignalToRust();
+MyDataInput(my_field: true).sendSignalToRust();
 ```
 
 ```{code-block} rust
@@ -74,5 +74,5 @@ while let Some(dart_signal) = receiver.recv().await {
 ```{code-block} proto
 :caption: Protobuf
 // [RUST-ATTRIBUTE(#[derive(Hash)])]
-message MyDataInput { ... }
+message MyDataInput { bool my_field = 1; }
 ```
