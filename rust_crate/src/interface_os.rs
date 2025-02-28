@@ -1,6 +1,9 @@
 use crate::error::RinfError;
 use crate::shutdown::SHUTDOWN_EVENTS;
-use allo_isolate::{IntoDart, Isolate, ZeroCopyBuffer};
+use allo_isolate::ffi::DartPostCObjectFnType;
+use allo_isolate::{
+    store_dart_post_cobject, IntoDart, Isolate, ZeroCopyBuffer,
+};
 use os_thread_local::ThreadLocal;
 use std::sync::Mutex;
 use std::sync::OnceLock;
@@ -9,7 +12,13 @@ use std::thread;
 static DART_ISOLATE: Mutex<Option<Isolate>> = Mutex::new(None);
 
 #[no_mangle]
-pub extern "C" fn prepare_isolate_extern(port: i64) {
+pub extern "C" fn prepare_isolate_extern(
+    store_post_object: DartPostCObjectFnType,
+    port: i64,
+) {
+    unsafe {
+        store_dart_post_cobject(store_post_object);
+    }
     let dart_isolate = Isolate::new(port);
     let mut guard = match DART_ISOLATE.lock() {
         Ok(inner) => inner,

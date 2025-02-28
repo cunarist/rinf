@@ -15,10 +15,6 @@ void setCompiledLibPathReal(String path) {
 Future<void> prepareInterfaceReal(
   AssignRustSignal assignRustSignal,
 ) async {
-  /// This should be called once at startup
-  /// to enable `allo_isolate` to send data from the Rust side.
-  rustLibrary.storeDartPostCObject(NativeApi.postCObject);
-
   // Prepare ports for communication over isolates.
   final rustSignalPort = ReceivePort();
 
@@ -47,7 +43,11 @@ Future<void> prepareInterfaceReal(
   });
 
   // Make Rust prepare its isolate to send data to Dart.
-  rustLibrary.prepareIsolate(rustSignalPort.sendPort.nativePort);
+  // This is handled by `allo_isolate`.
+  rustLibrary.prepareIsolate(
+    NativeApi.postCObject,
+    rustSignalPort.sendPort.nativePort,
+  );
 }
 
 void startRustLogicReal() {
