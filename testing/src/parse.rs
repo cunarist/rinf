@@ -9,14 +9,9 @@ fn implements_copy(attrs: &[Attribute]) -> bool {
 
             let mut found = false;
             let _ = attr.parse_nested_meta(|meta| {
-                let meta_path_str = meta.path.to_token_stream().to_string();
-                println!("Checking meta: {}", meta_path_str);
-
+                println!("Checking meta: {}", meta.path.to_token_stream());
                 if meta.path.is_ident("Copy") {
-                    println!("Found `Copy`!");
                     found = true;
-                } else {
-                    println!("Did not find `Copy`, got `{}`", meta_path_str);
                 }
                 Ok(())
             });
