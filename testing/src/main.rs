@@ -1,3 +1,5 @@
+mod parse;
+
 mod outer {
     mod inner {
         #[no_mangle]
@@ -15,4 +17,5 @@ fn main() {
     unsafe {
         expose_hidden();
     }
+    parse::analyze_file();
 }
