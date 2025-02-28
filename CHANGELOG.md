@@ -1,3 +1,7 @@
+## 7.3.0
+
+- It is now possible to use other Flutter packages that rely on Rust by removing a mechanism that might cause symbol conflicts.
+
 ## 7.2.0
 
 - Flutter tests now run on Linux, just as they do on other platforms.
