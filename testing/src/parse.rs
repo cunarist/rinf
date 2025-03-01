@@ -52,33 +52,86 @@ fn to_type_format(ty: &syn::Type) -> Format {
         other => {
             // Handle Option<T>
             if other.starts_with("Option") {
-                // Remove the prefix and suffix to get the inner type.
-                let inner = other
-                    .trim_start_matches("Option")
-                    .trim()
-                    .trim_start_matches('<')
-                    .trim_end_matches('>')
-                    .trim();
+                let inner = extract_inner_type(other, "Option");
                 if let Ok(inner_ty) = syn::parse_str::<syn::Type>(inner) {
                     return Format::Option(Box::new(to_type_format(&inner_ty)));
                 }
             }
+
             // Handle Vec<T> as a sequence.
             if other.starts_with("Vec") {
-                let inner = other
-                    .trim_start_matches("Vec")
-                    .trim()
-                    .trim_start_matches('<')
-                    .trim_end_matches('>')
-                    .trim();
+                let inner = extract_inner_type(other, "Vec");
                 if let Ok(inner_ty) = syn::parse_str::<syn::Type>(inner) {
                     return Format::Seq(Box::new(to_type_format(&inner_ty)));
                 }
             }
-            // Fallback: return the type name.
+
+            // Handle HashMap<K, V> as a map.
+            if other.starts_with("HashMap") {
+                let inner = extract_inner_type(other, "HashMap");
+                let parts: Vec<&str> =
+                    inner.split(',').map(str::trim).collect();
+                if parts.len() == 2 {
+                    if let (Ok(k), Ok(v)) = (
+                        syn::parse_str::<syn::Type>(parts[0]),
+                        syn::parse_str::<syn::Type>(parts[1]),
+                    ) {
+                        return Format::Map {
+                            key: Box::new(to_type_format(&k)),
+                            value: Box::new(to_type_format(&v)),
+                        };
+                    }
+                }
+            }
+
+            // Handle Tuples (e.g., "(Foo, Bar)")
+            if other.starts_with('(') && other.ends_with(')') {
+                let inner = other.trim_start_matches('(').trim_end_matches(')');
+                let types: Vec<_> = inner
+                    .split(',')
+                    .map(str::trim)
+                    .filter_map(|s| syn::parse_str::<syn::Type>(s).ok())
+                    .collect();
+                if !types.is_empty() {
+                    return Format::Tuple(
+                        types.iter().map(to_type_format).collect(),
+                    );
+                }
+            }
+
+            // Handle TupleArrays (e.g., "[Foo; N]")
+            if other.starts_with('[') && other.ends_with(']') {
+                let inner = other.trim_start_matches('[').trim_end_matches(']');
+                let parts: Vec<&str> =
+                    inner.split(';').map(str::trim).collect();
+                if parts.len() == 2 {
+                    if let (Ok(content_ty), Ok(size)) = (
+                        syn::parse_str::<syn::Type>(parts[0]),
+                        parts[1].parse::<usize>(),
+                    ) {
+                        return Format::TupleArray {
+                            content: Box::new(to_type_format(&content_ty)),
+                            size,
+                        };
+                    }
+                }
+            }
+
+            // Fallback: return type name
             Format::TypeName(other.to_string())
         }
     }
+}
+
+/// Extracts the inner type
+/// from a generic type like `Option<T>` or `Vec<T>`.
+fn extract_inner_type<'a>(input: &'a str, prefix: &'a str) -> &'a str {
+    input
+        .trim_start_matches(prefix)
+        .trim()
+        .trim_start_matches('<')
+        .trim_end_matches('>')
+        .trim()
 }
 
 /// Trace a struct by collecting its field names (and a placeholder type)
