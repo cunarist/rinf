@@ -1,5 +1,4 @@
 use std::fs;
-use syn::__private::ToTokens; // For test printing
 use syn::{Attribute, File, Ident, Item};
 
 fn implements_copy(attrs: &[Attribute]) -> bool {
@@ -9,7 +8,7 @@ fn implements_copy(attrs: &[Attribute]) -> bool {
 
             let mut found = false;
             let _ = attr.parse_nested_meta(|meta| {
-                println!("Checking meta: {}", meta.path.to_token_stream());
+                println!("Checking meta: {:?}", meta.path.get_ident());
                 if meta.path.is_ident("Copy") {
                     found = true;
                 }
