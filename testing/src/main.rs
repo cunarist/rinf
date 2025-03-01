@@ -17,5 +17,5 @@ fn main() {
     unsafe {
         expose_hidden();
     }
-    parse::analyze_file();
+    parse::generate_dart_code();
 }

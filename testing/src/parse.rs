@@ -1,9 +1,13 @@
 use quote::ToTokens;
+use serde_generate::dart::CodeGenerator;
+use serde_generate::{CodeGeneratorConfig, Encoding};
 use serde_reflection::{ContainerFormat, Format, Named, Registry};
 use std::fs;
+use std::path::PathBuf;
 use syn::{Attribute, File, Item, ItemStruct};
 
 fn implements_copy(attrs: &[Attribute]) -> bool {
+    return true;
     attrs.iter().any(|attr| {
         if attr.path().is_ident("derive") {
             println!("Found #[derive(...)]");
@@ -178,7 +182,8 @@ fn process_items(registry: &mut Registry, items: &[Item]) {
     }
 }
 
-pub fn analyze_file() {
+pub fn generate_dart_code() {
+    // Analyze the input Rust file.
     let file_path =
         "../flutter_package/example/native/hub/src/messages/counter_number.rs";
     let content = fs::read_to_string(file_path).expect("Failed to read file");
@@ -193,4 +198,15 @@ pub fn analyze_file() {
         println!("{:?}", container);
         println!("------");
     }
+
+    // Generate Dart code from the registry.
+    let config = CodeGeneratorConfig::new("generated".to_string())
+        .with_encodings([Encoding::Bincode]);
+    // Create the Dart code generator.
+    let generator = CodeGenerator::new(&config);
+    let output_path = PathBuf::from("../generated.dart");
+    generator.output(output_path, &registry).unwrap();
+
+    // Write the generated Dart code to the output file.
+    println!("Dart code generated!");
 }
