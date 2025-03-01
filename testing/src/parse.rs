@@ -35,6 +35,11 @@ fn extract_copy_structs(file_path: &str) -> Vec<Ident> {
         .filter_map(|item| {
             if let Item::Struct(s) = item {
                 if implements_copy(&s.attrs) {
+                    for field in s.fields.iter() {
+                        if let Some(ident) = &field.ident {
+                            println!("  Field: {}", ident);
+                        }
+                    }
                     return Some(s.ident);
                 }
             }
