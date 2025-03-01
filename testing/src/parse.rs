@@ -1,5 +1,5 @@
 use std::fs;
-use syn::__private::ToTokens;
+use syn::__private::ToTokens; // For test printing
 use syn::{Attribute, File, Ident, Item};
 
 fn implements_copy(attrs: &[Attribute]) -> bool {
