@@ -1,4 +1,4 @@
-use quote::quote;
+use quote::ToTokens;
 use serde_reflection::{ContainerFormat, Format, Named, Registry};
 use std::fs;
 use syn::{Attribute, File, Item, ItemStruct};
@@ -25,19 +25,72 @@ fn implements_copy(attrs: &[Attribute]) -> bool {
     })
 }
 
+/// Convert a syn field type to a serde_reflection::Format.
+/// This function handles common primitives and container types like Option and Vec.
+/// For unrecognized types, it returns a TypeName with the type's string representation.
+fn to_type_format(ty: &syn::Type) -> Format {
+    // Get a string representation of the type.
+    let ty_str = ty.to_token_stream().to_string();
+    let trimmed = ty_str.trim();
+
+    match trimmed {
+        "u8" => Format::U8,
+        "u16" => Format::U16,
+        "u32" => Format::U32,
+        "u64" => Format::U64,
+        "u128" => Format::U128,
+        "i8" => Format::I8,
+        "i16" => Format::I16,
+        "i32" => Format::I32,
+        "i64" => Format::I64,
+        "i128" => Format::I128,
+        "f32" => Format::F32,
+        "f64" => Format::F64,
+        "bool" => Format::Bool,
+        "char" => Format::Char,
+        "String" => Format::Str,
+        other => {
+            // Handle Option<T>
+            if other.starts_with("Option<") || other.starts_with("Option <") {
+                // Remove the prefix and suffix to get the inner type.
+                let inner = other
+                    .trim_start_matches("Option<")
+                    .trim_start_matches("Option <")
+                    .trim_end_matches('>');
+                if let Ok(inner_ty) = syn::parse_str::<syn::Type>(inner) {
+                    return Format::Option(Box::new(to_type_format(&inner_ty)));
+                }
+            }
+            // Handle Vec<T> as a sequence.
+            if other.starts_with("Vec<") || other.starts_with("Vec <") {
+                let inner = other
+                    .trim_start_matches("Vec<")
+                    .trim_start_matches("Vec <")
+                    .trim_end_matches('>');
+                if let Ok(inner_ty) = syn::parse_str::<syn::Type>(inner) {
+                    return Format::Seq(Box::new(to_type_format(&inner_ty)));
+                }
+            }
+            // Fallback: return the type name.
+            Format::TypeName(other.to_string())
+        }
+    }
+}
+
 /// Trace a struct by collecting its field names (and a placeholder type)
 /// and record its container format in the registry.
 fn trace_struct(registry: &mut Registry, s: &ItemStruct) {
     let mut fields = Vec::new();
     for field in s.fields.iter() {
         if let Some(ident) = &field.ident {
-            // Use the `quote!` macro to extract the field type as a string (for logging).
-            let ty_string = quote! { #field.ty }.to_string();
-            println!("    Tracing Field: {} with type: {}", ident, ty_string);
-            // For now, we use Format::Str as a placeholder for the field's type.
+            let field_format = to_type_format(&field.ty);
+            println!(
+                "    Tracing Field: {} with type format: {:?}",
+                ident, field_format
+            );
             fields.push(Named {
                 name: ident.to_string(),
-                value: Format::Str,
+                value: field_format,
             });
         }
     }
@@ -77,7 +130,7 @@ pub fn analyze_file() {
 
     let mut registry: Registry = Registry::new();
     process_items(&mut registry, &syntax_tree.items);
-    println!("------\nRegistry from `Copy` structs:\n------");
+    println!("------\nRegistry from `Copy` types:\n------");
     for (type_name, container) in &registry {
         println!("Type `{}`", type_name);
         println!("{:?}", container);
