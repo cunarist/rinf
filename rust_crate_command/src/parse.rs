@@ -6,6 +6,8 @@ use std::fs;
 use std::path::PathBuf;
 use syn::{Attribute, File, Item, ItemStruct};
 
+// TODO: Remove all panicking code.
+
 fn implements_copy(attrs: &[Attribute]) -> bool {
     return true;
     attrs.iter().any(|attr| {
@@ -184,8 +186,7 @@ fn process_items(registry: &mut Registry, items: &[Item]) {
 
 pub fn generate_dart_code() {
     // Analyze the input Rust file.
-    let file_path =
-        "../flutter_package/example/native/hub/src/messages/counter_number.rs";
+    let file_path = "./native/hub/src/messages/counter_number.rs";
     let content = fs::read_to_string(file_path).expect("Failed to read file");
     let syntax_tree: File =
         syn::parse_file(&content).expect("Failed to parse Rust file");
@@ -204,7 +205,7 @@ pub fn generate_dart_code() {
         .with_encodings([Encoding::Bincode]);
     // Create the Dart code generator.
     let generator = CodeGenerator::new(&config);
-    let output_path = PathBuf::from("../generated.dart");
+    let output_path = PathBuf::from("./");
     generator.output(output_path, &registry).unwrap();
 
     // Write the generated Dart code to the output file.

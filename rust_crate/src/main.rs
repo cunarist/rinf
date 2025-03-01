@@ -1,9 +1,17 @@
+use rinf_command::generate_dart_code;
+
 #[cfg(not(target_family = "wasm"))]
 fn main() -> Result<(), String> {
     use std::env;
     use std::fs;
     use std::path;
     use std::process;
+
+    // TODO: Parse CLI arguments.
+    // TODO: Rewrite Dart command code in Rust.
+    // TODO: Check that `rinf_command` is only compiled in the binary.
+    generate_dart_code();
+    return Ok(());
 
     // Ensure Protobuf compiler.
     let protoc_path = if let Ok(installed) = which::which("protoc") {

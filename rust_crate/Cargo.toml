@@ -13,6 +13,7 @@ show-backtrace = ["backtrace"]
 bevy = ["bevy_ecs"]
 
 [dependencies]
+rinf_command = { version = "7.3.0" }
 bevy_ecs = { version = "0.15", optional = true }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]

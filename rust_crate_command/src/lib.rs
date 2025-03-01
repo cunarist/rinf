@@ -1,5 +1,7 @@
 mod parse;
 
+pub use parse::generate_dart_code;
+
 mod outer {
     mod inner {
         #[no_mangle]
@@ -13,9 +15,6 @@ extern "Rust" {
     fn expose_hidden();
 }
 
-fn main() {
-    unsafe {
-        expose_hidden();
-    }
-    parse::generate_dart_code();
+unsafe fn test_hidden() {
+    expose_hidden();
 }

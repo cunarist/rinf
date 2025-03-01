@@ -1,6 +1,6 @@
 [package]
-name = "testing"
-version = "0.1.0"
+name = "rinf_command"
+version = "7.3.0"
 edition = "2021"
 
 [dependencies]
