@@ -24,28 +24,34 @@ fn implements_copy(attrs: &[Attribute]) -> bool {
     })
 }
 
+fn process_items(items: &[Item]) -> Vec<Ident> {
+    let mut structs = Vec::new();
+    for item in items {
+        match item {
+            Item::Struct(s) if implements_copy(&s.attrs) => {
+                println!("Struct: {}", s.ident);
+                for field in s.fields.iter() {
+                    if let Some(ident) = &field.ident {
+                        println!("  Field: {}", ident);
+                    }
+                }
+                structs.push(s.ident.clone());
+            }
+            Item::Mod(m) if m.content.is_some() => {
+                structs.extend(process_items(&m.content.as_ref().unwrap().1));
+            }
+            _ => {}
+        }
+    }
+    structs
+}
+
 fn extract_copy_structs(file_path: &str) -> Vec<Ident> {
     let content = fs::read_to_string(file_path).expect("Failed to read file");
     let syntax_tree: File =
         syn::parse_file(&content).expect("Failed to parse Rust file");
 
-    syntax_tree
-        .items
-        .into_iter()
-        .filter_map(|item| {
-            if let Item::Struct(s) = item {
-                if implements_copy(&s.attrs) {
-                    for field in s.fields.iter() {
-                        if let Some(ident) = &field.ident {
-                            println!("  Field: {}", ident);
-                        }
-                    }
-                    return Some(s.ident);
-                }
-            }
-            None
-        })
-        .collect()
+    process_items(&syntax_tree.items)
 }
 
 pub fn analyze_file() {
