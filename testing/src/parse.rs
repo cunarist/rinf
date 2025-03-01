@@ -51,22 +51,26 @@ fn to_type_format(ty: &syn::Type) -> Format {
         "String" => Format::Str,
         other => {
             // Handle Option<T>
-            if other.starts_with("Option<") || other.starts_with("Option <") {
+            if other.starts_with("Option") {
                 // Remove the prefix and suffix to get the inner type.
                 let inner = other
-                    .trim_start_matches("Option<")
-                    .trim_start_matches("Option <")
-                    .trim_end_matches('>');
+                    .trim_start_matches("Option")
+                    .trim()
+                    .trim_start_matches('<')
+                    .trim_end_matches('>')
+                    .trim();
                 if let Ok(inner_ty) = syn::parse_str::<syn::Type>(inner) {
                     return Format::Option(Box::new(to_type_format(&inner_ty)));
                 }
             }
             // Handle Vec<T> as a sequence.
-            if other.starts_with("Vec<") || other.starts_with("Vec <") {
+            if other.starts_with("Vec") {
                 let inner = other
-                    .trim_start_matches("Vec<")
-                    .trim_start_matches("Vec <")
-                    .trim_end_matches('>');
+                    .trim_start_matches("Vec")
+                    .trim()
+                    .trim_start_matches('<')
+                    .trim_end_matches('>')
+                    .trim();
                 if let Ok(inner_ty) = syn::parse_str::<syn::Type>(inner) {
                     return Format::Seq(Box::new(to_type_format(&inner_ty)));
                 }
