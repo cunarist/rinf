@@ -1,5 +1,5 @@
 # Verify that the example app works properly.
-name: example-app
+name: Example App
 
 on:
   push:
@@ -27,21 +27,21 @@ concurrency:
 jobs:
   build:
     name: ${{ matrix.runner }} / ${{ matrix.target }}
-    runs-on: ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}-latest
     strategy:
       fail-fast: false # Important
       matrix:
-        runner: [ubuntu-latest, windows-latest, macos-latest]
+        runner: [ubuntu, windows, macos]
         target: [android, web] # On all platforms
         include:
           # Specify targets for each platform
-          - runner: ubuntu-latest
+          - runner: ubuntu
             target: linux
-          - runner: windows-latest
+          - runner: windows
             target: windows
-          - runner: macos-latest
+          - runner: macos
             target: macos
-          - runner: macos-latest
+          - runner: macos
             target: ios
 
     steps:
@@ -49,6 +49,21 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            target
+            ~/.pub-cache
+            flutter_package/example/build
+          key: >
+            ${{ matrix.runner }}-${{ matrix.target }}
+            ${{ hashFiles('**/Cargo.toml', '**/pubspec.yaml') }}
+          restore-keys: |
+            ${{ matrix.runner }}-${{ matrix.target }}
+            ${{ matrix.runner }}
 
       - name: Setup Flutter SDK
         uses: subosito/flutter-action@v2

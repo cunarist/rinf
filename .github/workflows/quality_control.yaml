@@ -1,6 +1,6 @@
 # Confirm that the code and configuration files
 # are correctly formatted and analyzed.
-name: quality-control
+name: Quality Control
 
 on:
   push:

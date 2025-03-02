@@ -10,8 +10,8 @@ fn main() -> Result<(), String> {
     // TODO: Parse CLI arguments.
     // TODO: Rewrite Dart command code in Rust.
     // TODO: Check that `rinf_command` is only compiled in the binary.
-    generate_dart_code();
-    return Ok(());
+    // generate_dart_code();
+    // return Ok(());
 
     // Ensure Protobuf compiler.
     let protoc_path = if let Ok(installed) = which::which("protoc") {
