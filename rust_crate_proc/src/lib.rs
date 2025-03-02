@@ -21,3 +21,5 @@ pub fn derive_dart_signal(_input: TokenStream) -> TokenStream {
 pub fn derive_rust_signal(_input: TokenStream) -> TokenStream {
     TokenStream::new()
 }
+
+// TODO: Enforce trait-based type safety
