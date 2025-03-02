@@ -122,7 +122,7 @@ or made changes to the `.proto` files in the `./messages` directory,
 run the following command:
 
 ```shell
-rinf message
+rinf gen
 ```
 
 Now you can run and build this app just like any other Flutter projects.
@@ -139,7 +139,8 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
   await readmeFile.writeAsString(readmeSplitted.join('\n\n') + '\n');
 
   // Add Dart dependencies
-  await Process.run('dart', ['pub', 'add', 'protobuf']);
+  await Process.run('dart', ['pub', 'add', 'meta']);
+  await Process.run('dart', ['pub', 'add', 'tuple']);
 
   // Modify `./lib/main.dart`
   final mainFile = File.fromUri(flutterProjectPath.join('lib/main.dart'));

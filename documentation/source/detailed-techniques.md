@@ -16,7 +16,7 @@ It's important to note that creating a Protobuf `message` larger than a few mega
 
 ## Generation Path
 
-When you generate message code using the `rinf message` command, the resulting Dart and Rust modules' names and subpaths will precisely correspond to those of the `.proto` files.
+When you generate message code using the `rinf gen` command, the resulting Dart and Rust modules' names and subpaths will precisely correspond to those of the `.proto` files.
 
 - `./messages` : The `.proto` files under here and its subdirectories will be used.
 - `./lib/messages` : The generated Dart code will be placed here.
@@ -24,11 +24,11 @@ When you generate message code using the `rinf message` command, the resulting D
 
 ## Continuous Watching
 
-If you add the optional argument `-w` or `--watch` to the `rinf message` command, the message code will be automatically generated when `.proto` files are modified. If you add this argument, the command will not exit on its own.
+If you add the optional argument `-w` or `--watch` to the `rinf gen` command, the message code will be automatically generated when `.proto` files are modified. If you add this argument, the command will not exit on its own.
 
 ```{code-block} shell
 :caption: CLI
-rinf message --watch
+rinf gen --watch
 ```
 
 ## Comments

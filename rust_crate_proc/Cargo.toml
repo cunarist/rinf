@@ -1,0 +1,7 @@
+[package]
+name = "rinf_proc"
+version = "7.3.0"
+edition = "2021"
+
+[lib]
+proc-macro = true

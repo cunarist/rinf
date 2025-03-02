@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:rinf/rinf.dart';
-import './messages/all.dart';
+import './src/generated/generated.dart';
 
 void main() async {
   await initializeRust(assignRustSignal);

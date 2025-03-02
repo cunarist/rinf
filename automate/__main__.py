@@ -132,7 +132,7 @@ def prepare_user_app():
 def prepare_example_app():
     chdir(ROOT_DIR / "flutter_package" / "example")
 
-    command = "rinf message"
+    command = "rinf gen"
     while system(command) != 0:
         # Retry the command in case of failure,
         # possibly due to GitHub API rate limiting

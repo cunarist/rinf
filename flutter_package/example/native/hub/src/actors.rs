@@ -6,7 +6,7 @@
 //! instead, share memory by communicating.
 
 use crate::common::*;
-use crate::messages::*;
+use crate::signals::*;
 use messages::prelude::*;
 use rinf::debug_print;
 
