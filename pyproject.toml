@@ -1,6 +1,5 @@
-# Python scripts are used for managing code and automating tests.
-# The reason we're not using shell scripts
-# is because they're platform-dependent.
+# Python scripts manage code and automate tests.
+# We avoid shell scripts because they are platform-dependent.
 
 [tool.uv.workspace]
 members = ["documentation"]
