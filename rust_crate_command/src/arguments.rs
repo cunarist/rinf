@@ -22,8 +22,8 @@ pub fn run_command() -> Result<(), RinfCommandError> {
         Err(RinfCommandError::NotFlutterApp)?;
     }
 
+    // Run a command from user input.
     let arg_matcher = create_arg_matcher();
-
     match arg_matcher.subcommand() {
         Some(("config", _)) => {
             let rinf_config = load_verified_rinf_config(&root_dir)?;
