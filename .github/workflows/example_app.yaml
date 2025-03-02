@@ -50,6 +50,22 @@ jobs:
         with:
           submodules: true
 
+      - name: Cache Rust dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            target
+          key: rust-${{ runner.os }}-${{ hashFiles('**/Cargo.toml') }}
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+            flutter_package/example/build
+          key: flutter-${{ runner.os }}-${{ hashFiles('**/pubspec.yaml') }}
+
       - name: Setup Flutter SDK
         uses: subosito/flutter-action@v2
         with:
