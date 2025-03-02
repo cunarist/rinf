@@ -6,8 +6,8 @@ use std::env::current_dir;
 use std::fs;
 use std::path::PathBuf;
 use syn::{
-    Attribute, File, GenericArgument, Item, ItemStruct, PathArguments, Type,
-    TypePath,
+    Attribute, Expr, ExprLit, File, GenericArgument, Item, ItemStruct, Lit,
+    PathArguments, Type, TypeArray, TypePath, TypeTuple,
 };
 
 // TODO: Remove all panicking code.
@@ -95,6 +95,25 @@ fn to_type_format(ty: &Type) -> Format {
             } else {
                 Format::TypeName(ty.to_token_stream().to_string())
             }
+        }
+        Type::Tuple(TypeTuple { elems, .. }) => {
+            let formats: Vec<_> = elems.iter().map(to_type_format).collect();
+            Format::Tuple(formats)
+        }
+        Type::Array(TypeArray { elem, len, .. }) => {
+            if let Expr::Lit(ExprLit {
+                lit: Lit::Int(ref lit_int),
+                ..
+            }) = len
+            {
+                if let Ok(size) = lit_int.base10_parse::<usize>() {
+                    return Format::TupleArray {
+                        content: Box::new(to_type_format(elem)),
+                        size,
+                    };
+                }
+            }
+            Format::TypeName(ty.to_token_stream().to_string())
         }
         _ => Format::TypeName(ty.to_token_stream().to_string()),
     }
