@@ -1,6 +1,6 @@
 //! This module is written for Rinf demonstrations.
 
-use crate::messages::*;
+use crate::{SmallNumber, SmallText};
 
 pub async fn communicate() {
     // Send signals to Dart like below.

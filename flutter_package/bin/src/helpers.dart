@@ -40,9 +40,6 @@ Future<void> applyRustTemplate({
   final templateSource = packagePath.join('template/native/');
   final templateDestination = flutterProjectPath.join('native/');
   await copyDirectory(templateSource, templateDestination);
-  final messagesSource = packagePath.join('template/messages/');
-  final messagesDestination = flutterProjectPath.join('messages/');
-  await copyDirectory(messagesSource, messagesDestination);
 
   // Create workspace `Cargo.toml`
   final cargoText = '''

@@ -1,8 +1,10 @@
 //! This `hub` crate is the
 //! entry point of the Rust logic.
 
-mod messages;
 mod sample_functions;
+mod signals;
+
+use signals::*;
 
 // Uncomment below to target the web.
 // use tokio_with_wasm::alias as tokio;
