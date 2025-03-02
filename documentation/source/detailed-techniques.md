@@ -26,28 +26,3 @@ If you add the optional argument `-w` or `--watch` to the `rinf gen` command, th
 :caption: CLI
 rinf gen --watch
 ```
-
-## Comments
-
-It is possible to add comments like this.[^3]
-
-```{code-block} proto
-:caption: Protobuf
-// This is a video data sample of...
-// contains...
-// responsible for...
-message SomeData { ... }
-```
-
-[^3]: If a message doesn't need a channel, it is entirely fine not to mark it with a special comment. In such instances, the message will still be generated without the ability to send signals. Generally, these messages are intended to be nested inside other messages.
-
-This applies same to marked Protobuf messages.
-
-```{code-block} proto
-:caption: Protobuf
-// [DART-SIGNAL]
-// This is an audio data sample of...
-// contains...
-// responsible for...
-message OtherData { ... }
-```
