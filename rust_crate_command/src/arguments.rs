@@ -1,5 +1,6 @@
 use crate::{
-    apply_rust_template, generate_dart_code, load_verified_rinf_config,
+    apply_rust_template, build_webassembly, check_internet_connection,
+    generate_dart_code, load_verified_rinf_config,
     watch_and_generate_dart_code, RinfCommandError,
 };
 use clap::{Arg, ArgAction, Command};
@@ -12,7 +13,7 @@ use std::path::{Path, PathBuf};
 
 pub fn run_command() -> Result<(), RinfCommandError> {
     // Check the internet connection status and remember it.
-    check_connectivity();
+    let is_internet_connected = check_internet_connection();
 
     // Check if the ucrrent directory is Flutter app's root.
     let root_dir = current_dir().unwrap();
@@ -81,7 +82,7 @@ pub fn run_command() -> Result<(), RinfCommandError> {
         }
         Some(("wasm", sub_m)) => {
             let release = sub_m.get_flag("release");
-            build_webassembly(release);
+            build_webassembly(release, is_internet_connected);
         }
         Some(("server", _)) => {
             let full_command = "flutter run \
@@ -93,16 +94,6 @@ pub fn run_command() -> Result<(), RinfCommandError> {
     }
 
     Ok(())
-}
-
-// TODO: Implement all of these.
-
-fn check_connectivity() {
-    // Implement internet connectivity check logic.
-}
-
-fn build_webassembly(_release: bool) {
-    // Implement WebAssembly build logic.
 }
 
 fn is_flutter_app_project(root_dir: &Path) -> bool {

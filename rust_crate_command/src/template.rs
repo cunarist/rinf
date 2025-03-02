@@ -1,9 +1,8 @@
-use crate::{generate_dart_code, RinfConfigMessage};
+use crate::{generate_dart_code, run_dart_command, RinfConfigMessage};
 use include_dir::{include_dir, Dir};
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
-use std::process::Command;
 
 // TODO: Organize imports
 
@@ -169,14 +168,5 @@ fn update_main_dart(root_dir: &Path) -> io::Result<()> {
         fs::write(main_path, content)?;
         run_dart_command(&["format", "./lib/main.dart"])?;
     }
-    Ok(())
-}
-
-fn run_dart_command(args: &[&str]) -> io::Result<()> {
-    #[cfg(target_family = "windows")]
-    let cmd = "dart.bat";
-    #[cfg(target_family = "unix")]
-    let cmd = "dart";
-    Command::new(cmd).args(args).spawn()?.wait()?;
     Ok(())
 }
