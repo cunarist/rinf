@@ -3,6 +3,9 @@ import sys
 import time
 
 
+# TODO: Use `Path` to manage paths.
+
+
 def replace_text_in_file(filepath: str, change_from: str, change_to: str):
     with open(filepath, mode="r", encoding="utf8") as file:
         content: str = file.read()
