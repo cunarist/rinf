@@ -1,7 +1,7 @@
 # Verify that the documentation steps function as intended
 # when users utilize released versions
 # instead of the code from the repository.
-name: user-app
+name: User App
 
 on:
   workflow_dispatch:

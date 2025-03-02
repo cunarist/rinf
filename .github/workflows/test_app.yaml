@@ -1,6 +1,6 @@
 # Verify that the app build works as intended
 # when utilizing the code inside the repository.
-name: test-app
+name: Test App
 
 on:
   push:
