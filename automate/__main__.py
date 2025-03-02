@@ -143,8 +143,8 @@ def prepare_example_app():
 def run_command():
     if len(argv) < COMMAND_ARG + 1:
         print(
-            "Automation option is not provided."
-            "\nUse `python automate --help` to see all available operations."
+            "Automation option is not provided;"
+            "\nUse `python automate --help` to see all available operations"
         )
         return
 
@@ -159,7 +159,7 @@ def run_command():
         case "prepare-example-app":
             prepare_example_app()
         case _:
-            print("No such option for automation is available.")
+            print("No such option for automation is available")
 
 
 run_command()

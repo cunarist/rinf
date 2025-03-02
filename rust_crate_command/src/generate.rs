@@ -1,10 +1,10 @@
+use crate::RinfConfigMessage;
 use quote::ToTokens;
 use serde_generate::dart::{CodeGenerator, Installer};
 use serde_generate::{CodeGeneratorConfig, Encoding, SourceInstaller};
 use serde_reflection::{ContainerFormat, Format, Named, Registry};
-use std::env::current_dir;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use syn::{
     Attribute, Expr, ExprLit, File, GenericArgument, Item, ItemStruct, Lit,
     PathArguments, Type, TypeArray, TypePath, TypeTuple,
@@ -205,12 +205,11 @@ fn visit_rust_files(dir: PathBuf, registry: &mut Registry) {
     }
 }
 
-pub fn generate_dart_code() {
-    // TODO: Check if the CWD has correct `pubspec.yaml` file.
+pub fn generate_dart_code(root_dir: &Path, message_config: &RinfConfigMessage) {
+    // TODO: Use the config
 
     // Prepare paths.
-    let current_path = current_dir().unwrap();
-    let pubspec_path = current_path.join("pubspec.yaml");
+    let pubspec_path = root_dir.join("pubspec.yaml");
 
     // Read the file.
     // TODO: Remove
@@ -219,7 +218,7 @@ pub fn generate_dart_code() {
     // Analyze the input Rust files
     // and collect type registries.
     let mut registry: Registry = Registry::new();
-    let source_dir = current_path.join("native").join("hub").join("src");
+    let source_dir = root_dir.join("native").join("hub").join("src");
     visit_rust_files(source_dir, &mut registry);
 
     // Create the code generator config.
@@ -235,11 +234,17 @@ pub fn generate_dart_code() {
     // Generate Dart code from the registry.
     // Create the Dart code generator.
     let generator = CodeGenerator::new(&config);
-    generator.output(current_path, &registry).unwrap();
+    generator.output(root_dir.to_owned(), &registry).unwrap();
 
     // Write back to pubspec file.
     // TODO: Remove
     fs::write(&pubspec_path, pubpsec_content).unwrap();
+}
 
-    // Write the generated Dart code to the output file.
+pub fn watch_and_generate_dart_code(
+    root_dir: &Path,
+    message_config: &RinfConfigMessage,
+) {
+    // TODO: Use the config
+    // Implement watching and message code generation logic.
 }

@@ -1,15 +1,25 @@
 use crate::{
-    generate_dart_code, load_verified_rinf_config, RinfCommandError,
-    RinfConfigMessage,
+    apply_rust_template, generate_dart_code, load_verified_rinf_config,
+    watch_and_generate_dart_code, RinfCommandError,
 };
 use clap::{Arg, ArgAction, Command};
 use owo_colors::OwoColorize;
+use serde_yml::Value;
+use std::env::current_dir;
+use std::path::{Path, PathBuf};
 
 // TODO: Remove string-based paths
 
 pub fn run_command() -> Result<(), RinfCommandError> {
     // Check the internet connection status and remember it.
     check_connectivity();
+
+    // Check if the ucrrent directory is Flutter app's root.
+    let root_dir = current_dir().unwrap();
+    if !is_flutter_app_project(&root_dir) {
+        println!("{:?}", root_dir);
+        Err(RinfCommandError::NotFlutterApp)?;
+    }
 
     let matches = Command::new("rinf")
         .about("Helper commands for building apps using Rust in Flutter.")
@@ -58,16 +68,15 @@ pub fn run_command() -> Result<(), RinfCommandError> {
         }
         Some(("template", _)) => {
             let rinf_config = load_verified_rinf_config("pubspec.yaml")?;
-            apply_rust_template(&rinf_config.message);
+            apply_rust_template(&root_dir, &rinf_config.message).unwrap();
         }
         Some(("gen", sub_m)) => {
             let watch = sub_m.get_flag("watch");
             let rinf_config = load_verified_rinf_config("pubspec.yaml")?;
             if watch {
-                watch_and_generate_dart_code(&rinf_config.message);
+                watch_and_generate_dart_code(&root_dir, &rinf_config.message);
             } else {
-                // TODO: Pass `rinf_config.message` to this function.
-                generate_dart_code();
+                generate_dart_code(&root_dir, &rinf_config.message);
             }
         }
         Some(("wasm", sub_m)) => {
@@ -92,14 +101,25 @@ fn check_connectivity() {
     // Implement internet connectivity check logic.
 }
 
-fn apply_rust_template(_message_config: &RinfConfigMessage) {
-    // Implement Rust template application logic.
-}
-
-fn watch_and_generate_dart_code(_message_config: &RinfConfigMessage) {
-    // Implement watching and message code generation logic.
-}
-
 fn build_webassembly(_release: bool) {
     // Implement WebAssembly build logic.
+}
+
+fn is_flutter_app_project(root_dir: &Path) -> bool {
+    // Check if current folder is a Flutter app project.
+    let spec_file = root_dir.join("pubspec.yaml");
+    let publish_to = read_publish_to(&spec_file).unwrap();
+    publish_to == "none"
+}
+
+fn read_publish_to(file_path: &PathBuf) -> Option<String> {
+    let content = std::fs::read_to_string(file_path).unwrap();
+    let yaml: Value = serde_yml::from_str(&content).unwrap();
+    let field_value = yaml
+        .as_mapping()
+        .ok_or(RinfCommandError::Other)
+        .unwrap()
+        .get("publish_to")?;
+    let config = field_value.as_str().unwrap().to_string();
+    Some(config)
 }

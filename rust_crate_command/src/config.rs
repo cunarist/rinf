@@ -5,6 +5,8 @@ use std::fmt::{Display, Formatter};
 use std::fs;
 use thiserror::Error;
 
+// TODO: Organize error messages
+
 /// Error type for Rinf configuration loading.
 #[derive(Debug, Error)]
 pub enum RinfCommandError {
@@ -16,6 +18,9 @@ pub enum RinfCommandError {
 
     #[error("Unknown key '{0}' in rinf config. Available keys are: {1}")]
     UnknownKey(String, String),
+
+    #[error("This is not a Flutter app project")]
+    NotFlutterApp,
 
     #[error("Unknown error")]
     Other, // TODO: Remove
