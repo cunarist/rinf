@@ -6,6 +6,10 @@ edition = "2021"
 [lib]
 proc-macro = true
 
+[dependencies]
+syn = "2.0.98"
+quote = "1.0.38"
+
 [lints.clippy]
 unwrap_used = "deny"
 expect_used = "deny"
