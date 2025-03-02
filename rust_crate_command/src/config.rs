@@ -165,7 +165,12 @@ impl RinfConfig {
     }
 }
 
-/// Loads and verifies the rinf configuration from a YAML file.
+// TODO: Match the behavior of `load_verified_rinf_config` to its doc comment
+
+/// Attempts to load the rinf configuration from the provided pubspec.yaml file.
+/// If no rinf configuration is found, the default configuration is returned.
+/// If the Rinf configuration is invalid, an exception is thrown.
+/// Otherwise it loads all values found in the config, using defaults for missing values.
 pub fn load_verified_rinf_config(
     root_dir: &Path,
 ) -> Result<RinfConfig, RinfCommandError> {
