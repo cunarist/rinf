@@ -43,7 +43,8 @@ fn implements_copy(attrs: &[Attribute]) -> bool {
 fn to_type_format(ty: &Type) -> Format {
     match ty {
         Type::Path(TypePath { path, .. }) => {
-            // Get last segment (e.g., for `std::collections::HashMap`, get `HashMap`).
+            // Get last segment
+            // (e.g., for `std::collections::HashMap`, get `HashMap`).
             if let Some(last_segment) = path.segments.last() {
                 let ident = last_segment.ident.to_string();
 
@@ -119,7 +120,8 @@ fn to_type_format(ty: &Type) -> Format {
     }
 }
 
-/// Extracts the first generic type argument from a `PathSegment`, if available.
+/// Extracts the first generic type argument
+/// from a `PathSegment`, if available.
 fn extract_generic(segment: &syn::PathSegment) -> Option<Type> {
     if let PathArguments::AngleBracketed(args) = &segment.arguments {
         args.args.iter().find_map(|arg| {
@@ -184,7 +186,8 @@ fn trace_struct(registry: &mut Registry, s: &ItemStruct) {
     // Build the container format for the struct.
     let container = ContainerFormat::Struct(fields);
 
-    // Insert the struct's container format into the registry using its identifier as key.
+    // Insert the struct's container format
+    // into the registry using its identifier as key.
     let type_name = s.ident.to_string();
     registry.insert(type_name, container);
 }
