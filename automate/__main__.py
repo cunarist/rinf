@@ -35,7 +35,7 @@ def prepare_test_app():
     command = "flutter create test_app"
     system(command)
 
-    chdir("./test_app/")
+    chdir(ROOT_DIR / "test_app")
 
     command = "dart pub add \"rinf:{'path':'../flutter_package'}\""
     system(command)
@@ -65,7 +65,7 @@ def prepare_test_app():
         "wasm-bindgen",
     )
 
-    chdir("../")
+    chdir(ROOT_DIR)
 
     replace_text_in_file(
         ROOT_DIR / "Cargo.toml",
@@ -85,7 +85,7 @@ def prepare_user_app():
     command = "flutter create user_app"
     system(command)
 
-    chdir("./user_app/")
+    chdir(ROOT_DIR / "user_app")
 
     command = "flutter pub add rinf"
     system(command)
@@ -115,7 +115,7 @@ def prepare_user_app():
         "wasm-bindgen",
     )
 
-    chdir("../")
+    chdir(ROOT_DIR)
 
     replace_text_in_file(
         ROOT_DIR / "Cargo.toml",
@@ -130,7 +130,7 @@ def prepare_user_app():
 
 
 def prepare_example_app():
-    chdir("./flutter_package/example")
+    chdir(ROOT_DIR / "flutter_package" / "example")
 
     command = "rinf message"
     while system(command) != 0:
