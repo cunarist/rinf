@@ -51,31 +51,20 @@ jobs:
         with:
           submodules: true
 
-      - name: Cache Rust dependencies
+      - name: Cache dependencies
         uses: actions/cache@v3
         with:
           path: |
             ~/.cargo/registry
             target
-          key: >
-            rust-${{ matrix.runner }}-${{ matrix.target }}
-            ${{ hashFiles('**/Cargo.toml') }}
-          restore-keys: |
-            rust-${{ matrix.runner }}-${{ matrix.target }}
-            rust-${{ matrix.runner }}
-
-      - name: Cache Flutter dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
             ~/.pub-cache
             user_app/build
           key: >
-            flutter-${{ matrix.runner }}-${{ matrix.target }}
-            ${{ hashFiles('**/pubspec.yaml') }}
+            ${{ matrix.runner }}-${{ matrix.target }}
+            ${{ hashFiles('**/Cargo.toml', '**/pubspec.yaml') }}
           restore-keys: |
-            flutter-${{ matrix.runner }}-${{ matrix.target }}
-            flutter-${{ matrix.runner }}
+            ${{ matrix.runner }}-${{ matrix.target }}
+            ${{ matrix.runner }}
 
       - name: Setup Flutter SDK
         uses: subosito/flutter-action@v2
