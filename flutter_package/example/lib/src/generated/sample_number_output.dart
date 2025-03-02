@@ -5,7 +5,7 @@ class SampleNumberOutput {
   const SampleNumberOutput({
     required this.currentNumber,
     required this.dummyOne,
-    required this.dummyTwo,
+    this.dummyTwo,
     required this.dummyThree,
   });
 
@@ -14,8 +14,8 @@ class SampleNumberOutput {
     final instance = SampleNumberOutput(
       currentNumber: deserializer.deserializeInt32(),
       dummyOne: deserializer.deserializeUint32(),
-      dummyTwo: :: core :: option :: Option < SampleSchema >.deserialize(deserializer),
-      dummyThree: :: prost :: alloc :: vec :: Vec < i32 >.deserialize(deserializer),
+      dummyTwo: TraitHelpers.deserializeOptionSampleSchema(deserializer),
+      dummyThree: TraitHelpers.deserializeVectorI32(deserializer),
     );
     deserializer.decreaseContainerDepth();
     return instance;
@@ -32,19 +32,19 @@ class SampleNumberOutput {
 
   final int currentNumber;
   final int dummyOne;
-  final :: core :: option :: Option < SampleSchema > dummyTwo;
-  final :: prost :: alloc :: vec :: Vec < i32 > dummyThree;
+  final SampleSchema? dummyTwo;
+  final List<int> dummyThree;
 
   SampleNumberOutput copyWith({
     int? currentNumber,
     int? dummyOne,
-    :: core :: option :: Option < SampleSchema >? dummyTwo,
-    :: prost :: alloc :: vec :: Vec < i32 >? dummyThree,
+    SampleSchema? Function()? dummyTwo,
+    List<int>? dummyThree,
   }) {
     return SampleNumberOutput(
       currentNumber: currentNumber ?? this.currentNumber,
       dummyOne: dummyOne ?? this.dummyOne,
-      dummyTwo: dummyTwo ?? this.dummyTwo,
+      dummyTwo: dummyTwo == null ? this.dummyTwo : dummyTwo(),
       dummyThree: dummyThree ?? this.dummyThree,
     );
   }
@@ -53,8 +53,8 @@ class SampleNumberOutput {
     serializer.increaseContainerDepth();
     serializer.serializeInt32(currentNumber);
     serializer.serializeUint32(dummyOne);
-    dummyTwo.serialize(serializer);
-    dummyThree.serialize(serializer);
+    TraitHelpers.serializeOptionSampleSchema(dummyTwo, serializer);
+    TraitHelpers.serializeVectorI32(dummyThree, serializer);
     serializer.decreaseContainerDepth();
   }
 
@@ -73,7 +73,7 @@ class SampleNumberOutput {
       && currentNumber == other.currentNumber
       && dummyOne == other.dummyOne
       && dummyTwo == other.dummyTwo
-      && dummyThree == other.dummyThree;
+      && listEquals(dummyThree, other.dummyThree);
   }
 
   @override

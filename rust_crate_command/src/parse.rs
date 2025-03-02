@@ -5,7 +5,10 @@ use serde_reflection::{ContainerFormat, Format, Named, Registry};
 use std::env::current_dir;
 use std::fs;
 use std::path::PathBuf;
-use syn::{Attribute, File, Item, ItemStruct};
+use syn::{
+    Attribute, File, GenericArgument, Item, ItemStruct, PathArguments, Type,
+    TypePath,
+};
 
 // TODO: Remove all panicking code.
 
@@ -32,101 +35,101 @@ fn implements_copy(attrs: &[Attribute]) -> bool {
     })
 }
 
-/// Convert a syn field type to a serde_reflection::Format.
-/// This function handles common primitives and container types like Option and Vec.
-/// For unrecognized types, it returns a TypeName with the type's string representation.
-fn to_type_format(ty: &syn::Type) -> Format {
-    // Get a string representation of the type.
-    let ty_str = ty.to_token_stream().to_string();
-    let trimmed = ty_str.trim();
+/// Convert a `syn` field type to a `serde_reflection::Format`.
+/// This function handles common primitives
+/// and container types like `Option` and `Vec``.
+/// For unrecognized types, it returns a `TypeName`
+/// with the type's string representation.
+fn to_type_format(ty: &Type) -> Format {
+    match ty {
+        Type::Path(TypePath { path, .. }) => {
+            // Get last segment (e.g., for `std::collections::HashMap`, get `HashMap`).
+            if let Some(last_segment) = path.segments.last() {
+                let ident = last_segment.ident.to_string();
 
-    match trimmed {
-        "u8" => Format::U8,
-        "u16" => Format::U16,
-        "u32" => Format::U32,
-        "u64" => Format::U64,
-        "u128" => Format::U128,
-        "i8" => Format::I8,
-        "i16" => Format::I16,
-        "i32" => Format::I32,
-        "i64" => Format::I64,
-        "i128" => Format::I128,
-        "f32" => Format::F32,
-        "f64" => Format::F64,
-        "bool" => Format::Bool,
-        "char" => Format::Char,
-        "String" => Format::Str,
-        other => {
-            // Handle Option<T>
-            if other.starts_with("Option") {
-                let inner = extract_inner_type(other, "Option");
-                if let Ok(inner_ty) = syn::parse_str::<syn::Type>(inner) {
-                    return Format::Option(Box::new(to_type_format(&inner_ty)));
-                }
-            }
-
-            // Handle Vec<T> as a sequence.
-            if other.starts_with("Vec") {
-                let inner = extract_inner_type(other, "Vec");
-                if let Ok(inner_ty) = syn::parse_str::<syn::Type>(inner) {
-                    return Format::Seq(Box::new(to_type_format(&inner_ty)));
-                }
-            }
-
-            // Handle HashMap<K, V> as a map.
-            if other.starts_with("HashMap") {
-                let inner = extract_inner_type(other, "HashMap");
-                let parts: Vec<&str> =
-                    inner.split(',').map(str::trim).collect();
-                if parts.len() == 2 {
-                    if let (Ok(k), Ok(v)) = (
-                        syn::parse_str::<syn::Type>(parts[0]),
-                        syn::parse_str::<syn::Type>(parts[1]),
-                    ) {
-                        return Format::Map {
-                            key: Box::new(to_type_format(&k)),
-                            value: Box::new(to_type_format(&v)),
-                        };
+                match ident.as_str() {
+                    "u8" => Format::U8,
+                    "u16" => Format::U16,
+                    "u32" => Format::U32,
+                    "u64" => Format::U64,
+                    "u128" => Format::U128,
+                    "i8" => Format::I8,
+                    "i16" => Format::I16,
+                    "i32" => Format::I32,
+                    "i64" => Format::I64,
+                    "i128" => Format::I128,
+                    "f32" => Format::F32,
+                    "f64" => Format::F64,
+                    "bool" => Format::Bool,
+                    "char" => Format::Char,
+                    "String" => Format::Str,
+                    "Option" => {
+                        if let Some(inner) = extract_generic(last_segment) {
+                            Format::Option(Box::new(to_type_format(&inner)))
+                        } else {
+                            Format::TypeName("Option<?>".to_string())
+                        }
                     }
-                }
-            }
-
-            // Handle Tuples (e.g., "(Foo, Bar)")
-            if other.starts_with('(') && other.ends_with(')') {
-                let inner = other.trim_start_matches('(').trim_end_matches(')');
-                let types: Vec<_> = inner
-                    .split(',')
-                    .map(str::trim)
-                    .filter_map(|s| syn::parse_str::<syn::Type>(s).ok())
-                    .collect();
-                if !types.is_empty() {
-                    return Format::Tuple(
-                        types.iter().map(to_type_format).collect(),
-                    );
-                }
-            }
-
-            // Handle TupleArrays (e.g., "[Foo; N]")
-            if other.starts_with('[') && other.ends_with(']') {
-                let inner = other.trim_start_matches('[').trim_end_matches(']');
-                let parts: Vec<&str> =
-                    inner.split(';').map(str::trim).collect();
-                if parts.len() == 2 {
-                    if let (Ok(content_ty), Ok(size)) = (
-                        syn::parse_str::<syn::Type>(parts[0]),
-                        parts[1].parse::<usize>(),
-                    ) {
-                        return Format::TupleArray {
-                            content: Box::new(to_type_format(&content_ty)),
-                            size,
-                        };
+                    "Vec" => {
+                        if let Some(inner) = extract_generic(last_segment) {
+                            Format::Seq(Box::new(to_type_format(&inner)))
+                        } else {
+                            Format::TypeName("Vec<?>".to_string())
+                        }
                     }
+                    "HashMap" => {
+                        let mut generics = extract_generics(last_segment);
+                        if generics.len() == 2 {
+                            let key = to_type_format(&generics.remove(0));
+                            let value = to_type_format(&generics.remove(0));
+                            Format::Map {
+                                key: Box::new(key),
+                                value: Box::new(value),
+                            }
+                        } else {
+                            Format::TypeName("HashMap<?, ?>".to_string())
+                        }
+                    }
+                    _ => Format::TypeName(ident),
                 }
+            } else {
+                Format::TypeName(ty.to_token_stream().to_string())
             }
-
-            // Fallback: return type name
-            Format::TypeName(other.to_string())
         }
+        _ => Format::TypeName(ty.to_token_stream().to_string()),
+    }
+}
+
+/// Extracts the first generic type argument from a `PathSegment`, if available.
+fn extract_generic(segment: &syn::PathSegment) -> Option<Type> {
+    if let PathArguments::AngleBracketed(args) = &segment.arguments {
+        args.args.iter().find_map(|arg| {
+            if let GenericArgument::Type(ty) = arg {
+                Some(ty.clone())
+            } else {
+                None
+            }
+        })
+    } else {
+        None
+    }
+}
+
+/// Extracts all generic type arguments from a `PathSegment`.
+fn extract_generics(segment: &syn::PathSegment) -> Vec<Type> {
+    if let PathArguments::AngleBracketed(args) = &segment.arguments {
+        args.args
+            .iter()
+            .filter_map(|arg| {
+                if let GenericArgument::Type(ty) = arg {
+                    Some(ty.clone())
+                } else {
+                    None
+                }
+            })
+            .collect()
+    } else {
+        vec![]
     }
 }
 

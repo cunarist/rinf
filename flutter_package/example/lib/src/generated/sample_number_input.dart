@@ -5,17 +5,17 @@ class SampleNumberInput {
   const SampleNumberInput({
     required this.letter,
     required this.dummyOne,
-    required this.dummyTwo,
+    this.dummyTwo,
     required this.dummyThree,
   });
 
   static SampleNumberInput deserialize(BinaryDeserializer deserializer) {
     deserializer.increaseContainerDepth();
     final instance = SampleNumberInput(
-      letter: :: prost :: alloc :: string :: String.deserialize(deserializer),
+      letter: deserializer.deserializeString(),
       dummyOne: deserializer.deserializeUint32(),
-      dummyTwo: :: core :: option :: Option < SampleSchema >.deserialize(deserializer),
-      dummyThree: :: prost :: alloc :: vec :: Vec < i32 >.deserialize(deserializer),
+      dummyTwo: TraitHelpers.deserializeOptionSampleSchema(deserializer),
+      dummyThree: TraitHelpers.deserializeVectorI32(deserializer),
     );
     deserializer.decreaseContainerDepth();
     return instance;
@@ -30,31 +30,31 @@ class SampleNumberInput {
     return value;
   }
 
-  final :: prost :: alloc :: string :: String letter;
+  final String letter;
   final int dummyOne;
-  final :: core :: option :: Option < SampleSchema > dummyTwo;
-  final :: prost :: alloc :: vec :: Vec < i32 > dummyThree;
+  final SampleSchema? dummyTwo;
+  final List<int> dummyThree;
 
   SampleNumberInput copyWith({
-    :: prost :: alloc :: string :: String? letter,
+    String? letter,
     int? dummyOne,
-    :: core :: option :: Option < SampleSchema >? dummyTwo,
-    :: prost :: alloc :: vec :: Vec < i32 >? dummyThree,
+    SampleSchema? Function()? dummyTwo,
+    List<int>? dummyThree,
   }) {
     return SampleNumberInput(
       letter: letter ?? this.letter,
       dummyOne: dummyOne ?? this.dummyOne,
-      dummyTwo: dummyTwo ?? this.dummyTwo,
+      dummyTwo: dummyTwo == null ? this.dummyTwo : dummyTwo(),
       dummyThree: dummyThree ?? this.dummyThree,
     );
   }
 
   void serialize(BinarySerializer serializer) {
     serializer.increaseContainerDepth();
-    letter.serialize(serializer);
+    serializer.serializeString(letter);
     serializer.serializeUint32(dummyOne);
-    dummyTwo.serialize(serializer);
-    dummyThree.serialize(serializer);
+    TraitHelpers.serializeOptionSampleSchema(dummyTwo, serializer);
+    TraitHelpers.serializeVectorI32(dummyThree, serializer);
     serializer.decreaseContainerDepth();
   }
 
@@ -73,7 +73,7 @@ class SampleNumberInput {
       && letter == other.letter
       && dummyOne == other.dummyOne
       && dummyTwo == other.dummyTwo
-      && dummyThree == other.dummyThree;
+      && listEquals(dummyThree, other.dummyThree);
   }
 
   @override
