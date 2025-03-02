@@ -154,17 +154,6 @@ fn extract_generics(segment: &syn::PathSegment) -> Vec<Type> {
     }
 }
 
-/// Extracts the inner type
-/// from a generic type like `Option<T>` or `Vec<T>`.
-fn extract_inner_type<'a>(input: &'a str, prefix: &'a str) -> &'a str {
-    input
-        .trim_start_matches(prefix)
-        .trim()
-        .trim_start_matches('<')
-        .trim_end_matches('>')
-        .trim()
-}
-
 /// Trace a struct by collecting its field names (and a placeholder type)
 /// and record its container format in the registry.
 fn trace_struct(registry: &mut Registry, s: &ItemStruct) {
