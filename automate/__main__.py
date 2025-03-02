@@ -2,7 +2,6 @@ from os import chdir, remove, system
 from pathlib import Path
 from sys import argv
 
-wrong_type: int = "HI"
 from time import sleep
 
 # TODO: Check types in code quality CI
