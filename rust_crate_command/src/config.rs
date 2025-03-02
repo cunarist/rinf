@@ -3,6 +3,7 @@ use serde_yml::Value;
 use std::collections::HashSet;
 use std::fmt::{Display, Formatter};
 use std::fs;
+use std::path::Path;
 use thiserror::Error;
 
 // TODO: Organize error messages
@@ -166,8 +167,9 @@ impl RinfConfig {
 
 /// Loads and verifies the rinf configuration from a YAML file.
 pub fn load_verified_rinf_config(
-    file_path: &str,
+    root_dir: &Path,
 ) -> Result<RinfConfig, RinfCommandError> {
+    let file_path = root_dir.join("pubspec.yaml");
     let content = fs::read_to_string(file_path)?;
     let yaml: Value = serde_yml::from_str(&content)?;
     let rinf_yaml = yaml
