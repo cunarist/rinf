@@ -1,7 +1,6 @@
 from os import chdir, remove, system
 from pathlib import Path
 from sys import argv
-
 from time import sleep
 
 # TODO: Check types in code quality CI
