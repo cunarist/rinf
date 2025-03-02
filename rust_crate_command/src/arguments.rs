@@ -82,7 +82,7 @@ pub fn run_command() -> Result<(), RinfCommandError> {
         }
         Some(("wasm", sub_m)) => {
             let release = sub_m.get_flag("release");
-            build_webassembly(release, is_internet_connected);
+            build_webassembly(&root_dir, release, is_internet_connected);
         }
         Some(("server", _)) => {
             let full_command = "flutter run \
