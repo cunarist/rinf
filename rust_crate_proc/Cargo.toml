@@ -5,3 +5,7 @@ edition = "2021"
 
 [lib]
 proc-macro = true
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
