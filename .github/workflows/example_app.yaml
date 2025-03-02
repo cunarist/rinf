@@ -57,7 +57,7 @@ jobs:
             ~/.cargo/registry
             target
             ~/.pub-cache
-            user_app/build
+            flutter_package/example/build
           key: >
             ${{ matrix.runner }}-${{ matrix.target }}
             ${{ hashFiles('**/Cargo.toml', '**/pubspec.yaml') }}
