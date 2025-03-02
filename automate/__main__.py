@@ -1,7 +1,6 @@
 from os import chdir, remove, system
 from pathlib import Path
 from sys import argv
-from time import sleep
 
 ROOT_DIR = Path(__file__).parent.parent
 COMMAND_ARG = 1
@@ -40,11 +39,7 @@ def prepare_test_app():
     command = "dart pub add \"rinf:{'path':'../flutter_package'}\""
     system(command)
     command = "rinf template"
-    while system(command) != 0:
-        # Retry the command in case of failure,
-        # possibly due to GitHub API rate limiting
-        # associated with the 'protoc_prebuilt' crate.
-        sleep(60)
+    system(command)
 
     remove("Cargo.toml")
 
@@ -90,11 +85,7 @@ def prepare_user_app():
     command = "flutter pub add rinf"
     system(command)
     command = "rinf template"
-    while system(command) != 0:
-        # Retry the command in case of failure,
-        # possibly due to GitHub API rate limiting
-        # associated with the 'protoc_prebuilt' crate.
-        sleep(60)
+    system(command)
 
     remove("Cargo.toml")
 
@@ -133,11 +124,7 @@ def prepare_example_app():
     chdir(ROOT_DIR / "flutter_package" / "example")
 
     command = "rinf gen"
-    while system(command) != 0:
-        # Retry the command in case of failure,
-        # possibly due to GitHub API rate limiting
-        # associated with the 'protoc_prebuilt' crate.
-        sleep(60)
+    system(command)
 
 
 def run_command():
