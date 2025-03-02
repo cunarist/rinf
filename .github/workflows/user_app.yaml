@@ -11,21 +11,21 @@ on:
 jobs:
   build:
     name: ${{ matrix.runner }} / ${{ matrix.target }}
-    runs-on: ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}-latest
     strategy:
       fail-fast: false # Important
       matrix:
-        runner: [ubuntu-latest, windows-latest, macos-latest]
+        runner: [ubuntu, windows, macos]
         target: [android, web] # On all platforms
         include:
           # Specify targets for each platform
-          - runner: ubuntu-latest
+          - runner: ubuntu
             target: linux
-          - runner: windows-latest
+          - runner: windows
             target: windows
-          - runner: macos-latest
+          - runner: macos
             target: macos
-          - runner: macos-latest
+          - runner: macos
             target: ios
 
     steps:
@@ -40,7 +40,10 @@ jobs:
           path: |
             ~/.cargo/registry
             target
-          key: Rust-${{ runner.os }}-${{ hashFiles('**/Cargo.toml') }}
+          key: >
+            rust-${{ matrix.runner }}-${{ matrix.target }}-
+            ${{ hashFiles('**/Cargo.toml') }}
+          restore-keys: rust-${{ matrix.runner }}-${{ matrix.target }}-
 
       - name: Cache Flutter dependencies
         uses: actions/cache@v3
@@ -48,7 +51,10 @@ jobs:
           path: |
             ~/.pub-cache
             user_app/build
-          key: Flutter-${{ runner.os }}-${{ hashFiles('**/pubspec.yaml') }}
+          key: >
+            flutter-${{ matrix.runner }}-${{ matrix.target }}-
+            ${{ hashFiles('**/pubspec.yaml') }}
+          restore-keys: flutter-${{ matrix.runner }}-${{ matrix.target }}-
 
       - name: Setup Flutter SDK
         uses: subosito/flutter-action@v2
