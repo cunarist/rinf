@@ -85,6 +85,28 @@ jobs:
       - name: Check if the code has changed
         run: git diff --exit-code
 
+  script:
+    name: python-script
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: pip install pyright ruff
+
+      - name: Run Pyright
+        run: pyright
+
+      - name: Run Ruff
+        run: ruff check .
+
   config:
     name: configuration-files
     runs-on: ubuntu-latest
