@@ -50,17 +50,17 @@ def prepare_test_app():
 
     # Enable the web target, since it's not enabled by default.
     replace_text_in_file(
-        ROOT_DIR / "native" / "hub" / "src" / "lib.rs",
+        ROOT_DIR / "test_app" / "native" / "hub" / "src" / "lib.rs",
         "// use tokio_with_wasm::alias as tokio;",
         "use tokio_with_wasm::alias as tokio;",
     )
     replace_text_in_file(
-        ROOT_DIR / "native" / "hub" / "Cargo.toml",
+        ROOT_DIR / "test_app" / "native" / "hub" / "Cargo.toml",
         "# tokio_with_wasm",
         "tokio_with_wasm",
     )
     replace_text_in_file(
-        ROOT_DIR / "native" / "hub" / "Cargo.toml",
+        ROOT_DIR / "test_app" / "native" / "hub" / "Cargo.toml",
         "# wasm-bindgen",
         "wasm-bindgen",
     )
@@ -100,17 +100,17 @@ def prepare_user_app():
 
     # Enable the web target, since it's not enabled by default.
     replace_text_in_file(
-        ROOT_DIR / "native" / "hub" / "src" / "lib.rs",
+        ROOT_DIR / "user_app" / "native" / "hub" / "src" / "lib.rs",
         "// use tokio_with_wasm::alias as tokio;",
         "use tokio_with_wasm::alias as tokio;",
     )
     replace_text_in_file(
-        ROOT_DIR / "native" / "hub" / "Cargo.toml",
+        ROOT_DIR / "user_app" / "native" / "hub" / "Cargo.toml",
         "# tokio_with_wasm",
         "tokio_with_wasm",
     )
     replace_text_in_file(
-        ROOT_DIR / "native" / "hub" / "Cargo.toml",
+        ROOT_DIR / "user_app" / "native" / "hub" / "Cargo.toml",
         "# wasm-bindgen",
         "wasm-bindgen",
     )
