@@ -3,9 +3,6 @@ from pathlib import Path
 from sys import argv
 from time import sleep
 
-# TODO: Check types in code quality CI
-
-
 ROOT_DIR = Path(__file__).parent.parent
 COMMAND_ARG = 1
 
