@@ -1,7 +1,7 @@
 //! This module is written for Rinf demonstrations.
 
 use crate::common::*;
-use crate::messages::*;
+use crate::signals::*;
 use rinf::debug_print;
 use std::time::Duration;
 

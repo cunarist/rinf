@@ -1,5 +1,11 @@
-mod parse;
+mod arguments;
+mod config;
+mod generate;
 
-pub use parse::generate_dart_code;
+use config::*;
+use generate::*;
 
-// TODO: Remove all panickine code like `unwrap` or `expect`.
+pub use arguments::run_command;
+pub use config::RinfCommandError;
+
+// TODO: Remove all panicking code like `unwrap` or `expect`.

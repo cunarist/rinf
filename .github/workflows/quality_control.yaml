@@ -50,9 +50,9 @@ jobs:
           flutter pub get --directory flutter_package/
           flutter pub get --directory flutter_package/cargokit/build_tool
 
-      - name: Generate message files
+      - name: Generate signal files
         working-directory: flutter_package/example/
-        run: rinf message
+        run: rinf gen
 
       # Targets are basically combinations of
       # web/native and debug/release.

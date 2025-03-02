@@ -45,3 +45,9 @@ When you need to run a Flutter web server, use `rinf server` to get the complete
 :caption: CLI
 rinf server
 ```
+
+## Migrating from 7 to 8
+
+# TODO: Fill these in
+
+- Recursive signal derive is needed

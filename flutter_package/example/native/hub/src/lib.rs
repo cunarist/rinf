@@ -3,10 +3,11 @@
 
 mod actors;
 mod common;
-mod messages;
 mod sample_functions;
+mod signals;
 
 use common::*;
+use signals::*;
 use tokio_with_wasm::alias as tokio;
 
 rinf::write_interface!();

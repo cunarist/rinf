@@ -32,7 +32,7 @@ or made changes to the `.proto` files in the `./messages` directory,
 run the following command:
 
 ```shell
-rinf message
+rinf gen
 ```
 
 Now you can run and build this app just like any other Flutter projects.

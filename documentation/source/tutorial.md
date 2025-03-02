@@ -34,7 +34,7 @@ Next, generate Dart and Rust message code from `.proto` files.
 
 ```{code-block} shell
 :caption: CLI
-rinf message
+rinf gen
 ```
 
 Create a button widget in Dart that accepts the user input.
@@ -123,7 +123,7 @@ Generate Dart and Rust message code from `.proto` files.
 
 ```{code-block} shell
 :caption: CLI
-rinf message
+rinf gen
 ```
 
 Define an async Rust function that runs forever, sending numbers to Dart every second.
@@ -199,7 +199,7 @@ message MyTreasureOutput { int32 current_value = 1; }
 
 ```{code-block} shell
 :caption: CLI
-rinf message
+rinf gen
 ```
 
 ```{code-block} dart

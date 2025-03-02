@@ -12,24 +12,18 @@ use syn::{
 
 // TODO: Remove all panicking code.
 
-fn implements_copy(attrs: &[Attribute]) -> bool {
-    return true;
+fn implements_signal(attrs: &[Attribute]) -> bool {
     attrs.iter().any(|attr| {
         if attr.path().is_ident("derive") {
-            println!("Found #[derive(...)]");
-
             let mut found = false;
             let _ = attr.parse_nested_meta(|meta| {
-                println!("Checking meta: {:?}", meta.path.get_ident());
-                if meta.path.is_ident("Copy") {
-                    found = true;
-                }
+                let last_segment = meta.path.segments.last().unwrap();
+                let ident: &str = &last_segment.ident.to_string();
+                found = matches!(ident, "Signal" | "DartSignal" | "RustSignal");
                 Ok(())
             });
-
             found
         } else {
-            println!("Not a derive attribute");
             false
         }
     })
@@ -161,10 +155,6 @@ fn trace_struct(registry: &mut Registry, s: &ItemStruct) {
     for field in s.fields.iter() {
         if let Some(ident) = &field.ident {
             let field_format = to_type_format(&field.ty);
-            println!(
-                "    Tracing Field: {} with type format: {:?}",
-                ident, field_format
-            );
             fields.push(Named {
                 name: ident.to_string(),
                 value: field_format,
@@ -186,7 +176,7 @@ fn process_items(registry: &mut Registry, items: &[Item]) {
     let mut structs = Vec::new();
     for item in items {
         match item {
-            Item::Struct(s) if implements_copy(&s.attrs) => {
+            Item::Struct(s) if implements_signal(&s.attrs) => {
                 trace_struct(registry, s);
                 structs.push(s.ident.clone());
             }
@@ -195,6 +185,22 @@ fn process_items(registry: &mut Registry, items: &[Item]) {
                 process_items(registry, &m.content.as_ref().unwrap().1);
             }
             _ => {}
+        }
+    }
+}
+
+fn visit_rust_files(dir: PathBuf, registry: &mut Registry) {
+    if let Ok(entries) = fs::read_dir(dir) {
+        for entry in entries.filter_map(Result::ok) {
+            let path = entry.path();
+            if path.is_dir() {
+                visit_rust_files(path, registry); // Recurse into subdirectory
+            } else {
+                let content = fs::read_to_string(path).unwrap();
+                let syntax_tree: File = syn::parse_file(&content)
+                    .expect("Failed to parse Rust file");
+                process_items(registry, &syntax_tree.items);
+            }
         }
     }
 }
@@ -210,27 +216,11 @@ pub fn generate_dart_code() {
     // TODO: Remove
     let pubpsec_content = fs::read_to_string(&pubspec_path).unwrap();
 
-    // Analyze the input Rust file.
-    // TODO: Traverse all nested module files.
-    let file_path = current_path
-        .join("native")
-        .join("hub")
-        .join("src")
-        .join("messages")
-        .join("counter_number.rs");
-    let content = fs::read_to_string(file_path).expect("Failed to read file");
-    let syntax_tree: File =
-        syn::parse_file(&content).expect("Failed to parse Rust file");
-
-    // Collect type registries.
+    // Analyze the input Rust files
+    // and collect type registries.
     let mut registry: Registry = Registry::new();
-    process_items(&mut registry, &syntax_tree.items);
-    println!("------\nRegistry from `Copy` types:\n------");
-    for (type_name, container) in &registry {
-        println!("Type `{}`", type_name);
-        println!("{:?}", container);
-        println!("------");
-    }
+    let source_dir = current_path.join("native").join("hub").join("src");
+    visit_rust_files(source_dir, &mut registry);
 
     // Create the code generator config.
     let config = CodeGeneratorConfig::new("generated".to_string())
@@ -252,5 +242,4 @@ pub fn generate_dart_code() {
     fs::write(&pubspec_path, pubpsec_content).unwrap();
 
     // Write the generated Dart code to the output file.
-    println!("Dart code generated!");
 }
