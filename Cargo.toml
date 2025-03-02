@@ -1,10 +1,10 @@
 [workspace]
+resolver = "2"
 members = [
     "./flutter_package/example/native/*",
     "./rust_crate",
     "./rust_crate_command",
 ]
-resolver = "2"
 
 [patch.crates-io]
 rinf = { path = "./rust_crate" }
