@@ -14,6 +14,8 @@ child: Column(
 
 ## From Dart to Rust
 
+# TODO: Update the tutorial and messaging section
+
 Let's say that you want to create a new button in Dart that sends an array of numbers and a string to Rust. We need a signal to notify Rust that a user event has occurred.
 
 Write a new `.proto` file in the `./messages` directory with a new message. Note that the message should have the comment `[DART-SIGNAL]` above it.

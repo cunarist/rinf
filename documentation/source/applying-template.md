@@ -38,9 +38,6 @@ After running the command, you'll have new files and folders as your starter Rus
 *   │   ├── main.dart
     │   └── ...
     ├── linux/
-+   ├── messages/
-+   │   ├── basic.proto
-+   │   └── README.md
 +   ├── native/
 +   │   ├── hub/
 +   │   │   ├── src/

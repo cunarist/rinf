@@ -156,7 +156,12 @@ fn update_main_dart(root_dir: &Path) -> io::Result<()> {
         let mut content = fs::read_to_string(&main_path)?;
         // TODO: Update the import statement
         if !content.contains("messages/all.dart") {
-            content = content.replacen("import", "import 'package:rinf/rinf.dart';\nimport './messages/all.dart';\nimport", 1);
+            content = content.replacen(
+                "import",
+                "import 'package:rinf/rinf.dart';\
+                \nimport './messages/all.dart';\nimport",
+                1,
+            );
         }
         if !content.contains("initializeRust(assignRustSignal)") {
             content = content.replacen(
