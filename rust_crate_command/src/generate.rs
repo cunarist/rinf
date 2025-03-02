@@ -15,21 +15,15 @@ use syn::{
 fn implements_signal(attrs: &[Attribute]) -> bool {
     attrs.iter().any(|attr| {
         if attr.path().is_ident("derive") {
-            println!("Found #[derive(...)]");
-
             let mut found = false;
             let _ = attr.parse_nested_meta(|meta| {
-                println!("Checking meta: {:?}", meta.path.get_ident());
-
                 let last_segment = meta.path.segments.last().unwrap();
                 let ident: &str = &last_segment.ident.to_string();
                 found = matches!(ident, "Signal" | "DartSignal" | "RustSignal");
                 Ok(())
             });
-
             found
         } else {
-            println!("Not a derive attribute");
             false
         }
     })
@@ -161,10 +155,6 @@ fn trace_struct(registry: &mut Registry, s: &ItemStruct) {
     for field in s.fields.iter() {
         if let Some(ident) = &field.ident {
             let field_format = to_type_format(&field.ty);
-            println!(
-                "    Tracing Field: {} with type format: {:?}",
-                ident, field_format
-            );
             fields.push(Named {
                 name: ident.to_string(),
                 value: field_format,
@@ -252,5 +242,4 @@ pub fn generate_dart_code() {
     fs::write(&pubspec_path, pubpsec_content).unwrap();
 
     // Write the generated Dart code to the output file.
-    println!("Dart code generated!");
 }
