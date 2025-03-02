@@ -193,6 +193,8 @@ fn process_items(registry: &mut Registry, items: &[Item]) {
     }
 }
 
+// TODO: Warn overlapping type names
+
 fn visit_rust_files(dir: PathBuf, registry: &mut Registry) {
     if let Ok(entries) = fs::read_dir(dir) {
         for entry in entries.filter_map(Result::ok) {
