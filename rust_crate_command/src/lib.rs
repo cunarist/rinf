@@ -18,3 +18,5 @@ extern "Rust" {
 unsafe fn test_hidden() {
     expose_hidden();
 }
+
+// TODO: Remove all panickine code like `unwrap` or `expect`.

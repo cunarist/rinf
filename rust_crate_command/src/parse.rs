@@ -1,7 +1,8 @@
 use quote::ToTokens;
-use serde_generate::dart::CodeGenerator;
-use serde_generate::{CodeGeneratorConfig, Encoding};
+use serde_generate::dart::{CodeGenerator, Installer};
+use serde_generate::{CodeGeneratorConfig, Encoding, SourceInstaller};
 use serde_reflection::{ContainerFormat, Format, Named, Registry};
+use std::env::current_dir;
 use std::fs;
 use std::path::PathBuf;
 use syn::{Attribute, File, Item, ItemStruct};
@@ -185,12 +186,29 @@ fn process_items(registry: &mut Registry, items: &[Item]) {
 }
 
 pub fn generate_dart_code() {
+    // TODO: Check if the CWD has correct `pubspec.yaml` file.
+
+    // Prepare paths.
+    let current_path = current_dir().unwrap();
+    let pubspec_path = current_path.join("pubspec.yaml");
+
+    // Read the file.
+    // TODO: Remove
+    let pubpsec_content = fs::read_to_string(&pubspec_path).unwrap();
+
     // Analyze the input Rust file.
-    let file_path = "./native/hub/src/messages/counter_number.rs";
+    // TODO: Traverse all nested module files.
+    let file_path = current_path
+        .join("native")
+        .join("hub")
+        .join("src")
+        .join("messages")
+        .join("counter_number.rs");
     let content = fs::read_to_string(file_path).expect("Failed to read file");
     let syntax_tree: File =
         syn::parse_file(&content).expect("Failed to parse Rust file");
 
+    // Collect type registries.
     let mut registry: Registry = Registry::new();
     process_items(&mut registry, &syntax_tree.items);
     println!("------\nRegistry from `Copy` types:\n------");
@@ -200,13 +218,24 @@ pub fn generate_dart_code() {
         println!("------");
     }
 
-    // Generate Dart code from the registry.
+    // Create the code generator config.
     let config = CodeGeneratorConfig::new("generated".to_string())
         .with_encodings([Encoding::Bincode]);
+
+    // Install serialization modules.
+    let installer = Installer::new(PathBuf::from("./"));
+    installer.install_module(&config, &registry).unwrap();
+    installer.install_serde_runtime().unwrap();
+    installer.install_bincode_runtime().unwrap();
+
+    // Generate Dart code from the registry.
     // Create the Dart code generator.
     let generator = CodeGenerator::new(&config);
-    let output_path = PathBuf::from("./");
-    generator.output(output_path, &registry).unwrap();
+    generator.output(current_path, &registry).unwrap();
+
+    // Write back to pubspec file.
+    // TODO: Remove
+    fs::write(&pubspec_path, pubpsec_content).unwrap();
 
     // Write the generated Dart code to the output file.
     println!("Dart code generated!");
