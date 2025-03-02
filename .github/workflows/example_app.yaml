@@ -7,11 +7,9 @@ on:
       - main
     paths-ignore:
       - "**.md"
-      - "**.html"
   pull_request:
     paths-ignore:
       - "**.md"
-      - "**.html"
   workflow_dispatch:
 
 concurrency:
