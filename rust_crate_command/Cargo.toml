@@ -16,3 +16,4 @@ clap = "4.5.31"
 owo-colors = "4.2.0"
 thiserror = "2.0.11"                              # TODO: Unify error handling mechanism
 include_dir = "0.7.4"
+notify = "8.0.0"

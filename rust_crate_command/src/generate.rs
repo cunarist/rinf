@@ -1,10 +1,13 @@
 use crate::RinfConfigMessage;
+use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
 use quote::ToTokens;
 use serde_generate::dart::{CodeGenerator, Installer};
 use serde_generate::{CodeGeneratorConfig, Encoding, SourceInstaller};
 use serde_reflection::{ContainerFormat, Format, Named, Registry};
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::mpsc::channel;
+use std::time::Duration;
 use syn::{
     Attribute, Expr, ExprLit, File, GenericArgument, Item, ItemStruct, Lit,
     PathArguments, Type, TypeArray, TypePath, TypeTuple,
@@ -241,10 +244,67 @@ pub fn generate_dart_code(root_dir: &Path, message_config: &RinfConfigMessage) {
     fs::write(&pubspec_path, pubpsec_content).unwrap();
 }
 
+// TODO: `watch_and_generate_dart_code` is not tested, so check it later
+
+/// Watches the Rust source directory for changes and regenerates Dart code.
 pub fn watch_and_generate_dart_code(
     root_dir: &Path,
     message_config: &RinfConfigMessage,
 ) {
-    // TODO: Use the config
-    // Implement watching and message code generation logic.
+    // Prepare the source directory for Rust files.
+    let source_dir = root_dir.join("native").join("hub").join("src");
+    if !source_dir.exists() {
+        eprintln!("Source directory does not exist: {:?}", source_dir);
+        return;
+    }
+
+    // Create a channel to receive file change events.
+    let (tx, rx) = channel();
+
+    // Create a file system watcher using the new notify API.
+    let mut watcher = RecommendedWatcher::new(
+        move |res: Result<Event, notify::Error>| {
+            // Send events to the channel.
+            tx.send(res).expect("Watch channel send error");
+        },
+        Config::default(),
+    )
+    .expect("Failed to create watcher");
+
+    // Start watching the source directory recursively.
+    watcher
+        .watch(&source_dir, RecursiveMode::Recursive)
+        .expect("Failed to watch source directory");
+
+    loop {
+        // Block until an event is received.
+        match rx.recv() {
+            Ok(Ok(event)) => {
+                if should_regenerate(&event) {
+                    eprintln!("File change detected: {:?}", event);
+                    generate_dart_code(root_dir, message_config);
+                }
+            }
+            Ok(Err(e)) => {
+                eprintln!("Watch error: {:?}", e);
+                break;
+            }
+            Err(e) => {
+                eprintln!("Channel receive error: {:?}", e);
+                break;
+            }
+        }
+
+        // Optional: sleep briefly to avoid busy looping (if necessary).
+        std::thread::sleep(Duration::from_millis(100));
+    }
+}
+
+/// Determines whether the event requires
+/// regenerating Dart code by checking if any changed file is a Rust source.
+fn should_regenerate(event: &Event) -> bool {
+    event
+        .paths
+        .iter()
+        .any(|path| path.extension().map(|ext| ext == "rs").unwrap_or(false))
 }
