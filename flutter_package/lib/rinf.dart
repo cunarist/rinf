@@ -4,7 +4,7 @@ library;
 import 'dart:typed_data';
 import 'src/exports.dart';
 
-export 'src/interface.dart' show RustSignal, useLocalSpaceSymbol;
+export 'src/interface.dart' show RustSignal, useLocalSpaceSymbols;
 
 /// Starts the `main` function in Rust.
 Future<void> initializeRust(

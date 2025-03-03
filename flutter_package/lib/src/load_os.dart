@@ -31,7 +31,7 @@ RustLibrary loadRustLibrary() {
     throw UnsupportedError('This operating system is not supported.');
   }
 
-  if (useLocalSpaceSymbol) {
+  if (useLocalSpaceSymbols) {
     return RustLibraryLocal(lib: lib);
   } else {
     return RustLibraryGlobal();

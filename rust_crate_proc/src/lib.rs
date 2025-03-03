@@ -21,6 +21,18 @@ pub fn derive_signal_piece(_input: TokenStream) -> TokenStream {
 /// This can be marked on any type that implements `Deserialize`.
 #[proc_macro_derive(DartSignal)]
 pub fn derive_dart_signal(input: TokenStream) -> TokenStream {
+    derive_dart_signal_real(input)
+}
+
+/// Marks the struct as a signal endpoint
+/// that contains a message and binary from Dart to Rust.
+/// This can be marked on any type that implements `Deserialize`.
+#[proc_macro_derive(DartSignalBinary)]
+pub fn derive_dart_signal_binary(input: TokenStream) -> TokenStream {
+    derive_dart_signal_real(input)
+}
+
+fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
     let name = &ast.ident;
     let name_lit = format!("\"{}\"", name);
@@ -105,30 +117,72 @@ pub fn derive_dart_signal(input: TokenStream) -> TokenStream {
 /// This can be marked on any type that implements `Serialize`.
 #[proc_macro_derive(RustSignal)]
 pub fn derive_rust_signal(input: TokenStream) -> TokenStream {
+    derive_rust_signal_real(input, false)
+}
+
+/// Marks the struct as a signal endpoint
+/// that contains a message and binary from Rust to Dart.
+/// This can be marked on any type that implements `Serialize`.
+#[proc_macro_derive(RustSignalBinary)]
+pub fn derive_rust_signal_binary(input: TokenStream) -> TokenStream {
+    derive_rust_signal_real(input, true)
+}
+
+fn derive_rust_signal_real(
+    input: TokenStream,
+    include_binary: bool,
+) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
     let name = &ast.ident;
     let name_lit = format!("\"{}\"", name);
 
-    let expanded = quote! {
-        impl #name {
-            pub fn send_signal_to_dart(self) {
-                use bincode::serialize;
-                use rinf::{debug_print, send_rust_signal, RinfError};
-                let type_name = #name_lit;
-                let message_result: Result<Vec<u8>, RinfError> =
-                    serialize(&self)
-                    .map_err(|_| RinfError::CannotEncodeMessage);
-                let message_bytes = match message_result {
-                    Ok(inner) => inner,
-                    Err(error) => {
+    let expanded = if include_binary {
+        quote! {
+            impl #name {
+                pub fn send_signal_to_dart(self, binary:Vec<u8>) {
+                    use bincode::serialize;
+                    use rinf::{debug_print, send_rust_signal, RinfError};
+                    let type_name = #name_lit;
+                    let message_result: Result<Vec<u8>, RinfError> =
+                        serialize(&self)
+                        .map_err(|_| RinfError::CannotEncodeMessage);
+                    let message_bytes = match message_result {
+                        Ok(inner) => inner,
+                        Err(error) => {
+                            debug_print!("{}: \n{}", type_name, error);
+                            return;
+                        }
+                    };
+                    let result =
+                        send_rust_signal(type_name, message_bytes, binary);
+                    if let Err(error) = result {
                         debug_print!("{}: \n{}", type_name, error);
-                        return;
                     }
-                };
-                let result =
-                    send_rust_signal(type_name, message_bytes, Vec::new());
-                if let Err(error) = result {
-                    debug_print!("{}: \n{}", type_name, error);
+                }
+            }
+        }
+    } else {
+        quote! {
+            impl #name {
+                pub fn send_signal_to_dart(self) {
+                    use bincode::serialize;
+                    use rinf::{debug_print, send_rust_signal, RinfError};
+                    let type_name = #name_lit;
+                    let message_result: Result<Vec<u8>, RinfError> =
+                        serialize(&self)
+                        .map_err(|_| RinfError::CannotEncodeMessage);
+                    let message_bytes = match message_result {
+                        Ok(inner) => inner,
+                        Err(error) => {
+                            debug_print!("{}: \n{}", type_name, error);
+                            return;
+                        }
+                    };
+                    let result =
+                        send_rust_signal(type_name, message_bytes, Vec::new());
+                    if let Err(error) = result {
+                        debug_print!("{}: \n{}", type_name, error);
+                    }
                 }
             }
         }

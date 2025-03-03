@@ -5,7 +5,9 @@ use quote::ToTokens;
 use serde_generate::dart::{CodeGenerator, Installer};
 use serde_generate::{CodeGeneratorConfig, Encoding, SourceInstaller};
 use serde_reflection::{ContainerFormat, Format, Named, Registry};
+use std::collections::{HashMap, HashSet};
 use std::fs;
+use std::hash::Hash;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::channel;
 use std::time::Duration;
@@ -15,28 +17,41 @@ use syn::{
 };
 
 // TODO: Remove all panicking code
-// TODO: Preserve comments on structs
-// TODO: Handle enums
+// TODO: Handle enums and tuple structs
 // TODO: Support binary signals
 
-fn implements_signal(attrs: &[Attribute]) -> bool {
-    attrs.iter().any(|attr| {
+#[derive(PartialEq, Eq, Hash)]
+enum SignalAttribute {
+    SignalPiece,
+    DartSignal,
+    DartSignalBin,
+    RustSignal,
+    RustSignalBin,
+}
+
+fn extract_signal_attribute(attrs: &[Attribute]) -> HashSet<SignalAttribute> {
+    let mut extracted_attrs = HashSet::new();
+    for attr in attrs.iter() {
         if attr.path().is_ident("derive") {
-            let mut found = false;
             let _ = attr.parse_nested_meta(|meta| {
                 let last_segment = meta.path.segments.last().unwrap();
                 let ident: &str = &last_segment.ident.to_string();
-                found = matches!(
-                    ident,
-                    "SignalPiece" | "DartSignal" | "RustSignal"
-                );
+                let signal_attr_op = match ident {
+                    "SignalPiece" => Some(SignalAttribute::SignalPiece),
+                    "DartSignal" => Some(SignalAttribute::DartSignal),
+                    "DartSignalBinary" => Some(SignalAttribute::DartSignalBin),
+                    "RustSignal" => Some(SignalAttribute::RustSignalBin),
+                    "RustSignalBinary" => Some(SignalAttribute::RustSignalBin),
+                    _ => None,
+                };
+                if let Some(signal_attr) = signal_attr_op {
+                    extracted_attrs.insert(signal_attr);
+                }
                 Ok(())
             });
-            found
-        } else {
-            false
         }
-    })
+    }
+    extracted_attrs
 }
 
 /// Convert a `syn` field type to a `serde_reflection::Format`.
@@ -182,17 +197,29 @@ fn trace_struct(registry: &mut Registry, s: &ItemStruct) {
 }
 
 /// Process AST items and record struct types in the registry.
-fn process_items(registry: &mut Registry, items: &[Item]) {
+fn process_items(
+    items: &[Item],
+    registry: &mut Registry,
+    signal_attrs: &mut HashMap<String, HashSet<SignalAttribute>>,
+) {
     let mut structs = Vec::new();
     for item in items {
         match item {
-            Item::Struct(s) if implements_signal(&s.attrs) => {
-                trace_struct(registry, s);
-                structs.push(s.ident.clone());
+            Item::Struct(s) => {
+                let extracted_attrs = extract_signal_attribute(&s.attrs);
+                if !extracted_attrs.is_empty() {
+                    structs.push(s.ident.clone());
+                    trace_struct(registry, s);
+                }
+                signal_attrs.insert(s.ident.to_string(), extracted_attrs);
             }
             Item::Mod(m) if m.content.is_some() => {
                 // Recursively process items in nested modules.
-                process_items(registry, &m.content.as_ref().unwrap().1);
+                process_items(
+                    &m.content.as_ref().unwrap().1,
+                    registry,
+                    signal_attrs,
+                );
             }
             _ => {}
         }
@@ -201,17 +228,22 @@ fn process_items(registry: &mut Registry, items: &[Item]) {
 
 // TODO: Warn overlapping type names
 
-fn visit_rust_files(dir: PathBuf, registry: &mut Registry) {
+fn visit_rust_files(
+    dir: PathBuf,
+    registry: &mut Registry,
+    signal_attrs: &mut HashMap<String, HashSet<SignalAttribute>>,
+) {
     if let Ok(entries) = fs::read_dir(dir) {
         for entry in entries.filter_map(Result::ok) {
             let path = entry.path();
             if path.is_dir() {
-                visit_rust_files(path, registry); // Recurse into subdirectory
+                // Recurse into subdirectory.
+                visit_rust_files(path, registry, signal_attrs);
             } else {
                 let content = fs::read_to_string(path).unwrap();
                 let syntax_tree: File = syn::parse_file(&content)
                     .expect("Failed to parse Rust file");
-                process_items(registry, &syntax_tree.items);
+                process_items(&syntax_tree.items, registry, signal_attrs);
             }
         }
     }
@@ -219,10 +251,52 @@ fn visit_rust_files(dir: PathBuf, registry: &mut Registry) {
 
 // TODO: Distinguish Rust and Dart signals during interface generation
 
-fn generate_class_interface_code(class: &str) -> String {
+fn generate_class_interface_code(
+    class: &str,
+    extracted_attrs: &HashSet<SignalAttribute>,
+) -> String {
+    let mut code = String::new();
     let snake_class = class.to_case(Case::Snake);
-    format!(
-        r#"
+
+    if extracted_attrs.contains(&SignalAttribute::DartSignalBin) {
+        let new_code = format!(
+            r#"
+extension {class}DartSignalExt on {class} {{
+  @Native<SendDartSignalExtern>(
+    isLeaf: true,
+    symbol: 'rinf_send_dart_signal_{snake_class}',
+  )
+  external static void sendDartSignalExtern(
+    Pointer<Uint8> messageBytesAddress,
+    int messageBytesLength,
+    Pointer<Uint8> binaryAddress,
+    int binaryLength,
+  );
+
+  void sendSignalToRust(Uint8List binary) {{
+    final messageBytes = this.bincodeSerialize();
+      if (useLocalSpaceSymbols) {{
+        sendDartSignal(
+          'rinf_send_dart_signal_{snake_class}',
+          messageBytes,
+          binary,
+        );
+      }} else {{
+        sendDartSignalExtern(
+        messageBytes.address,
+        messageBytes.length,
+        binary.address,
+        binary.length,
+      );
+    }}
+  }}
+}}
+          "#
+        );
+        code.push_str(&new_code);
+    } else if extracted_attrs.contains(&SignalAttribute::DartSignal) {
+        let new_code = format!(
+            r#"
 extension {class}DartSignalExt on {class} {{
   @Native<SendDartSignalExtern>(
     isLeaf: true,
@@ -238,7 +312,7 @@ extension {class}DartSignalExt on {class} {{
   void sendSignalToRust() {{
     final messageBytes = this.bincodeSerialize();
     final binary = Uint8List(0);
-    if (shouldCallSymbol) {{
+    if (useLocalSpaceSymbols) {{
       sendDartSignal(
         'rinf_send_dart_signal_{snake_class}',
         messageBytes,
@@ -254,26 +328,42 @@ extension {class}DartSignalExt on {class} {{
     }}
   }}
 }}
+          "#
+        );
+        code.push_str(&new_code);
+    }
 
+    let has_rust_signal = extracted_attrs
+        .contains(&SignalAttribute::RustSignal)
+        || extracted_attrs.contains(&SignalAttribute::RustSignalBin);
+    if has_rust_signal {
+        let new_code = format!(
+            r#"
 extension {class}RustSignalExt on {class} {{
   static final rustStreamContoller =
       StreamController<RustSignal<{class}>>();
   static final rustSignalStream =
       rustStreamContoller.stream.asBroadcastStream();
 }}
-      "#
-    )
+          "#
+        );
+        code.push_str(&new_code);
+    }
+
+    code
 }
 
-fn generate_interface_code(root_dir: &Path, registry: &Registry) {
+fn generate_interface_code(
+    root_dir: &Path,
+    signal_attrs: &HashMap<String, HashSet<SignalAttribute>>,
+) {
     // Generate FFI interface code.
     let gen_file = root_dir
         .join("lib")
         .join("src")
         .join("generated")
         .join("rinf_interface.dart");
-    let mut code = r#"
-part of 'generated.dart';
+    let mut code = r#"part of 'generated.dart';
 
 typedef SendDartSignalExtern = Void Function(
   Pointer<Uint8>,
@@ -283,8 +373,8 @@ typedef SendDartSignalExtern = Void Function(
 );
     "#
     .to_owned();
-    for class in registry.keys() {
-        code.push_str(&generate_class_interface_code(class));
+    for (class, extracted_attrs) in signal_attrs {
+        code.push_str(&generate_class_interface_code(class, extracted_attrs));
     }
     fs::write(&gen_file, code).expect("Failed to write interface code");
 
@@ -325,8 +415,9 @@ pub fn generate_dart_code(root_dir: &Path, message_config: &RinfConfigMessage) {
 
     // Analyze the input Rust files and collect type registries.
     let mut registry: Registry = Registry::new();
+    let mut signal_attrs = HashMap::<String, HashSet<SignalAttribute>>::new();
     let source_dir = root_dir.join("native").join("hub").join("src");
-    visit_rust_files(source_dir, &mut registry);
+    visit_rust_files(source_dir, &mut registry, &mut signal_attrs);
 
     // Create the code generator config.
     let config = CodeGeneratorConfig::new("generated".to_string())
@@ -343,7 +434,7 @@ pub fn generate_dart_code(root_dir: &Path, message_config: &RinfConfigMessage) {
     generator.output(root_dir.to_owned(), &registry).unwrap();
 
     // Generate Dart interface code.
-    generate_interface_code(root_dir, &registry);
+    generate_interface_code(root_dir, &signal_attrs);
 
     // Write back to pubspec file.
     // TODO: Remove

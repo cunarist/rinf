@@ -64,6 +64,7 @@ class MyHomePage extends StatelessWidget {
         onPressed: () async {
           // The `sendSignalToRust` method is generated
           // from a marked Protobuf message.
+          // TODO: Update comments like this
           SampleNumberInput(
             letter: 'HELLO FROM DART!',
             dummyOne: 25,
