@@ -46,16 +46,3 @@ void startRustLogicReal() {
 void stopRustLogicReal() {
   // Dummy function to match the structure of native platforms.
 }
-
-void sendDartSignalReal(
-  int messageId,
-  Uint8List messageBytes,
-  Uint8List binary,
-) {
-  wasmBindingsObject.callMethod(
-    'send_dart_signal_extern'.toJS,
-    messageId.toJS,
-    messageBytes.toJS,
-    binary.toJS,
-  );
-}

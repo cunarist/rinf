@@ -1,7 +1,5 @@
 import 'dart:io';
 import 'dart:ffi';
-import 'dart:typed_data';
-import 'package:ffi/ffi.dart';
 
 String? dynamicLibPath;
 
@@ -61,20 +59,6 @@ typedef PostCObjectInner = Int8 Function(Int64, Pointer<Dart_CObject>);
 typedef PostCObjectPtr = Pointer<NativeFunction<PostCObjectInner>>;
 typedef PrepareIsolateExtern = Void Function(PostCObjectPtr, Int64);
 typedef PrepareIsolateWrap = void Function(PostCObjectPtr, int);
-typedef SendDartSignalExtern = Void Function(
-  Int32,
-  Pointer<Uint8>,
-  UintPtr,
-  Pointer<Uint8>,
-  UintPtr,
-);
-typedef SendDartSignalWrap = void Function(
-  int,
-  Pointer<Uint8>,
-  int,
-  Pointer<Uint8>,
-  int,
-);
 
 /// Abstract class for unifying the interface
 /// for calling native functions.
@@ -82,49 +66,7 @@ abstract class RustLibrary {
   void startRustLogic();
   void stopRustLogic();
   void prepareIsolate(PostCObjectPtr storePostObject, int port);
-  void sendDartSignal(
-    int messageId,
-    Uint8List messageBytes,
-    Uint8List binary,
-  );
 }
-
-// Direct access to global function symbols loaded in the process.
-// These are available only if the native library is
-// loaded into global space with `RTLD_GLOBAL` configuration.
-
-@Native<Void Function()>(
-  isLeaf: true,
-  symbol: 'start_rust_logic_extern',
-)
-external void startRustLogicExtern();
-
-@Native<Void Function()>(
-  isLeaf: true,
-  symbol: 'stop_rust_logic_extern',
-)
-external void stopRustLogicExtern();
-
-@Native<Void Function(PostCObjectPtr, Int64)>(
-  isLeaf: true,
-  symbol: 'prepare_isolate_extern',
-)
-external void prepareIsolateExtern(
-  PostCObjectPtr storePostObject,
-  int port,
-);
-
-@Native<SendDartSignalExtern>(
-  isLeaf: true,
-  symbol: 'send_dart_signal_extern',
-)
-external void sendDartSignalExtern(
-  int messageId,
-  Pointer<Uint8> messageBytesAddress,
-  int messageBytesLength,
-  Pointer<Uint8> binaryAddress,
-  int binaryLength,
-);
 
 /// Class for global native library symbols loaded with `RTLD_GLOBAL`.
 /// This is the efficient and ideal way to call native code.
@@ -133,6 +75,31 @@ external void sendDartSignalExtern(
 /// can only be used on globally loaded native symbols.
 /// - https://github.com/dart-lang/sdk/issues/44589
 class RustLibraryGlobal extends RustLibrary {
+  // Direct access to global function symbols loaded in the process.
+  // These are available only if the native library is
+  // loaded into global space with `RTLD_GLOBAL` configuration.
+
+  @Native<Void Function()>(
+    isLeaf: true,
+    symbol: 'start_rust_logic_extern',
+  )
+  external static void startRustLogicExtern();
+
+  @Native<Void Function()>(
+    isLeaf: true,
+    symbol: 'stop_rust_logic_extern',
+  )
+  external static void stopRustLogicExtern();
+
+  @Native<Void Function(PostCObjectPtr, Int64)>(
+    isLeaf: true,
+    symbol: 'prepare_isolate_extern',
+  )
+  external static void prepareIsolateExtern(
+    PostCObjectPtr storePostObject,
+    int port,
+  );
+
   void startRustLogic() {
     startRustLogicExtern();
   }
@@ -144,20 +111,6 @@ class RustLibraryGlobal extends RustLibrary {
   void prepareIsolate(PostCObjectPtr storePostObject, int port) {
     prepareIsolateExtern(storePostObject, port);
   }
-
-  void sendDartSignal(
-    int messageId,
-    Uint8List messageBytes,
-    Uint8List binary,
-  ) {
-    sendDartSignalExtern(
-      messageId,
-      messageBytes.address,
-      messageBytes.length,
-      binary.address,
-      binary.length,
-    );
-  }
 }
 
 /// Class for local native library symbols loaded with `RTLD_LOCAL`.
@@ -168,8 +121,6 @@ class RustLibraryLocal extends RustLibrary {
   late void Function() startRustLogicExtern;
   late void Function() stopRustLogicExtern;
   late void Function(PostCObjectPtr, int) prepareIsolateExtern;
-  late void Function(int, Pointer<Uint8>, int, Pointer<Uint8>, int)
-      sendDartSignalExtern;
 
   RustLibraryLocal({required this.lib}) {
     this.startRustLogicExtern =
@@ -184,10 +135,6 @@ class RustLibraryLocal extends RustLibrary {
         lib.lookupFunction<PrepareIsolateExtern, PrepareIsolateWrap>(
       'prepare_isolate_extern',
     );
-    this.sendDartSignalExtern =
-        lib.lookupFunction<SendDartSignalExtern, SendDartSignalWrap>(
-      'send_dart_signal_extern',
-    );
   }
 
   void startRustLogic() {
@@ -200,24 +147,5 @@ class RustLibraryLocal extends RustLibrary {
 
   void prepareIsolate(PostCObjectPtr storePostObject, int port) {
     prepareIsolateExtern(storePostObject, port);
-  }
-
-  void sendDartSignal(int messageId, Uint8List messageBytes, Uint8List binary) {
-    final Pointer<Uint8> messageMemory = malloc.allocate(messageBytes.length);
-    messageMemory.asTypedList(messageBytes.length).setAll(0, messageBytes);
-
-    final Pointer<Uint8> binaryMemory = malloc.allocate(binary.length);
-    binaryMemory.asTypedList(binary.length).setAll(0, binary);
-
-    sendDartSignalExtern(
-      messageId,
-      messageMemory,
-      messageBytes.length,
-      binaryMemory,
-      binary.length,
-    );
-
-    malloc.free(messageMemory);
-    malloc.free(binaryMemory);
   }
 }
