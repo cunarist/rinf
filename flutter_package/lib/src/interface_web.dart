@@ -27,7 +27,7 @@ Future<void> prepareInterfaceReal(
     Uint8List binary,
   ) {
     if (endpoint == 'RinfPrint') {
-      // -1 is a special message ID for Rust reports.
+      // This is a special message ID for Rust reports.
       String rustReport = utf8.decode(binary);
       print(rustReport);
       return;
