@@ -24,7 +24,10 @@ fn implements_signal(attrs: &[Attribute]) -> bool {
             let _ = attr.parse_nested_meta(|meta| {
                 let last_segment = meta.path.segments.last().unwrap();
                 let ident: &str = &last_segment.ident.to_string();
-                found = matches!(ident, "Signal" | "DartSignal" | "RustSignal");
+                found = matches!(
+                    ident,
+                    "SignalPiece" | "DartSignal" | "RustSignal"
+                );
                 Ok(())
             });
             found
