@@ -473,7 +473,7 @@ pub fn generate_dart_code(root_dir: &Path, message_config: &RinfConfigMessage) {
         .with_package_manifest(false);
 
     // Install serialization modules.
-    let installer = Installer::new(PathBuf::from("./"));
+    let installer = Installer::new(root_dir.to_owned());
     installer.install_module(&config, &registry).unwrap();
     installer.install_serde_runtime().unwrap();
     installer.install_bincode_runtime().unwrap();
