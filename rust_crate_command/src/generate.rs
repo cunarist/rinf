@@ -8,7 +8,6 @@ use serde_reflection::{ContainerFormat, Format, Named, Registry};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::hash::Hash;
-use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::channel;
 use std::time::Duration;
