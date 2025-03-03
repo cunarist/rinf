@@ -110,21 +110,20 @@ pub fn derive_rust_signal(input: TokenStream) -> TokenStream {
             pub fn send_signal_to_dart(self) {
                 use bincode::serialize;
                 use rinf::{debug_print, send_rust_signal, RinfError};
+                let type_name = #name_lit;
                 let message_result: Result<Vec<u8>, RinfError> =
                     serialize(&self)
                     .map_err(|_| RinfError::CannotEncodeMessage);
                 let message_bytes = match message_result {
                     Ok(inner) => inner,
                     Err(error) => {
-                        let type_name = #name_lit;
                         debug_print!("{}: \n{}", type_name, error);
                         return;
                     }
                 };
                 let result =
-                    send_rust_signal(#name_lit, message_bytes, Vec::new());
+                    send_rust_signal(type_name, message_bytes, Vec::new());
                 if let Err(error) = result {
-                    let type_name = #name_lit;
                     debug_print!("{}: \n{}", type_name, error);
                 }
             }
