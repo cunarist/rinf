@@ -2,6 +2,9 @@ part of generated_types;
 
 @immutable
 class SampleNumberOutput {
+  static final rustSignalStream =
+      sampleNumberOutputStreamController.stream.asBroadcastStream();
+
   const SampleNumberOutput({
     required this.currentNumber,
     required this.dummyOne,
@@ -104,8 +107,3 @@ class SampleNumberOutput {
 
 final sampleNumberOutputStreamController =
     StreamController<RustSignal<SampleNumberOutput>>();
-    
-extension SampleNumberOutputRustSignalExt on SampleNumberOutput {
-  static final rustSignalStream =
-      sampleNumberOutputStreamController.stream.asBroadcastStream();
-}

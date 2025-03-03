@@ -352,14 +352,19 @@ extension {class}DartSignalExt on {class} {{
             r#"
 final {camel_class}StreamController =
     StreamController<RustSignal<{class}>>();
-    
-extension {class}RustSignalExt on {class} {{
-  static final rustSignalStream =
-      {camel_class}StreamController.stream.asBroadcastStream();
-}}
 "#
         );
         code.push_str(&new_code);
+        code = code.replacen(
+            &format!("class {class} {{"),
+            &format!(
+                r#"class {class} {{
+  static final rustSignalStream =
+      {camel_class}StreamController.stream.asBroadcastStream();
+"#
+            ),
+            1,
+        );
     }
 
     fs::write(&class_file, code).unwrap();

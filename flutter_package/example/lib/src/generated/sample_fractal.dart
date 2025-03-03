@@ -2,6 +2,9 @@ part of generated_types;
 
 @immutable
 class SampleFractal {
+  static final rustSignalStream =
+      sampleFractalStreamController.stream.asBroadcastStream();
+
   const SampleFractal({
     required this.currentScale,
     this.dummy,
@@ -86,8 +89,3 @@ class SampleFractal {
 
 final sampleFractalStreamController =
     StreamController<RustSignal<SampleFractal>>();
-    
-extension SampleFractalRustSignalExt on SampleFractal {
-  static final rustSignalStream =
-      sampleFractalStreamController.stream.asBroadcastStream();
-}
