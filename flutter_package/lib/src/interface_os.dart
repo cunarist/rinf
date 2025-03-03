@@ -39,7 +39,7 @@ Future<void> prepareInterfaceReal(
       // Converting is needed on the Dart side.
       messageBytes = Uint8List(0);
     }
-    assignRustSignal(endpoint, messageBytes, binary);
+    assignRustSignal[endpoint]!(messageBytes, binary);
   });
 
   // Make Rust prepare its isolate to send data to Dart.

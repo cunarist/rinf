@@ -384,7 +384,7 @@ typedef SendDartSignalExtern = Void Function(
 
     // Write signal handler.
     code.push_str(
-        "\nfinal rustSignalHandlers = \
+        "\nfinal assignRustSignal = \
         <String, void Function(Uint8List, Uint8List)>{",
     );
     for (class, extracted_attrs) in signal_attrs {
@@ -408,7 +408,7 @@ typedef SendDartSignalExtern = Void Function(
         );
         code.push_str(&new_code);
     }
-    code.push_str("\n};");
+    code.push_str("\n};\n");
 
     // Save to a file.
     let shared_file = root_dir

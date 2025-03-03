@@ -7,15 +7,7 @@ typedef SendDartSignalExtern = Void Function(
   UintPtr,
 );
 
-final rustSignalHandlers = <String, void Function(Uint8List, Uint8List)>{
-  'SampleNumberOutput': (Uint8List messageBytes, Uint8List binary) {
-    final message = SampleNumberOutput.bincodeDeserialize(messageBytes);
-    final rustSignal = RustSignal(
-      message,
-      binary,
-    );
-    sampleNumberOutputStreamController.add(rustSignal);
-  },
+final assignRustSignal = <String, void Function(Uint8List, Uint8List)>{
   'SampleFractal': (Uint8List messageBytes, Uint8List binary) {
     final message = SampleFractal.bincodeDeserialize(messageBytes);
     final rustSignal = RustSignal(
@@ -23,5 +15,13 @@ final rustSignalHandlers = <String, void Function(Uint8List, Uint8List)>{
       binary,
     );
     sampleFractalStreamController.add(rustSignal);
+  },
+  'SampleNumberOutput': (Uint8List messageBytes, Uint8List binary) {
+    final message = SampleNumberOutput.bincodeDeserialize(messageBytes);
+    final rustSignal = RustSignal(
+      message,
+      binary,
+    );
+    sampleNumberOutputStreamController.add(rustSignal);
   },
 };

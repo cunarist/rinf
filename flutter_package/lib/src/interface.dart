@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 /// This type represents a function
 /// that can accept raw signal data from Rust
 /// and handle it accordingly.
-typedef AssignRustSignal = void Function(String, Uint8List, Uint8List);
+typedef AssignRustSignal = Map<String, Function(Uint8List, Uint8List)>;
 
 /// This contains a message from Rust.
 /// Optionally, a custom binary called `binary` can also be included.

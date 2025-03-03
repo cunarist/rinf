@@ -32,7 +32,7 @@ Future<void> prepareInterfaceReal(
       print(rustReport);
       return;
     }
-    assignRustSignal(endpoint, messageBytes, binary);
+    assignRustSignal[endpoint]!(messageBytes, binary);
   }.jsify();
 }
 
