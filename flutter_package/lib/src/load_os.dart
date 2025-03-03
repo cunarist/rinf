@@ -119,6 +119,8 @@ class RustLibraryGlobal extends RustLibrary {
 /// It involves extra memory copy before sending the data to Rust.
 class RustLibraryLocal extends RustLibrary {
   final DynamicLibrary lib;
+  final Map<String, SendDartSignalWrap> sendDartSignalExterns = {};
+
   late void Function() startRustLogicExtern;
   late void Function() stopRustLogicExtern;
   late void Function(PostCObjectPtr, int) prepareIsolateExtern;
@@ -163,9 +165,16 @@ class RustLibraryLocal extends RustLibrary {
     final Pointer<Uint8> binaryMemory = malloc.allocate(binary.length);
     binaryMemory.asTypedList(binary.length).setAll(0, binary);
 
-    final sendDartSignalExtern =
-        lib.lookupFunction<SendDartSignalExtern, SendDartSignalWrap>(
-            endpointSymbol);
+    // Cache the dynamic library functions
+    // to reduce symbol lookup overhead.
+    var sendDartSignalExtern = sendDartSignalExterns[endpointSymbol];
+    if (sendDartSignalExtern == null) {
+      sendDartSignalExtern =
+          lib.lookupFunction<SendDartSignalExtern, SendDartSignalWrap>(
+        endpointSymbol,
+      );
+      sendDartSignalExterns[endpointSymbol] = sendDartSignalExtern;
+    }
 
     sendDartSignalExtern(
       messageMemory,
