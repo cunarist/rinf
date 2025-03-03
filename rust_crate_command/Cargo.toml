@@ -21,3 +21,5 @@ notify = "8.0.0"
 # [lints.clippy]
 # unwrap_used = "deny"
 # expect_used = "deny"
+
+# TODO: Go to Rust 2024
