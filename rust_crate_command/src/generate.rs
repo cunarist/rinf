@@ -215,8 +215,8 @@ fn process_items(
                 if !extracted_attrs.is_empty() {
                     structs.push(s.ident.clone());
                     trace_struct(registry, s);
+                    signal_attrs.insert(s.ident.to_string(), extracted_attrs);
                 }
-                signal_attrs.insert(s.ident.to_string(), extracted_attrs);
             }
             Item::Mod(m) if m.content.is_some() => {
                 // Recursively process items in nested modules.
@@ -257,11 +257,17 @@ fn visit_rust_files(
 // TODO: Distinguish Rust and Dart signals during interface generation
 
 fn generate_class_interface_code(
+    root_dir: &Path,
     class: &str,
     extracted_attrs: &BTreeSet<SignalAttribute>,
-) -> Option<String> {
-    let mut code = String::new();
+) {
     let snake_class = class.to_case(Case::Snake);
+    let class_file = root_dir
+        .join("lib")
+        .join("src")
+        .join("generated")
+        .join(format!("{}.dart", snake_class));
+    let mut code = fs::read_to_string(&class_file).unwrap();
 
     if extracted_attrs.contains(&SignalAttribute::DartSignalBinary) {
         let new_code = format!(
@@ -357,11 +363,7 @@ extension {class}RustSignalExt on {class} {{
         code.push_str(&new_code);
     }
 
-    if code.is_empty() {
-        None
-    } else {
-        Some(code)
-    }
+    fs::write(&class_file, code).unwrap();
 }
 
 // TODO: Delete the folder before generating
@@ -425,20 +427,7 @@ fn generate_interface_code(
 ) {
     // Generate FFI interface code.
     for (class, extracted_attrs) in signal_attrs {
-        let code_op = generate_class_interface_code(class, extracted_attrs);
-        if let Some(code) = code_op {
-            let snake_class = class.to_case(Case::Snake);
-            let class_file = root_dir
-                .join("lib")
-                .join("src")
-                .join("generated")
-                .join(format!("{}.dart", snake_class));
-            let mut file = fs::OpenOptions::new()
-                .append(true)
-                .open(&class_file)
-                .expect("Failed to open interface file");
-            file.write_all(code.as_bytes()).unwrap();
-        }
+        generate_class_interface_code(root_dir, class, extracted_attrs);
     }
 
     // Write imports.
