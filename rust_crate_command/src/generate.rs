@@ -5,7 +5,7 @@ use quote::ToTokens;
 use serde_generate::dart::{CodeGenerator, Installer};
 use serde_generate::{CodeGeneratorConfig, Encoding, SourceInstaller};
 use serde_reflection::{ContainerFormat, Format, Named, Registry};
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::hash::Hash;
 use std::io::Write;
@@ -21,7 +21,7 @@ use syn::{
 // TODO: Handle enums and tuple structs
 // TODO: Support binary signals
 
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
 enum SignalAttribute {
     SignalPiece,
     DartSignal,
@@ -30,8 +30,8 @@ enum SignalAttribute {
     RustSignalBinary,
 }
 
-fn extract_signal_attribute(attrs: &[Attribute]) -> HashSet<SignalAttribute> {
-    let mut extracted_attrs = HashSet::new();
+fn extract_signal_attribute(attrs: &[Attribute]) -> BTreeSet<SignalAttribute> {
+    let mut extracted_attrs = BTreeSet::new();
     for attr in attrs.iter() {
         if attr.path().is_ident("derive") {
             let _ = attr.parse_nested_meta(|meta| {
@@ -68,7 +68,7 @@ fn to_type_format(ty: &Type) -> Format {
     match ty {
         Type::Path(TypePath { path, .. }) => {
             // Get last segment
-            // (e.g., for `std::collections::HashMap`, get `HashMap`).
+            // (e.g., for `std::collections::BTreeMap`, get `BTreeMap`).
             if let Some(last_segment) = path.segments.last() {
                 let ident = last_segment.ident.to_string();
 
@@ -102,7 +102,7 @@ fn to_type_format(ty: &Type) -> Format {
                             Format::TypeName("Vec<?>".to_string())
                         }
                     }
-                    "HashMap" => {
+                    "BTreeMap" => {
                         let mut generics = extract_generics(last_segment);
                         if generics.len() == 2 {
                             let key = to_type_format(&generics.remove(0));
@@ -112,7 +112,7 @@ fn to_type_format(ty: &Type) -> Format {
                                 value: Box::new(value),
                             }
                         } else {
-                            Format::TypeName("HashMap<?, ?>".to_string())
+                            Format::TypeName("BTreeMap<?, ?>".to_string())
                         }
                     }
                     _ => Format::TypeName(ident),
@@ -205,7 +205,7 @@ fn trace_struct(registry: &mut Registry, s: &ItemStruct) {
 fn process_items(
     items: &[Item],
     registry: &mut Registry,
-    signal_attrs: &mut HashMap<String, HashSet<SignalAttribute>>,
+    signal_attrs: &mut BTreeMap<String, BTreeSet<SignalAttribute>>,
 ) {
     let mut structs = Vec::new();
     for item in items {
@@ -236,7 +236,7 @@ fn process_items(
 fn visit_rust_files(
     dir: PathBuf,
     registry: &mut Registry,
-    signal_attrs: &mut HashMap<String, HashSet<SignalAttribute>>,
+    signal_attrs: &mut BTreeMap<String, BTreeSet<SignalAttribute>>,
 ) {
     if let Ok(entries) = fs::read_dir(dir) {
         for entry in entries.filter_map(Result::ok) {
@@ -258,7 +258,7 @@ fn visit_rust_files(
 
 fn generate_class_interface_code(
     class: &str,
-    extracted_attrs: &HashSet<SignalAttribute>,
+    extracted_attrs: &BTreeSet<SignalAttribute>,
 ) -> Option<String> {
     let mut code = String::new();
     let snake_class = class.to_case(Case::Snake);
@@ -368,7 +368,7 @@ extension {class}RustSignalExt on {class} {{
 
 fn generate_shared_code(
     root_dir: &Path,
-    signal_attrs: &HashMap<String, HashSet<SignalAttribute>>,
+    signal_attrs: &BTreeMap<String, BTreeSet<SignalAttribute>>,
 ) {
     // Write type aliases.
     let mut code = r#"part of 'generated.dart';
@@ -421,7 +421,7 @@ typedef SendDartSignalExtern = Void Function(
 
 fn generate_interface_code(
     root_dir: &Path,
-    signal_attrs: &HashMap<String, HashSet<SignalAttribute>>,
+    signal_attrs: &BTreeMap<String, BTreeSet<SignalAttribute>>,
 ) {
     // Generate FFI interface code.
     for (class, extracted_attrs) in signal_attrs {
@@ -477,7 +477,7 @@ pub fn generate_dart_code(root_dir: &Path, message_config: &RinfConfigMessage) {
 
     // Analyze the input Rust files and collect type registries.
     let mut registry: Registry = Registry::new();
-    let mut signal_attrs = HashMap::<String, HashSet<SignalAttribute>>::new();
+    let mut signal_attrs = BTreeMap::<String, BTreeSet<SignalAttribute>>::new();
     let source_dir = root_dir.join("native").join("hub").join("src");
     visit_rust_files(source_dir, &mut registry, &mut signal_attrs);
 
