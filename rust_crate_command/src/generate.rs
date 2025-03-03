@@ -25,9 +25,9 @@ use syn::{
 enum SignalAttribute {
     SignalPiece,
     DartSignal,
-    DartSignalBin,
+    DartSignalBinary,
     RustSignal,
-    RustSignalBin,
+    RustSignalBinary,
 }
 
 fn extract_signal_attribute(attrs: &[Attribute]) -> HashSet<SignalAttribute> {
@@ -40,9 +40,13 @@ fn extract_signal_attribute(attrs: &[Attribute]) -> HashSet<SignalAttribute> {
                 let signal_attr_op = match ident {
                     "SignalPiece" => Some(SignalAttribute::SignalPiece),
                     "DartSignal" => Some(SignalAttribute::DartSignal),
-                    "DartSignalBinary" => Some(SignalAttribute::DartSignalBin),
-                    "RustSignal" => Some(SignalAttribute::RustSignalBin),
-                    "RustSignalBinary" => Some(SignalAttribute::RustSignalBin),
+                    "DartSignalBinary" => {
+                        Some(SignalAttribute::DartSignalBinary)
+                    }
+                    "RustSignal" => Some(SignalAttribute::RustSignalBinary),
+                    "RustSignalBinary" => {
+                        Some(SignalAttribute::RustSignalBinary)
+                    }
                     _ => None,
                 };
                 if let Some(signal_attr) = signal_attr_op {
@@ -259,7 +263,7 @@ fn generate_class_interface_code(
     let mut code = String::new();
     let snake_class = class.to_case(Case::Snake);
 
-    if extracted_attrs.contains(&SignalAttribute::DartSignalBin) {
+    if extracted_attrs.contains(&SignalAttribute::DartSignalBinary) {
         let new_code = format!(
             r#"
 extension {class}DartSignalExt on {class} {{
@@ -336,7 +340,7 @@ extension {class}DartSignalExt on {class} {{
 
     let has_rust_signal = extracted_attrs
         .contains(&SignalAttribute::RustSignal)
-        || extracted_attrs.contains(&SignalAttribute::RustSignalBin);
+        || extracted_attrs.contains(&SignalAttribute::RustSignalBinary);
     if has_rust_signal {
         let new_code = format!(
             r#"
