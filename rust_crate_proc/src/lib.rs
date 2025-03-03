@@ -139,7 +139,7 @@ fn derive_rust_signal_real(
     let expanded = if include_binary {
         quote! {
             impl #name {
-                pub fn send_signal_to_dart(self, binary:Vec<u8>) {
+                pub fn send_signal_to_dart(self, binary: Vec<u8>) {
                     use bincode::serialize;
                     use rinf::{debug_print, send_rust_signal, RinfError};
                     let type_name = #name_lit;
