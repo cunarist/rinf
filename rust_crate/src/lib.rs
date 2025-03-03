@@ -14,4 +14,4 @@ pub use error::RinfError;
 pub use interface::{send_rust_signal, start_rust_logic, DartSignal};
 pub use shutdown::dart_shutdown;
 
-pub use rinf_proc::{DartSignal, RustSignal, Signal};
+pub use rinf_proc::{DartSignal, RustSignal, SignalPiece};

@@ -7,8 +7,8 @@ use syn::{parse_macro_input, DeriveInput, Ident};
 /// that can be nested within other signals.
 /// A `Signal` cannot operate independently
 /// and is only a partial component of `DartSignal` or `RustSignal`.
-#[proc_macro_derive(Signal)]
-pub fn derive_signal(_input: TokenStream) -> TokenStream {
+#[proc_macro_derive(SignalPiece)]
+pub fn derive_signal_piece(_input: TokenStream) -> TokenStream {
     TokenStream::new()
 }
 

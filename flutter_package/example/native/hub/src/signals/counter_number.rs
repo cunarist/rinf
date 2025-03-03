@@ -1,4 +1,4 @@
-use rinf::{DartSignal, RustSignal, Signal};
+use rinf::{DartSignal, RustSignal, SignalPiece};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, DartSignal)]
@@ -17,7 +17,7 @@ pub struct SampleNumberOutput {
     pub dummy_three: Vec<i32>,
 }
 
-#[derive(Serialize, Deserialize, Signal)]
+#[derive(Serialize, Deserialize, SignalPiece)]
 pub struct SampleSchema {
     pub sample_field_one: bool,
     pub sample_field_two: bool,
