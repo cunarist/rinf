@@ -1,4 +1,4 @@
-part of generated_types;
+part of 'generated.dart';
 
 @immutable
 class SampleNumberInput {
@@ -59,9 +59,9 @@ class SampleNumberInput {
   }
 
   Uint8List bincodeSerialize() {
-      final serializer = BincodeSerializer();
-      serialize(serializer);
-      return serializer.bytes;
+    final serializer = BincodeSerializer();
+    serialize(serializer);
+    return serializer.bytes;
   }
 
   @override
@@ -69,11 +69,11 @@ class SampleNumberInput {
     if (identical(this, other)) return true;
     if (other.runtimeType != runtimeType) return false;
 
-    return other is SampleNumberInput
-      && letter == other.letter
-      && dummyOne == other.dummyOne
-      && dummyTwo == other.dummyTwo
-      && listEquals(dummyThree, other.dummyThree);
+    return other is SampleNumberInput &&
+        letter == other.letter &&
+        dummyOne == other.dummyOne &&
+        dummyTwo == other.dummyTwo &&
+        listEquals(dummyThree, other.dummyThree);
   }
 
   @override
@@ -90,11 +90,11 @@ class SampleNumberInput {
 
     assert(() {
       fullString = '$runtimeType('
-        'letter: $letter, '
-        'dummyOne: $dummyOne, '
-        'dummyTwo: $dummyTwo, '
-        'dummyThree: $dummyThree'
-        ')';
+          'letter: $letter, '
+          'dummyOne: $dummyOne, '
+          'dummyTwo: $dummyTwo, '
+          'dummyThree: $dummyThree'
+          ')';
       return true;
     }());
 

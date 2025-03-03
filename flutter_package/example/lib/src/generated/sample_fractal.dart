@@ -1,4 +1,4 @@
-part of generated_types;
+part of 'generated.dart';
 
 @immutable
 class SampleFractal {

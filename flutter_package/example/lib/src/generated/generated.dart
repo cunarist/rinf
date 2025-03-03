@@ -1,3 +1,4 @@
+// ignore_for_file: unused_import
 library generated_types;
 
 import 'dart:typed_data';

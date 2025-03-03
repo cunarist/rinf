@@ -1,4 +1,4 @@
-part of generated_types;
+part of 'generated.dart';
 class TraitHelpers {
   static void serializeOptionSampleSchema(SampleSchema? value, BinarySerializer serializer) {
     if (value == null) {

@@ -1,7 +1,7 @@
 // Copyright (c) Facebook, Inc. and its affiliates
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-part of serde;
+part of 'serde.dart';
 
 ///
 /// A Dart type to represent the Rust u64 type.

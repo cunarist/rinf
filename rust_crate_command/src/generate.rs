@@ -461,13 +461,6 @@ pub fn generate_dart_code(root_dir: &Path, message_config: &RinfConfigMessage) {
     // TODO: Use the config
     // TODO: Use `rinf_generated` path by default instead of `generated`
 
-    // Prepare paths.
-    let pubspec_path = root_dir.join("pubspec.yaml");
-
-    // Read the file.
-    // TODO: Remove
-    let pubpsec_content = fs::read_to_string(&pubspec_path).unwrap();
-
     // Analyze the input Rust files and collect type registries.
     let mut registry: Registry = Registry::new();
     let mut signal_attrs = BTreeMap::<String, BTreeSet<SignalAttribute>>::new();
@@ -478,7 +471,8 @@ pub fn generate_dart_code(root_dir: &Path, message_config: &RinfConfigMessage) {
 
     // Create the code generator config.
     let config = CodeGeneratorConfig::new("generated".to_string())
-        .with_encodings([Encoding::Bincode]);
+        .with_encodings([Encoding::Bincode])
+        .with_package_manifest(false);
 
     // Install serialization modules.
     let installer = Installer::new(PathBuf::from("./"));
@@ -492,10 +486,6 @@ pub fn generate_dart_code(root_dir: &Path, message_config: &RinfConfigMessage) {
 
     // Generate Dart interface code.
     generate_interface_code(root_dir, &signal_attrs);
-
-    // Write back to pubspec file.
-    // TODO: Remove
-    fs::write(&pubspec_path, pubpsec_content).unwrap();
 }
 
 // TODO: `watch_and_generate_dart_code` is not tested, so check it later
