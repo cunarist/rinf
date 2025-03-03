@@ -21,7 +21,7 @@ Future<void> prepareInterfaceReal(
   await loadJsFile();
 
   // Listen to Rust via JavaScript.
-  rinfBindingsObject['send_rust_signal_extern'] = (
+  rinfBindingsObject['rinf_send_rust_signal_extern'] = (
     int messageId,
     Uint8List messageBytes,
     Uint8List binary,
@@ -40,7 +40,7 @@ void startRustLogicReal() {
   if (wasAlreadyLoaded) {
     return;
   }
-  wasmBindingsObject.callMethod('start_rust_logic_extern'.toJS);
+  wasmBindingsObject.callMethod('rinf_start_rust_logic_extern'.toJS);
 }
 
 void stopRustLogicReal() {

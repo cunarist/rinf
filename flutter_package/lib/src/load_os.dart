@@ -81,19 +81,19 @@ class RustLibraryGlobal extends RustLibrary {
 
   @Native<Void Function()>(
     isLeaf: true,
-    symbol: 'start_rust_logic_extern',
+    symbol: 'rinf_start_rust_logic_extern',
   )
   external static void startRustLogicExtern();
 
   @Native<Void Function()>(
     isLeaf: true,
-    symbol: 'stop_rust_logic_extern',
+    symbol: 'rinf_stop_rust_logic_extern',
   )
   external static void stopRustLogicExtern();
 
   @Native<Void Function(PostCObjectPtr, Int64)>(
     isLeaf: true,
-    symbol: 'prepare_isolate_extern',
+    symbol: 'rinf_prepare_isolate_extern',
   )
   external static void prepareIsolateExtern(
     PostCObjectPtr storePostObject,
@@ -125,15 +125,15 @@ class RustLibraryLocal extends RustLibrary {
   RustLibraryLocal({required this.lib}) {
     this.startRustLogicExtern =
         lib.lookupFunction<Void Function(), void Function()>(
-      'start_rust_logic_extern',
+      'rinf_start_rust_logic_extern',
     );
     this.stopRustLogicExtern =
         lib.lookupFunction<Void Function(), void Function()>(
-      'stop_rust_logic_extern',
+      'rinf_stop_rust_logic_extern',
     );
     this.prepareIsolateExtern =
         lib.lookupFunction<PrepareIsolateExtern, PrepareIsolateWrap>(
-      'prepare_isolate_extern',
+      'rinf_prepare_isolate_extern',
     );
   }
 
