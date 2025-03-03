@@ -102,9 +102,10 @@ class SampleNumberOutput {
   }
 }
 
+final sampleNumberOutputStreamController =
+    StreamController<RustSignal<SampleNumberOutput>>();
+    
 extension SampleNumberOutputRustSignalExt on SampleNumberOutput {
-  static final rustStreamContoller =
-      StreamController<RustSignal<SampleNumberOutput>>();
   static final rustSignalStream =
-      rustStreamContoller.stream.asBroadcastStream();
+      sampleNumberOutputStreamController.stream.asBroadcastStream();
 }

@@ -342,13 +342,15 @@ extension {class}DartSignalExt on {class} {{
         .contains(&SignalAttribute::RustSignal)
         || extracted_attrs.contains(&SignalAttribute::RustSignalBinary);
     if has_rust_signal {
+        let camel_class = class.to_case(Case::Camel);
         let new_code = format!(
             r#"
+final {camel_class}StreamController =
+    StreamController<RustSignal<{class}>>();
+    
 extension {class}RustSignalExt on {class} {{
-  static final rustStreamContoller =
-      StreamController<RustSignal<{class}>>();
   static final rustSignalStream =
-      rustStreamContoller.stream.asBroadcastStream();
+      {camel_class}StreamController.stream.asBroadcastStream();
 }}
 "#
         );
@@ -364,8 +366,12 @@ extension {class}RustSignalExt on {class} {{
 
 // TODO: Delete the folder before generating
 
-fn generate_shared_code(root_dir: &Path) {
-    let code = r#"part of 'generated.dart';
+fn generate_shared_code(
+    root_dir: &Path,
+    signal_attrs: &HashMap<String, HashSet<SignalAttribute>>,
+) {
+    // Write type aliases.
+    let mut code = r#"part of 'generated.dart';
 
 typedef SendDartSignalExtern = Void Function(
   Pointer<Uint8>,
@@ -376,6 +382,35 @@ typedef SendDartSignalExtern = Void Function(
 "#
     .to_owned();
 
+    // Write signal handler.
+    code.push_str(
+        "\nfinal rustSignalHandlers = \
+        <String, void Function(Uint8List, Uint8List)>{",
+    );
+    for (class, extracted_attrs) in signal_attrs {
+        let has_rust_signal = extracted_attrs
+            .contains(&SignalAttribute::RustSignal)
+            || extracted_attrs.contains(&SignalAttribute::RustSignalBinary);
+        if !has_rust_signal {
+            continue;
+        }
+        let camel_class = class.to_case(Case::Camel);
+        let new_code = format!(
+            r#"
+  '{class}': (Uint8List messageBytes, Uint8List binary) {{
+    final message = {class}.bincodeDeserialize(messageBytes);
+    final rustSignal = RustSignal(
+      message,
+      binary,
+    );
+    {camel_class}StreamController.add(rustSignal);
+  }},"#
+        );
+        code.push_str(&new_code);
+    }
+    code.push_str("\n};");
+
+    // Save to a file.
     let shared_file = root_dir
         .join("lib")
         .join("src")
@@ -426,7 +461,7 @@ export '../serde/serde.dart';"#,
     fs::write(&top_file, top_content).unwrap();
 
     // Write the shared code.
-    generate_shared_code(root_dir);
+    generate_shared_code(root_dir, signal_attrs);
 }
 
 pub fn generate_dart_code(root_dir: &Path, message_config: &RinfConfigMessage) {

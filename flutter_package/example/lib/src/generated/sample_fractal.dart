@@ -84,9 +84,10 @@ class SampleFractal {
   }
 }
 
+final sampleFractalStreamController =
+    StreamController<RustSignal<SampleFractal>>();
+    
 extension SampleFractalRustSignalExt on SampleFractal {
-  static final rustStreamContoller =
-      StreamController<RustSignal<SampleFractal>>();
   static final rustSignalStream =
-      rustStreamContoller.stream.asBroadcastStream();
+      sampleFractalStreamController.stream.asBroadcastStream();
 }
