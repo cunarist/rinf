@@ -15,6 +15,7 @@ use syn::{
 
 // TODO: Remove all panicking code.
 // TODO: Preserve comments on structs.
+// TODO: Handle enums.
 
 fn implements_signal(attrs: &[Attribute]) -> bool {
     attrs.iter().any(|attr| {
