@@ -32,28 +32,26 @@ enum SignalAttribute {
 fn extract_signal_attribute(attrs: &[Attribute]) -> BTreeSet<SignalAttribute> {
     let mut extracted_attrs = BTreeSet::new();
     for attr in attrs.iter() {
-        if attr.path().is_ident("derive") {
-            let _ = attr.parse_nested_meta(|meta| {
-                let last_segment = meta.path.segments.last().unwrap();
-                let ident: &str = &last_segment.ident.to_string();
-                let signal_attr_op = match ident {
-                    "SignalPiece" => Some(SignalAttribute::SignalPiece),
-                    "DartSignal" => Some(SignalAttribute::DartSignal),
-                    "DartSignalBinary" => {
-                        Some(SignalAttribute::DartSignalBinary)
-                    }
-                    "RustSignal" => Some(SignalAttribute::RustSignalBinary),
-                    "RustSignalBinary" => {
-                        Some(SignalAttribute::RustSignalBinary)
-                    }
-                    _ => None,
-                };
-                if let Some(signal_attr) = signal_attr_op {
-                    extracted_attrs.insert(signal_attr);
-                }
-                Ok(())
-            });
+        if !attr.path().is_ident("derive") {
+            continue;
         }
+        attr.parse_nested_meta(|meta| {
+            let last_segment = meta.path.segments.last().unwrap();
+            let ident: &str = &last_segment.ident.to_string();
+            let signal_attr_op = match ident {
+                "SignalPiece" => Some(SignalAttribute::SignalPiece),
+                "DartSignal" => Some(SignalAttribute::DartSignal),
+                "DartSignalBinary" => Some(SignalAttribute::DartSignalBinary),
+                "RustSignal" => Some(SignalAttribute::RustSignalBinary),
+                "RustSignalBinary" => Some(SignalAttribute::RustSignalBinary),
+                _ => None,
+            };
+            if let Some(signal_attr) = signal_attr_op {
+                extracted_attrs.insert(signal_attr);
+            }
+            Ok(())
+        })
+        .unwrap();
     }
     extracted_attrs
 }
