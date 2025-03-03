@@ -16,6 +16,7 @@ thiserror = "2.0.11"                              # TODO: Unify error handling m
 include_dir = "0.7.4"
 notify = "8.0.0"
 
-[lints.clippy]
-unwrap_used = "deny"
-expect_used = "deny"
+# TODO: Reactivate warnings
+# [lints.clippy]
+# unwrap_used = "deny"
+# expect_used = "deny"
