@@ -5,7 +5,7 @@ use syn::{parse_macro_input, DeriveInput, Ident};
 
 /// Marks the struct as a signal
 /// that can be nested within other signals.
-/// A `Signal` cannot operate independently
+/// A `SignalPiece` cannot operate independently
 /// and is only a partial component of `DartSignal` or `RustSignal`.
 #[proc_macro_derive(SignalPiece)]
 pub fn derive_signal_piece(_input: TokenStream) -> TokenStream {
