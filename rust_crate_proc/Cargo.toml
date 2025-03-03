@@ -9,6 +9,7 @@ proc-macro = true
 [dependencies]
 syn = "2.0.98"
 quote = "1.0.38"
+convert_case = "0.8.0"
 
 [lints.clippy]
 unwrap_used = "deny"
