@@ -1,5 +1,8 @@
 import 'dart:io';
 import 'dart:ffi';
+import 'dart:typed_data';
+import 'package:ffi/ffi.dart';
+import 'interface.dart';
 
 String? dynamicLibPath;
 
@@ -28,25 +31,11 @@ RustLibrary loadRustLibrary() {
     throw UnsupportedError('This operating system is not supported.');
   }
 
-  // On Android, native library symbols are loaded in local space
-  // because of Flutter's `RTLD_LOCAL` behavior.
-  // Therefore we cannot use the efficient `RustLibraryGlobal`.
-  // - https://github.com/dart-lang/native/issues/923
-  if (Platform.isAndroid) {
+  if (useLocalSpaceSymbol) {
     return RustLibraryLocal(lib: lib);
+  } else {
+    return RustLibraryGlobal();
   }
-
-  // On Linux, `RTLD_LOCAL` behavior is required in tests
-  // due to symbol resolution behavior observed across all distributions.
-  // With `RTLD_GLOBAL`, symbols cannot be found.
-  final isTest = Platform.environment.containsKey('FLUTTER_TEST');
-  if (Platform.isLinux && isTest) {
-    return RustLibraryLocal(lib: lib);
-  }
-
-  // Native library symbols are loaded in global space
-  // thanks to Flutter's `RTLD_GLOBAL` behavior.
-  return RustLibraryGlobal();
 }
 
 /// The central interface for calling native function.
@@ -59,6 +48,18 @@ typedef PostCObjectInner = Int8 Function(Int64, Pointer<Dart_CObject>);
 typedef PostCObjectPtr = Pointer<NativeFunction<PostCObjectInner>>;
 typedef PrepareIsolateExtern = Void Function(PostCObjectPtr, Int64);
 typedef PrepareIsolateWrap = void Function(PostCObjectPtr, int);
+typedef SendDartSignalExtern = Void Function(
+  Pointer<Uint8>,
+  UintPtr,
+  Pointer<Uint8>,
+  UintPtr,
+);
+typedef SendDartSignalWrap = void Function(
+  Pointer<Uint8>,
+  int,
+  Pointer<Uint8>,
+  int,
+);
 
 /// Abstract class for unifying the interface
 /// for calling native functions.
@@ -121,6 +122,8 @@ class RustLibraryLocal extends RustLibrary {
   late void Function() startRustLogicExtern;
   late void Function() stopRustLogicExtern;
   late void Function(PostCObjectPtr, int) prepareIsolateExtern;
+  late void Function(int, Pointer<Uint8>, int, Pointer<Uint8>, int)
+      sendDartSignalExtern;
 
   RustLibraryLocal({required this.lib}) {
     this.startRustLogicExtern =
@@ -147,5 +150,31 @@ class RustLibraryLocal extends RustLibrary {
 
   void prepareIsolate(PostCObjectPtr storePostObject, int port) {
     prepareIsolateExtern(storePostObject, port);
+  }
+
+  void sendDartSignal(
+    String endpointSymbol,
+    Uint8List messageBytes,
+    Uint8List binary,
+  ) {
+    final Pointer<Uint8> messageMemory = malloc.allocate(messageBytes.length);
+    messageMemory.asTypedList(messageBytes.length).setAll(0, messageBytes);
+
+    final Pointer<Uint8> binaryMemory = malloc.allocate(binary.length);
+    binaryMemory.asTypedList(binary.length).setAll(0, binary);
+
+    final sendDartSignalExtern =
+        lib.lookupFunction<SendDartSignalExtern, SendDartSignalWrap>(
+            endpointSymbol);
+
+    sendDartSignalExtern(
+      messageMemory,
+      messageBytes.length,
+      binaryMemory,
+      binary.length,
+    );
+
+    malloc.free(messageMemory);
+    malloc.free(binaryMemory);
   }
 }

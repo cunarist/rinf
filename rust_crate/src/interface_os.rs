@@ -106,7 +106,7 @@ pub extern "C" fn rinf_stop_rust_logic_extern() {
 }
 
 pub fn send_rust_signal_real(
-    message_id: &str,
+    endpoint: &str,
     message_bytes: Vec<u8>,
     binary: Vec<u8>,
 ) -> Result<(), RinfError> {
@@ -126,7 +126,7 @@ pub fn send_rust_signal_real(
 
     dart_isolate.post(
         vec![
-            message_id.into_dart(),
+            endpoint.into_dart(),
             if message_filled {
                 ZeroCopyBuffer(message_bytes).into_dart()
             } else {

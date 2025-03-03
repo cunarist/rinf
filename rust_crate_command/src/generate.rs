@@ -1,4 +1,5 @@
 use crate::RinfConfigMessage;
+use convert_case::{Case, Casing};
 use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
 use quote::ToTokens;
 use serde_generate::dart::{CodeGenerator, Installer};
@@ -13,9 +14,10 @@ use syn::{
     PathArguments, Type, TypeArray, TypePath, TypeTuple,
 };
 
-// TODO: Remove all panicking code.
-// TODO: Preserve comments on structs.
-// TODO: Handle enums.
+// TODO: Remove all panicking code
+// TODO: Preserve comments on structs
+// TODO: Handle enums
+// TODO: Support binary signals
 
 fn implements_signal(attrs: &[Attribute]) -> bool {
     attrs.iter().any(|attr| {
@@ -39,7 +41,7 @@ fn implements_signal(attrs: &[Attribute]) -> bool {
 
 /// Convert a `syn` field type to a `serde_reflection::Format`.
 /// This function handles common primitives
-/// and container types like `Option` and `Vec``.
+/// and container types like `Option` and `Vec`.
 /// For unrecognized types, it returns a `TypeName`
 /// with the type's string representation.
 fn to_type_format(ty: &Type) -> Format {
@@ -215,8 +217,104 @@ fn visit_rust_files(dir: PathBuf, registry: &mut Registry) {
     }
 }
 
+// TODO: Distinguish Rust and Dart signals during interface generation
+
+fn generate_class_interface_code(class: &str) -> String {
+    let snake_class = class.to_case(Case::Snake);
+    format!(
+        r#"
+extension {class}DartSignalExt on {class} {{
+  @Native<SendDartSignalExtern>(
+    isLeaf: true,
+    symbol: 'rinf_send_dart_signal_{snake_class}',
+  )
+  external static void sendDartSignalExtern(
+    Pointer<Uint8> messageBytesAddress,
+    int messageBytesLength,
+    Pointer<Uint8> binaryAddress,
+    int binaryLength,
+  );
+
+  void sendSignalToRust() {{
+    final messageBytes = this.bincodeSerialize();
+    final binary = Uint8List(0);
+    if (shouldCallSymbol) {{
+      sendDartSignal(
+        'rinf_send_dart_signal_{snake_class}',
+        messageBytes,
+        binary,
+      );
+    }} else {{
+      sendDartSignalExtern(
+        messageBytes.address,
+        messageBytes.length,
+        binary.address,
+        binary.length,
+      );
+    }}
+  }}
+}}
+
+extension {class}RustSignalExt on {class} {{
+  static final rustStreamContoller =
+      StreamController<RustSignal<{class}>>();
+  static final rustSignalStream =
+      rustStreamContoller.stream.asBroadcastStream();
+}}
+      "#
+    )
+}
+
+fn generate_interface_code(root_dir: &Path, registry: &Registry) {
+    // Generate FFI interface code.
+    let gen_file = root_dir
+        .join("lib")
+        .join("src")
+        .join("generated")
+        .join("rinf_interface.dart");
+    let mut code = r#"
+part of 'generated.dart';
+
+typedef SendDartSignalExtern = Void Function(
+  Pointer<Uint8>,
+  UintPtr,
+  Pointer<Uint8>,
+  UintPtr,
+);
+    "#
+    .to_owned();
+    for class in registry.keys() {
+        code.push_str(&generate_class_interface_code(class));
+    }
+    fs::write(&gen_file, code).expect("Failed to write interface code");
+
+    // Write imports.
+    let top_file = root_dir
+        .join("lib")
+        .join("src")
+        .join("generated")
+        .join("generated.dart");
+    let mut top_content = fs::read_to_string(&top_file).unwrap();
+    top_content = top_content.replacen(
+        "export '../serde/serde.dart';",
+        r#"import 'dart:async';
+import 'dart:ffi';
+import 'package:rinf/rinf.dart';
+
+export '../serde/serde.dart';"#,
+        1,
+    );
+    top_content = top_content.replacen(
+        "export '../serde/serde.dart';\n",
+        "export '../serde/serde.dart';\n\npart 'rinf_interface.dart';",
+        1,
+    );
+    fs::write(&top_file, top_content).unwrap();
+}
+
 pub fn generate_dart_code(root_dir: &Path, message_config: &RinfConfigMessage) {
     // TODO: Use the config
+    // TODO: Use `rinf_generated` path by default instead of `generated`
 
     // Prepare paths.
     let pubspec_path = root_dir.join("pubspec.yaml");
@@ -225,8 +323,7 @@ pub fn generate_dart_code(root_dir: &Path, message_config: &RinfConfigMessage) {
     // TODO: Remove
     let pubpsec_content = fs::read_to_string(&pubspec_path).unwrap();
 
-    // Analyze the input Rust files
-    // and collect type registries.
+    // Analyze the input Rust files and collect type registries.
     let mut registry: Registry = Registry::new();
     let source_dir = root_dir.join("native").join("hub").join("src");
     visit_rust_files(source_dir, &mut registry);
@@ -241,10 +338,12 @@ pub fn generate_dart_code(root_dir: &Path, message_config: &RinfConfigMessage) {
     installer.install_serde_runtime().unwrap();
     installer.install_bincode_runtime().unwrap();
 
-    // Generate Dart code from the registry.
-    // Create the Dart code generator.
+    // Generate Dart serialization code from the registry.
     let generator = CodeGenerator::new(&config);
     generator.output(root_dir.to_owned(), &registry).unwrap();
+
+    // Generate Dart interface code.
+    generate_interface_code(root_dir, &registry);
 
     // Write back to pubspec file.
     // TODO: Remove
