@@ -419,6 +419,8 @@ pub fn generate_dart_code(root_dir: &Path, message_config: &RinfConfigMessage) {
     let source_dir = root_dir.join("native").join("hub").join("src");
     visit_rust_files(source_dir, &mut registry, &mut signal_attrs);
 
+    // TODO: Include comments from original structs with `with_comments`
+
     // Create the code generator config.
     let config = CodeGeneratorConfig::new("generated".to_string())
         .with_encodings([Encoding::Bincode]);
