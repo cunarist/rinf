@@ -10,6 +10,8 @@ use crate::signals::*;
 use messages::prelude::*;
 use rinf::debug_print;
 
+// TODO: Organize imports
+
 // The letter type for communicating with an actor.
 pub struct ClickedLetter;
 
