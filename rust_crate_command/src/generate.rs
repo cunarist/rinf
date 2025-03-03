@@ -364,6 +364,26 @@ extension {class}RustSignalExt on {class} {{
 
 // TODO: Delete the folder before generating
 
+fn generate_shared_code(root_dir: &Path) {
+    let code = r#"part of 'generated.dart';
+
+typedef SendDartSignalExtern = Void Function(
+  Pointer<Uint8>,
+  UintPtr,
+  Pointer<Uint8>,
+  UintPtr,
+);
+"#
+    .to_owned();
+
+    let shared_file = root_dir
+        .join("lib")
+        .join("src")
+        .join("generated")
+        .join("rinf_interface.dart");
+    fs::write(&shared_file, code).unwrap();
+}
+
 fn generate_interface_code(
     root_dir: &Path,
     signal_attrs: &HashMap<String, HashSet<SignalAttribute>>,
@@ -402,17 +422,11 @@ import 'package:rinf/rinf.dart';
 export '../serde/serde.dart';"#,
         1,
     );
-    top_content.push_str(
-        r#"
-typedef SendDartSignalExtern = Void Function(
-  Pointer<Uint8>,
-  UintPtr,
-  Pointer<Uint8>,
-  UintPtr,
-);
-"#,
-    );
+    top_content.push_str("part 'rinf_interface.dart';\n");
     fs::write(&top_file, top_content).unwrap();
+
+    // Write the shared code.
+    generate_shared_code(root_dir);
 }
 
 pub fn generate_dart_code(root_dir: &Path, message_config: &RinfConfigMessage) {

@@ -90,4 +90,3 @@ extension SampleFractalRustSignalExt on SampleFractal {
   static final rustSignalStream =
       rustStreamContoller.stream.asBroadcastStream();
 }
-          

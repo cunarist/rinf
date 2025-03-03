@@ -108,4 +108,3 @@ extension SampleNumberOutputRustSignalExt on SampleNumberOutput {
   static final rustSignalStream =
       rustStreamContoller.stream.asBroadcastStream();
 }
-          
