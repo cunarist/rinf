@@ -35,9 +35,9 @@ pub fn derive_dart_signal_binary(input: TokenStream) -> TokenStream {
 fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
     let name = &ast.ident;
-    let name_lit = format!("\"{}\"", name);
-    let snake_name = name.to_string().to_case(Case::Snake);
-    let upper_snake_name = name.to_string().to_case(Case::UpperSnake);
+    let name_lit = name.to_string();
+    let snake_name = name_lit.to_case(Case::Snake);
+    let upper_snake_name = name_lit.to_case(Case::UpperSnake);
 
     let channel_type_ident =
         Ident::new(&format!("{}Channel", name), name.span());
@@ -134,7 +134,7 @@ fn derive_rust_signal_real(
 ) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
     let name = &ast.ident;
-    let name_lit = format!("\"{}\"", name);
+    let name_lit = name.to_string();
 
     let expanded = if include_binary {
         quote! {
