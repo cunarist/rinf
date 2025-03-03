@@ -124,8 +124,6 @@ class RustLibraryLocal extends RustLibrary {
   late void Function() startRustLogicExtern;
   late void Function() stopRustLogicExtern;
   late void Function(PostCObjectPtr, int) prepareIsolateExtern;
-  late void Function(int, Pointer<Uint8>, int, Pointer<Uint8>, int)
-      sendDartSignalExtern;
 
   RustLibraryLocal({required this.lib}) {
     this.startRustLogicExtern =
