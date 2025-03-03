@@ -27,11 +27,11 @@ Remove `RINF:` from Protobuf message annotations. For example, `[RINF:DART-SIGNA
 message SomeMessage {}
 ```
 
-Import messages from the root `messages` module, not from the inner module where they are declared.
+Import messages from the root `generated` module, not from the inner module where they are declared.
 
 ```{code-block} dart
 :caption: Dart
-import './messages/all.dart';
+import 'generated.dart';
 ```
 
 ```{code-block} rust

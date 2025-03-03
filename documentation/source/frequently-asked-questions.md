@@ -214,7 +214,7 @@ In this case, you can specify a path that points to the compiled Rust library. S
 
 ```{code-block} dart
 :caption: lib/main.dart
-import './messages/all.dart';
+import 'generated.dart';
 
 async void main() {
   await initializeRust(compiledLibPath: '/path/to/library/libhub.so');

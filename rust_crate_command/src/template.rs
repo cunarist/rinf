@@ -159,7 +159,7 @@ fn update_main_dart(root_dir: &Path) -> io::Result<()> {
             content = content.replacen(
                 "import",
                 "import 'package:rinf/rinf.dart';\
-                \nimport './messages/all.dart';\nimport",
+                \nimport 'generated.dart';\nimport",
                 1,
             );
         }
