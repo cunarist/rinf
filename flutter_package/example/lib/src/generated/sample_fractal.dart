@@ -83,3 +83,11 @@ class SampleFractal {
     return fullString ?? 'SampleFractal';
   }
 }
+
+extension SampleFractalRustSignalExt on SampleFractal {
+  static final rustStreamContoller =
+      StreamController<RustSignal<SampleFractal>>();
+  static final rustSignalStream =
+      rustStreamContoller.stream.asBroadcastStream();
+}
+          

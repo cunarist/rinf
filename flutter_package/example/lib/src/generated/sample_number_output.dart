@@ -101,3 +101,11 @@ class SampleNumberOutput {
     return fullString ?? 'SampleNumberOutput';
   }
 }
+
+extension SampleNumberOutputRustSignalExt on SampleNumberOutput {
+  static final rustStreamContoller =
+      StreamController<RustSignal<SampleNumberOutput>>();
+  static final rustSignalStream =
+      rustStreamContoller.stream.asBroadcastStream();
+}
+          

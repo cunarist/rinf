@@ -101,3 +101,36 @@ class SampleNumberInput {
     return fullString ?? 'SampleNumberInput';
   }
 }
+
+extension SampleNumberInputDartSignalExt on SampleNumberInput {
+  @Native<SendDartSignalExtern>(
+    isLeaf: true,
+    symbol: 'rinf_send_dart_signal_sample_number_input',
+  )
+  external static void sendDartSignalExtern(
+    Pointer<Uint8> messageBytesAddress,
+    int messageBytesLength,
+    Pointer<Uint8> binaryAddress,
+    int binaryLength,
+  );
+
+  void sendSignalToRust() {
+    final messageBytes = this.bincodeSerialize();
+    final binary = Uint8List(0);
+    if (useLocalSpaceSymbols) {
+      sendDartSignal(
+        'rinf_send_dart_signal_sample_number_input',
+        messageBytes,
+        binary,
+      );
+    } else {
+      sendDartSignalExtern(
+        messageBytes.address,
+        messageBytes.length,
+        binary.address,
+        binary.length,
+      );
+    }
+  }
+}
+          

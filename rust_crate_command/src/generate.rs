@@ -8,6 +8,7 @@ use serde_reflection::{ContainerFormat, Format, Named, Registry};
 use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::hash::Hash;
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::channel;
 use std::time::Duration;
@@ -254,7 +255,7 @@ fn visit_rust_files(
 fn generate_class_interface_code(
     class: &str,
     extracted_attrs: &HashSet<SignalAttribute>,
-) -> String {
+) -> Option<String> {
     let mut code = String::new();
     let snake_class = class.to_case(Case::Snake);
 
@@ -291,7 +292,7 @@ extension {class}DartSignalExt on {class} {{
     }}
   }}
 }}
-          "#
+"#
         );
         code.push_str(&new_code);
     } else if extracted_attrs.contains(&SignalAttribute::DartSignal) {
@@ -328,7 +329,7 @@ extension {class}DartSignalExt on {class} {{
     }}
   }}
 }}
-          "#
+"#
         );
         code.push_str(&new_code);
     }
@@ -345,38 +346,41 @@ extension {class}RustSignalExt on {class} {{
   static final rustSignalStream =
       rustStreamContoller.stream.asBroadcastStream();
 }}
-          "#
+"#
         );
         code.push_str(&new_code);
     }
 
-    code
+    if code.is_empty() {
+        None
+    } else {
+        Some(code)
+    }
 }
+
+// TODO: Delete the folder before generating
 
 fn generate_interface_code(
     root_dir: &Path,
     signal_attrs: &HashMap<String, HashSet<SignalAttribute>>,
 ) {
     // Generate FFI interface code.
-    let gen_file = root_dir
-        .join("lib")
-        .join("src")
-        .join("generated")
-        .join("rinf_interface.dart");
-    let mut code = r#"part of 'generated.dart';
-
-typedef SendDartSignalExtern = Void Function(
-  Pointer<Uint8>,
-  UintPtr,
-  Pointer<Uint8>,
-  UintPtr,
-);
-    "#
-    .to_owned();
     for (class, extracted_attrs) in signal_attrs {
-        code.push_str(&generate_class_interface_code(class, extracted_attrs));
+        let code_op = generate_class_interface_code(class, extracted_attrs);
+        if let Some(code) = code_op {
+            let snake_class = class.to_case(Case::Snake);
+            let class_file = root_dir
+                .join("lib")
+                .join("src")
+                .join("generated")
+                .join(format!("{}.dart", snake_class));
+            let mut file = fs::OpenOptions::new()
+                .append(true)
+                .open(&class_file)
+                .expect("Failed to open interface file");
+            file.write_all(code.as_bytes()).unwrap();
+        }
     }
-    fs::write(&gen_file, code).expect("Failed to write interface code");
 
     // Write imports.
     let top_file = root_dir
@@ -394,10 +398,15 @@ import 'package:rinf/rinf.dart';
 export '../serde/serde.dart';"#,
         1,
     );
-    top_content = top_content.replacen(
-        "export '../serde/serde.dart';\n",
-        "export '../serde/serde.dart';\n\npart 'rinf_interface.dart';",
-        1,
+    top_content.push_str(
+        r#"
+typedef SendDartSignalExtern = Void Function(
+  Pointer<Uint8>,
+  UintPtr,
+  Pointer<Uint8>,
+  UintPtr,
+);
+"#,
     );
     fs::write(&top_file, top_content).unwrap();
 }
