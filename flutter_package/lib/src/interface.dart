@@ -29,13 +29,12 @@ class RustSignal<T> {
 /// `RTLD_LOCAL` and `RTLD_GLOBAL` between platforms.
 /// `RTLD_GLOBAL` is preferred as it has less overhead
 /// because extra `malloc` can be avoided in Flutter.
-/// On the web, this value is set to true.
 final useLocalSpaceSymbols = checkSymbolSpace();
 
 /// Specifies whether to look up symbols in the local space of dynamic library.
 bool checkSymbolSpace() {
-  // On the web, we need to call functions
-  // from the imported JavaScript module.
+  // On the web, this value doesn't mean anything.
+  // We just provide a dummy value here.
   if (kIsWeb) {
     return true;
   }

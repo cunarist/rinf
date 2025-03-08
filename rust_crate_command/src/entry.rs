@@ -47,6 +47,7 @@ pub fn run_command() -> Result<(), RinfCommandError> {
             build_webassembly(&root_dir, release, is_internet_connected);
         }
         Some(("server", _)) => {
+            // TODO: Dim the output
             let full_command = "flutter run \
                 --web-header=Cross-Origin-Opener-Policy=same-origin \
                 --web-header=Cross-Origin-Embedder-Policy=require-corp";

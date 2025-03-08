@@ -253,24 +253,50 @@ fn visit_rust_files(
 
 // TODO: Distinguish Rust and Dart signals during interface generation
 
-fn generate_class_interface_code(
+fn generate_class_extension_code(
     root_dir: &Path,
     class: &str,
     extracted_attrs: &BTreeSet<SignalAttribute>,
 ) {
     let snake_class = class.to_case(Case::Snake);
-    let class_file = root_dir
+    let os_file = root_dir
         .join("lib")
         .join("src")
         .join("generated")
-        .join(format!("{}.dart", snake_class));
-    let mut code = fs::read_to_string(&class_file).unwrap();
+        .join(format!("{}_os.dart", snake_class));
+    let web_file = root_dir
+        .join("lib")
+        .join("src")
+        .join("generated")
+        .join(format!("{}_web.dart", snake_class));
+
+    let mut os_code = r#"// ignore_for_file:unused_import,unused_element
+import 'dart:ffi';
+import 'dart:typed_data';
+import 'package:rinf/rinf.dart';
+import 'generated.dart';
+
+typedef _SendDartSignalExtern = Void Function(
+  Pointer<Uint8>,
+  UintPtr,
+  Pointer<Uint8>,
+  UintPtr,
+);
+"#
+    .to_owned();
+
+    let mut web_code = r#"// ignore_for_file:unused_import,unused_element
+import 'dart:typed_data';
+import 'package:rinf/rinf.dart';
+import 'generated.dart';
+"#
+    .to_owned();
 
     if extracted_attrs.contains(&SignalAttribute::DartSignalBinary) {
-        let new_code = format!(
+        let new_os_code = format!(
             r#"
 extension {class}DartSignalExt on {class} {{
-  @Native<SendDartSignalExtern>(
+  @Native<_SendDartSignalExtern>(
     isLeaf: true,
     symbol: 'rinf_send_dart_signal_{snake_class}',
   )
@@ -301,12 +327,27 @@ extension {class}DartSignalExt on {class} {{
 }}
 "#
         );
-        code.push_str(&new_code);
-    } else if extracted_attrs.contains(&SignalAttribute::DartSignal) {
-        let new_code = format!(
+        os_code.push_str(&new_os_code);
+        let new_web_code = format!(
             r#"
 extension {class}DartSignalExt on {class} {{
-  @Native<SendDartSignalExtern>(
+  void sendSignalToRust(Uint8List binary) {{
+    final messageBytes = this.bincodeSerialize();
+    sendDartSignal(
+      'rinf_send_dart_signal_{snake_class}',
+      messageBytes,
+      binary,
+    );
+  }}
+}}
+"#
+        );
+        web_code.push_str(&new_web_code);
+    } else if extracted_attrs.contains(&SignalAttribute::DartSignal) {
+        let new_os_code = format!(
+            r#"
+extension {class}DartSignalExt on {class} {{
+  @Native<_SendDartSignalExtern>(
     isLeaf: true,
     symbol: 'rinf_send_dart_signal_{snake_class}',
   )
@@ -338,8 +379,41 @@ extension {class}DartSignalExt on {class} {{
 }}
 "#
         );
-        code.push_str(&new_code);
+        os_code.push_str(&new_os_code);
+        let new_web_code = format!(
+            r#"
+extension {class}DartSignalExt on {class} {{
+  void sendSignalToRust() {{
+    final messageBytes = this.bincodeSerialize();
+    final binary = Uint8List(0);
+    sendDartSignal(
+      'rinf_send_dart_signal_{snake_class}',
+      messageBytes,
+      binary,
+    );
+  }}
+}}
+"#
+        );
+        web_code.push_str(&new_web_code);
     }
+
+    fs::write(&os_file, os_code).unwrap();
+    fs::write(&web_file, web_code).unwrap();
+}
+
+fn generate_class_interface_code(
+    root_dir: &Path,
+    class: &str,
+    extracted_attrs: &BTreeSet<SignalAttribute>,
+) {
+    let snake_class = class.to_case(Case::Snake);
+    let class_file = root_dir
+        .join("lib")
+        .join("src")
+        .join("generated")
+        .join(format!("{}.dart", snake_class));
+    let mut code = fs::read_to_string(&class_file).unwrap();
 
     let has_rust_signal = extracted_attrs
         .contains(&SignalAttribute::RustSignal)
@@ -376,13 +450,6 @@ fn generate_shared_code(
 ) {
     // Write type aliases.
     let mut code = r#"part of 'generated.dart';
-
-typedef SendDartSignalExtern = Void Function(
-  Pointer<Uint8>,
-  UintPtr,
-  Pointer<Uint8>,
-  UintPtr,
-);
 "#
     .to_owned();
 
@@ -419,7 +486,7 @@ typedef SendDartSignalExtern = Void Function(
         .join("lib")
         .join("src")
         .join("generated")
-        .join("rinf_interface.dart");
+        .join("signal_handlers.dart");
     fs::write(&shared_file, code).unwrap();
 }
 
@@ -429,6 +496,7 @@ fn generate_interface_code(
 ) {
     // Generate FFI interface code.
     for (class, extracted_attrs) in signal_attrs {
+        generate_class_extension_code(root_dir, class, extracted_attrs);
         generate_class_interface_code(root_dir, class, extracted_attrs);
     }
 
@@ -442,13 +510,32 @@ fn generate_interface_code(
     top_content = top_content.replacen(
         "export '../serde/serde.dart';",
         r#"import 'dart:async';
-import 'dart:ffi';
 import 'package:rinf/rinf.dart';
 
 export '../serde/serde.dart';"#,
         1,
     );
-    top_content.push_str("part 'rinf_interface.dart';\n");
+    let mut extension_content = String::new();
+    for class in signal_attrs.keys() {
+        let snake_class = class.to_case(Case::Snake);
+        extension_content.push_str(&format!(
+            r#"export '{}_os.dart'
+    if (dart.library.js_interop) '{}_web.dart';
+"#,
+            snake_class, snake_class
+        ));
+    }
+    top_content = top_content.replacen(
+        "export '../serde/serde.dart';\n",
+        &format!(
+            r#"export '../serde/serde.dart';
+
+{}"#,
+            extension_content
+        ),
+        1,
+    );
+    top_content.push_str("part 'signal_handlers.dart';\n");
     fs::write(&top_file, top_content).unwrap();
 
     // Write the shared code.
