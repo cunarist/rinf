@@ -13,7 +13,7 @@ dependencies:
   rinf:
     path: ../
   cupertino_icons: ^1.0.2
-  meta: ^1.16.0
+  meta: ^1.15.0
   tuple: ^2.0.2
 
 dev_dependencies:
