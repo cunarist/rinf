@@ -56,7 +56,6 @@ jobs:
             ~/.cargo/registry
             target
             ~/.pub-cache
-            test_app/build
           key: >
             ${{ matrix.runner }}-${{ matrix.target }}
             ${{ hashFiles('**/Cargo.toml', '**/pubspec.yaml') }}
