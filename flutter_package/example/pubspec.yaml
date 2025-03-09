@@ -1,5 +1,5 @@
 name: example_app
-description: Demonstrates how to use the rinf plugin.
+description: Demonstrates how to use the Rinf plugin
 publish_to: "none"
 
 version: 0.1.0
