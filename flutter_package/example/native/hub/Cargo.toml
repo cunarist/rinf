@@ -2,7 +2,7 @@
 # Do not change the name of this crate.
 name = "hub"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [lib]
 # `lib` is required for non-library targets,

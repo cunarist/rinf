@@ -1,5 +1,5 @@
-use crate::{generate_dart_code, run_dart_command, RinfConfigMessage};
-use include_dir::{include_dir, Dir};
+use crate::{RinfConfigMessage, generate_dart_code, run_dart_command};
+use include_dir::{Dir, include_dir};
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};

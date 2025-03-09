@@ -1,7 +1,7 @@
 use crate::{
-    apply_rust_template, build_webassembly, check_internet_connection,
-    generate_dart_code, load_verified_rinf_config,
-    watch_and_generate_dart_code, RinfCommandError,
+    RinfCommandError, apply_rust_template, build_webassembly,
+    check_internet_connection, generate_dart_code, load_verified_rinf_config,
+    watch_and_generate_dart_code,
 };
 use clap::{Arg, ArgAction, ArgMatches, Command};
 use owo_colors::OwoColorize;

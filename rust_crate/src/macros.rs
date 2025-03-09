@@ -6,7 +6,7 @@
 macro_rules! write_interface {
     () => {
         #[cfg(not(target_family = "wasm"))]
-        #[no_mangle]
+        #[unsafe(no_mangle)]
         pub extern "C" fn rinf_start_rust_logic_extern() {
             let result = $crate::start_rust_logic(main);
             if let Err(error) = result {

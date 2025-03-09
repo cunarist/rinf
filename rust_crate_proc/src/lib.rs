@@ -1,7 +1,7 @@
 use convert_case::{Case, Casing};
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, DeriveInput, Ident};
+use syn::{DeriveInput, Ident, parse_macro_input};
 
 // TODO: Prohibit `Os`/`Web` suffix.
 // TODO: Add `doc(hidden)` where needed.
@@ -86,7 +86,7 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
             std::sync::LazyLock::new(rinf::signal_channel);
 
         #[cfg(not(target_family = "wasm"))]
-        #[no_mangle]
+        #[unsafe(no_mangle)]
         pub unsafe extern "C" fn #extern_fn_ident(
             message_pointer: *const u8,
             message_size: usize,

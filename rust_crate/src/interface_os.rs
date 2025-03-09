@@ -1,8 +1,8 @@
-use crate::shutdown::SHUTDOWN_EVENTS;
 use crate::RinfError;
+use crate::shutdown::SHUTDOWN_EVENTS;
 use allo_isolate::ffi::DartPostCObjectFnType;
 use allo_isolate::{
-    store_dart_post_cobject, IntoDart, Isolate, ZeroCopyBuffer,
+    IntoDart, Isolate, ZeroCopyBuffer, store_dart_post_cobject,
 };
 use os_thread_local::ThreadLocal;
 use std::sync::Mutex;
@@ -13,12 +13,12 @@ use std::thread;
 
 static DART_ISOLATE: Mutex<Option<Isolate>> = Mutex::new(None);
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn rinf_prepare_isolate_extern(
     store_post_object: DartPostCObjectFnType,
     port: i64,
 ) {
-    store_dart_post_cobject(store_post_object);
+    unsafe { store_dart_post_cobject(store_post_object) }
     let dart_isolate = Isolate::new(port);
     let mut guard = match DART_ISOLATE.lock() {
         Ok(inner) => inner,
@@ -102,7 +102,7 @@ where
     Ok(())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn rinf_stop_rust_logic_extern() {
     SHUTDOWN_EVENTS.dart_stopped.set();
 }

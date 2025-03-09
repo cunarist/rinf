@@ -1,12 +1,12 @@
 [package]
 name = "rinf"
 version = "7.3.0"
-edition = "2021"
+edition = "2024"
 license = "MIT"
 description = "Rust for native business logic, Flutter for flexible and beautiful GUI"
 repository = "https://github.com/cunarist/rinf"
 documentation = "https://rinf.cunarist.com"
-rust-version = "1.80"
+rust-version = "1.85"
 
 [features]
 show-backtrace = ["backtrace"]

@@ -124,7 +124,7 @@ fn to_type_format(ty: &Type) -> Format {
         }
         Type::Array(TypeArray { elem, len, .. }) => {
             if let Expr::Lit(ExprLit {
-                lit: Lit::Int(ref lit_int),
+                lit: Lit::Int(lit_int),
                 ..
             }) = len
             {

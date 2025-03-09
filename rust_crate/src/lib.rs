@@ -9,9 +9,9 @@ mod interface_os;
 #[cfg(target_family = "wasm")]
 mod interface_web;
 
-pub use channel::{signal_channel, SignalReceiver, SignalSender};
+pub use channel::{SignalReceiver, SignalSender, signal_channel};
 pub use error::RinfError;
-pub use interface::{send_rust_signal, start_rust_logic, DartSignal};
+pub use interface::{DartSignal, send_rust_signal, start_rust_logic};
 pub use shutdown::dart_shutdown;
 
 pub use rinf_proc::{
