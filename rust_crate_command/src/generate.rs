@@ -300,7 +300,7 @@ extension {class}DartSignalExt on {class} {{
     isLeaf: true,
     symbol: 'rinf_send_dart_signal_{snake_class}',
   )
-  external static void sendDartSignalExtern(
+  external static void _sendDartSignalExtern(
     Pointer<Uint8> messageBytesAddress,
     int messageBytesLength,
     Pointer<Uint8> binaryAddress,
@@ -316,7 +316,7 @@ extension {class}DartSignalExt on {class} {{
           binary,
         );
       }} else {{
-        sendDartSignalExtern(
+        _sendDartSignalExtern(
         messageBytes.address,
         messageBytes.length,
         binary.address,
@@ -351,7 +351,7 @@ extension {class}DartSignalExt on {class} {{
     isLeaf: true,
     symbol: 'rinf_send_dart_signal_{snake_class}',
   )
-  external static void sendDartSignalExtern(
+  external static void _sendDartSignalExtern(
     Pointer<Uint8> messageBytesAddress,
     int messageBytesLength,
     Pointer<Uint8> binaryAddress,
@@ -368,7 +368,7 @@ extension {class}DartSignalExt on {class} {{
         binary,
       );
     }} else {{
-      sendDartSignalExtern(
+      _sendDartSignalExtern(
         messageBytes.address,
         messageBytes.length,
         binary.address,
