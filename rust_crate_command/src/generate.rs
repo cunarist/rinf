@@ -427,7 +427,10 @@ export '../serde/serde.dart';"#,
     generate_shared_code(root_dir, signal_attrs);
 }
 
-pub fn generate_dart_code(root_dir: &Path, message_config: &RinfConfigMessage) {
+pub fn generate_dart_code(
+    root_dir: &Path,
+    _message_config: &RinfConfigMessage,
+) {
     // TODO: Use the config
     // TODO: Use `rinf_generated` path by default instead of `generated`
 

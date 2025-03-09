@@ -4,9 +4,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Deserialize, DartSignal)]
 pub struct SampleNumberInput {
     pub letter: String,
-    pub dummy_one: u32,
-    pub dummy_two: Option<SampleSchema>,
-    pub dummy_three: Vec<i32>,
+    pub _dummy_one: u32,
+    pub _dummy_two: Option<SampleSchema>,
+    pub _dummy_three: Vec<i32>,
 }
 
 #[derive(Serialize, RustSignal)]
