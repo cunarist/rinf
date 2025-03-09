@@ -4,6 +4,7 @@ use quote::quote;
 use syn::{parse_macro_input, DeriveInput, Ident};
 
 // TODO: Prohibit `Os`/`Web` suffix.
+// TODO: Add `doc(hidden)` where needed.
 
 /// Marks the struct as a signal
 /// that can be nested within other signals.

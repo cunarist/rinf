@@ -402,6 +402,8 @@ extension {class}DartSignalExt on {class} {{
     fs::write(&web_file, web_code).unwrap();
 }
 
+// TODO: Make some generated items private.
+
 fn generate_class_interface_code(
     root_dir: &Path,
     class: &str,
