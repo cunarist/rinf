@@ -85,11 +85,17 @@ fn update_gitignore(root_dir: &Path) -> io::Result<()> {
     let gitignore_path = root_dir.join(".gitignore");
     let mut content = fs::read_to_string(&gitignore_path).unwrap_or_default();
     if !content.contains("# Rust related") {
-        content.push_str("\n# Rust related\n.cargo/\ntarget/\n");
+        content.push_str("\n# Rust related\n/.cargo/\n/target/\n");
     }
-    if !content.contains("# Generated messages") {
+    if !content.contains("# Generated signals") {
         // TODO: Update the path
-        content.push_str("\n# Generated messages\n*/**/messages/\n");
+        content.push_str(
+            r#"# Generated signals
+/lib/src/bincode
+/lib/src/serde
+/lib/src/generated
+"#,
+        );
     }
     fs::write(gitignore_path, content)
 }

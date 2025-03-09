@@ -46,9 +46,10 @@ app.*.map.json
 /android/app/release
 
 # Rust related
-.cargo/
-target/
+/.cargo/
+/target/
 
-# Generated messages
-*/**/messages/
-# TODO: Update this value.
+# Generated signals
+/lib/src/bincode
+/lib/src/serde
+/lib/src/generated
