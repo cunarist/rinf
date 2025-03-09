@@ -68,7 +68,10 @@ typedef SendDartSignalWrap = void Function(
 abstract class RustLibrary {
   void startRustLogic();
   void stopRustLogic();
-  void prepareIsolate(PostCObjectPtr storePostObject, int port);
+  void prepareIsolate(
+    PostCObjectPtr storePostObject,
+    int port,
+  );
   void sendDartSignal(
     String endpointSymbol,
     Uint8List messageBytes,
@@ -99,7 +102,7 @@ class RustLibraryGlobal extends RustLibrary {
   )
   external static void stopRustLogicExtern();
 
-  @Native<Void Function(PostCObjectPtr, Int64)>(
+  @Native<PrepareIsolateExtern>(
     isLeaf: true,
     symbol: 'rinf_prepare_isolate_extern',
   )
@@ -171,6 +174,10 @@ class RustLibraryLocal extends RustLibrary {
     this.prepareIsolateExtern =
         lib.lookupFunction<PrepareIsolateExtern, PrepareIsolateWrap>(
       'rinf_prepare_isolate_extern',
+    );
+    this.sendDartSignalExtern =
+        lib.lookupFunction<SendDartSignalExtern, SendDartSignalWrap>(
+      'rinf_send_dart_signal_extern',
     );
   }
 
