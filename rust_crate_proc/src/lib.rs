@@ -19,7 +19,7 @@ pub fn derive_signal_piece(_input: TokenStream) -> TokenStream {
 
 /// Marks the struct as a signal endpoint
 /// that contains a message from Dart to Rust.
-/// This can be marked on any type that implements `Deserialize`.
+/// This can be marked on any type that implements `Decode`.
 #[proc_macro_derive(DartSignal)]
 pub fn derive_dart_signal(input: TokenStream) -> TokenStream {
     derive_dart_signal_real(input)
@@ -27,7 +27,7 @@ pub fn derive_dart_signal(input: TokenStream) -> TokenStream {
 
 /// Marks the struct as a signal endpoint
 /// that contains a message and binary from Dart to Rust.
-/// This can be marked on any type that implements `Deserialize`.
+/// This can be marked on any type that implements `Decode`.
 #[proc_macro_derive(DartSignalBinary)]
 pub fn derive_dart_signal_binary(input: TokenStream) -> TokenStream {
     derive_dart_signal_real(input)
@@ -55,12 +55,13 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
                 #channel_const_ident.1.clone()
             }
 
-            fn send_dart_signal(message_bytes: &[u8], binary: &[u8]){
-                use rinf::deserialize;
-                use rinf::{debug_print, RinfError};
-                let message_result: Result<#name, RinfError> =
-                    deserialize(message_bytes)
-                    .map_err(|_| RinfError::CannotDecodeMessage);
+            fn send_dart_signal(message_bytes: &[u8], binary: &[u8]) {
+                use rinf::{debug_print, decode_from_slice, Configuration};
+                let message_result = decode_from_slice::<Self, Configuration>(
+                    message_bytes,
+                    Default::default(),
+                )
+                .map(|(msg, _)| msg);
                 let message = match message_result {
                     Ok(inner) => inner,
                     Err(error) => {
@@ -111,7 +112,7 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
 
 /// Marks the struct as a signal endpoint
 /// that contains a message from Rust to Dart.
-/// This can be marked on any type that implements `Serialize`.
+/// This can be marked on any type that implements `Encode`.
 #[proc_macro_derive(RustSignal)]
 pub fn derive_rust_signal(input: TokenStream) -> TokenStream {
     derive_rust_signal_real(input, false)
@@ -119,7 +120,7 @@ pub fn derive_rust_signal(input: TokenStream) -> TokenStream {
 
 /// Marks the struct as a signal endpoint
 /// that contains a message and binary from Rust to Dart.
-/// This can be marked on any type that implements `Serialize`.
+/// This can be marked on any type that implements `Encode`.
 #[proc_macro_derive(RustSignalBinary)]
 pub fn derive_rust_signal_binary(input: TokenStream) -> TokenStream {
     derive_rust_signal_real(input, true)
@@ -137,12 +138,15 @@ fn derive_rust_signal_real(
         quote! {
             impl #name {
                 pub fn send_signal_to_dart(self, binary: Vec<u8>) {
-                    use rinf::serialize;
-                    use rinf::{debug_print, send_rust_signal, RinfError};
+                    use rinf::{
+                        debug_print, encode_to_vec, send_rust_signal,
+                        Configuration,
+                    };
                     let type_name = #name_lit;
-                    let message_result: Result<Vec<u8>, RinfError> =
-                        serialize(&self)
-                        .map_err(|_| RinfError::CannotEncodeMessage);
+                    let message_result = encode_to_vec::<&Self, Configuration>(
+                        &self,
+                        Default::default(),
+                    );
                     let message_bytes = match message_result {
                         Ok(inner) => inner,
                         Err(error) => {
@@ -162,12 +166,15 @@ fn derive_rust_signal_real(
         quote! {
             impl #name {
                 pub fn send_signal_to_dart(self) {
-                    use rinf::serialize;
-                    use rinf::{debug_print, send_rust_signal, RinfError};
+                    use rinf::{
+                        debug_print, encode_to_vec, send_rust_signal,
+                        Configuration,
+                    };
                     let type_name = #name_lit;
-                    let message_result: Result<Vec<u8>, RinfError> =
-                        serialize(&self)
-                        .map_err(|_| RinfError::CannotEncodeMessage);
+                    let message_result = encode_to_vec::<&Self, Configuration>(
+                        &self,
+                        Default::default(),
+                    );
                     let message_bytes = match message_result {
                         Ok(inner) => inner,
                         Err(error) => {

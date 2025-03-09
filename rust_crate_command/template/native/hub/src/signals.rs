@@ -1,12 +1,12 @@
+use bincode::{Decode, Encode};
 use rinf::{DartSignal, RustSignal};
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, DartSignal)]
+#[derive(Debug, Decode, DartSignal)]
 pub struct SmallText {
     pub text: String,
 }
 
-#[derive(Serialize, RustSignal)]
+#[derive(Encode, RustSignal)]
 pub struct SmallNumber {
     pub number: i32,
 }

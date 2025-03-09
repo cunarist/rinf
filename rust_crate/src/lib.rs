@@ -19,4 +19,4 @@ pub use rinf_proc::{
 };
 
 #[doc(hidden)]
-pub use bincode::{deserialize, serialize};
+pub use bincode::{config::Configuration, decode_from_slice, encode_to_vec};
