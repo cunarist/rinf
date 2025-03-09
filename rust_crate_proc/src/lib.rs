@@ -55,7 +55,7 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
                 #channel_const_ident.1.clone()
             }
 
-            fn send_dart_signal(message_bytes: &[u8], binary: &[u8]){
+            fn send_dart_signal(message_bytes: &[u8], binary: &[u8]) {
                 use rinf::deserialize;
                 use rinf::{debug_print, RinfError};
                 let message_result: Result<#name, RinfError> =
