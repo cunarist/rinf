@@ -459,6 +459,9 @@ pub fn generate_dart_code(
 
     // Generate Dart interface code.
     generate_interface_code(root_dir, &signal_attrs);
+
+    // Remove unnecessary files.
+    fs::remove_file(root_dir.join("lib").join("generated.dart")).unwrap();
 }
 
 // TODO: `watch_and_generate_dart_code` is not tested, so check it later
