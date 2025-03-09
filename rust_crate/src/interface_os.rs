@@ -1,15 +1,15 @@
 use crate::shutdown::SHUTDOWN_EVENTS;
-use crate::{RinfError, SEND_DART_SIGNALS};
+use crate::RinfError;
 use allo_isolate::ffi::DartPostCObjectFnType;
 use allo_isolate::{
     store_dart_post_cobject, IntoDart, Isolate, ZeroCopyBuffer,
 };
 use os_thread_local::ThreadLocal;
-use std::collections::HashMap;
-use std::ffi::{c_char, CStr};
 use std::sync::Mutex;
-use std::sync::{LazyLock, OnceLock};
+use std::sync::OnceLock;
 use std::thread;
+
+// TODO: Organize crate imports
 
 static DART_ISOLATE: Mutex<Option<Isolate>> = Mutex::new(None);
 
@@ -105,29 +105,6 @@ where
 #[no_mangle]
 pub extern "C" fn rinf_stop_rust_logic_extern() {
     SHUTDOWN_EVENTS.dart_stopped.set();
-}
-
-type SendDartSignalExterns = LazyLock<HashMap<&'static str, fn(&[u8], &[u8])>>;
-static SEND_DART_SIGNAL_EXTERNS: SendDartSignalExterns =
-    LazyLock::new(|| SEND_DART_SIGNALS.iter().copied().collect());
-
-#[no_mangle]
-pub unsafe extern "C" fn rinf_send_dart_signal_extern(
-    endpoint_symbol: *const c_char,
-    message_pointer: *const u8,
-    message_size: usize,
-    binary_pointer: *const u8,
-    binary_size: usize,
-) {
-    use std::slice::from_raw_parts;
-    let message_bytes = from_raw_parts(message_pointer, message_size);
-    let binary = from_raw_parts(binary_pointer, binary_size);
-    let Ok(symbol) = CStr::from_ptr(endpoint_symbol).to_str() else {
-        return;
-    };
-    if let Some(func) = SEND_DART_SIGNAL_EXTERNS.get(symbol) {
-        func(message_bytes, binary);
-    }
 }
 
 pub fn send_rust_signal_real(

@@ -14,7 +14,6 @@ crate-type = ["lib", "cdylib", "staticlib"]
 [dependencies]
 rinf = "7.3.0"
 serde = "1.0.218"
-linkme = "0.3.32"                                      # TODO: Think about this dependency
 tokio = { version = "1", features = ["rt", "macros"] }
 
 # Uncomment below to target the web.

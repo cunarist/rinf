@@ -21,7 +21,6 @@ bevy_ecs = { version = "0.15", optional = true }
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 allo-isolate = "0.1.26"
 os-thread-local = "0.1.3"
-linkme = "0.3.32"
 backtrace = { version = "0.3.69", optional = true }
 
 [target.'cfg(target_family = "wasm")'.dependencies]

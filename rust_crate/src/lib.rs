@@ -11,18 +11,12 @@ mod interface_web;
 
 pub use channel::{signal_channel, SignalReceiver, SignalSender};
 pub use error::RinfError;
-pub use interface::{
-    send_rust_signal, start_rust_logic, DartSignal, SEND_DART_SIGNALS,
-};
+pub use interface::{send_rust_signal, start_rust_logic, DartSignal};
 pub use shutdown::dart_shutdown;
 
 pub use rinf_proc::{
     DartSignal, DartSignalBinary, RustSignal, RustSignalBinary, SignalPiece,
 };
-
-#[cfg(not(target_family = "wasm"))]
-#[doc(hidden)]
-pub use linkme::distributed_slice;
 
 #[doc(hidden)]
 pub use bincode::{deserialize, serialize};

@@ -54,13 +54,3 @@ pub fn send_rust_signal(
 ) -> Result<(), RinfError> {
     send_rust_signal_real(endpoint, message_bytes, binary)
 }
-
-/// Collects the extern signal functions
-/// that will be called from Dart.
-#[cfg(not(target_family = "wasm"))]
-#[linkme::distributed_slice]
-#[doc(hidden)]
-pub static SEND_DART_SIGNALS: [(&'static str, fn(&[u8], &[u8]))];
-
-#[cfg(target_family = "wasm")]
-pub static SEND_DART_SIGNALS: () = ();
