@@ -84,33 +84,33 @@ jobs:
       - name: Build the example app
         if: matrix.target == 'linux'
         working-directory: user_app/
-        run: flutter build linux --verbose
+        run: flutter build linux
 
       - name: Build the example app
         if: matrix.target == 'android'
         working-directory: user_app/
         run: |
-          flutter build apk --verbose
-          flutter build appbundle --verbose
+          flutter build apk
+          flutter build appbundle
 
       - name: Build the example app
         if: matrix.target == 'windows'
         working-directory: user_app/
-        run: flutter build windows --verbose
+        run: flutter build windows
 
       - name: Build the example app
         if: matrix.target == 'macos'
         working-directory: user_app/
-        run: flutter build macos --verbose
+        run: flutter build macos
 
       - name: Build the example app
         if: matrix.target == 'ios'
         working-directory: user_app/
-        run: flutter build ios --verbose --no-codesign
+        run: flutter build ios --no-codesign
 
       - name: Build the example app
         if: matrix.target == 'web'
         working-directory: user_app/
         run: |
           rinf wasm --release
-          flutter build web --verbose
+          flutter build web
