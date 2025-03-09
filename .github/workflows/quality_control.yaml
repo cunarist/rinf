@@ -43,7 +43,7 @@ jobs:
 
       - name: Install the CLI tool
         working-directory: rust_crate/
-        run: cargo install --path ./
+        run: cargo install --path .
 
       - name: Fetch Flutter dependencies
         run: |

@@ -90,7 +90,7 @@ jobs:
 
       - name: Install the CLI tool
         working-directory: rust_crate/
-        run: cargo install --path ./
+        run: cargo install --path .
 
       - name: Prepare a Flutter app for testing
         run: python automate prepare-example-app
