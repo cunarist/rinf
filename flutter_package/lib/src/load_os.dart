@@ -49,12 +49,14 @@ typedef PostCObjectPtr = Pointer<NativeFunction<PostCObjectInner>>;
 typedef PrepareIsolateExtern = Void Function(PostCObjectPtr, Int64);
 typedef PrepareIsolateWrap = void Function(PostCObjectPtr, int);
 typedef SendDartSignalExtern = Void Function(
+  Pointer<Utf8>,
   Pointer<Uint8>,
   UintPtr,
   Pointer<Uint8>,
   UintPtr,
 );
 typedef SendDartSignalWrap = void Function(
+  Pointer<Utf8>,
   Pointer<Uint8>,
   int,
   Pointer<Uint8>,
@@ -67,6 +69,11 @@ abstract class RustLibrary {
   void startRustLogic();
   void stopRustLogic();
   void prepareIsolate(PostCObjectPtr storePostObject, int port);
+  void sendDartSignal(
+    String endpointSymbol,
+    Uint8List messageBytes,
+    Uint8List binary,
+  );
 }
 
 /// Class for global native library symbols loaded with `RTLD_GLOBAL`.
@@ -101,6 +108,18 @@ class RustLibraryGlobal extends RustLibrary {
     int port,
   );
 
+  @Native<SendDartSignalExtern>(
+    isLeaf: true,
+    symbol: 'rinf_send_dart_signal_extern',
+  )
+  external static void sendDartSignalExtern(
+    Pointer<Utf8> endpointSymbol,
+    Pointer<Uint8> messageBytesAddress,
+    int messageBytesLength,
+    Pointer<Uint8> binaryAddress,
+    int binaryLength,
+  );
+
   void startRustLogic() {
     startRustLogicExtern();
   }
@@ -112,6 +131,21 @@ class RustLibraryGlobal extends RustLibrary {
   void prepareIsolate(PostCObjectPtr storePostObject, int port) {
     prepareIsolateExtern(storePostObject, port);
   }
+
+  void sendDartSignal(
+    String endpointSymbol,
+    Uint8List messageBytes,
+    Uint8List binary,
+  ) {
+    final Pointer<Utf8> endpointCString = endpointSymbol.toNativeUtf8();
+    sendDartSignalExtern(
+      endpointCString,
+      messageBytes.address,
+      messageBytes.length,
+      binary.address,
+      binary.length,
+    );
+  }
 }
 
 /// Class for local native library symbols loaded with `RTLD_LOCAL`.
@@ -119,11 +153,11 @@ class RustLibraryGlobal extends RustLibrary {
 /// It involves extra memory copy before sending the data to Rust.
 class RustLibraryLocal extends RustLibrary {
   final DynamicLibrary lib;
-  final Map<String, SendDartSignalWrap> sendDartSignalExterns = {};
 
   late void Function() startRustLogicExtern;
   late void Function() stopRustLogicExtern;
-  late void Function(PostCObjectPtr, int) prepareIsolateExtern;
+  late PrepareIsolateWrap prepareIsolateExtern;
+  late SendDartSignalWrap sendDartSignalExtern;
 
   RustLibraryLocal({required this.lib}) {
     this.startRustLogicExtern =
@@ -163,18 +197,10 @@ class RustLibraryLocal extends RustLibrary {
     final Pointer<Uint8> binaryMemory = malloc.allocate(binary.length);
     binaryMemory.asTypedList(binary.length).setAll(0, binary);
 
-    // Cache the dynamic library functions
-    // to reduce symbol lookup overhead.
-    var sendDartSignalExtern = sendDartSignalExterns[endpointSymbol];
-    if (sendDartSignalExtern == null) {
-      sendDartSignalExtern =
-          lib.lookupFunction<SendDartSignalExtern, SendDartSignalWrap>(
-        endpointSymbol,
-      );
-      sendDartSignalExterns[endpointSymbol] = sendDartSignalExtern;
-    }
+    final Pointer<Utf8> endpointCString = endpointSymbol.toNativeUtf8();
 
     sendDartSignalExtern(
+      endpointCString,
       messageMemory,
       messageBytes.length,
       binaryMemory,

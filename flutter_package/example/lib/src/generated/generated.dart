@@ -12,15 +12,6 @@ import 'package:rinf/rinf.dart';
 
 export '../serde/serde.dart';
 
-export 'sample_fractal_os.dart'
-    if (dart.library.js_interop) 'sample_fractal_web.dart';
-export 'sample_number_input_os.dart'
-    if (dart.library.js_interop) 'sample_number_input_web.dart';
-export 'sample_number_output_os.dart'
-    if (dart.library.js_interop) 'sample_number_output_web.dart';
-export 'sample_schema_os.dart'
-    if (dart.library.js_interop) 'sample_schema_web.dart';
-
 part 'trait_helpers.dart';
 part 'sample_fractal.dart';
 part 'sample_number_input.dart';

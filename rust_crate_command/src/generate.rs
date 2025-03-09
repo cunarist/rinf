@@ -259,128 +259,32 @@ fn generate_class_extension_code(
     extracted_attrs: &BTreeSet<SignalAttribute>,
 ) {
     let snake_class = class.to_case(Case::Snake);
-    let os_file = root_dir
+    let class_file = root_dir
         .join("lib")
         .join("src")
         .join("generated")
-        .join(format!("{}_os.dart", snake_class));
-    let web_file = root_dir
-        .join("lib")
-        .join("src")
-        .join("generated")
-        .join(format!("{}_web.dart", snake_class));
-
-    let mut os_code = r#"// ignore_for_file:unused_import,unused_element
-import 'dart:ffi';
-import 'dart:typed_data';
-import 'package:rinf/rinf.dart';
-import 'generated.dart';
-
-typedef _SendDartSignalExtern = Void Function(
-  Pointer<Uint8>,
-  UintPtr,
-  Pointer<Uint8>,
-  UintPtr,
-);
-"#
-    .to_owned();
-
-    let mut web_code = r#"// ignore_for_file:unused_import,unused_element
-import 'dart:typed_data';
-import 'package:rinf/rinf.dart';
-import 'generated.dart';
-"#
-    .to_owned();
+        .join(format!("{}.dart", snake_class));
+    let mut code = fs::read_to_string(&class_file).unwrap();
 
     if extracted_attrs.contains(&SignalAttribute::DartSignalBinary) {
-        let new_os_code = format!(
-            r#"
-extension {class}DartSignalExt on {class} {{
-  @Native<_SendDartSignalExtern>(
-    isLeaf: true,
-    symbol: 'rinf_send_dart_signal_{snake_class}',
-  )
-  external static void _sendDartSignalExtern(
-    Pointer<Uint8> messageBytesAddress,
-    int messageBytesLength,
-    Pointer<Uint8> binaryAddress,
-    int binaryLength,
-  );
-
-  void sendSignalToRust(Uint8List binary) {{
-    final messageBytes = bincodeSerialize();
-      if (useLocalSpaceSymbols) {{
-        sendDartSignal(
-          'rinf_send_dart_signal_{snake_class}',
-          messageBytes,
-          binary,
-        );
-      }} else {{
-        _sendDartSignalExtern(
-        messageBytes.address,
-        messageBytes.length,
-        binary.address,
-        binary.length,
-      );
-    }}
-  }}
-}}
-"#
-        );
-        os_code.push_str(&new_os_code);
-        let new_web_code = format!(
+        let new_code = format!(
             r#"
 extension {class}DartSignalExt on {class} {{
   void sendSignalToRust(Uint8List binary) {{
     final messageBytes = bincodeSerialize();
-    sendDartSignal(
-      'rinf_send_dart_signal_{snake_class}',
-      messageBytes,
-      binary,
-    );
-  }}
-}}
-"#
-        );
-        web_code.push_str(&new_web_code);
-    } else if extracted_attrs.contains(&SignalAttribute::DartSignal) {
-        let new_os_code = format!(
-            r#"
-extension {class}DartSignalExt on {class} {{
-  @Native<_SendDartSignalExtern>(
-    isLeaf: true,
-    symbol: 'rinf_send_dart_signal_{snake_class}',
-  )
-  external static void _sendDartSignalExtern(
-    Pointer<Uint8> messageBytesAddress,
-    int messageBytesLength,
-    Pointer<Uint8> binaryAddress,
-    int binaryLength,
-  );
-
-  void sendSignalToRust() {{
-    final messageBytes = bincodeSerialize();
-    final binary = Uint8List(0);
-    if (useLocalSpaceSymbols) {{
       sendDartSignal(
         'rinf_send_dart_signal_{snake_class}',
         messageBytes,
         binary,
       );
-    }} else {{
-      _sendDartSignalExtern(
-        messageBytes.address,
-        messageBytes.length,
-        binary.address,
-        binary.length,
-      );
     }}
   }}
 }}
 "#
         );
-        os_code.push_str(&new_os_code);
-        let new_web_code = format!(
+        code.push_str(&new_code);
+    } else if extracted_attrs.contains(&SignalAttribute::DartSignal) {
+        let new_code = format!(
             r#"
 extension {class}DartSignalExt on {class} {{
   void sendSignalToRust() {{
@@ -395,11 +299,10 @@ extension {class}DartSignalExt on {class} {{
 }}
 "#
         );
-        web_code.push_str(&new_web_code);
+        code.push_str(&new_code);
     }
 
-    fs::write(&os_file, os_code).unwrap();
-    fs::write(&web_file, web_code).unwrap();
+    fs::write(&class_file, code).unwrap();
 }
 
 // TODO: Make some generated items private.
@@ -515,26 +418,6 @@ fn generate_interface_code(
 import 'package:rinf/rinf.dart';
 
 export '../serde/serde.dart';"#,
-        1,
-    );
-    let mut extension_content = String::new();
-    for class in signal_attrs.keys() {
-        let snake_class = class.to_case(Case::Snake);
-        extension_content.push_str(&format!(
-            r#"export '{}_os.dart'
-    if (dart.library.js_interop) '{}_web.dart';
-"#,
-            snake_class, snake_class
-        ));
-    }
-    top_content = top_content.replacen(
-        "export '../serde/serde.dart';\n",
-        &format!(
-            r#"export '../serde/serde.dart';
-
-{}"#,
-            extension_content
-        ),
         1,
     );
     top_content.push_str("part 'signal_handlers.dart';\n");

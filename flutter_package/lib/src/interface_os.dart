@@ -63,6 +63,5 @@ void sendDartSignalReal(
   Uint8List messageBytes,
   Uint8List binary,
 ) {
-  final rustLibraryLocal = rustLibrary as RustLibraryLocal;
-  rustLibraryLocal.sendDartSignal(endpointSymbol, messageBytes, binary);
+  rustLibrary.sendDartSignal(endpointSymbol, messageBytes, binary);
 }

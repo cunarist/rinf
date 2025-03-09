@@ -44,10 +44,11 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
         Ident::new(&format!("{}Channel", name), name.span());
     let channel_const_ident =
         Ident::new(&format!("{}_CHANNEL", upper_snake_name), name.span());
-    let extern_fn_ident = Ident::new(
-        &format!("rinf_send_dart_signal_{}", snake_name),
-        name.span(),
-    );
+    let send_const_ident =
+        Ident::new(&format!("{}_SEND", upper_snake_name), name.span());
+
+    let extern_fn_name = &format!("rinf_send_dart_signal_{}", snake_name);
+    let extern_fn_ident = Ident::new(extern_fn_name, name.span());
 
     let expanded = quote! {
         impl #name {
@@ -87,25 +88,18 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
             std::sync::LazyLock::new(rinf::signal_channel);
 
         #[cfg(not(target_family = "wasm"))]
-        #[no_mangle]
-        pub unsafe extern "C" fn #extern_fn_ident(
-            message_pointer: *const u8,
-            message_size: usize,
-            binary_pointer: *const u8,
-            binary_size: usize,
-        ) {
-            use std::slice::from_raw_parts;
-            let message_bytes = from_raw_parts(message_pointer, message_size);
-            let binary = from_raw_parts(binary_pointer, binary_size);
+        #[distributed_slice(rinf::SEND_DART_SIGNALS)]
+        static #send_const_ident: (&str, fn(&[u8], &[u8])) =
+            (#extern_fn_name, #extern_fn_ident);
+
+        #[cfg(not(target_family = "wasm"))]
+        fn #extern_fn_ident(message_bytes: &[u8], binary: &[u8]) {
             #name::send_dart_signal(message_bytes, binary);
         }
 
         #[cfg(target_family = "wasm")]
         #[wasm_bindgen::prelude::wasm_bindgen]
-        pub fn #extern_fn_ident(
-            message_bytes: &[u8],
-            binary: &[u8],
-        ) {
+        pub fn #extern_fn_ident(message_bytes: &[u8], binary: &[u8]) {
             #name::send_dart_signal(message_bytes, binary);
         }
     };
