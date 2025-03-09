@@ -308,7 +308,7 @@ extension {class}DartSignalExt on {class} {{
   );
 
   void sendSignalToRust(Uint8List binary) {{
-    final messageBytes = this.bincodeSerialize();
+    final messageBytes = bincodeSerialize();
       if (useLocalSpaceSymbols) {{
         sendDartSignal(
           'rinf_send_dart_signal_{snake_class}',
@@ -332,7 +332,7 @@ extension {class}DartSignalExt on {class} {{
             r#"
 extension {class}DartSignalExt on {class} {{
   void sendSignalToRust(Uint8List binary) {{
-    final messageBytes = this.bincodeSerialize();
+    final messageBytes = bincodeSerialize();
     sendDartSignal(
       'rinf_send_dart_signal_{snake_class}',
       messageBytes,
@@ -359,7 +359,7 @@ extension {class}DartSignalExt on {class} {{
   );
 
   void sendSignalToRust() {{
-    final messageBytes = this.bincodeSerialize();
+    final messageBytes = bincodeSerialize();
     final binary = Uint8List(0);
     if (useLocalSpaceSymbols) {{
       sendDartSignal(
@@ -384,7 +384,7 @@ extension {class}DartSignalExt on {class} {{
             r#"
 extension {class}DartSignalExt on {class} {{
   void sendSignalToRust() {{
-    final messageBytes = this.bincodeSerialize();
+    final messageBytes = bincodeSerialize();
     final binary = Uint8List(0);
     sendDartSignal(
       'rinf_send_dart_signal_{snake_class}',
