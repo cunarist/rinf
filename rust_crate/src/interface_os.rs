@@ -14,7 +14,7 @@ use std::thread;
 static DART_ISOLATE: Mutex<Option<Isolate>> = Mutex::new(None);
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn rinf_prepare_isolate_extern(
+pub extern "C" fn rinf_prepare_isolate_extern(
     store_post_object: DartPostCObjectFnType,
     port: i64,
 ) {
