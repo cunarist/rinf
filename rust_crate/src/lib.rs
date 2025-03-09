@@ -23,3 +23,6 @@ pub use rinf_proc::{
 #[cfg(not(target_family = "wasm"))]
 #[doc(hidden)]
 pub use linkme::distributed_slice;
+
+#[doc(hidden)]
+pub use bincode::{deserialize, serialize};

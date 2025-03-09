@@ -58,7 +58,7 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
             }
 
             fn send_dart_signal(message_bytes: &[u8], binary: &[u8]){
-                use bincode::deserialize;
+                use rinf::deserialize;
                 use rinf::{debug_print, RinfError};
                 let message_result: Result<#name, RinfError> =
                     deserialize(message_bytes)
@@ -88,7 +88,7 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
             std::sync::LazyLock::new(rinf::signal_channel);
 
         #[cfg(not(target_family = "wasm"))]
-        #[distributed_slice(rinf::SEND_DART_SIGNALS)]
+        #[linkme::distributed_slice(rinf::SEND_DART_SIGNALS)]
         static #send_const_ident: (&str, fn(&[u8], &[u8])) =
             (#extern_fn_name, #extern_fn_ident);
 
@@ -135,7 +135,7 @@ fn derive_rust_signal_real(
         quote! {
             impl #name {
                 pub fn send_signal_to_dart(self, binary: Vec<u8>) {
-                    use bincode::serialize;
+                    use rinf::serialize;
                     use rinf::{debug_print, send_rust_signal, RinfError};
                     let type_name = #name_lit;
                     let message_result: Result<Vec<u8>, RinfError> =
@@ -160,7 +160,7 @@ fn derive_rust_signal_real(
         quote! {
             impl #name {
                 pub fn send_signal_to_dart(self) {
-                    use bincode::serialize;
+                    use rinf::serialize;
                     use rinf::{debug_print, send_rust_signal, RinfError};
                     let type_name = #name_lit;
                     let message_result: Result<Vec<u8>, RinfError> =
