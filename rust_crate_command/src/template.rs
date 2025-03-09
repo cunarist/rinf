@@ -90,7 +90,8 @@ fn update_gitignore(root_dir: &Path) -> io::Result<()> {
     if !content.contains("# Generated signals") {
         // TODO: Update the path
         content.push_str(
-            r#"# Generated signals
+            r#"
+# Generated signals
 /lib/src/bincode
 /lib/src/serde
 /lib/src/generated
