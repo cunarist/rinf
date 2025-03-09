@@ -13,7 +13,7 @@ crate-type = ["lib", "cdylib", "staticlib"]
 
 [dependencies]
 rinf = "7.3.0"
-bincode = "2.0.0"
+serde = "1.0.218"
 tokio = { version = "1", features = ["rt", "macros"] }
 
 # Uncomment below to target the web.

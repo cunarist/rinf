@@ -4,6 +4,8 @@ use std::fmt;
 #[derive(Debug)]
 pub enum RinfError {
     NoDartIsolate,
+    CannotEncodeMessage,
+    CannotDecodeMessage,
     NoSignalHandler,
     NoBindings,
 }
@@ -13,6 +15,12 @@ impl fmt::Display for RinfError {
         match self {
             Self::NoDartIsolate => {
                 write!(f, "Dart isolate for Rust signals was not created")
+            }
+            Self::CannotDecodeMessage => {
+                write!(f, "Could not decode the message")
+            }
+            Self::CannotEncodeMessage => {
+                write!(f, "Could not encode the message")
             }
             Self::NoSignalHandler => {
                 write!(f, "Could not find the handler for Dart signal")
