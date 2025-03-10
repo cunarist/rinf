@@ -11,7 +11,7 @@ use generate::*;
 use template::*;
 use webassembly::*;
 
-pub use config::RinfCommandError;
+pub use config::SetupError;
 pub use entry::run_command;
 
 // TODO: Remove all panicking code like `unwrap` or `expect`.

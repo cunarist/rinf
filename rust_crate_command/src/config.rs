@@ -10,7 +10,7 @@ use thiserror::Error;
 
 /// Error type for Rinf configuration loading.
 #[derive(Debug, Error)]
-pub enum RinfCommandError {
+pub enum SetupError {
     #[error("Failed to read YAML file: {0}")]
     IoError(#[from] std::io::Error),
 
@@ -68,9 +68,7 @@ impl Default for RinfConfigMessage {
 
 impl RinfConfigMessage {
     /// Constructs a `RinfConfigMessage` from a YAML map.
-    pub fn from_yaml(
-        yaml: &serde_yml::Mapping,
-    ) -> Result<Self, RinfCommandError> {
+    pub fn from_yaml(yaml: &serde_yml::Mapping) -> Result<Self, SetupError> {
         let valid_keys: HashSet<&str> = [
             "input_dir",
             "rust_output_dir",
@@ -83,7 +81,7 @@ impl RinfConfigMessage {
         for key in yaml.keys() {
             if let Some(key_str) = key.as_str() {
                 if !valid_keys.contains(key_str) {
-                    return Err(RinfCommandError::UnknownKey(
+                    return Err(SetupError::UnknownKey(
                         key_str.to_string(),
                         valid_keys
                             .iter()
@@ -135,15 +133,13 @@ impl Display for RinfConfig {
 
 impl RinfConfig {
     /// Constructs a `RinfConfig` from a YAML map.
-    pub fn from_yaml(
-        yaml: &serde_yml::Mapping,
-    ) -> Result<Self, RinfCommandError> {
+    pub fn from_yaml(yaml: &serde_yml::Mapping) -> Result<Self, SetupError> {
         let valid_keys: HashSet<&str> = ["message"].into_iter().collect();
 
         for key in yaml.keys() {
             if let Some(key_str) = key.as_str() {
                 if !valid_keys.contains(key_str) {
-                    return Err(RinfCommandError::UnknownKey(
+                    return Err(SetupError::UnknownKey(
                         key_str.to_string(),
                         valid_keys
                             .iter()
@@ -174,13 +170,13 @@ impl RinfConfig {
 /// Otherwise it loads all values found in the config, using defaults for missing values.
 pub fn load_verified_rinf_config(
     root_dir: &Path,
-) -> Result<RinfConfig, RinfCommandError> {
+) -> Result<RinfConfig, SetupError> {
     let file_path = root_dir.join("pubspec.yaml");
     let content = fs::read_to_string(file_path)?;
     let yaml: Value = serde_yml::from_str(&content)?;
     let rinf_yaml = yaml
         .as_mapping()
-        .ok_or(RinfCommandError::Other)?
+        .ok_or(SetupError::Other)?
         .get("rinf")
         .and_then(Value::as_mapping);
     let config = match rinf_yaml {

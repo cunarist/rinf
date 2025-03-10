@@ -1,4 +1,4 @@
-use crate::RinfError;
+use crate::AppError;
 use crate::shutdown::SHUTDOWN_EVENTS;
 use allo_isolate::ffi::DartPostCObjectFnType;
 use allo_isolate::{
@@ -46,7 +46,7 @@ impl Drop for ShutdownDropper {
     }
 }
 
-pub fn start_rust_logic_real<F, T>(main_fn: F) -> Result<(), RinfError>
+pub fn start_rust_logic_real<F, T>(main_fn: F) -> Result<(), AppError>
 where
     F: Fn() -> T + Send + 'static,
 {
@@ -111,14 +111,14 @@ pub fn send_rust_signal_real(
     endpoint: &str,
     message_bytes: Vec<u8>,
     binary: Vec<u8>,
-) -> Result<(), RinfError> {
+) -> Result<(), AppError> {
     // When `DART_ISOLATE` is not initialized, just return the error.
     // This can happen when running test code in Rust.
     let guard = match DART_ISOLATE.lock() {
         Ok(inner) => inner,
         Err(poisoned) => poisoned.into_inner(),
     };
-    let dart_isolate = guard.as_ref().ok_or(RinfError::NoDartIsolate)?;
+    let dart_isolate = guard.as_ref().ok_or(AppError::NoDartIsolate)?;
 
     // If a `Vec<u8>` is empty, we can't just simply send it to Dart
     // because panic can occur from null pointers.

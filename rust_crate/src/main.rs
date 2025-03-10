@@ -1,5 +1,5 @@
 #[cfg(not(target_family = "wasm"))]
-fn main() -> Result<(), rinf_command::RinfCommandError> {
+fn main() -> Result<(), rinf_command::SetupError> {
     rinf_command::run_command()
     // TODO: Check that `rinf_command` crate is only embedded in the binary.
     // TODO: Think about the return type

@@ -1,8 +1,8 @@
-use crate::error::RinfError;
+use crate::error::AppError;
 use js_sys::Uint8Array;
 use wasm_bindgen::prelude::*;
 
-pub fn start_rust_logic_real<F, T>(main_fn: F) -> Result<(), RinfError>
+pub fn start_rust_logic_real<F, T>(main_fn: F) -> Result<(), AppError>
 where
     F: Fn() -> T + 'static,
 {
@@ -40,11 +40,11 @@ pub fn send_rust_signal_real(
     endpoint: &str,
     message_bytes: Vec<u8>,
     binary: Vec<u8>,
-) -> Result<(), RinfError> {
+) -> Result<(), AppError> {
     let result = rinf_send_rust_signal_extern(
         endpoint,
         js_sys::Uint8Array::from(message_bytes.as_slice()),
         js_sys::Uint8Array::from(binary.as_slice()),
     );
-    result.map_err(|_| RinfError::NoBindings)
+    result.map_err(|_| AppError::NoBindings)
 }

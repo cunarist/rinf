@@ -1,5 +1,5 @@
 use crate::{
-    RinfCommandError, apply_rust_template, build_webassembly,
+    SetupError, apply_rust_template, build_webassembly,
     check_internet_connection, generate_dart_code, load_verified_rinf_config,
     watch_and_generate_dart_code,
 };
@@ -11,7 +11,7 @@ use std::path::{Path, PathBuf};
 
 // TODO: Remove string-based paths
 
-pub fn run_command() -> Result<(), RinfCommandError> {
+pub fn run_command() -> Result<(), SetupError> {
     // Check the internet connection status and remember it.
     let is_internet_connected = check_internet_connection();
 
@@ -19,7 +19,7 @@ pub fn run_command() -> Result<(), RinfCommandError> {
     let root_dir = current_dir().unwrap();
     if !is_flutter_app_project(&root_dir) {
         println!("{:?}", root_dir);
-        Err(RinfCommandError::NotFlutterApp)?;
+        Err(SetupError::NotFlutterApp)?;
     }
 
     // Run a command from user input.
@@ -113,7 +113,7 @@ fn read_publish_to(file_path: &PathBuf) -> Option<String> {
     let yaml: Value = serde_yml::from_str(&content).unwrap();
     let field_value = yaml
         .as_mapping()
-        .ok_or(RinfCommandError::Other)
+        .ok_or(SetupError::Other)
         .unwrap()
         .get("publish_to")?;
     let config = field_value.as_str().unwrap().to_string();

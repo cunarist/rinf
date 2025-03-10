@@ -10,7 +10,7 @@ mod interface_os;
 mod interface_web;
 
 pub use channel::{SignalReceiver, SignalSender, signal_channel};
-pub use error::RinfError;
+pub use error::AppError;
 pub use interface::{DartSignal, send_rust_signal, start_rust_logic};
 pub use shutdown::dart_shutdown;
 
