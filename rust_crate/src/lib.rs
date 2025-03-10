@@ -2,12 +2,15 @@ mod channel;
 mod error;
 mod macros;
 mod shutdown;
+mod traits;
 
 mod interface;
 #[cfg(not(target_family = "wasm"))]
 mod interface_os;
 #[cfg(target_family = "wasm")]
 mod interface_web;
+
+use traits::*;
 
 pub use channel::{SignalReceiver, SignalSender, signal_channel};
 pub use error::AppError;

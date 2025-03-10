@@ -1,5 +1,5 @@
-use crate::AppError;
 use crate::shutdown::SHUTDOWN_EVENTS;
+use crate::{AppError, LockAnyway};
 use allo_isolate::ffi::DartPostCObjectFnType;
 use allo_isolate::{
     IntoDart, Isolate, ZeroCopyBuffer, store_dart_post_cobject,
@@ -20,10 +20,7 @@ pub extern "C" fn rinf_prepare_isolate_extern(
 ) {
     unsafe { store_dart_post_cobject(store_post_object) }
     let dart_isolate = Isolate::new(port);
-    let mut guard = match DART_ISOLATE.lock() {
-        Ok(inner) => inner,
-        Err(poisoned) => poisoned.into_inner(),
-    };
+    let mut guard = DART_ISOLATE.lock_anyway();
     guard.replace(dart_isolate);
 }
 
@@ -114,10 +111,7 @@ pub fn send_rust_signal_real(
 ) -> Result<(), AppError> {
     // When `DART_ISOLATE` is not initialized, just return the error.
     // This can happen when running test code in Rust.
-    let guard = match DART_ISOLATE.lock() {
-        Ok(inner) => inner,
-        Err(poisoned) => poisoned.into_inner(),
-    };
+    let guard = DART_ISOLATE.lock_anyway();
     let dart_isolate = guard.as_ref().ok_or(AppError::NoDartIsolate)?;
 
     // If a `Vec<u8>` is empty, we can't just simply send it to Dart

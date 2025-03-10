@@ -1,3 +1,4 @@
+use crate::LockAnyway;
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::{Arc, LazyLock, Mutex};
@@ -54,10 +55,7 @@ impl Event {
     /// Creates a future that will be resolved
     /// when the flag is set to `true`.
     pub fn wait_async(&self) -> EventFuture {
-        let guard = match self.inner.lock() {
-            Ok(inner) => inner,
-            Err(poisoned) => poisoned.into_inner(),
-        };
+        let guard = self.inner.lock_anyway();
         EventFuture {
             started_session: guard.session,
             inner: self.inner.clone(),
@@ -70,10 +68,7 @@ impl Event {
     /// Sets the flag to `true` and notifies all waiting threads.
     /// This will wake up any threads or async tasks.
     pub fn set(&self) {
-        let mut guard = match self.inner.lock() {
-            Ok(inner) => inner,
-            Err(poisoned) => poisoned.into_inner(),
-        };
+        let mut guard = self.inner.lock_anyway();
         guard.flag = true; // Set the flag
         guard.session += 1; // Increment the session count
 
@@ -89,10 +84,7 @@ impl Event {
     /// but subsequent calls to `wait` will
     /// block until the flag is set again.
     pub fn clear(&self) {
-        let mut guard = match self.inner.lock() {
-            Ok(inner) => inner,
-            Err(poisoned) => poisoned.into_inner(),
-        };
+        let mut guard = self.inner.lock_anyway();
         guard.flag = false; // Clear the flag
     }
 
@@ -135,10 +127,7 @@ struct EventBlocking {
 #[cfg(not(target_family = "wasm"))]
 impl EventBlocking {
     fn new(inner: Arc<Mutex<EventInner>>, condvar: Arc<Condvar>) -> Self {
-        let guard = match inner.lock() {
-            Ok(inner) => inner,
-            Err(poisoned) => poisoned.into_inner(),
-        };
+        let guard = inner.lock_anyway();
         EventBlocking {
             inner: inner.clone(),
             condvar,
@@ -148,20 +137,14 @@ impl EventBlocking {
 
     pub fn wait(&self) {
         // Lock the inner state and wait on the condition variable
-        let mut guard = match self.inner.lock() {
-            Ok(inner) => inner,
-            Err(poisoned) => poisoned.into_inner(),
-        };
+        let mut guard = self.inner.lock_anyway();
         loop {
             // Check if the condition is met
             if guard.flag || guard.session != self.started_session {
                 break;
             }
             // Wait on the condition variable and reassign the guard
-            guard = match self.condvar.wait(guard) {
-                Ok(inner) => inner,
-                Err(poisoned) => poisoned.into_inner(),
-            };
+            guard = self.condvar.wait(guard).unwrap_or_else(|p| p.into_inner());
         }
     }
 }
@@ -176,10 +159,7 @@ impl Future for EventFuture {
     type Output = ();
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        let mut guard = match self.inner.lock() {
-            Ok(inner) => inner,
-            Err(poisoned) => poisoned.into_inner(),
-        };
+        let mut guard = self.inner.lock_anyway();
 
         // Check if the flag is set or if the session count has changed.
         // If the flag is true or the session count is different
