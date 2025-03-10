@@ -18,9 +18,6 @@ pub fn apply_rust_template(
     // Copy basic folders needed for Rust to work
     dump_template(root_dir).unwrap();
 
-    // Create workspace `Cargo.toml`
-    write_cargo_toml(root_dir).unwrap();
-
     // Modify `.gitignore`
     update_gitignore(root_dir).unwrap();
 
@@ -62,7 +59,16 @@ fn dump_entry(
             }
         }
         include_dir::DirEntry::File(file) => {
-            let file_path = dest_path.join(file.path());
+            let mut file_path = dest_path.join(file.path());
+            let file_name = file_path
+                .file_name()
+                .and_then(|f| f.to_str())
+                .unwrap()
+                .to_owned();
+            if file_name.ends_with(".template") {
+                let new_name = file_name.strip_suffix(".template").unwrap();
+                file_path.set_file_name(new_name);
+            }
             if let Some(parent) = file_path.parent() {
                 fs::create_dir_all(parent)?;
             }
@@ -70,15 +76,6 @@ fn dump_entry(
         }
     }
     Ok(())
-}
-
-fn write_cargo_toml(root_dir: &Path) -> io::Result<()> {
-    let cargo_toml_content = r#"
-[workspace]
-members = [\"./native/*\"]
-resolver = \"2\"
-"#;
-    fs::write(root_dir.join("Cargo.toml"), cargo_toml_content)
 }
 
 fn update_gitignore(root_dir: &Path) -> io::Result<()> {
