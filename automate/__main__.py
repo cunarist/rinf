@@ -21,10 +21,12 @@ def replace_text_once(filepath: Path, change_from: str, change_to: str):
 
 def update_cargokit():
     print("Updating CargoKit...")
-    command = "git subtree pull"
-    command += " --prefix flutter_package/cargokit"
-    command += " https://github.com/irondash/cargokit.git"
-    command += " main"
+    command = (
+        "git subtree pull"
+        " --prefix flutter_package/cargokit"
+        " https://github.com/irondash/cargokit.git"
+        " main"
+    )
     run_subprocess(command, ROOT_DIR)
 
 
