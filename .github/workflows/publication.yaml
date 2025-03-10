@@ -54,12 +54,17 @@ jobs:
       # Save the `crates.io` API token at
       # `GitHub repo - Settings - Security - Secrets and variables - Actions`.
 
-      - name: Check the Rust crate
+      - name: Check Rust crates
         working-directory: rust_crate/
-        run: cargo publish --dry-run
+        run: |
+          cargo publish --dry-run --manifest-path rust_crate_proc/Cargo.toml
+          cargo publish --dry-run --manifest-path rust_crate_command/Cargo.toml
+          cargo publish --dry-run --manifest-path rust_crate/Cargo.toml
 
-      - name: Publish the Rust crate
+      - name: Publish Rust crates
         working-directory: rust_crate/
         run: |
           cargo login ${{ secrets.CRATES_IO_API_TOKEN }}
-          cargo publish
+          cargo publish --manifest-path rust_crate_proc/Cargo.toml
+          cargo publish --manifest-path rust_crate_command/Cargo.toml
+          cargo publish --manifest-path rust_crate/Cargo.toml
