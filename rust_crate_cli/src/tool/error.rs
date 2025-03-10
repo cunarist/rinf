@@ -2,17 +2,19 @@
 // TODO: Organize error conversion
 
 use std::error::Error;
+use std::ffi::OsString;
 
 /// Error type for Rinf configuration loading.
 #[derive(Debug)]
 pub enum SetupError {
-    IoError(std::io::Error),
-    YamlError(serde_yml::Error),
-    ClipError(arboard::Error),
-    SyntaxError(syn::Error),
-    ReflectionError(Box<dyn Error>),
-    WatchError(notify::Error),
+    Io(std::io::Error),
+    Yaml(serde_yml::Error),
+    Clip(arboard::Error),
+    Syntax(syn::Error),
+    Reflection(Box<dyn Error>),
+    WatchingFile(notify::Error),
     UnknownKey(String, String),
+    BadFilePath(OsString),
     NotFlutterApp,
     Other, // TODO: Remove
 }
@@ -20,30 +22,33 @@ pub enum SetupError {
 impl std::fmt::Display for SetupError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            SetupError::IoError(e) => {
+            SetupError::Io(e) => {
                 write!(f, "Failed to read YAML file: {}", e)
             }
-            SetupError::YamlError(e) => {
+            SetupError::Yaml(e) => {
                 write!(f, "Failed to parse YAML: {}", e)
             }
-            SetupError::ClipError(e) => {
+            SetupError::Clip(e) => {
                 write!(f, "Failed to use clipboard: {}", e)
             }
-            SetupError::SyntaxError(e) => {
+            SetupError::Syntax(e) => {
                 write!(f, "Invalid syntax: {}", e)
             }
-            SetupError::ReflectionError(e) => {
+            SetupError::Reflection(e) => {
                 write!(f, "Failed to use reflection: {}", e)
             }
-            SetupError::WatchError(e) => {
+            SetupError::WatchingFile(e) => {
                 write!(f, "Watch error: {}", e)
             }
             SetupError::UnknownKey(key, available) => {
                 write!(
                     f,
-                    "Unknown key '{}' in rinf config. Available keys are: {}",
+                    "Unknown key \"{}\" in rinf config. Available keys are: {}",
                     key, available
                 )
+            }
+            SetupError::BadFilePath(name) => {
+                write!(f, "\"{:?}\" is not a valid file path", name)
             }
             SetupError::NotFlutterApp => {
                 write!(f, "This is not a Flutter app project")
@@ -57,36 +62,36 @@ impl std::error::Error for SetupError {}
 
 impl From<std::io::Error> for SetupError {
     fn from(err: std::io::Error) -> Self {
-        SetupError::IoError(err)
+        SetupError::Io(err)
     }
 }
 
 impl From<serde_yml::Error> for SetupError {
     fn from(err: serde_yml::Error) -> Self {
-        SetupError::YamlError(err)
+        SetupError::Yaml(err)
     }
 }
 
 impl From<arboard::Error> for SetupError {
     fn from(err: arboard::Error) -> Self {
-        SetupError::ClipError(err)
+        SetupError::Clip(err)
     }
 }
 
 impl From<syn::Error> for SetupError {
     fn from(err: syn::Error) -> Self {
-        SetupError::SyntaxError(err)
+        SetupError::Syntax(err)
     }
 }
 
 impl From<Box<dyn Error>> for SetupError {
     fn from(err: Box<dyn Error>) -> Self {
-        SetupError::ReflectionError(err)
+        SetupError::Reflection(err)
     }
 }
 
 impl From<notify::Error> for SetupError {
     fn from(err: notify::Error) -> Self {
-        SetupError::WatchError(err)
+        SetupError::WatchingFile(err)
     }
 }

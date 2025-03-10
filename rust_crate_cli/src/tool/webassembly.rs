@@ -26,14 +26,13 @@ pub fn build_webassembly(
         "[{}/{}] Preparing WebAssembly output path",
         step, total_steps
     );
-    let output_path = root_dir.join("web").join("pkg");
 
     step += 1;
     println!(
         "[{}/{}] Compiling Rust with `wasm-pack` to `web` target",
         step, total_steps
     );
-    compile_wasm(output_path, is_release_mode)?;
+    compile_wasm(root_dir, is_release_mode)?;
 
     println!(
         "[{}/{}] WebAssembly module is now ready 🎉",
@@ -58,15 +57,19 @@ fn install_wasm_toolchain() -> Result<(), SetupError> {
 }
 
 fn compile_wasm(
-    output_path: std::path::PathBuf,
+    root_dir: &Path,
     is_release_mode: bool,
 ) -> Result<(), SetupError> {
+    let out_path = root_dir.join("web").join("pkg");
+    let out_string = out_path
+        .to_str()
+        .ok_or_else(|| SetupError::BadFilePath(out_path.as_os_str().into()))?;
     let mut wasm_pack_args = vec![
         "--quiet",
         "build",
         "./native/hub",
         "--out-dir",
-        output_path.to_str().unwrap(),
+        out_string,
         "--out-name",
         "hub",
         "--no-typescript",

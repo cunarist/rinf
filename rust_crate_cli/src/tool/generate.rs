@@ -11,6 +11,7 @@ use std::hash::Hash;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::channel;
 use std::time::Duration;
+use syn::spanned::Spanned;
 use syn::{
     Attribute, Expr, ExprLit, File, GenericArgument, Item, ItemStruct, Lit,
     PathArguments, Type, TypeArray, TypePath, TypeTuple,
@@ -37,7 +38,12 @@ fn extract_signal_attribute(
             continue;
         }
         attr.parse_nested_meta(|meta| {
-            let last_segment = meta.path.segments.last().unwrap();
+            let Some(last_segment) = meta.path.segments.last() else {
+                return Err(syn::Error::new(
+                    meta.path.span(),
+                    "Missing derive item name",
+                ));
+            };
             let ident: &str = &last_segment.ident.to_string();
             let signal_attr_op = match ident {
                 "SignalPiece" => Some(SignalAttribute::SignalPiece),
@@ -217,11 +223,9 @@ fn process_items(
             }
             Item::Mod(m) if m.content.is_some() => {
                 // Recursively process items in nested modules.
-                process_items(
-                    &m.content.as_ref().unwrap().1,
-                    registry,
-                    signal_attrs,
-                )?;
+                if let Some(inner_items) = m.content.as_ref().map(|p| &p.1) {
+                    process_items(inner_items, registry, signal_attrs)?;
+                }
             }
             _ => {}
         }

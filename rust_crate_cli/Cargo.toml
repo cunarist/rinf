@@ -26,7 +26,6 @@ convert_case = "0.8.0"
 arboard = "3.4.1"
 notify = "8.0.0"
 
-# TODO: Reactivate warnings
-# [lints.clippy]
-# unwrap_used = "deny"
-# expect_used = "deny"
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"

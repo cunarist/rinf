@@ -61,15 +61,18 @@ fn dump_entry(
         }
         include_dir::DirEntry::File(file) => {
             let mut file_path = dest_path.join(file.path());
+            let file_name_os = file_path.file_name().ok_or_else(|| {
+                SetupError::BadFilePath(file_path.as_os_str().into())
+            })?;
             let file_name = file_path
                 .file_name()
-                .and_then(|f| f.to_str())
-                .unwrap()
+                .ok_or_else(|| SetupError::BadFilePath(file_name_os.into()))?
+                .to_str()
+                .ok_or_else(|| SetupError::BadFilePath(file_name_os.into()))?
                 .to_owned();
-            if file_name.ends_with(".template") {
-                let new_name = file_name.strip_suffix(".template").unwrap();
-                file_path.set_file_name(new_name);
-            }
+            let clean_name =
+                file_name.strip_suffix(".template").unwrap_or(&file_name);
+            file_path.set_file_name(clean_name);
             if let Some(parent) = file_path.parent() {
                 create_dir_all(parent)?;
             }
