@@ -1,5 +1,5 @@
 [package]
-name = "rinf_command"
+name = "rinf_cli"
 version = "7.3.0"
 edition = "2024"
 license = "MIT"
@@ -7,6 +7,10 @@ description = "Rust for native business logic, Flutter for flexible and beautifu
 repository = "https://github.com/cunarist/rinf"
 documentation = "https://rinf.cunarist.com"
 include = ["/src/", "/template/"]
+
+[[bin]]
+name = "rinf"
+path = "src/bin/main.rs"
 
 [dependencies]
 syn = { version = "2.0.98", features = ["full"] }

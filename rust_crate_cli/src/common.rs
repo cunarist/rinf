@@ -6,8 +6,6 @@ pub fn run_dart_command(args: &[&str]) -> std::io::Result<()> {
     let cmd = "dart.bat";
     #[cfg(target_family = "unix")]
     let cmd = "dart";
-    #[cfg(target_family = "wasm")]
-    let cmd = "none"; // Dummy value to suppress unused warnings
     run_subprocess(cmd, args);
     Ok(())
 }

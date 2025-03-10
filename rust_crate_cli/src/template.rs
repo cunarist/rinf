@@ -128,7 +128,7 @@ flutter doctor
 You also need to have the CLI tool for Rinf ready.
 
 ```shell
-cargo install rinf
+cargo install rinf_cli
 ```
 
 Signals sent between Dart and Rust are implemented using signal attributes.

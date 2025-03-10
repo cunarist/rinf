@@ -17,7 +17,7 @@ Now install the command executable to easily run Rinf commands in the CLI.[^1]
 
 ```{code-block} shell
 :caption: CLI
-cargo install rinf
+cargo install rinf_cli
 ```
 
 Then, simply run this in the command-line from your Flutter project's directory.

@@ -13,7 +13,6 @@ show-backtrace = ["backtrace"]
 bevy = ["bevy_ecs"]
 
 [dependencies]
-rinf_command = { version = "7.3.0" }
 rinf_proc = { version = "7.3.0" }
 bincode = "1.3.3"
 bevy_ecs = { version = "0.15", optional = true }
