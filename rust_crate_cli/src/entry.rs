@@ -58,20 +58,20 @@ pub fn run_command() -> Result<(), SetupError> {
 
 fn create_arg_matcher() -> ArgMatches {
     Command::new("rinf")
-        .about("Helper commands for building apps using Rust in Flutter.")
+        .about("CLI tool for building apps using Rust in Flutter")
         .subcommand_required(true)
         .arg_required_else_help(true)
         .subcommand(
             Command::new("config")
-                .about("Show Rinf configuration resolved from `pubspec.yaml`."),
+                .about("Show Rinf configuration resolved from `pubspec.yaml`"),
         )
         .subcommand(
             Command::new("template")
-                .about("Apply Rust template to the current Flutter project."),
+                .about("Apply Rust template to the current Flutter project"),
         )
         .subcommand(
             Command::new("gen")
-                .about("Generate Dart code from Rust code with attributes.")
+                .about("Generate Dart code from Rust structs with attributes")
                 .arg(
                     Arg::new("watch")
                         .short('w')
@@ -82,7 +82,7 @@ fn create_arg_matcher() -> ArgMatches {
         )
         .subcommand(
             Command::new("wasm")
-                .about("Build the WebAssembly module for the web.")
+                .about("Build the WebAssembly module for the web")
                 .arg(
                     Arg::new("release")
                         .short('r')
@@ -93,7 +93,7 @@ fn create_arg_matcher() -> ArgMatches {
         )
         .subcommand(
             Command::new("server")
-                .about("Show how to run Flutter web server with web headers."),
+                .about("Get full `flutter run` command with web headers"),
         )
         .get_matches()
 }
@@ -124,6 +124,7 @@ fn provide_server_command() {
         " --web-header=Cross-Origin-Embedder-Policy=require-corp",
     );
     clipboard.set_text(full_command).unwrap();
-    let full_guide = "Full `flutter run` command copied to clipboard";
+    let full_guide =
+        "Full `flutter run` command for the web copied to clipboard";
     println!("{}", full_guide.dimmed());
 }
