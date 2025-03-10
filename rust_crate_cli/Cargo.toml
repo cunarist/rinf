@@ -15,7 +15,7 @@ path = "src/bin/main.rs"
 [dependencies]
 syn = { version = "2.0.98", features = ["full"] }
 quote = "1.0.38"
-serde = "1.0.218"
+serde = { version = "1.0.218", features = ["derive"] }
 serde_yml = "0.0.12"
 serde-reflection = "0.5.0"
 serde-generate = "0.29.0"
