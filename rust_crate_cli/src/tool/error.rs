@@ -11,7 +11,7 @@ pub enum SetupError {
     Yaml(serde_yml::Error),
     Clip(arboard::Error),
     Syntax(syn::Error),
-    Reflection(Box<dyn Error>),
+    ReflectionModule(Box<dyn Error>),
     WatchingFile(notify::Error),
     UnknownKey(String, String),
     BadFilePath(OsString),
@@ -34,7 +34,7 @@ impl std::fmt::Display for SetupError {
             SetupError::Syntax(e) => {
                 write!(f, "Invalid syntax: {}", e)
             }
-            SetupError::Reflection(e) => {
+            SetupError::ReflectionModule(e) => {
                 write!(f, "Failed to use reflection: {}", e)
             }
             SetupError::WatchingFile(e) => {
@@ -81,12 +81,6 @@ impl From<arboard::Error> for SetupError {
 impl From<syn::Error> for SetupError {
     fn from(err: syn::Error) -> Self {
         SetupError::Syntax(err)
-    }
-}
-
-impl From<Box<dyn Error>> for SetupError {
-    fn from(err: Box<dyn Error>) -> Self {
-        SetupError::Reflection(err)
     }
 }
 
