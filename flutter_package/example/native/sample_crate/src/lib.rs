@@ -3,7 +3,7 @@
 mod error;
 mod fractal;
 
-use error::ExampleError;
+use error::*;
 
 pub use fractal::draw_fractal_image;
 

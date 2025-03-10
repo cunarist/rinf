@@ -1,9 +1,15 @@
 //! This module is written for Rinf demonstrations.
 
-use crate::common::*;
-use crate::signals::*;
+use crate::{SampleFractal, SampleSchema};
+use anyhow::Result;
 use rinf::debug_print;
+use sample_crate::{
+    draw_fractal_image, fetch_from_web_api, get_current_time, get_hardward_id,
+};
 use std::time::Duration;
+use tokio::task::{spawn, spawn_blocking, yield_now};
+use tokio::time::sleep;
+use tokio_with_wasm::alias as tokio;
 
 // TODO: Organize asterisk imports
 
@@ -23,7 +29,7 @@ pub async fn stream_fractal() {
     spawn(async move {
         loop {
             // Wait for 40 milliseconds on each frame
-            tokio::time::sleep(Duration::from_millis(40)).await;
+            sleep(Duration::from_millis(40)).await;
             if sender.capacity() == 0 {
                 continue;
             }
@@ -35,9 +41,8 @@ pub async fn stream_fractal() {
 
             // Calculate the fractal image
             // parallelly in a separate thread pool.
-            let join_handle = spawn_blocking(move || {
-                sample_crate::draw_fractal_image(current_scale)
-            });
+            let join_handle =
+                spawn_blocking(move || draw_fractal_image(current_scale));
             let _ = sender.send(join_handle).await;
         }
     });
@@ -74,33 +79,33 @@ pub async fn run_debug_tests() -> Result<()> {
         return Ok(());
     }
 
-    tokio::time::sleep(Duration::from_secs(1)).await;
+    sleep(Duration::from_secs(1)).await;
     debug_print!("Starting debug tests.");
 
     // Get the current time.
-    let current_time = sample_crate::get_current_time();
+    let current_time = get_current_time();
     debug_print!("System time: {current_time}");
 
     // Fetch data from a web API.
     let url = "http://jsonplaceholder.typicode.com/todos/1";
-    let web_response = sample_crate::fetch_from_web_api(url).await?;
+    let web_response = fetch_from_web_api(url).await?;
     debug_print!("Response from a web API: {web_response:?}");
 
     // Use a crate that accesses operating system APIs.
-    let hwid = sample_crate::get_hardward_id()?;
+    let hwid = get_hardward_id()?;
     debug_print!("Hardware ID: {hwid:?}");
 
-    // Test `tokio::join!` for futures.
+    // Test async closures.
     let join_first = async {
-        tokio::time::sleep(Duration::from_secs(1)).await;
+        sleep(Duration::from_secs(1)).await;
         debug_print!("First future finished.");
     };
     let join_second = async {
-        tokio::time::sleep(Duration::from_secs(2)).await;
+        sleep(Duration::from_secs(2)).await;
         debug_print!("Second future finished.");
     };
     let join_third = async {
-        tokio::time::sleep(Duration::from_secs(3)).await;
+        sleep(Duration::from_secs(3)).await;
         debug_print!("Third future finished.");
     };
     join_first.await;
@@ -108,18 +113,18 @@ pub async fn run_debug_tests() -> Result<()> {
     join_third.await;
 
     // Avoid blocking the async event loop by yielding.
-    let mut last_time = sample_crate::get_current_time();
+    let mut last_time = get_current_time();
     let mut count = 0u64;
     let mut steps_finished = 0;
     loop {
         for _ in 0..1000000 {
             count += 1;
         }
-        tokio::task::yield_now().await;
-        let time_passed = sample_crate::get_current_time() - last_time;
+        yield_now().await;
+        let time_passed = get_current_time() - last_time;
         if time_passed.num_milliseconds() > 1000 {
             debug_print!("Counted to {count}, yielding regularly.");
-            last_time = sample_crate::get_current_time();
+            last_time = get_current_time();
             steps_finished += 1;
             if steps_finished == 10 {
                 break;

@@ -2,15 +2,18 @@
 //! entry point of the Rust logic.
 
 mod actors;
-mod common;
 mod sample_functions;
 mod signals;
 
-use common::*;
+use actors::*;
+use sample_functions::*;
 use signals::*;
+
+use rinf::{dart_shutdown, write_interface};
+use tokio::task::spawn;
 use tokio_with_wasm::alias as tokio;
 
-rinf::write_interface!();
+write_interface!();
 
 // TODO: Apply actor model everywhere.
 
@@ -21,10 +24,10 @@ async fn main() {
     // Always use non-blocking async functions like `tokio::fs::File::open`.
     // If you must use blocking code, use `tokio::task::spawn_blocking`
     // or the equivalent provided by your async library.
-    spawn(sample_functions::stream_fractal());
-    spawn(sample_functions::run_debug_tests());
-    spawn(actors::create_actors());
+    spawn(stream_fractal());
+    spawn(run_debug_tests());
+    spawn(create_actors());
 
     // Keep the main function running until Dart shutdown.
-    rinf::dart_shutdown().await;
+    dart_shutdown().await;
 }

@@ -6,10 +6,13 @@ mod signals;
 
 use signals::*;
 
+use rinf::{dart_shutdown, write_interface};
+use tokio::task::spawn;
+
 // Uncomment below to target the web.
 // use tokio_with_wasm::alias as tokio;
 
-rinf::write_interface!();
+write_interface!();
 
 // You can go with any async library, not just `tokio`.
 #[tokio::main(flavor = "current_thread")]
@@ -18,8 +21,8 @@ async fn main() {
     // Always use non-blocking async functions like `tokio::fs::File::open`.
     // If you must use blocking code, use `tokio::task::spawn_blocking`
     // or the equivalent provided by your async library.
-    tokio::spawn(sample_functions::communicate());
+    spawn(sample_functions::communicate());
 
     // Keep the main function running until Dart shutdown.
-    rinf::dart_shutdown().await;
+    dart_shutdown().await;
 }

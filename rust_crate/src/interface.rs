@@ -1,4 +1,4 @@
-use crate::error::AppError;
+use crate::AppError;
 
 #[cfg(not(target_family = "wasm"))]
 use super::interface_os::*;

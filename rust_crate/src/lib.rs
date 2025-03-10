@@ -10,6 +10,7 @@ mod interface_os;
 #[cfg(target_family = "wasm")]
 mod interface_web;
 
+use shutdown::*;
 use traits::*;
 
 pub use channel::{SignalReceiver, SignalSender, signal_channel};

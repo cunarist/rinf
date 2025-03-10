@@ -69,6 +69,8 @@ use crate::common::*;
 use crate::messages::*;
 use rinf::debug_print;
 
+// TODO: Organize imports in code snippets
+
 pub async fn calculate_precious_data() {
     let receiver = MyPreciousData::get_dart_signal_receiver(); // GENERATED
     while let Some(dart_signal) = receiver.recv().await {

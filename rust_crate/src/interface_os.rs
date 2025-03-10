@@ -1,5 +1,4 @@
-use crate::shutdown::SHUTDOWN_EVENTS;
-use crate::{AppError, LockAnyway};
+use crate::{AppError, LockAnyway, SHUTDOWN_EVENTS, debug_print};
 use allo_isolate::ffi::DartPostCObjectFnType;
 use allo_isolate::{
     IntoDart, Isolate, ZeroCopyBuffer, store_dart_post_cobject,
@@ -53,14 +52,14 @@ where
         #[cfg(not(feature = "backtrace"))]
         {
             std::panic::set_hook(Box::new(|panic_info| {
-                crate::debug_print!("A panic occurred in Rust.\n{panic_info}");
+                debug_print!("A panic occurred in Rust.\n{panic_info}");
             }));
         }
         #[cfg(feature = "backtrace")]
         {
             std::panic::set_hook(Box::new(|panic_info| {
                 let backtrace = backtrace::Backtrace::new();
-                crate::debug_print!(
+                debug_print!(
                     "A panic occurred in Rust.\n{panic_info}\n{backtrace:?}"
                 );
             }));
