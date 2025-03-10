@@ -51,3 +51,4 @@ rinf server
 # TODO: Fill these in
 
 - Recursive signal derive is needed
+- `cargo uninstall rinf` and `cargo install rinf_cli`
