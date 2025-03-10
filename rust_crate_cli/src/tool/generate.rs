@@ -18,7 +18,6 @@ use syn::{
 
 // TODO: Remove all panicking code
 // TODO: Handle enums and tuple structs
-// TODO: Support binary signals
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
 enum SignalAttribute {
