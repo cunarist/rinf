@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 
 // TODO: Organize imports
 
-static TEMPLATE_DIR: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/template");
+static TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/template");
 
 /// Creates new folders and files in an existing Flutter project folder.
 pub fn apply_rust_template(
