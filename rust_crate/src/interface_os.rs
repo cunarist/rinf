@@ -1,4 +1,4 @@
-use crate::{AppError, LockRecovery, SHUTDOWN_EVENTS};
+use crate::{AppError, GuardRecovery, SHUTDOWN_EVENTS};
 use allo_isolate::ffi::DartPostCObjectFnType;
 use allo_isolate::{
     IntoDart, Isolate, ZeroCopyBuffer, store_dart_post_cobject,
