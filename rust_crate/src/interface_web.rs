@@ -1,6 +1,6 @@
 use crate::{AppError, SHUTDOWN_EVENTS, ShutdownEventsLock};
 use js_sys::Uint8Array;
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::prelude::{JsValue, wasm_bindgen};
 
 // There is no shutdown mechanism on the web.
 static _SHUTDOWN_EVENTS: &ShutdownEventsLock = &SHUTDOWN_EVENTS;
@@ -13,7 +13,8 @@ where
     #[cfg(debug_assertions)]
     {
         use crate::debug_print;
-        std::panic::set_hook(Box::new(|panic_info| {
+        use std::panic::set_hook;
+        set_hook(Box::new(|panic_info| {
             debug_print!("A panic occurred in Rust.\n{panic_info}");
         }));
     }
@@ -47,8 +48,8 @@ pub fn send_rust_signal_real(
 ) -> Result<(), AppError> {
     let result = rinf_send_rust_signal_extern(
         endpoint,
-        js_sys::Uint8Array::from(message_bytes.as_slice()),
-        js_sys::Uint8Array::from(binary.as_slice()),
+        Uint8Array::from(message_bytes.as_slice()),
+        Uint8Array::from(binary.as_slice()),
     );
     result.map_err(|_| AppError::NoBindings)
 }

@@ -6,7 +6,7 @@ use allo_isolate::{
 use os_thread_local::ThreadLocal;
 use std::sync::Mutex;
 use std::sync::OnceLock;
-use std::thread;
+use std::thread::spawn;
 
 // TODO: Organize crate imports
 
@@ -50,16 +50,18 @@ where
     #[cfg(debug_assertions)]
     {
         use crate::debug_print;
+        use std::panic::set_hook;
         #[cfg(not(feature = "backtrace"))]
         {
-            std::panic::set_hook(Box::new(|panic_info| {
+            set_hook(Box::new(|panic_info| {
                 debug_print!("A panic occurred in Rust.\n{panic_info}");
             }));
         }
         #[cfg(feature = "backtrace")]
         {
-            std::panic::set_hook(Box::new(|panic_info| {
-                let backtrace = backtrace::Backtrace::new();
+            use backtrace::Backtrace;
+            set_hook(Box::new(|panic_info| {
+                let backtrace = Backtrace::new();
                 debug_print!(
                     "A panic occurred in Rust.\n{panic_info}\n{backtrace:?}"
                 );
@@ -74,7 +76,7 @@ where
     let _ = SHUTDOWN_DROPPER.set(thread_local);
 
     // Spawn a new thread to run the async runtime.
-    thread::spawn(move || {
+    spawn(move || {
         // Notify that Dart has stopped
         // to terminate the previous Rust async runtime threads.
         // After Dart's hot restart or reopening the app,

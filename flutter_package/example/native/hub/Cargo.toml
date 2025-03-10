@@ -24,4 +24,5 @@ tokio_with_wasm = { version = "0.8.1", features = [
 wasm-bindgen = "0.2.100"
 messages = "0.3.1"
 anyhow = "1.0.89"
+async-trait = "0.1.87"
 sample_crate = { path = "../sample_crate" }
