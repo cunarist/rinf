@@ -3,8 +3,6 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{DeriveInput, Ident, parse_macro_input};
 
-// TODO: Prohibit `Os`/`Web` suffix.
-
 /// Marks the struct as a signal
 /// that can be nested within other signals.
 /// A `SignalPiece` cannot be sent independently
