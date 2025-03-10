@@ -1,18 +1,8 @@
-mod common;
-mod config;
-mod entry;
-mod error;
-mod generate;
-mod template;
-mod webassembly;
+#[cfg(not(target_family = "wasm"))]
+mod tool;
 
-use common::*;
-use config::*;
-use generate::*;
-use template::*;
-use webassembly::*;
+#[cfg(not(target_family = "wasm"))]
+use tool::*;
 
-pub use entry::run_command;
-pub use error::SetupError;
-
-// TODO: Remove all panicking code like `unwrap` or `expect`.
+#[cfg(not(target_family = "wasm"))]
+pub use tool::{SetupError, run_command};

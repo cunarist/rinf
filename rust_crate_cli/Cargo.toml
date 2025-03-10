@@ -12,7 +12,7 @@ include = ["/src/", "/template/"]
 name = "rinf"
 path = "src/bin/main.rs"
 
-[dependencies]
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
 syn = { version = "2.0.98", features = ["full"] }
 quote = "1.0.38"
 serde = { version = "1.0.218", features = ["derive"] }
