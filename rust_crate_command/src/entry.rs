@@ -99,7 +99,6 @@ fn create_arg_matcher() -> ArgMatches {
 }
 
 fn is_flutter_app_project(root_dir: &Path) -> bool {
-    // Check if current folder is a Flutter app project.
     let spec_file = root_dir.join("pubspec.yaml");
     let publish_to = read_publish_to(&spec_file).unwrap();
     publish_to == "none"
