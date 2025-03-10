@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, DartSignal)]
 pub struct SmallText {
-    pub text: String,
+    pub _text: String,
 }
 
 #[derive(Serialize, RustSignal)]
