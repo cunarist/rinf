@@ -1,14 +1,18 @@
-use std::sync::{Mutex, MutexGuard};
+use std::sync::{MutexGuard, PoisonError};
 
-pub trait LockAnyway<T> {
-    fn lock_anyway(&self) -> MutexGuard<'_, T>;
+/// There is no panicking code in the Rinf crate.
+/// We assume that any mutex used here will never be poisoned.
+/// This trait handles the recovery from a logically poisoned situation,
+/// which is unlikely to occur.
+pub trait LockRecovery<'a, T> {
+    fn recover(self) -> MutexGuard<'a, T>;
 }
 
-impl<T> LockAnyway<T> for Mutex<T> {
-    fn lock_anyway(&self) -> MutexGuard<'_, T> {
-        // There is no panicking code in the Rinf crate.
-        // We assume that any mutex used here is never poisoned.
-        match self.lock() {
+impl<'a, T> LockRecovery<'a, T>
+    for Result<MutexGuard<'a, T>, PoisonError<MutexGuard<'a, T>>>
+{
+    fn recover(self) -> MutexGuard<'a, T> {
+        match self {
             Ok(inner) => inner,
             Err(poisoned) => poisoned.into_inner(),
         }

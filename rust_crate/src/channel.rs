@@ -1,4 +1,4 @@
-use crate::LockAnyway;
+use crate::LockRecovery;
 use std::collections::VecDeque;
 use std::future::Future;
 use std::pin::Pin;
@@ -36,7 +36,7 @@ impl<T> SignalSender<T> {
     /// message, it will be woken up. This method does not fail if the mutex
     /// is poisoned but simply ignores the failure.
     pub fn send(&self, msg: T) {
-        let mut guard = self.inner.lock_anyway();
+        let mut guard = self.inner.lock().recover();
 
         // Enqueue the message
         guard.queue.push_back(msg);
@@ -66,7 +66,7 @@ impl<T> Clone for SignalReceiver<T> {
     /// original receiver will no longer receive messages after this clone.
     /// This ensures only the most recent receiver can access the message queue.
     fn clone(&self) -> Self {
-        let mut guard = self.inner.lock_anyway();
+        let mut guard = self.inner.lock().recover();
         let new_receiver = SignalReceiver {
             inner: self.inner.clone(),
             id: guard.active_receiver_id + 1, // Increment ID for new receiver
@@ -95,7 +95,7 @@ impl<T> Future for RecvFuture<T> {
     /// a message is sent. If this receiver is not the active receiver, it will
     /// return `None`.
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        let mut guard = self.inner.lock_anyway();
+        let mut guard = self.inner.lock().recover();
 
         // Only allow the current active receiver to receive messages
         if guard.active_receiver_id == self.receiver_id {
