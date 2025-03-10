@@ -13,10 +13,9 @@ pub enum SetupError {
     Syntax(syn::Error),
     ReflectionModule(Box<dyn Error>),
     WatchingFile(notify::Error),
-    UnknownKey(String, String),
+    PubConfig(String),
     BadFilePath(OsString),
     NotFlutterApp,
-    Other, // TODO: Remove
 }
 
 impl std::fmt::Display for SetupError {
@@ -40,20 +39,15 @@ impl std::fmt::Display for SetupError {
             SetupError::WatchingFile(e) => {
                 write!(f, "Watch error: {}", e)
             }
-            SetupError::UnknownKey(key, available) => {
-                write!(
-                    f,
-                    "Unknown key \"{}\" in rinf config. Available keys are: {}",
-                    key, available
-                )
+            SetupError::PubConfig(msg) => {
+                write!(f, "Invalid `pubspec.yaml` config: {}", msg)
             }
             SetupError::BadFilePath(name) => {
-                write!(f, "\"{:?}\" is not a valid file path", name)
+                write!(f, "`{:?}` is not a valid file path", name)
             }
             SetupError::NotFlutterApp => {
                 write!(f, "This is not a Flutter app project")
             }
-            SetupError::Other => write!(f, "Unknown error"),
         }
     }
 }

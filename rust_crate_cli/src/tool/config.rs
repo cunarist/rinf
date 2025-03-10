@@ -60,14 +60,15 @@ impl RinfConfigMessage {
         for key in yaml.keys() {
             if let Some(key_str) = key.as_str() {
                 if !valid_keys.contains(key_str) {
-                    return Err(SetupError::UnknownKey(
-                        key_str.to_string(),
+                    Err(SetupError::PubConfig(format!(
+                        "Unknown key \"{}\", Available keys are: {}",
+                        key_str,
                         valid_keys
                             .iter()
                             .cloned()
                             .collect::<Vec<_>>()
                             .join(", "),
-                    ));
+                    )))?;
                 }
             }
         }
@@ -118,14 +119,15 @@ impl RinfConfig {
         for key in yaml.keys() {
             if let Some(key_str) = key.as_str() {
                 if !valid_keys.contains(key_str) {
-                    return Err(SetupError::UnknownKey(
-                        key_str.to_string(),
+                    Err(SetupError::PubConfig(format!(
+                        "Unknown key \"{}\", Available keys are: {}",
+                        key_str,
                         valid_keys
                             .iter()
                             .cloned()
                             .collect::<Vec<_>>()
                             .join(", "),
-                    ));
+                    )))?
                 }
             }
         }
@@ -155,7 +157,7 @@ pub fn load_verified_rinf_config(
     let yaml: Value = serde_yml::from_str(&content)?;
     let rinf_yaml = yaml
         .as_mapping()
-        .ok_or(SetupError::Other)?
+        .ok_or(SetupError::PubConfig("Parsing failed".to_owned()))?
         .get("rinf")
         .and_then(Value::as_mapping);
     let config = match rinf_yaml {
