@@ -16,7 +16,7 @@ pub fn run_command() -> Result<(), SetupError> {
     // Check the internet connection status and remember it.
     let is_internet_connected = check_internet_connection();
 
-    // Check if the ucrrent directory is Flutter app's root.
+    // Check if the current directory is Flutter app's root.
     let root_dir = current_dir().unwrap();
     if !is_flutter_app_project(&root_dir) {
         println!("{:?}", root_dir);
