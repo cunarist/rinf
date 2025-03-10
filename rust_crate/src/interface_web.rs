@@ -1,6 +1,9 @@
-use crate::{AppError, debug_print};
+use crate::{AppError, SHUTDOWN_EVENTS, ShutdownEventsLock};
 use js_sys::Uint8Array;
 use wasm_bindgen::prelude::*;
+
+// There is no shutdown mechanism on the web.
+static _SHUTDOWN_EVENTS: &ShutdownEventsLock = &SHUTDOWN_EVENTS;
 
 pub fn start_rust_logic_real<F, T>(main_fn: F) -> Result<(), AppError>
 where
@@ -9,6 +12,7 @@ where
     // Add kind description for panics.
     #[cfg(debug_assertions)]
     {
+        use crate::debug_print;
         std::panic::set_hook(Box::new(|panic_info| {
             debug_print!("A panic occurred in Rust.\n{panic_info}");
         }));

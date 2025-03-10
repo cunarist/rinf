@@ -9,7 +9,7 @@ use std::task::{Context, Poll, Waker};
 #[cfg(not(target_family = "wasm"))]
 use std::sync::Condvar;
 
-type ShutdownEventsLock = LazyLock<ShutdownEvents>;
+pub type ShutdownEventsLock = LazyLock<ShutdownEvents>;
 pub static SHUTDOWN_EVENTS: ShutdownEventsLock =
     LazyLock::new(|| ShutdownEvents {
         dart_stopped: Event::new(),

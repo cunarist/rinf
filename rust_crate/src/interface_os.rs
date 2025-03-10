@@ -1,4 +1,4 @@
-use crate::{AppError, LockRecovery, SHUTDOWN_EVENTS, debug_print};
+use crate::{AppError, LockRecovery, SHUTDOWN_EVENTS};
 use allo_isolate::ffi::DartPostCObjectFnType;
 use allo_isolate::{
     IntoDart, Isolate, ZeroCopyBuffer, store_dart_post_cobject,
@@ -49,6 +49,7 @@ where
     // Enable console output for panics.
     #[cfg(debug_assertions)]
     {
+        use crate::debug_print;
         #[cfg(not(feature = "backtrace"))]
         {
             std::panic::set_hook(Box::new(|panic_info| {
