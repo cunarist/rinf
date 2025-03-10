@@ -8,18 +8,20 @@ macro_rules! write_interface {
         #[cfg(not(target_family = "wasm"))]
         #[unsafe(no_mangle)]
         pub extern "C" fn rinf_start_rust_logic_extern() {
+            use rinf::debug_print;
             let result = $crate::start_rust_logic(main);
             if let Err(error) = result {
-                rinf::debug_print!("{error}");
+                debug_print!("{error}");
             }
         }
 
         #[cfg(target_family = "wasm")]
         #[wasm_bindgen::prelude::wasm_bindgen]
         pub fn rinf_start_rust_logic_extern() {
+            use rinf::debug_print;
             let result = $crate::start_rust_logic(main);
             if let Err(error) = result {
-                rinf::debug_print!("{error}");
+                debug_print!("{error}");
             }
         }
     };

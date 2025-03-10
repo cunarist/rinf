@@ -1,6 +1,7 @@
 //! This module is written for Rinf demonstrations.
 
 use crate::{SmallNumber, SmallText};
+use rinf::debug_print;
 
 pub async fn communicate() {
     // Send signals to Dart like below.
@@ -10,7 +11,7 @@ pub async fn communicate() {
     let receiver = SmallText::get_dart_signal_receiver();
     while let Some(dart_signal) = receiver.recv().await {
         let message: SmallText = dart_signal.message;
-        rinf::debug_print!("{message:?}");
+        debug_print!("{message:?}");
     }
 }
 
