@@ -5,5 +5,5 @@ fn main() -> Result<(), rinf_cli::SetupError> {
 
 #[cfg(target_family = "wasm")]
 fn main() {
-    // Dummy function to make the linter happy.
+    // This is a dummy function to make Clippy happy.
 }
