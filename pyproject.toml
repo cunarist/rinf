@@ -2,7 +2,7 @@
 # We avoid shell scripts because they are platform-dependent.
 
 [tool.uv.workspace]
-members = ["documentation"]
+members = ["automate", "documentation"]
 
 [tool.ruff]
 select = ["E", "F", "N", "I", "PL"]
