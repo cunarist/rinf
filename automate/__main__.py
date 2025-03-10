@@ -1,9 +1,14 @@
-from os import chdir, remove, system
+from os import remove
 from pathlib import Path
+from subprocess import run
 from sys import argv
 
 ROOT_DIR = Path(__file__).parent.parent
 COMMAND_ARG = 1
+
+
+def run_subprocess(command: str, cwd: Path):
+    run(command.split(), cwd=cwd, check=True, shell=True)
 
 
 def replace_text_once(filepath: Path, change_from: str, change_to: str):
@@ -20,7 +25,7 @@ def update_cargokit():
     command += " --prefix flutter_package/cargokit"
     command += " https://github.com/irondash/cargokit.git"
     command += " main"
-    system(command)
+    run_subprocess(command, ROOT_DIR)
 
 
 def prepare_test_app():
@@ -32,16 +37,15 @@ def prepare_test_app():
         file.write(content)
 
     command = "flutter create test_app"
-    system(command)
+    run_subprocess(command, ROOT_DIR)
 
-    chdir(ROOT_DIR / "test_app")
-
-    command = "dart pub add \"rinf:{'path':'../flutter_package'}\""
-    system(command)
+    command = "dart pub add rinf --path=../flutter_package"
+    run_subprocess(command, ROOT_DIR / "test_app")
     command = "rinf template"
-    system(command)
+    run_subprocess(command, ROOT_DIR / "test_app")
 
-    remove("Cargo.toml")
+    # Use repository Cargo workspace.
+    remove(ROOT_DIR / "test_app" / "Cargo.toml")
 
     # Enable the web target, since it's not enabled by default.
     replace_text_once(
@@ -60,8 +64,7 @@ def prepare_test_app():
         "wasm-bindgen",
     )
 
-    chdir(ROOT_DIR)
-
+    # Update workspace members.
     replace_text_once(
         ROOT_DIR / "Cargo.toml",
         "flutter_package/example/native/*",
@@ -78,16 +81,15 @@ def prepare_user_app():
         file.write(content)
 
     command = "flutter create user_app"
-    system(command)
-
-    chdir(ROOT_DIR / "user_app")
+    run_subprocess(command, ROOT_DIR)
 
     command = "flutter pub add rinf"
-    system(command)
+    run_subprocess(command, ROOT_DIR / "user_app")
     command = "rinf template"
-    system(command)
+    run_subprocess(command, ROOT_DIR / "user_app")
 
-    remove("Cargo.toml")
+    # Use repository Cargo workspace.
+    remove(ROOT_DIR / "user_app" / "Cargo.toml")
 
     # Enable the web target, since it's not enabled by default.
     replace_text_once(
@@ -106,8 +108,7 @@ def prepare_user_app():
         "wasm-bindgen",
     )
 
-    chdir(ROOT_DIR)
-
+    # Update workspace members.
     replace_text_once(
         ROOT_DIR / "Cargo.toml",
         "flutter_package/example/native/*",
@@ -121,10 +122,8 @@ def prepare_user_app():
 
 
 def prepare_example_app():
-    chdir(ROOT_DIR / "flutter_package" / "example")
-
     command = "rinf gen"
-    system(command)
+    run_subprocess(command, ROOT_DIR / "flutter_package" / "example")
 
 
 def run_command():
