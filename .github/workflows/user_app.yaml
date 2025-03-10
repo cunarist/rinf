@@ -75,7 +75,6 @@ jobs:
           python-version: "3.13"
 
       - name: Install the CLI tool
-        working-directory: rust_crate/
         run: cargo install rinf_cli
 
       - name: Prepare a Flutter app for testing

@@ -89,8 +89,7 @@ jobs:
           python-version: "3.13"
 
       - name: Install the CLI tool
-        working-directory: rust_crate/
-        run: cargo install --path .
+        run: cargo install --path rust_crate_cli
 
       - name: Prepare a Flutter app for testing
         run: python automate prepare-example-app

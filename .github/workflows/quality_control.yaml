@@ -42,8 +42,7 @@ jobs:
         run: rustup component add clippy
 
       - name: Install the CLI tool
-        working-directory: rust_crate/
-        run: cargo install --path .
+        run: cargo install --path rust_crate_cli
 
       - name: Fetch Flutter dependencies
         run: |
