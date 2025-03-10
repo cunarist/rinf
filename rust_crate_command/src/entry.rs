@@ -3,6 +3,7 @@ use crate::{
     check_internet_connection, generate_dart_code, load_verified_rinf_config,
     watch_and_generate_dart_code,
 };
+use arboard::Clipboard;
 use clap::{Arg, ArgAction, ArgMatches, Command};
 use owo_colors::OwoColorize;
 use serde_yml::Value;
@@ -47,11 +48,7 @@ pub fn run_command() -> Result<(), SetupError> {
             build_webassembly(&root_dir, release, is_internet_connected);
         }
         Some(("server", _)) => {
-            // TODO: Dim the output
-            let full_command = "flutter run \
-                --web-header=Cross-Origin-Opener-Policy=same-origin \
-                --web-header=Cross-Origin-Embedder-Policy=require-corp";
-            println!("{}", full_command);
+            provide_server_command();
         }
         _ => unreachable!(), // TODO: Remove this unreachable
     }
@@ -118,4 +115,16 @@ fn read_publish_to(file_path: &PathBuf) -> Option<String> {
         .get("publish_to")?;
     let config = field_value.as_str().unwrap().to_string();
     Some(config)
+}
+
+fn provide_server_command() {
+    let mut clipboard = Clipboard::new().unwrap();
+    let full_command = concat!(
+        "flutter run",
+        " --web-header=Cross-Origin-Opener-Policy=same-origin",
+        " --web-header=Cross-Origin-Embedder-Policy=require-corp",
+    );
+    clipboard.set_text(full_command).unwrap();
+    let full_guide = "Full `flutter run` command copied to clipboard";
+    println!("{}", full_guide.dimmed());
 }

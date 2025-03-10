@@ -19,6 +19,7 @@ clap = "4.5.31"
 owo-colors = "4.2.0"
 include_dir = "0.7.4"
 convert_case = "0.8.0"
+arboard = "3.4.1"
 notify = "8.0.0"
 
 # TODO: Reactivate warnings
