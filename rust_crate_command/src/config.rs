@@ -1,33 +1,12 @@
+use crate::SetupError;
 use serde::Deserialize;
 use serde_yml::Value;
 use std::collections::HashSet;
 use std::fmt::{Display, Formatter};
 use std::fs;
 use std::path::Path;
-use thiserror::Error;
 
-// TODO: Organize error messages
-
-/// Error type for Rinf configuration loading.
-#[derive(Debug, Error)]
-pub enum SetupError {
-    #[error("Failed to read YAML file: {0}")]
-    IoError(#[from] std::io::Error),
-
-    #[error("Failed to parse YAML: {0}")]
-    YamlError(#[from] serde_yml::Error),
-
-    #[error("Unknown key '{0}' in rinf config. Available keys are: {1}")]
-    UnknownKey(String, String),
-
-    #[error("This is not a Flutter app project")]
-    NotFlutterApp,
-
-    #[error("Unknown error")]
-    Other, // TODO: Remove
-}
-
-// TODO: Remove the message.
+// TODO: Remove the message config struct.
 
 /// Rinf message configuration structure.
 #[derive(Deserialize)]
