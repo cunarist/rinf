@@ -52,3 +52,4 @@ rinf server
 
 - Recursive signal derive is needed
 - `cargo uninstall rinf` and `cargo install rinf_cli`
+- New signal code generation
