@@ -5,10 +5,15 @@
 //! To build a solid app, do not communicate by sharing memory;
 //! instead, share memory by communicating.
 
-use crate::common::*;
-use crate::messages::*;
-use messages::prelude::*;
+use crate::{SampleNumberInput, SampleNumberOutput};
+use anyhow::Result;
+use async_trait::async_trait;
+use messages::prelude::{Actor, Address, Context, Handler};
 use rinf::debug_print;
+use tokio::task::spawn;
+use tokio_with_wasm::alias as tokio;
+
+// TODO: Organize imports
 
 // The letter type for communicating with an actor.
 pub struct ClickedLetter;

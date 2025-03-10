@@ -1,27 +1,23 @@
-use crate::error::RinfError;
-use crate::shutdown::SHUTDOWN_EVENTS;
+use crate::{AppError, GuardRecovery, SHUTDOWN_EVENTS};
 use allo_isolate::ffi::DartPostCObjectFnType;
 use allo_isolate::{
-    store_dart_post_cobject, IntoDart, Isolate, ZeroCopyBuffer,
+    IntoDart, Isolate, ZeroCopyBuffer, store_dart_post_cobject,
 };
 use os_thread_local::ThreadLocal;
 use std::sync::Mutex;
 use std::sync::OnceLock;
-use std::thread;
+use std::thread::spawn;
 
 static DART_ISOLATE: Mutex<Option<Isolate>> = Mutex::new(None);
 
-#[no_mangle]
-pub unsafe extern "C" fn prepare_isolate_extern(
+#[unsafe(no_mangle)]
+pub extern "C" fn rinf_prepare_isolate_extern(
     store_post_object: DartPostCObjectFnType,
     port: i64,
 ) {
-    store_dart_post_cobject(store_post_object);
+    unsafe { store_dart_post_cobject(store_post_object) }
     let dart_isolate = Isolate::new(port);
-    let mut guard = match DART_ISOLATE.lock() {
-        Ok(inner) => inner,
-        Err(poisoned) => poisoned.into_inner(),
-    };
+    let mut guard = DART_ISOLATE.lock().recover();
     guard.replace(dart_isolate);
 }
 
@@ -44,24 +40,27 @@ impl Drop for ShutdownDropper {
     }
 }
 
-pub fn start_rust_logic_real<F, T>(main_fn: F) -> Result<(), RinfError>
+pub fn start_rust_logic_real<F, T>(main_fn: F) -> Result<(), AppError>
 where
     F: Fn() -> T + Send + 'static,
 {
     // Enable console output for panics.
     #[cfg(debug_assertions)]
     {
+        use crate::debug_print;
+        use std::panic::set_hook;
         #[cfg(not(feature = "backtrace"))]
         {
-            std::panic::set_hook(Box::new(|panic_info| {
-                crate::debug_print!("A panic occurred in Rust.\n{panic_info}");
+            set_hook(Box::new(|panic_info| {
+                debug_print!("A panic occurred in Rust.\n{panic_info}");
             }));
         }
         #[cfg(feature = "backtrace")]
         {
-            std::panic::set_hook(Box::new(|panic_info| {
-                let backtrace = backtrace::Backtrace::new();
-                crate::debug_print!(
+            use backtrace::Backtrace;
+            set_hook(Box::new(|panic_info| {
+                let backtrace = Backtrace::new();
+                debug_print!(
                     "A panic occurred in Rust.\n{panic_info}\n{backtrace:?}"
                 );
             }));
@@ -75,7 +74,7 @@ where
     let _ = SHUTDOWN_DROPPER.set(thread_local);
 
     // Spawn a new thread to run the async runtime.
-    thread::spawn(move || {
+    spawn(move || {
         // Notify that Dart has stopped
         // to terminate the previous Rust async runtime threads.
         // After Dart's hot restart or reopening the app,
@@ -100,23 +99,20 @@ where
     Ok(())
 }
 
-#[no_mangle]
-pub extern "C" fn stop_rust_logic_extern() {
+#[unsafe(no_mangle)]
+pub extern "C" fn rinf_stop_rust_logic_extern() {
     SHUTDOWN_EVENTS.dart_stopped.set();
 }
 
 pub fn send_rust_signal_real(
-    message_id: i32,
+    endpoint: &str,
     message_bytes: Vec<u8>,
     binary: Vec<u8>,
-) -> Result<(), RinfError> {
+) -> Result<(), AppError> {
     // When `DART_ISOLATE` is not initialized, just return the error.
     // This can happen when running test code in Rust.
-    let guard = match DART_ISOLATE.lock() {
-        Ok(inner) => inner,
-        Err(poisoned) => poisoned.into_inner(),
-    };
-    let dart_isolate = guard.as_ref().ok_or(RinfError::NoDartIsolate)?;
+    let guard = DART_ISOLATE.lock().recover();
+    let dart_isolate = guard.as_ref().ok_or(AppError::NoDartIsolate)?;
 
     // If a `Vec<u8>` is empty, we can't just simply send it to Dart
     // because panic can occur from null pointers.
@@ -126,7 +122,7 @@ pub fn send_rust_signal_real(
 
     dart_isolate.post(
         vec![
-            message_id.into_dart(),
+            endpoint.into_dart(),
             if message_filled {
                 ZeroCopyBuffer(message_bytes).into_dart()
             } else {

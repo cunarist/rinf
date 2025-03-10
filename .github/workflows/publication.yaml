@@ -1,7 +1,7 @@
 # Publish packages online.
 # This is performed only when a new Git tag
 # with version information is added.
-name: publication
+name: Publication
 
 # With default Git settings, Unix-like systems use LF (`\n`) for new lines,
 # while Windows uses CRLF (`\r\n`) in local repositories.
@@ -54,12 +54,15 @@ jobs:
       # Save the `crates.io` API token at
       # `GitHub repo - Settings - Security - Secrets and variables - Actions`.
 
-      - name: Check the Rust crate
-        working-directory: rust_crate/
-        run: cargo publish --dry-run
+      - name: Check Rust crates
+        run: |
+          cargo publish --dry-run --manifest-path rust_crate_proc/Cargo.toml
+          cargo publish --dry-run --manifest-path rust_crate_command/Cargo.toml
+          cargo publish --dry-run --manifest-path rust_crate/Cargo.toml
 
-      - name: Publish the Rust crate
-        working-directory: rust_crate/
+      - name: Publish Rust crates
         run: |
           cargo login ${{ secrets.CRATES_IO_API_TOKEN }}
-          cargo publish
+          cargo publish --manifest-path rust_crate_proc/Cargo.toml
+          cargo publish --manifest-path rust_crate_command/Cargo.toml
+          cargo publish --manifest-path rust_crate/Cargo.toml

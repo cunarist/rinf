@@ -1,16 +1,21 @@
-use crate::error::RinfError;
+use crate::{AppError, SHUTDOWN_EVENTS, ShutdownEventsLock};
 use js_sys::Uint8Array;
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::prelude::{JsValue, wasm_bindgen};
 
-pub fn start_rust_logic_real<F, T>(main_fn: F) -> Result<(), RinfError>
+// There is no shutdown mechanism on the web.
+static _SHUTDOWN_EVENTS: &ShutdownEventsLock = &SHUTDOWN_EVENTS;
+
+pub fn start_rust_logic_real<F, T>(main_fn: F) -> Result<(), AppError>
 where
     F: Fn() -> T + 'static,
 {
     // Add kind description for panics.
     #[cfg(debug_assertions)]
     {
-        std::panic::set_hook(Box::new(|panic_info| {
-            crate::debug_print!("A panic occurred in Rust.\n{panic_info}");
+        use crate::debug_print;
+        use std::panic::set_hook;
+        set_hook(Box::new(|panic_info| {
+            debug_print!("A panic occurred in Rust.\n{panic_info}");
         }));
     }
 
@@ -29,22 +34,22 @@ extern "C" {
     // in the main JavaScript thread. Loading the function
     // fails in web workers.
     #[wasm_bindgen(js_namespace = rinfBindings, catch)]
-    pub fn send_rust_signal_extern(
-        resource: i32,
+    pub fn rinf_send_rust_signal_extern(
+        endpoint: &str,
         message_bytes: Uint8Array,
         binary: Uint8Array,
     ) -> Result<(), JsValue>;
 }
 
 pub fn send_rust_signal_real(
-    message_id: i32,
+    endpoint: &str,
     message_bytes: Vec<u8>,
     binary: Vec<u8>,
-) -> Result<(), RinfError> {
-    let result = send_rust_signal_extern(
-        message_id,
-        js_sys::Uint8Array::from(message_bytes.as_slice()),
-        js_sys::Uint8Array::from(binary.as_slice()),
+) -> Result<(), AppError> {
+    let result = rinf_send_rust_signal_extern(
+        endpoint,
+        Uint8Array::from(message_bytes.as_slice()),
+        Uint8Array::from(binary.as_slice()),
     );
-    result.map_err(|_| RinfError::NoBindings)
+    result.map_err(|_| AppError::NoBindings)
 }
