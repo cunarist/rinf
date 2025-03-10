@@ -1,4 +1,4 @@
-use crate::RinfConfigMessage;
+use crate::{RinfConfigMessage, SetupError};
 use convert_case::{Case, Casing};
 use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
 use quote::ToTokens;
@@ -6,7 +6,7 @@ use serde_generate::dart::{CodeGenerator, Installer};
 use serde_generate::{CodeGeneratorConfig, Encoding, SourceInstaller};
 use serde_reflection::{ContainerFormat, Format, Named, Registry};
 use std::collections::{BTreeMap, BTreeSet};
-use std::fs;
+use std::fs::{read_dir, read_to_string, remove_file, write};
 use std::hash::Hash;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::channel;
@@ -28,7 +28,9 @@ enum SignalAttribute {
     RustSignalBinary,
 }
 
-fn extract_signal_attribute(attrs: &[Attribute]) -> BTreeSet<SignalAttribute> {
+fn extract_signal_attribute(
+    attrs: &[Attribute],
+) -> Result<BTreeSet<SignalAttribute>, SetupError> {
     let mut extracted_attrs = BTreeSet::new();
     for attr in attrs.iter() {
         if !attr.path().is_ident("derive") {
@@ -49,10 +51,9 @@ fn extract_signal_attribute(attrs: &[Attribute]) -> BTreeSet<SignalAttribute> {
                 extracted_attrs.insert(signal_attr);
             }
             Ok(())
-        })
-        .unwrap();
+        })?;
     }
-    extracted_attrs
+    Ok(extracted_attrs)
 }
 
 /// Convert a `syn` field type to a `serde_reflection::Format`.
@@ -202,12 +203,12 @@ fn process_items(
     items: &[Item],
     registry: &mut Registry,
     signal_attrs: &mut BTreeMap<String, BTreeSet<SignalAttribute>>,
-) {
+) -> Result<(), SetupError> {
     let mut structs = Vec::new();
     for item in items {
         match item {
             Item::Struct(s) => {
-                let extracted_attrs = extract_signal_attribute(&s.attrs);
+                let extracted_attrs = extract_signal_attribute(&s.attrs)?;
                 if !extracted_attrs.is_empty() {
                     structs.push(s.ident.clone());
                     trace_struct(registry, s);
@@ -220,11 +221,12 @@ fn process_items(
                     &m.content.as_ref().unwrap().1,
                     registry,
                     signal_attrs,
-                );
+                )?;
             }
             _ => {}
         }
     }
+    Ok(())
 }
 
 // TODO: Warn overlapping type names
@@ -233,21 +235,20 @@ fn visit_rust_files(
     dir: PathBuf,
     registry: &mut Registry,
     signal_attrs: &mut BTreeMap<String, BTreeSet<SignalAttribute>>,
-) {
-    if let Ok(entries) = fs::read_dir(dir) {
-        for entry in entries.filter_map(Result::ok) {
-            let path = entry.path();
-            if path.is_dir() {
-                // Recurse into subdirectory.
-                visit_rust_files(path, registry, signal_attrs);
-            } else {
-                let content = fs::read_to_string(path).unwrap();
-                let syntax_tree: File = syn::parse_file(&content)
-                    .expect("Failed to parse Rust file");
-                process_items(&syntax_tree.items, registry, signal_attrs);
-            }
+) -> Result<(), SetupError> {
+    let entries = read_dir(dir)?;
+    for entry in entries.filter_map(Result::ok) {
+        let path = entry.path();
+        if path.is_dir() {
+            // Recurse into subdirectory.
+            visit_rust_files(path, registry, signal_attrs)?;
+        } else {
+            let content = read_to_string(path)?;
+            let syntax_tree: File = syn::parse_file(&content)?;
+            process_items(&syntax_tree.items, registry, signal_attrs)?;
         }
     }
+    Ok(())
 }
 
 // TODO: Distinguish Rust and Dart signals during interface generation
@@ -256,14 +257,14 @@ fn generate_class_extension_code(
     root_dir: &Path,
     class: &str,
     extracted_attrs: &BTreeSet<SignalAttribute>,
-) {
+) -> Result<(), SetupError> {
     let snake_class = class.to_case(Case::Snake);
     let class_file = root_dir
         .join("lib")
         .join("src")
         .join("generated")
         .join(format!("{}.dart", snake_class));
-    let mut code = fs::read_to_string(&class_file).unwrap();
+    let mut code = read_to_string(&class_file)?;
 
     if extracted_attrs.contains(&SignalAttribute::DartSignalBinary) {
         let new_code = format!(
@@ -301,7 +302,8 @@ extension {class}DartSignalExt on {class} {{
         code.push_str(&new_code);
     }
 
-    fs::write(&class_file, code).unwrap();
+    write(&class_file, code)?;
+    Ok(())
 }
 
 // TODO: Make some generated items private.
@@ -310,14 +312,14 @@ fn generate_class_interface_code(
     root_dir: &Path,
     class: &str,
     extracted_attrs: &BTreeSet<SignalAttribute>,
-) {
+) -> Result<(), SetupError> {
     let snake_class = class.to_case(Case::Snake);
     let class_file = root_dir
         .join("lib")
         .join("src")
         .join("generated")
         .join(format!("{}.dart", snake_class));
-    let mut code = fs::read_to_string(&class_file).unwrap();
+    let mut code = read_to_string(&class_file)?;
 
     let has_rust_signal = extracted_attrs
         .contains(&SignalAttribute::RustSignal)
@@ -343,7 +345,8 @@ final {camel_class}StreamController =
         );
     }
 
-    fs::write(&class_file, code).unwrap();
+    write(&class_file, code)?;
+    Ok(())
 }
 
 // TODO: Delete the folder before generating
@@ -351,7 +354,7 @@ final {camel_class}StreamController =
 fn generate_shared_code(
     root_dir: &Path,
     signal_attrs: &BTreeMap<String, BTreeSet<SignalAttribute>>,
-) {
+) -> Result<(), SetupError> {
     // Write type aliases.
     let mut code = r#"part of 'generated.dart';
 "#
@@ -391,17 +394,18 @@ fn generate_shared_code(
         .join("src")
         .join("generated")
         .join("signal_handlers.dart");
-    fs::write(&shared_file, code).unwrap();
+    write(&shared_file, code)?;
+    Ok(())
 }
 
 fn generate_interface_code(
     root_dir: &Path,
     signal_attrs: &BTreeMap<String, BTreeSet<SignalAttribute>>,
-) {
+) -> Result<(), SetupError> {
     // Generate FFI interface code.
     for (class, extracted_attrs) in signal_attrs {
-        generate_class_extension_code(root_dir, class, extracted_attrs);
-        generate_class_interface_code(root_dir, class, extracted_attrs);
+        generate_class_extension_code(root_dir, class, extracted_attrs)?;
+        generate_class_interface_code(root_dir, class, extracted_attrs)?;
     }
 
     // Write imports.
@@ -410,7 +414,7 @@ fn generate_interface_code(
         .join("src")
         .join("generated")
         .join("generated.dart");
-    let mut top_content = fs::read_to_string(&top_file).unwrap();
+    let mut top_content = read_to_string(&top_file)?;
     top_content = top_content.replacen(
         "export '../serde/serde.dart';",
         r#"import 'dart:async';
@@ -420,16 +424,17 @@ export '../serde/serde.dart';"#,
         1,
     );
     top_content.push_str("part 'signal_handlers.dart';\n");
-    fs::write(&top_file, top_content).unwrap();
+    write(&top_file, top_content)?;
 
     // Write the shared code.
-    generate_shared_code(root_dir, signal_attrs);
+    generate_shared_code(root_dir, signal_attrs)?;
+    Ok(())
 }
 
 pub fn generate_dart_code(
     root_dir: &Path,
     _message_config: &RinfConfigMessage,
-) {
+) -> Result<(), SetupError> {
     // TODO: Use the config
     // TODO: Use `rinf_generated` path by default instead of `generated`
 
@@ -437,7 +442,7 @@ pub fn generate_dart_code(
     let mut registry: Registry = Registry::new();
     let mut signal_attrs = BTreeMap::<String, BTreeSet<SignalAttribute>>::new();
     let source_dir = root_dir.join("native").join("hub").join("src");
-    visit_rust_files(source_dir, &mut registry, &mut signal_attrs);
+    visit_rust_files(source_dir, &mut registry, &mut signal_attrs)?;
 
     // TODO: Include comments from original structs with `with_comments`
 
@@ -448,19 +453,20 @@ pub fn generate_dart_code(
 
     // Install serialization modules.
     let installer = Installer::new(root_dir.to_owned());
-    installer.install_module(&config, &registry).unwrap();
-    installer.install_serde_runtime().unwrap();
-    installer.install_bincode_runtime().unwrap();
+    installer.install_module(&config, &registry)?;
+    installer.install_serde_runtime()?;
+    installer.install_bincode_runtime()?;
 
     // Generate Dart serialization code from the registry.
     let generator = CodeGenerator::new(&config);
-    generator.output(root_dir.to_owned(), &registry).unwrap();
+    generator.output(root_dir.to_owned(), &registry)?;
 
     // Generate Dart interface code.
-    generate_interface_code(root_dir, &signal_attrs);
+    generate_interface_code(root_dir, &signal_attrs)?;
 
     // Remove unnecessary files.
-    fs::remove_file(root_dir.join("lib").join("generated.dart")).unwrap();
+    remove_file(root_dir.join("lib").join("generated.dart"))?;
+    Ok(())
 }
 
 // TODO: `watch_and_generate_dart_code` is not tested, so check it later
@@ -469,39 +475,43 @@ pub fn generate_dart_code(
 pub fn watch_and_generate_dart_code(
     root_dir: &Path,
     message_config: &RinfConfigMessage,
-) {
+) -> Result<(), SetupError> {
     // Prepare the source directory for Rust files.
     let source_dir = root_dir.join("native").join("hub").join("src");
     if !source_dir.exists() {
         eprintln!("Source directory does not exist: {:?}", source_dir);
-        return;
+        return Ok(());
+        // TODO: Return an error
     }
 
     // Create a channel to receive file change events.
-    let (tx, rx) = channel();
+    let (sender, receiver) = channel();
 
     // Create a file system watcher using the new notify API.
     let mut watcher = RecommendedWatcher::new(
         move |res: Result<Event, notify::Error>| {
             // Send events to the channel.
-            tx.send(res).expect("Watch channel send error");
+            let result = sender.send(res);
+            if let Err(error) = result {
+                eprintln!("{}", error);
+            }
         },
         Config::default(),
-    )
-    .expect("Failed to create watcher");
+    )?;
 
     // Start watching the source directory recursively.
-    watcher
-        .watch(&source_dir, RecursiveMode::Recursive)
-        .expect("Failed to watch source directory");
+    watcher.watch(&source_dir, RecursiveMode::Recursive)?;
 
     loop {
         // Block until an event is received.
-        match rx.recv() {
+        match receiver.recv() {
             Ok(Ok(event)) => {
                 if should_regenerate(&event) {
                     eprintln!("File change detected: {:?}", event);
-                    generate_dart_code(root_dir, message_config);
+                    let result = generate_dart_code(root_dir, message_config);
+                    if let Err(error) = result {
+                        eprintln!("{}", error);
+                    }
                 }
             }
             Ok(Err(e)) => {
@@ -517,6 +527,7 @@ pub fn watch_and_generate_dart_code(
         // Optional: sleep briefly to avoid busy looping (if necessary).
         std::thread::sleep(Duration::from_millis(100));
     }
+    Ok(())
 }
 
 /// Determines whether the event requires

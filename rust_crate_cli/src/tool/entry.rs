@@ -17,7 +17,7 @@ pub fn run_command() -> Result<(), SetupError> {
     let is_internet_connected = check_internet_connection();
 
     // Check if the current directory is Flutter app's root.
-    let root_dir = current_dir().unwrap();
+    let root_dir = current_dir()?;
     if !is_flutter_app_project(&root_dir) {
         Err(SetupError::NotFlutterApp)?;
     }
@@ -31,7 +31,7 @@ pub fn run_command() -> Result<(), SetupError> {
         }
         Some(("template", _)) => {
             let rinf_config = load_verified_rinf_config(&root_dir)?;
-            apply_rust_template(&root_dir, &rinf_config.message).unwrap();
+            apply_rust_template(&root_dir, &rinf_config.message)?;
         }
         Some(("gen", sub_m)) => {
             let watch = sub_m.get_flag("watch");
@@ -44,10 +44,10 @@ pub fn run_command() -> Result<(), SetupError> {
         }
         Some(("wasm", sub_m)) => {
             let release = sub_m.get_flag("release");
-            build_webassembly(&root_dir, release, is_internet_connected);
+            build_webassembly(&root_dir, release, is_internet_connected)?;
         }
         Some(("server", _)) => {
-            provide_server_command();
+            provide_server_command()?;
         }
         _ => unreachable!(), // TODO: Remove this unreachable
     }
@@ -99,31 +99,28 @@ fn create_arg_matcher() -> ArgMatches {
 
 fn is_flutter_app_project(root_dir: &Path) -> bool {
     let spec_file = root_dir.join("pubspec.yaml");
-    let publish_to = read_publish_to(&spec_file).unwrap();
+    let publish_to = read_publish_to(&spec_file).unwrap_or("none".to_owned());
     publish_to == "none"
 }
 
 fn read_publish_to(file_path: &PathBuf) -> Option<String> {
-    let content = std::fs::read_to_string(file_path).unwrap();
-    let yaml: Value = serde_yml::from_str(&content).unwrap();
-    let field_value = yaml
-        .as_mapping()
-        .ok_or(SetupError::Other)
-        .unwrap()
-        .get("publish_to")?;
-    let config = field_value.as_str().unwrap().to_string();
+    let content = std::fs::read_to_string(file_path).ok()?;
+    let yaml: Value = serde_yml::from_str(&content).ok()?;
+    let field_value = yaml.as_mapping()?.get("publish_to")?;
+    let config = field_value.as_str()?.to_string();
     Some(config)
 }
 
-fn provide_server_command() {
-    let mut clipboard = Clipboard::new().unwrap();
+fn provide_server_command() -> Result<(), SetupError> {
+    let mut clipboard = Clipboard::new()?;
     let full_command = concat!(
         "flutter run",
         " --web-header=Cross-Origin-Opener-Policy=same-origin",
         " --web-header=Cross-Origin-Embedder-Policy=require-corp",
     );
-    clipboard.set_text(full_command).unwrap();
+    clipboard.set_text(full_command)?;
     let full_guide =
         "Full `flutter run` command for the web copied to clipboard";
     println!("{}", full_guide.dimmed());
+    Ok(())
 }

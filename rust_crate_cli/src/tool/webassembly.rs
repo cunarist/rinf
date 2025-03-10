@@ -1,4 +1,4 @@
-use crate::run_subprocess;
+use crate::{SetupError, run_subprocess};
 use std::path::Path;
 use std::process::Command;
 
@@ -6,7 +6,7 @@ pub fn build_webassembly(
     root_dir: &Path,
     is_release_mode: bool,
     is_internet_connected: bool,
-) {
+) -> Result<(), SetupError> {
     let total_steps = 3;
     let mut step = 0;
 
@@ -16,7 +16,7 @@ pub fn build_webassembly(
             "[{}/{}] Installing Rust toolchain for the web",
             step, total_steps
         );
-        install_wasm_toolchain();
+        install_wasm_toolchain()?;
     } else {
         println!("Skipping ensurement of Rust toolchain for the web");
     }
@@ -33,28 +33,34 @@ pub fn build_webassembly(
         "[{}/{}] Compiling Rust with `wasm-pack` to `web` target",
         step, total_steps
     );
-    compile_wasm(output_path, is_release_mode);
+    compile_wasm(output_path, is_release_mode)?;
 
     println!(
         "[{}/{}] WebAssembly module is now ready 🎉",
         step, total_steps
     );
     println!("To get the Flutter web server command, run `rinf server`");
+
+    Ok(())
 }
 
-fn install_wasm_toolchain() {
-    run_subprocess("rustup", &["toolchain", "install", "nightly"]);
-    run_subprocess("rustup", &["+nightly", "component", "add", "rust-src"]);
+fn install_wasm_toolchain() -> Result<(), SetupError> {
+    run_subprocess("rustup", &["toolchain", "install", "nightly"])?;
+    run_subprocess("rustup", &["+nightly", "component", "add", "rust-src"])?;
     run_subprocess(
         "rustup",
         &["+nightly", "target", "add", "wasm32-unknown-unknown"],
-    );
-    run_subprocess("rustup", &["target", "add", "wasm32-unknown-unknown"]);
-    run_subprocess("cargo", &["install", "wasm-pack"]);
-    run_subprocess("cargo", &["install", "wasm-bindgen-cli"]);
+    )?;
+    run_subprocess("rustup", &["target", "add", "wasm32-unknown-unknown"])?;
+    run_subprocess("cargo", &["install", "wasm-pack"])?;
+    run_subprocess("cargo", &["install", "wasm-bindgen-cli"])?;
+    Ok(())
 }
 
-fn compile_wasm(output_path: std::path::PathBuf, is_release_mode: bool) {
+fn compile_wasm(
+    output_path: std::path::PathBuf,
+    is_release_mode: bool,
+) -> Result<(), SetupError> {
     let mut wasm_pack_args = vec![
         "--quiet",
         "build",
@@ -81,12 +87,12 @@ fn compile_wasm(output_path: std::path::PathBuf, is_release_mode: bool) {
             "RUSTFLAGS",
             "-C target-feature=+atomics,+bulk-memory,+mutable-globals",
         )
-        .status()
-        .expect("Failed to compile with wasm-pack");
+        .status()?;
 
     if !status.success() {
         panic!("Wasm compilation failed");
     }
 
     println!("Saved `.wasm` and `.js` files to `web/pkg/`");
+    Ok(())
 }

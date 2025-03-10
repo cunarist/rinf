@@ -1,7 +1,8 @@
-use crate::{RinfConfigMessage, generate_dart_code, run_dart_command};
+use crate::{
+    RinfConfigMessage, SetupError, generate_dart_code, run_dart_command,
+};
 use include_dir::{Dir, include_dir};
-use std::fs;
-use std::io;
+use std::fs::{create_dir_all, read_to_string, write};
 use std::path::{Path, PathBuf};
 
 // TODO: Organize imports
@@ -12,34 +13,34 @@ static TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/template");
 pub fn apply_rust_template(
     root_dir: &PathBuf,
     message_config: &RinfConfigMessage,
-) -> io::Result<()> {
+) -> Result<(), SetupError> {
     // TODO: Use `message_config`
 
     // Copy basic folders needed for Rust to work
-    dump_template(root_dir).unwrap();
+    dump_template(root_dir)?;
 
     // Modify `.gitignore`
-    update_gitignore(root_dir).unwrap();
+    update_gitignore(root_dir)?;
 
     // Modify `README.md`
-    update_readme(root_dir).unwrap();
+    update_readme(root_dir)?;
 
     // Add Dart dependencies
-    run_dart_command(&["pub", "add", "meta"]).unwrap();
-    run_dart_command(&["pub", "add", "tuple"]).unwrap();
+    run_dart_command(&["pub", "add", "meta"])?;
+    run_dart_command(&["pub", "add", "tuple"])?;
 
     // Modify `./lib/main.dart`
-    update_main_dart(root_dir).unwrap();
+    update_main_dart(root_dir)?;
 
     // Generate message code
-    generate_dart_code(root_dir, message_config);
+    generate_dart_code(root_dir, message_config)?;
 
     println!("Rust template is now ready 🎉");
     Ok(())
 }
 
 /// Recursively extracts the embedded `TEMPLATE_DIR` to `dest_path`
-fn dump_template(dest_path: &PathBuf) -> io::Result<()> {
+fn dump_template(dest_path: &PathBuf) -> Result<(), SetupError> {
     for entry in TEMPLATE_DIR.entries() {
         dump_entry(dest_path, entry)?;
     }
@@ -49,11 +50,11 @@ fn dump_template(dest_path: &PathBuf) -> io::Result<()> {
 fn dump_entry(
     dest_path: &PathBuf,
     entry: &include_dir::DirEntry,
-) -> io::Result<()> {
+) -> Result<(), SetupError> {
     match entry {
         include_dir::DirEntry::Dir(dir) => {
             let dir_path = dest_path.join(dir.path());
-            fs::create_dir_all(&dir_path)?;
+            create_dir_all(&dir_path)?;
             for sub_entry in dir.entries() {
                 dump_entry(dest_path, sub_entry)?;
             }
@@ -70,17 +71,17 @@ fn dump_entry(
                 file_path.set_file_name(new_name);
             }
             if let Some(parent) = file_path.parent() {
-                fs::create_dir_all(parent)?;
+                create_dir_all(parent)?;
             }
-            fs::write(file_path, file.contents())?;
+            write(file_path, file.contents())?;
         }
     }
     Ok(())
 }
 
-fn update_gitignore(root_dir: &Path) -> io::Result<()> {
+fn update_gitignore(root_dir: &Path) -> Result<(), SetupError> {
     let gitignore_path = root_dir.join(".gitignore");
-    let mut content = fs::read_to_string(&gitignore_path).unwrap_or_default();
+    let mut content = read_to_string(&gitignore_path).unwrap_or_default();
     if !content.contains("# Rust related") {
         content.push_str("\n# Rust related\n/.cargo/\n/target/\n");
     }
@@ -95,12 +96,13 @@ fn update_gitignore(root_dir: &Path) -> io::Result<()> {
 "#,
         );
     }
-    fs::write(gitignore_path, content)
+    write(gitignore_path, content)?;
+    Ok(())
 }
 
-fn update_readme(root_dir: &Path) -> io::Result<()> {
+fn update_readme(root_dir: &Path) -> Result<(), SetupError> {
     let readme_path = root_dir.join("README.md");
-    let mut content = fs::read_to_string(&readme_path).unwrap_or_default();
+    let mut content = read_to_string(&readme_path).unwrap_or_default();
     let guide_section = "## Using Rust Inside Flutter";
 
     if !content.contains(guide_section) {
@@ -150,14 +152,15 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
 "#);
     }
 
-    fs::write(readme_path, content)
+    write(readme_path, content)?;
+    Ok(())
 }
 
-fn update_main_dart(root_dir: &Path) -> io::Result<()> {
+fn update_main_dart(root_dir: &Path) -> Result<(), SetupError> {
     let main_path = root_dir.join("lib/main.dart");
     if main_path.exists() {
         run_dart_command(&["format", "./lib/main.dart"])?;
-        let mut content = fs::read_to_string(&main_path)?;
+        let mut content = read_to_string(&main_path)?;
         // TODO: Update the import statement
         if !content.contains("messages/all.dart") {
             content = content.replacen(
@@ -174,7 +177,7 @@ fn update_main_dart(root_dir: &Path) -> io::Result<()> {
                 1,
             );
         }
-        fs::write(main_path, content)?;
+        write(main_path, content)?;
         run_dart_command(&["format", "./lib/main.dart"])?;
     }
     Ok(())

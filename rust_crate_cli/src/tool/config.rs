@@ -3,7 +3,7 @@ use serde::Deserialize;
 use serde_yml::Value;
 use std::collections::HashSet;
 use std::fmt::{Display, Formatter};
-use std::fs;
+use std::fs::read_to_string;
 use std::path::Path;
 
 // TODO: Remove the message config struct.
@@ -151,7 +151,7 @@ pub fn load_verified_rinf_config(
     root_dir: &Path,
 ) -> Result<RinfConfig, SetupError> {
     let file_path = root_dir.join("pubspec.yaml");
-    let content = fs::read_to_string(file_path)?;
+    let content = read_to_string(file_path)?;
     let yaml: Value = serde_yml::from_str(&content)?;
     let rinf_yaml = yaml
         .as_mapping()
