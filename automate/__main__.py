@@ -8,7 +8,7 @@ COMMAND_ARG = 1
 
 
 def run_subprocess(command: str, cwd: Path):
-    run(command.split(), cwd=cwd, check=True, shell=True)
+    run(command, cwd=cwd, check=True, shell=True)
 
 
 def replace_text_once(filepath: Path, change_from: str, change_to: str):
