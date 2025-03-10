@@ -1,8 +1,8 @@
-use crate::error::RinfError;
+use crate::error::AppError;
 use js_sys::Uint8Array;
 use wasm_bindgen::prelude::*;
 
-pub fn start_rust_logic_real<F, T>(main_fn: F) -> Result<(), RinfError>
+pub fn start_rust_logic_real<F, T>(main_fn: F) -> Result<(), AppError>
 where
     F: Fn() -> T + 'static,
 {
@@ -29,22 +29,22 @@ extern "C" {
     // in the main JavaScript thread. Loading the function
     // fails in web workers.
     #[wasm_bindgen(js_namespace = rinfBindings, catch)]
-    pub fn send_rust_signal_extern(
-        resource: i32,
+    pub fn rinf_send_rust_signal_extern(
+        endpoint: &str,
         message_bytes: Uint8Array,
         binary: Uint8Array,
     ) -> Result<(), JsValue>;
 }
 
 pub fn send_rust_signal_real(
-    message_id: i32,
+    endpoint: &str,
     message_bytes: Vec<u8>,
     binary: Vec<u8>,
-) -> Result<(), RinfError> {
-    let result = send_rust_signal_extern(
-        message_id,
+) -> Result<(), AppError> {
+    let result = rinf_send_rust_signal_extern(
+        endpoint,
         js_sys::Uint8Array::from(message_bytes.as_slice()),
         js_sys::Uint8Array::from(binary.as_slice()),
     );
-    result.map_err(|_| RinfError::NoBindings)
+    result.map_err(|_| AppError::NoBindings)
 }

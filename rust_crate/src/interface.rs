@@ -1,4 +1,4 @@
-use crate::error::RinfError;
+use crate::error::AppError;
 
 #[cfg(not(target_family = "wasm"))]
 use super::interface_os::*;
@@ -27,7 +27,7 @@ pub struct DartSignal<T> {
 /// along with all the tasks it manages.
 #[doc(hidden)]
 #[cfg(not(target_family = "wasm"))]
-pub fn start_rust_logic<F, T>(main_fn: F) -> Result<(), RinfError>
+pub fn start_rust_logic<F, T>(main_fn: F) -> Result<(), AppError>
 where
     F: Fn() -> T + Send + 'static,
 {
@@ -38,7 +38,7 @@ where
 /// On the web, futures usually don't implement the `Send` trait
 /// because JavaScript environment is fundamentally single-threaded.
 #[cfg(target_family = "wasm")]
-pub fn start_rust_logic<F, T>(main_fn: F) -> Result<(), RinfError>
+pub fn start_rust_logic<F, T>(main_fn: F) -> Result<(), AppError>
 where
     F: Fn() -> T + 'static,
 {
@@ -48,9 +48,9 @@ where
 /// Send a signal to Dart.
 #[doc(hidden)]
 pub fn send_rust_signal(
-    message_id: i32,
+    endpoint: &str,
     message_bytes: Vec<u8>,
     binary: Vec<u8>,
-) -> Result<(), RinfError> {
-    send_rust_signal_real(message_id, message_bytes, binary)
+) -> Result<(), AppError> {
+    send_rust_signal_real(endpoint, message_bytes, binary)
 }

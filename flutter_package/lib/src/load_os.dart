@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ffi';
 import 'dart:typed_data';
 import 'package:ffi/ffi.dart';
+import 'interface.dart';
 
 String? dynamicLibPath;
 
@@ -30,25 +31,11 @@ RustLibrary loadRustLibrary() {
     throw UnsupportedError('This operating system is not supported.');
   }
 
-  // On Android, native library symbols are loaded in local space
-  // because of Flutter's `RTLD_LOCAL` behavior.
-  // Therefore we cannot use the efficient `RustLibraryGlobal`.
-  // - https://github.com/dart-lang/native/issues/923
-  if (Platform.isAndroid) {
-    return RustLibraryLocal(lib: lib);
+  if (useLocalSpaceSymbols) {
+    return RustLibraryLocal(lib);
+  } else {
+    return RustLibraryGlobal(lib);
   }
-
-  // On Linux, `RTLD_LOCAL` behavior is required in tests
-  // due to symbol resolution behavior observed across all distributions.
-  // With `RTLD_GLOBAL`, symbols cannot be found.
-  final isTest = Platform.environment.containsKey('FLUTTER_TEST');
-  if (Platform.isLinux && isTest) {
-    return RustLibraryLocal(lib: lib);
-  }
-
-  // Native library symbols are loaded in global space
-  // thanks to Flutter's `RTLD_GLOBAL` behavior.
-  return RustLibraryGlobal();
 }
 
 /// The central interface for calling native function.
@@ -60,16 +47,14 @@ final rustLibrary = loadRustLibrary();
 typedef PostCObjectInner = Int8 Function(Int64, Pointer<Dart_CObject>);
 typedef PostCObjectPtr = Pointer<NativeFunction<PostCObjectInner>>;
 typedef PrepareIsolateExtern = Void Function(PostCObjectPtr, Int64);
-typedef PrepareIsolateWrap = void Function(PostCObjectPtr, int);
+typedef PrepareIsolateWrapped = void Function(PostCObjectPtr, int);
 typedef SendDartSignalExtern = Void Function(
-  Int32,
   Pointer<Uint8>,
   UintPtr,
   Pointer<Uint8>,
   UintPtr,
 );
-typedef SendDartSignalWrap = void Function(
-  int,
+typedef SendDartSignalWrapped = void Function(
   Pointer<Uint8>,
   int,
   Pointer<Uint8>,
@@ -81,50 +66,16 @@ typedef SendDartSignalWrap = void Function(
 abstract class RustLibrary {
   void startRustLogic();
   void stopRustLogic();
-  void prepareIsolate(PostCObjectPtr storePostObject, int port);
+  void prepareIsolate(
+    PostCObjectPtr storePostObject,
+    int port,
+  );
   void sendDartSignal(
-    int messageId,
+    String endpointSymbol,
     Uint8List messageBytes,
     Uint8List binary,
   );
 }
-
-// Direct access to global function symbols loaded in the process.
-// These are available only if the native library is
-// loaded into global space with `RTLD_GLOBAL` configuration.
-
-@Native<Void Function()>(
-  isLeaf: true,
-  symbol: 'start_rust_logic_extern',
-)
-external void startRustLogicExtern();
-
-@Native<Void Function()>(
-  isLeaf: true,
-  symbol: 'stop_rust_logic_extern',
-)
-external void stopRustLogicExtern();
-
-@Native<Void Function(PostCObjectPtr, Int64)>(
-  isLeaf: true,
-  symbol: 'prepare_isolate_extern',
-)
-external void prepareIsolateExtern(
-  PostCObjectPtr storePostObject,
-  int port,
-);
-
-@Native<SendDartSignalExtern>(
-  isLeaf: true,
-  symbol: 'send_dart_signal_extern',
-)
-external void sendDartSignalExtern(
-  int messageId,
-  Pointer<Uint8> messageBytesAddress,
-  int messageBytesLength,
-  Pointer<Uint8> binaryAddress,
-  int binaryLength,
-);
 
 /// Class for global native library symbols loaded with `RTLD_GLOBAL`.
 /// This is the efficient and ideal way to call native code.
@@ -132,7 +83,38 @@ external void sendDartSignalExtern(
 /// that enables the `Uint8List.address` syntax
 /// can only be used on globally loaded native symbols.
 /// - https://github.com/dart-lang/sdk/issues/44589
+/// - https://github.com/dart-lang/sdk/issues/44856
 class RustLibraryGlobal extends RustLibrary {
+  // Direct access to global function symbols loaded in the process.
+  // These are available only if the native library is
+  // loaded into global space with `RTLD_GLOBAL` configuration.
+
+  final DynamicLibrary lib;
+  final Map<String, SendDartSignalWrapped> sendDartSignalExterns = {};
+
+  RustLibraryGlobal(this.lib);
+
+  @Native<Void Function()>(
+    isLeaf: true,
+    symbol: 'rinf_start_rust_logic_extern',
+  )
+  external static void startRustLogicExtern();
+
+  @Native<Void Function()>(
+    isLeaf: true,
+    symbol: 'rinf_stop_rust_logic_extern',
+  )
+  external static void stopRustLogicExtern();
+
+  @Native<PrepareIsolateExtern>(
+    isLeaf: true,
+    symbol: 'rinf_prepare_isolate_extern',
+  )
+  external static void prepareIsolateExtern(
+    PostCObjectPtr storePostObject,
+    int port,
+  );
+
   void startRustLogic() {
     startRustLogicExtern();
   }
@@ -146,17 +128,42 @@ class RustLibraryGlobal extends RustLibrary {
   }
 
   void sendDartSignal(
-    int messageId,
+    String endpointSymbol,
     Uint8List messageBytes,
     Uint8List binary,
   ) {
+    // Using the `@Native` annotation and avoiding `malloc`
+    // with generated messages is not possible
+    // because we cannot pass symbols dynamically.
+    // Therefore, we search for the symbols in the dynamic library.
+    // Also, Dart's native assets feature is not fully reliable yet.
+
+    final Pointer<Uint8> messageMemory = malloc.allocate(messageBytes.length);
+    messageMemory.asTypedList(messageBytes.length).setAll(0, messageBytes);
+
+    final Pointer<Uint8> binaryMemory = malloc.allocate(binary.length);
+    binaryMemory.asTypedList(binary.length).setAll(0, binary);
+
+    // Cache the dynamic library functions
+    // to reduce symbol lookup overhead.
+    var sendDartSignalExtern = sendDartSignalExterns[endpointSymbol];
+    if (sendDartSignalExtern == null) {
+      sendDartSignalExtern =
+          lib.lookupFunction<SendDartSignalExtern, SendDartSignalWrapped>(
+        endpointSymbol,
+      );
+      sendDartSignalExterns[endpointSymbol] = sendDartSignalExtern;
+    }
+
     sendDartSignalExtern(
-      messageId,
-      messageBytes.address,
+      messageMemory,
       messageBytes.length,
-      binary.address,
+      binaryMemory,
       binary.length,
     );
+
+    malloc.free(messageMemory);
+    malloc.free(binaryMemory);
   }
 }
 
@@ -165,28 +172,24 @@ class RustLibraryGlobal extends RustLibrary {
 /// It involves extra memory copy before sending the data to Rust.
 class RustLibraryLocal extends RustLibrary {
   final DynamicLibrary lib;
+
   late void Function() startRustLogicExtern;
   late void Function() stopRustLogicExtern;
-  late void Function(PostCObjectPtr, int) prepareIsolateExtern;
-  late void Function(int, Pointer<Uint8>, int, Pointer<Uint8>, int)
-      sendDartSignalExtern;
+  late PrepareIsolateWrapped prepareIsolateExtern;
+  final Map<String, SendDartSignalWrapped> sendDartSignalExterns = {};
 
-  RustLibraryLocal({required this.lib}) {
+  RustLibraryLocal(this.lib) {
     this.startRustLogicExtern =
         lib.lookupFunction<Void Function(), void Function()>(
-      'start_rust_logic_extern',
+      'rinf_start_rust_logic_extern',
     );
     this.stopRustLogicExtern =
         lib.lookupFunction<Void Function(), void Function()>(
-      'stop_rust_logic_extern',
+      'rinf_stop_rust_logic_extern',
     );
     this.prepareIsolateExtern =
-        lib.lookupFunction<PrepareIsolateExtern, PrepareIsolateWrap>(
-      'prepare_isolate_extern',
-    );
-    this.sendDartSignalExtern =
-        lib.lookupFunction<SendDartSignalExtern, SendDartSignalWrap>(
-      'send_dart_signal_extern',
+        lib.lookupFunction<PrepareIsolateExtern, PrepareIsolateWrapped>(
+      'rinf_prepare_isolate_extern',
     );
   }
 
@@ -202,15 +205,29 @@ class RustLibraryLocal extends RustLibrary {
     prepareIsolateExtern(storePostObject, port);
   }
 
-  void sendDartSignal(int messageId, Uint8List messageBytes, Uint8List binary) {
+  void sendDartSignal(
+    String endpointSymbol,
+    Uint8List messageBytes,
+    Uint8List binary,
+  ) {
     final Pointer<Uint8> messageMemory = malloc.allocate(messageBytes.length);
     messageMemory.asTypedList(messageBytes.length).setAll(0, messageBytes);
 
     final Pointer<Uint8> binaryMemory = malloc.allocate(binary.length);
     binaryMemory.asTypedList(binary.length).setAll(0, binary);
 
+    // Cache the dynamic library functions
+    // to reduce symbol lookup overhead.
+    var sendDartSignalExtern = sendDartSignalExterns[endpointSymbol];
+    if (sendDartSignalExtern == null) {
+      sendDartSignalExtern =
+          lib.lookupFunction<SendDartSignalExtern, SendDartSignalWrapped>(
+        endpointSymbol,
+      );
+      sendDartSignalExterns[endpointSymbol] = sendDartSignalExtern;
+    }
+
     sendDartSignalExtern(
-      messageId,
       messageMemory,
       messageBytes.length,
       binaryMemory,

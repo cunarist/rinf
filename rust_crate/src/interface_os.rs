@@ -1,22 +1,24 @@
-use crate::error::RinfError;
+use crate::AppError;
 use crate::shutdown::SHUTDOWN_EVENTS;
 use allo_isolate::ffi::DartPostCObjectFnType;
 use allo_isolate::{
-    store_dart_post_cobject, IntoDart, Isolate, ZeroCopyBuffer,
+    IntoDart, Isolate, ZeroCopyBuffer, store_dart_post_cobject,
 };
 use os_thread_local::ThreadLocal;
 use std::sync::Mutex;
 use std::sync::OnceLock;
 use std::thread;
 
+// TODO: Organize crate imports
+
 static DART_ISOLATE: Mutex<Option<Isolate>> = Mutex::new(None);
 
-#[no_mangle]
-pub unsafe extern "C" fn prepare_isolate_extern(
+#[unsafe(no_mangle)]
+pub extern "C" fn rinf_prepare_isolate_extern(
     store_post_object: DartPostCObjectFnType,
     port: i64,
 ) {
-    store_dart_post_cobject(store_post_object);
+    unsafe { store_dart_post_cobject(store_post_object) }
     let dart_isolate = Isolate::new(port);
     let mut guard = match DART_ISOLATE.lock() {
         Ok(inner) => inner,
@@ -44,7 +46,7 @@ impl Drop for ShutdownDropper {
     }
 }
 
-pub fn start_rust_logic_real<F, T>(main_fn: F) -> Result<(), RinfError>
+pub fn start_rust_logic_real<F, T>(main_fn: F) -> Result<(), AppError>
 where
     F: Fn() -> T + Send + 'static,
 {
@@ -100,23 +102,23 @@ where
     Ok(())
 }
 
-#[no_mangle]
-pub extern "C" fn stop_rust_logic_extern() {
+#[unsafe(no_mangle)]
+pub extern "C" fn rinf_stop_rust_logic_extern() {
     SHUTDOWN_EVENTS.dart_stopped.set();
 }
 
 pub fn send_rust_signal_real(
-    message_id: i32,
+    endpoint: &str,
     message_bytes: Vec<u8>,
     binary: Vec<u8>,
-) -> Result<(), RinfError> {
+) -> Result<(), AppError> {
     // When `DART_ISOLATE` is not initialized, just return the error.
     // This can happen when running test code in Rust.
     let guard = match DART_ISOLATE.lock() {
         Ok(inner) => inner,
         Err(poisoned) => poisoned.into_inner(),
     };
-    let dart_isolate = guard.as_ref().ok_or(RinfError::NoDartIsolate)?;
+    let dart_isolate = guard.as_ref().ok_or(AppError::NoDartIsolate)?;
 
     // If a `Vec<u8>` is empty, we can't just simply send it to Dart
     // because panic can occur from null pointers.
@@ -126,7 +128,7 @@ pub fn send_rust_signal_real(
 
     dart_isolate.post(
         vec![
-            message_id.into_dart(),
+            endpoint.into_dart(),
             if message_filled {
                 ZeroCopyBuffer(message_bytes).into_dart()
             } else {

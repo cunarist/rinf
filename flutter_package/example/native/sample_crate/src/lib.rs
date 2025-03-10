@@ -30,7 +30,7 @@ pub fn get_hardward_id() -> Result<String, ExampleError> {
 }
 
 // `chrono` supports all platforms, including web.
-use chrono::{offset, DateTime};
+use chrono::{DateTime, offset};
 pub fn get_current_time() -> DateTime<offset::Local> {
     offset::Local::now()
 }

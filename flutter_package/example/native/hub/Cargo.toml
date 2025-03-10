@@ -2,7 +2,7 @@
 # Do not change the name of this crate.
 name = "hub"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [lib]
 # `lib` is required for non-library targets,
@@ -13,7 +13,7 @@ crate-type = ["lib", "cdylib", "staticlib"]
 
 [dependencies]
 rinf = "7.3.0"
-prost = "0.13.0"
+serde = "1.0.218"
 tokio = { version = "1", features = ["rt", "sync", "time", "macros"] }
 tokio_with_wasm = { version = "0.8.1", features = [
     "rt",
