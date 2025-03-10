@@ -55,8 +55,7 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
             }
 
             fn send_dart_signal(message_bytes: &[u8], binary: &[u8]) {
-                use rinf::deserialize;
-                use rinf::{debug_print, AppError};
+                use rinf::{AppError, debug_print, deserialize};
                 let message_result: Result<#name, AppError> =
                     deserialize(message_bytes)
                     .map_err(|_| AppError::CannotDecodeMessage);
@@ -136,8 +135,9 @@ fn derive_rust_signal_real(
         quote! {
             impl #name {
                 pub fn send_signal_to_dart(self, binary: Vec<u8>) {
-                    use rinf::serialize;
-                    use rinf::{debug_print, send_rust_signal, AppError};
+                    use rinf::{
+                        AppError, debug_print, send_rust_signal, serialize
+                    };
                     let type_name = #name_lit;
                     let message_result: Result<Vec<u8>, AppError> =
                         serialize(&self)
@@ -161,8 +161,9 @@ fn derive_rust_signal_real(
         quote! {
             impl #name {
                 pub fn send_signal_to_dart(self) {
-                    use rinf::serialize;
-                    use rinf::{debug_print, send_rust_signal, AppError};
+                    use rinf::{
+                        AppError, debug_print, send_rust_signal, serialize
+                    };
                     let type_name = #name_lit;
                     let message_result: Result<Vec<u8>, AppError> =
                         serialize(&self)
