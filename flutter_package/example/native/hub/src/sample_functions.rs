@@ -11,8 +11,6 @@ use tokio::task::{spawn, spawn_blocking, yield_now};
 use tokio::time::sleep;
 use tokio_with_wasm::alias as tokio;
 
-// TODO: Organize asterisk imports
-
 // Using the `cfg` macro enables conditional statement.
 #[cfg(debug_assertions)]
 const IS_DEBUG_MODE: bool = true;

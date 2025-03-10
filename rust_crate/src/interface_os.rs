@@ -8,8 +8,6 @@ use std::sync::Mutex;
 use std::sync::OnceLock;
 use std::thread::spawn;
 
-// TODO: Organize crate imports
-
 static DART_ISOLATE: Mutex<Option<Isolate>> = Mutex::new(None);
 
 #[unsafe(no_mangle)]

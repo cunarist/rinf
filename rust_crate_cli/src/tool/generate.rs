@@ -17,7 +17,6 @@ use syn::{
     PathArguments, Type, TypeArray, TypePath, TypeTuple,
 };
 
-// TODO: Remove all panicking code
 // TODO: Handle enums and tuple structs
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -255,8 +254,6 @@ fn visit_rust_files(
     Ok(())
 }
 
-// TODO: Distinguish Rust and Dart signals during interface generation
-
 fn generate_class_extension_code(
     root_dir: &Path,
     class: &str,
@@ -440,7 +437,6 @@ pub fn generate_dart_code(
     _message_config: &RinfConfigMessage,
 ) -> Result<(), SetupError> {
     // TODO: Use the config
-    // TODO: Use `rinf_generated` path by default instead of `generated`
 
     // Analyze the input Rust files and collect type registries.
     let mut registry: Registry = Registry::new();
@@ -448,7 +444,7 @@ pub fn generate_dart_code(
     let source_dir = root_dir.join("native").join("hub").join("src");
     visit_rust_files(source_dir, &mut registry, &mut signal_attrs)?;
 
-    // TODO: Include comments from original structs with `with_comments`
+    // TODO: Include comments from original structs with `with_comments` method
 
     // Create the code generator config.
     let config = CodeGeneratorConfig::new("generated".to_string())
@@ -489,9 +485,9 @@ pub fn watch_and_generate_dart_code(
     // Prepare the source directory for Rust files.
     let source_dir = root_dir.join("native").join("hub").join("src");
     if !source_dir.exists() {
-        eprintln!("Source directory does not exist: {:?}", source_dir);
-        return Ok(());
-        // TODO: Return an error
+        Err(SetupError::ProjectStructure(
+            "Source directory of the `hub` crate does not exist",
+        ))?;
     }
 
     // Create a channel to receive file change events.

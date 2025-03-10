@@ -5,8 +5,6 @@ use include_dir::{Dir, include_dir};
 use std::fs::{create_dir_all, read_to_string, write};
 use std::path::{Path, PathBuf};
 
-// TODO: Organize imports
-
 static TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/template");
 
 /// Creates new folders and files in an existing Flutter project folder.
@@ -89,7 +87,6 @@ fn update_gitignore(root_dir: &Path) -> Result<(), SetupError> {
         content.push_str("\n# Rust related\n/.cargo/\n/target/\n");
     }
     if !content.contains("# Generated signals") {
-        // TODO: Update the path
         content.push_str(
             r#"
 # Generated signals
@@ -164,7 +161,6 @@ fn update_main_dart(root_dir: &Path) -> Result<(), SetupError> {
     if main_path.exists() {
         run_dart_command(&["format", "./lib/main.dart"])?;
         let mut content = read_to_string(&main_path)?;
-        // TODO: Update the import statement
         if !content.contains("messages/all.dart") {
             content = content.replacen(
                 "import",

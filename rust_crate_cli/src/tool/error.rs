@@ -15,7 +15,7 @@ pub enum SetupError {
     WatchingFile(notify::Error),
     PubConfig(String),
     BadFilePath(OsString),
-    NotFlutterApp,
+    ProjectStructure(&'static str),
 }
 
 impl std::fmt::Display for SetupError {
@@ -45,8 +45,8 @@ impl std::fmt::Display for SetupError {
             SetupError::BadFilePath(name) => {
                 write!(f, "`{:?}` is not a valid file path", name)
             }
-            SetupError::NotFlutterApp => {
-                write!(f, "This is not a Flutter app project")
+            SetupError::ProjectStructure(msg) => {
+                write!(f, "Invalid project structure: {}", msg)
             }
         }
     }

@@ -13,5 +13,3 @@ pub use error::*;
 pub use generate::*;
 pub use template::*;
 pub use webassembly::*;
-
-// TODO: Remove all panicking code like `unwrap` or `expect`.
