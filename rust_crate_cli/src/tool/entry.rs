@@ -9,11 +9,7 @@ use std::env::current_dir;
 use std::path::Path;
 
 #[derive(Parser)]
-#[command(
-    author,
-    version,
-    about = "CLI tool for building apps using Rust in Flutter"
-)]
+#[command(about = "CLI tool for building apps using Rust in Flutter")]
 struct CliInput {
     #[command(subcommand)]
     command: CliCommand,
