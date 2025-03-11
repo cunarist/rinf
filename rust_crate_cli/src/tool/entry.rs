@@ -19,24 +19,20 @@ struct CliInput {
 enum CliCommand {
     /// Show Rinf configuration resolved from `pubspec.yaml`
     Config,
-
     /// Apply Rust template to the current Flutter project
     Template,
-
     /// Generate Dart code from Rust structs with attributes
     Gen {
         /// Continuously watches Rust files
         #[arg(short, long)]
         watch: bool,
     },
-
     /// Build the WebAssembly module for the web
     Wasm {
         /// Builds in release mode
         #[arg(short, long)]
         release: bool,
     },
-
     /// Get full `flutter run` command with web headers
     Server,
 }
