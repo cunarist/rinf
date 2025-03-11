@@ -99,7 +99,9 @@ fn create_arg_matcher() -> ArgMatches {
 
 fn is_flutter_app_project(root_dir: &Path) -> bool {
     let spec_file = root_dir.join("pubspec.yaml");
-    let publish_to = read_publish_to(&spec_file).unwrap_or("none".to_owned());
+    let Some(publish_to) = read_publish_to(&spec_file) else {
+        return true;
+    };
     publish_to == "none"
 }
 
