@@ -4,7 +4,7 @@ use serde_yml::Value;
 use std::collections::HashSet;
 use std::fmt::{Display, Formatter};
 use std::fs::read_to_string;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 // TODO: Remove the message config struct.
 
@@ -165,4 +165,12 @@ pub fn load_verified_rinf_config(
         None => RinfConfig::default(),
     };
     Ok(config)
+}
+
+pub fn read_publish_to(file_path: &PathBuf) -> Option<String> {
+    let content = std::fs::read_to_string(file_path).ok()?;
+    let yaml: Value = serde_yml::from_str(&content).ok()?;
+    let field_value = yaml.as_mapping()?.get("publish_to")?;
+    let config = field_value.as_str()?.to_string();
+    Some(config)
 }

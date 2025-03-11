@@ -1,14 +1,12 @@
 use crate::{
     SetupError, apply_rust_template, build_webassembly,
     check_internet_connection, generate_dart_code, load_verified_rinf_config,
-    watch_and_generate_dart_code,
+    provide_server_command, read_publish_to, watch_and_generate_dart_code,
 };
-use arboard::Clipboard;
 use clap::{Parser, Subcommand};
 use owo_colors::OwoColorize;
-use serde_yml::Value;
 use std::env::current_dir;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 #[derive(Parser)]
 #[command(
@@ -97,26 +95,4 @@ fn is_flutter_app_project(root_dir: &Path) -> bool {
         return true;
     };
     publish_to == "none"
-}
-
-fn read_publish_to(file_path: &PathBuf) -> Option<String> {
-    let content = std::fs::read_to_string(file_path).ok()?;
-    let yaml: Value = serde_yml::from_str(&content).ok()?;
-    let field_value = yaml.as_mapping()?.get("publish_to")?;
-    let config = field_value.as_str()?.to_string();
-    Some(config)
-}
-
-fn provide_server_command() -> Result<(), SetupError> {
-    let mut clipboard = Clipboard::new()?;
-    let full_command = concat!(
-        "flutter run",
-        " --web-header=Cross-Origin-Opener-Policy=same-origin",
-        " --web-header=Cross-Origin-Embedder-Policy=require-corp",
-    );
-    clipboard.set_text(full_command)?;
-    let full_guide =
-        "Full `flutter run` command for the web copied to clipboard";
-    println!("{}", full_guide.dimmed());
-    Ok(())
 }
