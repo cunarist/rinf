@@ -69,6 +69,13 @@ jobs:
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: >
+            wasm32-unknown-unknown,
+            armv7-linux-androideabi,
+            aarch64-linux-android,
+            i686-linux-android,
+            x86_64-linux-android
 
       - name: Setup Ninja and GTK3 toolchain (Only Linux target)
         if: matrix.target == 'linux'
