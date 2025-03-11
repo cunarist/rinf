@@ -51,7 +51,7 @@ pub fn run_command() -> Result<(), SetupError> {
 
     // Run a command from user input.
     let cli = CliInput::parse();
-    match &cli.command {
+    match cli.command {
         CliCommand::Config => {
             let rinf_config = load_verified_rinf_config(&root_dir)?;
             println!("{}", rinf_config.dimmed());
@@ -62,14 +62,14 @@ pub fn run_command() -> Result<(), SetupError> {
         }
         CliCommand::Gen { watch } => {
             let rinf_config = load_verified_rinf_config(&root_dir)?;
-            if *watch {
+            if watch {
                 watch_and_generate_dart_code(&root_dir, &rinf_config.message)?;
             } else {
                 generate_dart_code(&root_dir, &rinf_config.message)?;
             }
         }
         CliCommand::Wasm { release } => {
-            build_webassembly(&root_dir, *release, is_internet_connected)?;
+            build_webassembly(&root_dir, release, is_internet_connected)?;
         }
         CliCommand::Server => {
             provide_server_command()?;
