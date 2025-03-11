@@ -22,7 +22,7 @@ impl std::fmt::Display for SetupError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             SetupError::Io(e) => {
-                write!(f, "Failed to read YAML file: {}", e)
+                write!(f, "Failed to operate on file: {}", e)
             }
             SetupError::Yaml(e) => {
                 write!(f, "Failed to parse YAML: {}", e)
@@ -43,7 +43,7 @@ impl std::fmt::Display for SetupError {
                 write!(f, "Invalid `pubspec.yaml` config: {}", msg)
             }
             SetupError::BadFilePath(name) => {
-                write!(f, "`{:?}` is not a valid file path", name)
+                write!(f, "Not a valid file path: `{}`", name.to_string_lossy())
             }
             SetupError::ProjectStructure(msg) => {
                 write!(f, "Invalid project structure: {}", msg)
