@@ -68,6 +68,9 @@ fn dump_entry(
                 .to_str()
                 .ok_or_else(|| SetupError::BadFilePath(file_name_os.into()))?
                 .to_owned();
+            // The existence of files like `Cargo.toml` prevents us
+            // from including the folder in the crate.
+            // That's why we add the `.template` extension to them.
             let clean_name =
                 file_name.strip_suffix(".template").unwrap_or(&file_name);
             file_path.set_file_name(clean_name);
