@@ -9,8 +9,8 @@ use std::ffi::OsString;
 pub enum SetupError {
     Io(std::io::Error),
     Yaml(serde_yml::Error),
-    Clip(arboard::Error),
-    Syntax(syn::Error),
+    Clipboard(arboard::Error),
+    CodeSyntax(syn::Error),
     ReflectionModule(Box<dyn Error>),
     WatchingFile(notify::Error),
     PubConfig(String),
@@ -27,17 +27,17 @@ impl std::fmt::Display for SetupError {
             SetupError::Yaml(e) => {
                 write!(f, "Failed to parse YAML: {}", e)
             }
-            SetupError::Clip(e) => {
+            SetupError::Clipboard(e) => {
                 write!(f, "Failed to use clipboard: {}", e)
             }
-            SetupError::Syntax(e) => {
-                write!(f, "Invalid syntax: {}", e)
+            SetupError::CodeSyntax(e) => {
+                write!(f, "Invalid code syntax: {}", e)
             }
             SetupError::ReflectionModule(e) => {
                 write!(f, "Failed to use reflection: {}", e)
             }
             SetupError::WatchingFile(e) => {
-                write!(f, "Watch error: {}", e)
+                write!(f, "Watching error: {}", e)
             }
             SetupError::PubConfig(msg) => {
                 write!(f, "Invalid `pubspec.yaml` config: {}", msg)
@@ -68,13 +68,13 @@ impl From<serde_yml::Error> for SetupError {
 
 impl From<arboard::Error> for SetupError {
     fn from(err: arboard::Error) -> Self {
-        SetupError::Clip(err)
+        SetupError::Clipboard(err)
     }
 }
 
 impl From<syn::Error> for SetupError {
     fn from(err: syn::Error) -> Self {
-        SetupError::Syntax(err)
+        SetupError::CodeSyntax(err)
     }
 }
 
