@@ -10,8 +10,10 @@ pub fn provide_server_command() -> Result<(), SetupError> {
         " --web-header=Cross-Origin-Embedder-Policy=require-corp",
     );
     clipboard.set_text(full_command)?;
-    let full_guide =
-        "Full `flutter run` command for the web copied to clipboard";
+    let full_guide = concat!(
+        "Full `flutter run` command for the web",
+        " has been copied to the clipboard"
+    );
     println!("{}", full_guide.dimmed());
     Ok(())
 }
