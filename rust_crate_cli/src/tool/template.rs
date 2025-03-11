@@ -12,7 +12,7 @@ pub fn apply_rust_template(
     root_dir: &PathBuf,
     message_config: &RinfConfigMessage,
 ) -> Result<(), SetupError> {
-    // TODO: Use `message_config`
+    // TODO: Return error if `native` folder already exists.
 
     // Copy basic folders needed for Rust to work
     dump_template(root_dir)?;
