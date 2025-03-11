@@ -142,7 +142,6 @@ impl RinfConfig {
     }
 }
 
-// TODO: Parse YAML files in a type-safe way
 // TODO: Match the behavior of `load_verified_rinf_config` to its doc comment
 
 /// Attempts to load the rinf configuration from the provided pubspec.yaml file.
