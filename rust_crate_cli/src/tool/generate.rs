@@ -18,6 +18,7 @@ use syn::{
 };
 
 // TODO: Handle enums and tuple structs
+// TODO: Write unit tests, like https://github.com/cunarist/rinf/pull/307
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
 enum SignalAttribute {
