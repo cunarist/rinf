@@ -6,7 +6,6 @@ pub enum AppError {
     NoDartIsolate,
     CannotEncodeMessage,
     CannotDecodeMessage,
-    NoSignalHandler,
     NoBindings,
 }
 
@@ -21,9 +20,6 @@ impl fmt::Display for AppError {
             }
             Self::CannotEncodeMessage => {
                 write!(f, "Could not encode the message")
-            }
-            Self::NoSignalHandler => {
-                write!(f, "Could not find the handler for Dart signal")
             }
             Self::NoBindings => {
                 write!(f, "Rinf bindings are not ready")
