@@ -4,11 +4,48 @@ use crate::{
     watch_and_generate_dart_code,
 };
 use arboard::Clipboard;
-use clap::{Arg, ArgAction, ArgMatches, Command};
+use clap::{Parser, Subcommand};
 use owo_colors::OwoColorize;
 use serde_yml::Value;
 use std::env::current_dir;
 use std::path::{Path, PathBuf};
+
+#[derive(Parser)]
+#[command(
+    author,
+    version,
+    about = "CLI tool for building apps using Rust in Flutter"
+)]
+struct CliInput {
+    #[command(subcommand)]
+    command: CliCommand,
+}
+
+#[derive(Subcommand)]
+enum CliCommand {
+    /// Show Rinf configuration resolved from `pubspec.yaml`
+    Config,
+
+    /// Apply Rust template to the current Flutter project
+    Template,
+
+    /// Generate Dart code from Rust structs with attributes
+    Gen {
+        /// Continuously watches Rust files
+        #[arg(short, long)]
+        watch: bool,
+    },
+
+    /// Build the WebAssembly module for the web
+    Wasm {
+        /// Builds in release mode
+        #[arg(short, long)]
+        release: bool,
+    },
+
+    /// Get full `flutter run` command with web headers
+    Server,
+}
 
 pub fn run_command() -> Result<(), SetupError> {
     // Check the internet connection status and remember it.
@@ -23,78 +60,33 @@ pub fn run_command() -> Result<(), SetupError> {
     }
 
     // Run a command from user input.
-    let arg_matcher = create_arg_matcher();
-    match arg_matcher.subcommand() {
-        Some(("config", _)) => {
+    let cli = CliInput::parse();
+    match &cli.command {
+        CliCommand::Config => {
             let rinf_config = load_verified_rinf_config(&root_dir)?;
             println!("{}", rinf_config.dimmed());
         }
-        Some(("template", _)) => {
+        CliCommand::Template => {
             let rinf_config = load_verified_rinf_config(&root_dir)?;
             apply_rust_template(&root_dir, &rinf_config.message)?;
         }
-        Some(("gen", sub_m)) => {
-            let watch = sub_m.get_flag("watch");
+        CliCommand::Gen { watch } => {
             let rinf_config = load_verified_rinf_config(&root_dir)?;
-            if watch {
+            if *watch {
                 watch_and_generate_dart_code(&root_dir, &rinf_config.message)?;
             } else {
                 generate_dart_code(&root_dir, &rinf_config.message)?;
             }
         }
-        Some(("wasm", sub_m)) => {
-            let release = sub_m.get_flag("release");
-            build_webassembly(&root_dir, release, is_internet_connected)?;
+        CliCommand::Wasm { release } => {
+            build_webassembly(&root_dir, *release, is_internet_connected)?;
         }
-        Some(("server", _)) => {
+        CliCommand::Server => {
             provide_server_command()?;
         }
-        _ => unreachable!(), // TODO: Remove this unreachable
     }
 
     Ok(())
-}
-
-fn create_arg_matcher() -> ArgMatches {
-    Command::new("rinf")
-        .about("CLI tool for building apps using Rust in Flutter")
-        .subcommand_required(true)
-        .arg_required_else_help(true)
-        .subcommand(
-            Command::new("config")
-                .about("Show Rinf configuration resolved from `pubspec.yaml`"),
-        )
-        .subcommand(
-            Command::new("template")
-                .about("Apply Rust template to the current Flutter project"),
-        )
-        .subcommand(
-            Command::new("gen")
-                .about("Generate Dart code from Rust structs with attributes")
-                .arg(
-                    Arg::new("watch")
-                        .short('w')
-                        .long("watch")
-                        .help("Continuously watches Rust files")
-                        .action(ArgAction::SetTrue),
-                ),
-        )
-        .subcommand(
-            Command::new("wasm")
-                .about("Build the WebAssembly module for the web")
-                .arg(
-                    Arg::new("release")
-                        .short('r')
-                        .long("release")
-                        .help("Builds in release mode")
-                        .action(ArgAction::SetTrue),
-                ),
-        )
-        .subcommand(
-            Command::new("server")
-                .about("Get full `flutter run` command with web headers"),
-        )
-        .get_matches()
 }
 
 fn is_flutter_app_project(root_dir: &Path) -> bool {
