@@ -1,25 +1,38 @@
-// TODO: Organize error messages
-// TODO: Organize error conversion
-
 use std::error::Error;
 use std::ffi::OsString;
+use std::fmt::{Display, Formatter};
 
 /// Error type for Rinf configuration loading.
 #[derive(Debug)]
 pub enum SetupError {
+    // Below are automatically converted variants.
     Io(std::io::Error),
     Yaml(serde_yml::Error),
     Clipboard(arboard::Error),
     CodeSyntax(syn::Error),
-    ReflectionModule(Box<dyn Error>),
     WatchingFile(notify::Error),
+    // Below are manually converted variants.
+    ReflectionModule,
     PubConfig(String),
     BadFilePath(OsString),
     ProjectStructure(&'static str),
 }
 
-impl std::fmt::Display for SetupError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl Error for SetupError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            SetupError::Io(e) => Some(e),
+            SetupError::Yaml(e) => Some(e),
+            SetupError::Clipboard(e) => Some(e),
+            SetupError::CodeSyntax(e) => Some(e),
+            SetupError::WatchingFile(e) => Some(e),
+            _ => None,
+        }
+    }
+}
+
+impl Display for SetupError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             SetupError::Io(e) => {
                 write!(f, "Failed to operate on file: {}", e)
@@ -33,11 +46,11 @@ impl std::fmt::Display for SetupError {
             SetupError::CodeSyntax(e) => {
                 write!(f, "Invalid code syntax: {}", e)
             }
-            SetupError::ReflectionModule(e) => {
-                write!(f, "Failed to use reflection: {}", e)
-            }
             SetupError::WatchingFile(e) => {
-                write!(f, "Watching error: {}", e)
+                write!(f, "Failed to watch files: {}", e)
+            }
+            SetupError::ReflectionModule => {
+                write!(f, "Failed to write reflection modules")
             }
             SetupError::PubConfig(msg) => {
                 write!(f, "Invalid `pubspec.yaml` config: {}", msg)
@@ -51,8 +64,6 @@ impl std::fmt::Display for SetupError {
         }
     }
 }
-
-impl std::error::Error for SetupError {}
 
 impl From<std::io::Error> for SetupError {
     fn from(err: std::io::Error) -> Self {

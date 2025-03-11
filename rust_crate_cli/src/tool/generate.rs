@@ -455,13 +455,13 @@ pub fn generate_dart_code(
     let installer = Installer::new(root_dir.to_owned());
     installer
         .install_module(&config, &registry)
-        .map_err(SetupError::ReflectionModule)?;
+        .map_err(|_| SetupError::ReflectionModule)?;
     installer
         .install_serde_runtime()
-        .map_err(SetupError::ReflectionModule)?;
+        .map_err(|_| SetupError::ReflectionModule)?;
     installer
         .install_bincode_runtime()
-        .map_err(SetupError::ReflectionModule)?;
+        .map_err(|_| SetupError::ReflectionModule)?;
 
     // Generate Dart serialization code from the registry.
     let generator = CodeGenerator::new(&config);
