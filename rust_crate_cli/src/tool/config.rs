@@ -1,6 +1,6 @@
 use crate::SetupError;
 use serde::Deserialize;
-use serde_yml::Value;
+use serde_yml::{Mapping, Value, from_str};
 use std::collections::HashSet;
 use std::fmt::{Display, Formatter};
 use std::fs::read_to_string;
@@ -47,7 +47,7 @@ impl Default for RinfConfigMessage {
 
 impl RinfConfigMessage {
     /// Constructs a `RinfConfigMessage` from a YAML map.
-    pub fn from_yaml(yaml: &serde_yml::Mapping) -> Result<Self, SetupError> {
+    pub fn from_yaml(yaml: &Mapping) -> Result<Self, SetupError> {
         let valid_keys: HashSet<&str> = [
             "input_dir",
             "rust_output_dir",
@@ -113,7 +113,7 @@ impl Display for RinfConfig {
 
 impl RinfConfig {
     /// Constructs a `RinfConfig` from a YAML map.
-    pub fn from_yaml(yaml: &serde_yml::Mapping) -> Result<Self, SetupError> {
+    pub fn from_yaml(yaml: &Mapping) -> Result<Self, SetupError> {
         let valid_keys: HashSet<&str> = ["message"].into_iter().collect();
 
         for key in yaml.keys() {
@@ -154,7 +154,7 @@ pub fn load_verified_rinf_config(
 ) -> Result<RinfConfig, SetupError> {
     let file_path = root_dir.join("pubspec.yaml");
     let content = read_to_string(file_path)?;
-    let yaml: Value = serde_yml::from_str(&content)?;
+    let yaml: Value = from_str(&content)?;
     let rinf_yaml = yaml
         .as_mapping()
         .ok_or(SetupError::PubConfig("Parsing failed".to_owned()))?
@@ -169,7 +169,7 @@ pub fn load_verified_rinf_config(
 
 pub fn read_publish_to(file_path: &PathBuf) -> Option<String> {
     let content = std::fs::read_to_string(file_path).ok()?;
-    let yaml: Value = serde_yml::from_str(&content).ok()?;
+    let yaml: Value = from_str(&content).ok()?;
     let field_value = yaml.as_mapping()?.get("publish_to")?;
     let config = field_value.as_str()?.to_string();
     Some(config)
