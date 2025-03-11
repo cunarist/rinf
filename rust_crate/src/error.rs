@@ -1,5 +1,5 @@
 use std::error::Error;
-use std::fmt;
+use std::fmt::{Display, Formatter};
 
 #[derive(Debug)]
 pub enum AppError {
@@ -9,8 +9,10 @@ pub enum AppError {
     NoBindings,
 }
 
-impl fmt::Display for AppError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl Error for AppError {}
+
+impl Display for AppError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::NoDartIsolate => {
                 write!(f, "Dart isolate for Rust signals was not created")
@@ -27,5 +29,3 @@ impl fmt::Display for AppError {
         }
     }
 }
-
-impl Error for AppError {}

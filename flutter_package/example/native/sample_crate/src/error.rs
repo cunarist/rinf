@@ -1,5 +1,5 @@
 use std::error::Error;
-use std::fmt;
+use std::fmt::{Display, Formatter};
 
 #[derive(Debug)]
 pub enum ExampleError {
@@ -8,8 +8,10 @@ pub enum ExampleError {
     WebApi,
 }
 
-impl fmt::Display for ExampleError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl Error for ExampleError {}
+
+impl Display for ExampleError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Fractal => {
                 write!(f, "Failed to generate fractal")
@@ -23,5 +25,3 @@ impl fmt::Display for ExampleError {
         }
     }
 }
-
-impl Error for ExampleError {}
