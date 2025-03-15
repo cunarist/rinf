@@ -84,16 +84,14 @@ jobs:
           distribution: "zulu"
           java-version: "17"
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
+      - name: Install the Python environment manager
+        uses: astral-sh/setup-uv@v5
 
       - name: Install the CLI tool
         run: cargo install --path rust_crate_cli
 
       - name: Prepare a Flutter app for testing
-        run: python automate prepare-test-app
+        run: uv run automate prepare-test-app
 
       - name: Build the example app
         if: matrix.target == 'linux'

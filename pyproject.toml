@@ -1,10 +1,13 @@
 # Python scripts manage code and automate tests.
 # We avoid shell scripts because they are platform-dependent.
 
+[dependency-groups]
+dev = ["ruff", "pyright"]
+
 [tool.uv.workspace]
 members = ["automate", "documentation"]
 
-[tool.ruff]
+[tool.ruff.lint]
 select = ["E", "F", "N", "I", "PL"]
 
 [tool.pyright]

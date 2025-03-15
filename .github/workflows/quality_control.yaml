@@ -92,19 +92,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-
-      - name: Install dependencies
-        run: pip install pyright ruff
+      - name: Install the Python environment manager
+        uses: astral-sh/setup-uv@v5
 
       - name: Run Pyright
-        run: pyright
+        run: uv run pyright
 
       - name: Run Ruff
-        run: ruff check .
+        run: uv run ruff check .
 
   config:
     name: configuration-files
