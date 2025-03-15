@@ -130,10 +130,7 @@ def prepare_example_app():
 
 def run_command():
     if len(argv) < COMMAND_ARG + 1:
-        print(
-            "Automation option is not provided;"
-            "\nUse `python automate --help` to see all available operations"
-        )
+        print("Automation option is not provided")
         return
 
     command = argv[COMMAND_ARG]
