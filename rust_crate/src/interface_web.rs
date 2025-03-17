@@ -19,6 +19,8 @@ where
         }));
     }
 
+    // TODO: Run this in a web worker where blocking is possible.
+
     // Run the main function.
     main_fn();
 
