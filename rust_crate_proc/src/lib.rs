@@ -22,8 +22,6 @@ pub fn derive_signal_piece(input: TokenStream) -> TokenStream {
   TokenStream::from(expanded)
 }
 
-// TODO: Hide generated code from intellisense autocomplete.
-
 /// Marks the struct as a signal endpoint
 /// that contains a message from Dart to Rust.
 /// This can be marked on any type that implements `Deserialize`.
