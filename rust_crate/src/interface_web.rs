@@ -1,4 +1,6 @@
-use crate::{AppError, SHUTDOWN_EVENTS, ShutdownEventsLock};
+use crate::AppError;
+use crate::shutdown::SHUTDOWN_EVENTS;
+use crate::traits::GuardRecovery;
 use js_sys::Uint8Array;
 use wasm_bindgen::prelude::{JsValue, wasm_bindgen};
 
