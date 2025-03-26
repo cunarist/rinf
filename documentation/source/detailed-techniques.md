@@ -16,7 +16,7 @@ It's important to note that creating a Protobuf `message` larger than a few mega
 
 ## Generation Path
 
-When you generate message code using the `rinf gen` command, the resulting Dart modules will be placed under `lib/src/generated` folder.
+When you generate message code using the `rinf gen` command, the resulting Dart modules will be placed under `lib/src/bindings` folder.
 
 ## Continuous Watching
 

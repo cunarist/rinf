@@ -58,14 +58,14 @@ pub fn run_command() -> Result<(), SetupError> {
     }
     CliCommand::Template => {
       let rinf_config = load_verified_rinf_config(&root_dir)?;
-      apply_rust_template(&root_dir, &rinf_config.message)?;
+      apply_rust_template(&root_dir, &rinf_config)?;
     }
     CliCommand::Gen { watch } => {
       let rinf_config = load_verified_rinf_config(&root_dir)?;
       if watch {
-        watch_and_generate_dart_code(&root_dir, &rinf_config.message)?;
+        watch_and_generate_dart_code(&root_dir, &rinf_config)?;
       } else {
-        generate_dart_code(&root_dir, &rinf_config.message)?;
+        generate_dart_code(&root_dir, &rinf_config)?;
       }
     }
     CliCommand::Wasm { release } => {

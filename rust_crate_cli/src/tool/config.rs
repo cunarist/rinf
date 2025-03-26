@@ -1,140 +1,48 @@
 use crate::SetupError;
 use serde::Deserialize;
-use serde_yml::{Mapping, Value, from_str};
-use std::collections::HashSet;
+use serde_yml::{Value, from_str, from_value};
 use std::fmt::{Display, Formatter};
 use std::fs::read_to_string;
-use std::path::{Path, PathBuf};
-
-// TODO: Remove the message config struct.
+use std::path::Path;
 
 /// Rinf message configuration structure.
 #[derive(Deserialize)]
-pub struct RinfConfigMessage {
-  pub input_dir: String,
-  pub rust_output_dir: String,
-  pub dart_output_dir: String,
-  pub rust_serde: bool,
-}
-
-impl Display for RinfConfigMessage {
-  fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-    write!(
-      f,
-      "message:\
-      \n  input_dir: {}\
-      \n  rust_output_dir: {}\
-      \n  dart_output_dir: {}\
-      \n  rust_serde: {}",
-      self.input_dir,
-      self.rust_output_dir,
-      self.dart_output_dir,
-      self.rust_serde
-    )
-  }
-}
-
-impl Default for RinfConfigMessage {
-  fn default() -> Self {
-    Self {
-      input_dir: "messages/".to_string(),
-      rust_output_dir: "native/hub/src/messages/".to_string(),
-      dart_output_dir: "lib/messages/".to_string(),
-      rust_serde: false,
-    }
-  }
-}
-
-impl RinfConfigMessage {
-  /// Constructs a `RinfConfigMessage` from a YAML map.
-  pub fn from_yaml(yaml: &Mapping) -> Result<Self, SetupError> {
-    let valid_keys: HashSet<&str> = [
-      "input_dir",
-      "rust_output_dir",
-      "dart_output_dir",
-      "rust_serde",
-    ]
-    .into_iter()
-    .collect();
-
-    for key in yaml.keys() {
-      if let Some(key_str) = key.as_str() {
-        if !valid_keys.contains(key_str) {
-          Err(SetupError::PubConfig(format!(
-            "Unknown key \"{}\", Available keys are: {}",
-            key_str,
-            valid_keys.iter().cloned().collect::<Vec<_>>().join(", "),
-          )))?;
-        }
-      }
-    }
-
-    Ok(Self {
-      input_dir: yaml
-        .get("input_dir")
-        .and_then(Value::as_str)
-        .unwrap_or("messages/")
-        .to_string(),
-      rust_output_dir: yaml
-        .get("rust_output_dir")
-        .and_then(Value::as_str)
-        .unwrap_or("native/hub/src/messages/")
-        .to_string(),
-      dart_output_dir: yaml
-        .get("dart_output_dir")
-        .and_then(Value::as_str)
-        .unwrap_or("lib/messages/")
-        .to_string(),
-      rust_serde: yaml
-        .get("rust_serde")
-        .and_then(Value::as_bool)
-        .unwrap_or(false),
-    })
-  }
-}
-
-/// Main Rinf configuration structure.
-#[derive(Deserialize, Default)]
 pub struct RinfConfig {
-  pub message: RinfConfigMessage,
+  #[serde(default = "create_default_input_crates")]
+  pub input_crates: Vec<String>,
+  #[serde(default = "create_default_dart_output_dir")]
+  pub dart_output_dir: String,
 }
 
 impl Display for RinfConfig {
   fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-    write!(f, "{}", self.message)
+    write!(
+      f,
+      "message:\
+      \n  input_crates: {}\
+      \n  dart_output_dir: {}",
+      self.input_crates.join(", "),
+      self.dart_output_dir,
+    )
   }
 }
 
-// TODO: Make `from_yaml` a trait method.
-
-impl RinfConfig {
-  /// Constructs a `RinfConfig` from a YAML map.
-  pub fn from_yaml(yaml: &Mapping) -> Result<Self, SetupError> {
-    let valid_keys: HashSet<&str> = ["message"].into_iter().collect();
-
-    for key in yaml.keys() {
-      if let Some(key_str) = key.as_str() {
-        if !valid_keys.contains(key_str) {
-          Err(SetupError::PubConfig(format!(
-            "Unknown key \"{}\", Available keys are: {}",
-            key_str,
-            valid_keys.iter().cloned().collect::<Vec<_>>().join(", "),
-          )))?
-        }
-      }
+impl Default for RinfConfig {
+  fn default() -> Self {
+    Self {
+      input_crates: create_default_input_crates(),
+      dart_output_dir: create_default_dart_output_dir(),
     }
-
-    let message_yaml = yaml.get("message").and_then(Value::as_mapping);
-    let message = match message_yaml {
-      Some(map) => RinfConfigMessage::from_yaml(map)?,
-      None => RinfConfigMessage::default(),
-    };
-
-    Ok(Self { message })
   }
 }
 
-// TODO: Match the behavior of `load_verified_rinf_config` to its doc comment
+fn create_default_input_crates() -> Vec<String> {
+  vec!["hub".to_owned()]
+}
+
+fn create_default_dart_output_dir() -> String {
+  "lib/src/bindings".to_owned()
+}
 
 /// Attempts to load the rinf configuration from the provided pubspec.yaml file.
 /// If no rinf configuration is found, the default configuration is returned.
@@ -145,23 +53,23 @@ pub fn load_verified_rinf_config(
 ) -> Result<RinfConfig, SetupError> {
   let file_path = root_dir.join("pubspec.yaml");
   let content = read_to_string(file_path)?;
-  let yaml: Value = from_str(&content)?;
-  let rinf_yaml = yaml
+  let file_yaml: Value = from_str(&content)?;
+  let rinf_yaml = file_yaml
     .as_mapping()
     .ok_or(SetupError::PubConfig("Parsing failed".to_owned()))?
     .get("rinf")
-    .and_then(Value::as_mapping);
+    .cloned();
   let config = match rinf_yaml {
-    Some(map) => RinfConfig::from_yaml(map)?,
+    Some(map) => from_value(map)?,
     None => RinfConfig::default(),
   };
   Ok(config)
 }
 
-pub fn read_publish_to(file_path: &PathBuf) -> Option<String> {
+pub fn read_publish_to(file_path: &Path) -> Option<String> {
   let content = std::fs::read_to_string(file_path).ok()?;
-  let yaml: Value = from_str(&content).ok()?;
-  let field_value = yaml.as_mapping()?.get("publish_to")?;
+  let file_yaml: Value = from_str(&content).ok()?;
+  let field_value = file_yaml.as_mapping()?.get("publish_to")?;
   let config = field_value.as_str()?.to_string();
   Some(config)
 }

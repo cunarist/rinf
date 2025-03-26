@@ -1,4 +1,4 @@
-use crate::tool::{RinfConfigMessage, SetupError};
+use crate::tool::{RinfConfig, SetupError};
 use convert_case::{Case, Casing};
 use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
 use quote::ToTokens;
@@ -6,7 +6,9 @@ use serde_generate::dart::{CodeGenerator, Installer};
 use serde_generate::{CodeGeneratorConfig, Encoding, SourceInstaller};
 use serde_reflection::{ContainerFormat, Format, Named, Registry};
 use std::collections::{BTreeMap, BTreeSet};
-use std::fs::{read_dir, read_to_string, remove_file, write};
+use std::fs::{
+  create_dir_all, read_dir, read_to_string, remove_dir_all, rename, write,
+};
 use std::hash::Hash;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::channel;
@@ -235,6 +237,7 @@ fn process_items(
 }
 
 // TODO: Warn overlapping type names
+// TODO: Disallow type names that starts with "Rinf"
 
 fn visit_rust_files(
   dir: PathBuf,
@@ -257,14 +260,12 @@ fn visit_rust_files(
 }
 
 fn generate_class_extension_code(
-  root_dir: &Path,
+  gen_dir: &Path,
   class: &str,
   extracted_attrs: &BTreeSet<SignalAttribute>,
 ) -> Result<(), SetupError> {
   let snake_class = class.to_case(Case::Snake);
-  let class_file = root_dir
-    .join("lib")
-    .join("src")
+  let class_file = gen_dir
     .join("generated")
     .join(format!("{}.dart", snake_class));
   let mut code = read_to_string(&class_file)?;
@@ -312,14 +313,12 @@ extension {class}DartSignalExt on {class} {{
 // TODO: Make some generated items private.
 
 fn generate_class_interface_code(
-  root_dir: &Path,
+  gen_dir: &Path,
   class: &str,
   extracted_attrs: &BTreeSet<SignalAttribute>,
 ) -> Result<(), SetupError> {
   let snake_class = class.to_case(Case::Snake);
-  let class_file = root_dir
-    .join("lib")
-    .join("src")
+  let class_file = gen_dir
     .join("generated")
     .join(format!("{}.dart", snake_class));
   let mut code = read_to_string(&class_file)?;
@@ -351,10 +350,8 @@ final {camel_class}StreamController =
   Ok(())
 }
 
-// TODO: Delete the folder before generating
-
 fn generate_shared_code(
-  root_dir: &Path,
+  gen_dir: &Path,
   signal_attrs: &BTreeMap<String, BTreeSet<SignalAttribute>>,
 ) -> Result<(), SetupError> {
   // Write type aliases.
@@ -391,31 +388,23 @@ fn generate_shared_code(
   code.push_str("\n};\n");
 
   // Save to a file.
-  let shared_file = root_dir
-    .join("lib")
-    .join("src")
-    .join("generated")
-    .join("signal_handlers.dart");
+  let shared_file = gen_dir.join("generated").join("signal_handlers.dart");
   write(&shared_file, code)?;
   Ok(())
 }
 
 fn generate_interface_code(
-  root_dir: &Path,
+  gen_dir: &Path,
   signal_attrs: &BTreeMap<String, BTreeSet<SignalAttribute>>,
 ) -> Result<(), SetupError> {
   // Generate FFI interface code.
   for (class, extracted_attrs) in signal_attrs {
-    generate_class_extension_code(root_dir, class, extracted_attrs)?;
-    generate_class_interface_code(root_dir, class, extracted_attrs)?;
+    generate_class_extension_code(gen_dir, class, extracted_attrs)?;
+    generate_class_interface_code(gen_dir, class, extracted_attrs)?;
   }
 
   // Write imports.
-  let top_file = root_dir
-    .join("lib")
-    .join("src")
-    .join("generated")
-    .join("generated.dart");
+  let top_file = gen_dir.join("generated").join("generated.dart");
   let mut top_content = read_to_string(&top_file)?;
   top_content = top_content.replacen(
     "export '../serde/serde.dart';",
@@ -429,33 +418,38 @@ export '../serde/serde.dart';"#,
   write(&top_file, top_content)?;
 
   // Write the shared code.
-  generate_shared_code(root_dir, signal_attrs)?;
+  generate_shared_code(gen_dir, signal_attrs)?;
   Ok(())
 }
 
 pub fn generate_dart_code(
   root_dir: &Path,
-  _message_config: &RinfConfigMessage,
+  rinf_config: &RinfConfig,
 ) -> Result<(), SetupError> {
-  // TODO: Use the config
-
   // Analyze the input Rust files and collect type registries.
   let mut registry: Registry = Registry::new();
   let mut signal_attrs = BTreeMap::<String, BTreeSet<SignalAttribute>>::new();
-  let source_dir = root_dir.join("native").join("hub").join("src");
-  visit_rust_files(source_dir, &mut registry, &mut signal_attrs)?;
+  for crate_name in &rinf_config.input_crates {
+    let source_dir = root_dir.join("native").join(crate_name).join("src");
+    visit_rust_files(source_dir, &mut registry, &mut signal_attrs)?;
+  }
 
   // TODO: Include comments from original structs with `with_comments` method
 
+  // Empty the generation folder.
+  let gen_dir = root_dir.join(rinf_config.dart_output_dir.clone());
+  let _ = remove_dir_all(&gen_dir);
+  create_dir_all(&gen_dir)?;
+
   // Create the code generator config.
-  let config = CodeGeneratorConfig::new("generated".to_string())
+  let gen_config = CodeGeneratorConfig::new("generated".to_string())
     .with_encodings([Encoding::Bincode])
     .with_package_manifest(false);
 
   // Install serialization modules.
-  let installer = Installer::new(root_dir.to_owned());
+  let installer = Installer::new(gen_dir.clone());
   installer
-    .install_module(&config, &registry)
+    .install_module(&gen_config, &registry)
     .map_err(|_| SetupError::ReflectionModule)?;
   installer
     .install_serde_runtime()
@@ -465,14 +459,23 @@ pub fn generate_dart_code(
     .map_err(|_| SetupError::ReflectionModule)?;
 
   // Generate Dart serialization code from the registry.
-  let generator = CodeGenerator::new(&config);
-  generator.output(root_dir.to_owned(), &registry)?;
+  let generator = CodeGenerator::new(&gen_config);
+  generator.output(gen_dir.clone(), &registry)?;
+  move_directory_contents(&gen_dir.join("lib").join("src"), &gen_dir)?;
+  remove_dir_all(gen_dir.join("lib"))?;
 
-  // Generate Dart interface code.
-  generate_interface_code(root_dir, &signal_attrs)?;
+  // Write the export file.
+  let gen_dir_name = gen_dir
+    .file_name()
+    .and_then(|s| s.to_str())
+    .unwrap_or("bindings");
+  write(
+    gen_dir.join(format!("{gen_dir_name}.dart")),
+    "export 'generated/generated.dart';",
+  )?;
 
-  // Remove unnecessary files.
-  remove_file(root_dir.join("lib").join("generated.dart"))?;
+  // Generate Dart interface code for FFI.
+  generate_interface_code(&gen_dir, &signal_attrs)?;
   Ok(())
 }
 
@@ -481,7 +484,7 @@ pub fn generate_dart_code(
 /// Watches the Rust source directory for changes and regenerates Dart code.
 pub fn watch_and_generate_dart_code(
   root_dir: &Path,
-  message_config: &RinfConfigMessage,
+  message_config: &RinfConfig,
 ) -> Result<(), SetupError> {
   // Prepare the source directory for Rust files.
   let source_dir = root_dir.join("native").join("hub").join("src");
@@ -544,4 +547,27 @@ fn should_regenerate(event: &Event) -> bool {
     .paths
     .iter()
     .any(|path| path.extension().map(|ext| ext == "rs").unwrap_or(false))
+}
+
+/// Iterate over the files and directories in A.
+/// Then, move each inner file or directory to B.
+/// This function is recursive and checks all nested children.
+fn move_directory_contents(
+  dir_from: &Path,
+  dir_to: &Path,
+) -> Result<(), SetupError> {
+  if !dir_to.is_dir() {
+    create_dir_all(dir_to)?;
+  }
+  for entry_result in read_dir(dir_from)? {
+    let entry = entry_result?;
+    let src_path = entry.path();
+    let dest_path = dir_to.join(entry.file_name());
+    if src_path.is_dir() {
+      move_directory_contents(&src_path, &dest_path)?;
+    } else {
+      rename(&src_path, &dest_path)?;
+    }
+  }
+  Ok(())
 }

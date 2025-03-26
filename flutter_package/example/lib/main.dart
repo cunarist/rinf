@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:rinf/rinf.dart';
-import 'src/generated/generated.dart';
+import 'src/bindings/bindings.dart';
 
 void main() async {
   await initializeRust(assignRustSignal);

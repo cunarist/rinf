@@ -54,3 +54,4 @@ rinf server
 - `cargo uninstall rinf` and `cargo install rinf_cli`
 - New signal code generation
 - Requires Rust 2024 edition.
+- Change Rinf config schema

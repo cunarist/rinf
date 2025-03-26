@@ -1,17 +1,16 @@
 use crate::tool::{
-  RinfConfigMessage, SetupError, generate_dart_code, run_dart_command,
-  run_subprocess,
+  RinfConfig, SetupError, generate_dart_code, run_dart_command, run_subprocess,
 };
 use include_dir::{Dir, include_dir};
 use std::fs::{create_dir_all, read_to_string, write};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 static TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/template");
 
 /// Creates new folders and files in an existing Flutter project folder.
 pub fn apply_rust_template(
-  root_dir: &PathBuf,
-  message_config: &RinfConfigMessage,
+  root_dir: &Path,
+  message_config: &RinfConfig,
 ) -> Result<(), SetupError> {
   if root_dir.join("native").is_dir() {
     Err(SetupError::TemplateApplied)?;
@@ -44,7 +43,7 @@ pub fn apply_rust_template(
 }
 
 /// Recursively extracts the embedded `TEMPLATE_DIR` to `dest_path`
-fn dump_template(dest_path: &PathBuf) -> Result<(), SetupError> {
+fn dump_template(dest_path: &Path) -> Result<(), SetupError> {
   for entry in TEMPLATE_DIR.entries() {
     dump_entry(dest_path, entry)?;
   }
@@ -52,7 +51,7 @@ fn dump_template(dest_path: &PathBuf) -> Result<(), SetupError> {
 }
 
 fn dump_entry(
-  dest_path: &PathBuf,
+  dest_path: &Path,
   entry: &include_dir::DirEntry,
 ) -> Result<(), SetupError> {
   match entry {
@@ -101,7 +100,7 @@ fn update_gitignore(root_dir: &Path) -> Result<(), SetupError> {
 # Generated signals
 /lib/src/bincode
 /lib/src/serde
-/lib/src/generated
+/lib/src/bindings
 "#,
     );
   }
@@ -175,7 +174,7 @@ fn update_main_dart(root_dir: &Path) -> Result<(), SetupError> {
       content = content.replacen(
         "import",
         "import 'package:rinf/rinf.dart';\
-        \nimport 'src/generated/generated.dart';\nimport",
+        \nimport 'src/bindings/bindings.dart';\nimport",
         1,
       );
     }

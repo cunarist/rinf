@@ -52,4 +52,4 @@ app.*.map.json
 # Generated signals
 /lib/src/bincode
 /lib/src/serde
-/lib/src/generated
+/lib/src/bindings
