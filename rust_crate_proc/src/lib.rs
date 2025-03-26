@@ -114,7 +114,7 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
 
     #[cfg(not(target_family = "wasm"))]
     #[unsafe(no_mangle)]
-    pub unsafe extern "C" fn #extern_fn_ident(
+    unsafe extern "C" fn #extern_fn_ident(
       message_pointer: *const u8,
       message_size: usize,
       binary_pointer: *const u8,

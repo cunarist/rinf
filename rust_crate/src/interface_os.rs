@@ -13,7 +13,7 @@ use std::thread::spawn;
 static DART_ISOLATE: Mutex<Option<Isolate>> = Mutex::new(None);
 
 #[unsafe(no_mangle)]
-pub extern "C" fn rinf_prepare_isolate_extern(
+extern "C" fn rinf_prepare_isolate_extern(
   store_post_object: DartPostCObjectFnType,
   port: i64,
 ) {
@@ -100,7 +100,7 @@ where
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn rinf_stop_rust_logic_extern() {
+extern "C" fn rinf_stop_rust_logic_extern() {
   SHUTDOWN_EVENTS.dart_stopped.set();
 }
 
