@@ -20,14 +20,14 @@ write_interface!();
 // You can go with any async library, not just `tokio`.
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
-    // Spawn concurrent tasks.
-    // Always use non-blocking async functions like `tokio::fs::File::open`.
-    // If you must use blocking code, use `tokio::task::spawn_blocking`
-    // or the equivalent provided by your async library.
-    spawn(stream_fractal());
-    spawn(run_debug_tests());
-    spawn(create_actors());
+  // Spawn concurrent tasks.
+  // Always use non-blocking async functions like `tokio::fs::File::open`.
+  // If you must use blocking code, use `tokio::task::spawn_blocking`
+  // or the equivalent provided by your async library.
+  spawn(stream_fractal());
+  spawn(run_debug_tests());
+  spawn(create_actors());
 
-    // Keep the main function running until Dart shutdown.
-    dart_shutdown().await;
+  // Keep the main function running until Dart shutdown.
+  dart_shutdown().await;
 }

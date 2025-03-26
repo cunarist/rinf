@@ -3,99 +3,99 @@ use std::path::Path;
 use std::process::Command;
 
 pub fn build_webassembly(
-    root_dir: &Path,
-    is_release_mode: bool,
-    is_internet_connected: bool,
+  root_dir: &Path,
+  is_release_mode: bool,
+  is_internet_connected: bool,
 ) -> Result<(), SetupError> {
-    let total_steps = 3;
-    let mut step = 0;
+  let total_steps = 3;
+  let mut step = 0;
 
-    if is_internet_connected {
-        step += 1;
-        println!(
-            "[{}/{}] Installing Rust toolchain for the web",
-            step, total_steps
-        );
-        install_wasm_toolchain()?;
-    } else {
-        println!("Skipping ensurement of Rust toolchain for the web");
-    }
-
+  if is_internet_connected {
     step += 1;
     println!(
-        "[{}/{}] Preparing WebAssembly output path",
-        step, total_steps
+      "[{}/{}] Installing Rust toolchain for the web",
+      step, total_steps
     );
+    install_wasm_toolchain()?;
+  } else {
+    println!("Skipping ensurement of Rust toolchain for the web");
+  }
 
-    step += 1;
-    println!(
-        "[{}/{}] Compiling Rust with `wasm-pack` to `web` target",
-        step, total_steps
-    );
-    compile_wasm(root_dir, is_release_mode)?;
+  step += 1;
+  println!(
+    "[{}/{}] Preparing WebAssembly output path",
+    step, total_steps
+  );
 
-    println!(
-        "[{}/{}] WebAssembly module is now ready 🎉",
-        step, total_steps
-    );
-    println!("To get the Flutter web server command, run `rinf server`");
+  step += 1;
+  println!(
+    "[{}/{}] Compiling Rust with `wasm-pack` to `web` target",
+    step, total_steps
+  );
+  compile_wasm(root_dir, is_release_mode)?;
 
-    Ok(())
+  println!(
+    "[{}/{}] WebAssembly module is now ready 🎉",
+    step, total_steps
+  );
+  println!("To get the Flutter web server command, run `rinf server`");
+
+  Ok(())
 }
 
 fn install_wasm_toolchain() -> Result<(), SetupError> {
-    run_subprocess("rustup", &["toolchain", "install", "nightly"])?;
-    run_subprocess("rustup", &["+nightly", "component", "add", "rust-src"])?;
-    run_subprocess(
-        "rustup",
-        &["+nightly", "target", "add", "wasm32-unknown-unknown"],
-    )?;
-    run_subprocess("rustup", &["target", "add", "wasm32-unknown-unknown"])?;
-    run_subprocess("cargo", &["install", "wasm-pack"])?;
-    run_subprocess("cargo", &["install", "wasm-bindgen-cli"])?;
-    Ok(())
+  run_subprocess("rustup", &["toolchain", "install", "nightly"])?;
+  run_subprocess("rustup", &["+nightly", "component", "add", "rust-src"])?;
+  run_subprocess(
+    "rustup",
+    &["+nightly", "target", "add", "wasm32-unknown-unknown"],
+  )?;
+  run_subprocess("rustup", &["target", "add", "wasm32-unknown-unknown"])?;
+  run_subprocess("cargo", &["install", "wasm-pack"])?;
+  run_subprocess("cargo", &["install", "wasm-bindgen-cli"])?;
+  Ok(())
 }
 
 fn compile_wasm(
-    root_dir: &Path,
-    is_release_mode: bool,
+  root_dir: &Path,
+  is_release_mode: bool,
 ) -> Result<(), SetupError> {
-    let out_path = root_dir.join("web").join("pkg");
-    let out_string = out_path
-        .to_str()
-        .ok_or_else(|| SetupError::BadFilePath(out_path.as_os_str().into()))?;
-    let mut wasm_pack_args = vec![
-        "--quiet",
-        "build",
-        "./native/hub",
-        "--out-dir",
-        out_string,
-        "--out-name",
-        "hub",
-        "--no-typescript",
-        "--target",
-        "web",
-        "--",
-        "-Z",
-        "build-std=std,panic_abort",
-    ];
-    if !is_release_mode {
-        wasm_pack_args.insert(7, "--dev");
-    }
+  let out_path = root_dir.join("web").join("pkg");
+  let out_string = out_path
+    .to_str()
+    .ok_or_else(|| SetupError::BadFilePath(out_path.as_os_str().into()))?;
+  let mut wasm_pack_args = vec![
+    "--quiet",
+    "build",
+    "./native/hub",
+    "--out-dir",
+    out_string,
+    "--out-name",
+    "hub",
+    "--no-typescript",
+    "--target",
+    "web",
+    "--",
+    "-Z",
+    "build-std=std,panic_abort",
+  ];
+  if !is_release_mode {
+    wasm_pack_args.insert(7, "--dev");
+  }
 
-    let status = Command::new("wasm-pack")
-        .args(&wasm_pack_args)
-        .env("RUSTUP_TOOLCHAIN", "nightly")
-        .env(
-            "RUSTFLAGS",
-            "-C target-feature=+atomics,+bulk-memory,+mutable-globals",
-        )
-        .status()?;
+  let status = Command::new("wasm-pack")
+    .args(&wasm_pack_args)
+    .env("RUSTUP_TOOLCHAIN", "nightly")
+    .env(
+      "RUSTFLAGS",
+      "-C target-feature=+atomics,+bulk-memory,+mutable-globals",
+    )
+    .status()?;
 
-    if !status.success() {
-        panic!("Wasm compilation failed");
-    }
+  if !status.success() {
+    panic!("Wasm compilation failed");
+  }
 
-    println!("Saved `.wasm` and `.js` files to `web/pkg/`");
-    Ok(())
+  println!("Saved `.wasm` and `.js` files to `web/pkg/`");
+  Ok(())
 }

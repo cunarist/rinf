@@ -5,16 +5,16 @@ use std::sync::{MutexGuard, PoisonError};
 /// This trait handles the recovery from a logically poisoned situation,
 /// which is unlikely to occur.
 pub trait GuardRecovery<'a, T> {
-    fn recover(self) -> MutexGuard<'a, T>;
+  fn recover(self) -> MutexGuard<'a, T>;
 }
 
 impl<'a, T> GuardRecovery<'a, T>
-    for Result<MutexGuard<'a, T>, PoisonError<MutexGuard<'a, T>>>
+  for Result<MutexGuard<'a, T>, PoisonError<MutexGuard<'a, T>>>
 {
-    fn recover(self) -> MutexGuard<'a, T> {
-        match self {
-            Ok(inner) => inner,
-            Err(poisoned) => poisoned.into_inner(),
-        }
+  fn recover(self) -> MutexGuard<'a, T> {
+    match self {
+      Ok(inner) => inner,
+      Err(poisoned) => poisoned.into_inner(),
     }
+  }
 }

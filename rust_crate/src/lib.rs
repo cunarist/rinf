@@ -19,7 +19,7 @@ pub use interface::{DartSignal, send_rust_signal, start_rust_logic};
 pub use shutdown::dart_shutdown;
 
 pub use rinf_proc::{
-    DartSignal, DartSignalBinary, RustSignal, RustSignalBinary, SignalPiece,
+  DartSignal, DartSignalBinary, RustSignal, RustSignalBinary, SignalPiece,
 };
 
 #[doc(hidden)]

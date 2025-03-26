@@ -1,2 +1,3 @@
 style_edition = "2024"
-max_width = 80         # This matches the maximum line length used in Dart
+max_width = 80
+tab_spaces = 2
