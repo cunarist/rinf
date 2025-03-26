@@ -134,9 +134,7 @@ fn derive_rust_signal_real(
     quote! {
       impl #name {
         pub fn send_signal_to_dart(self, binary: Vec<u8>) {
-          use rinf::{
-            AppError, debug_print, send_rust_signal, serialize
-          };
+          use rinf::{AppError, debug_print, send_rust_signal, serialize};
           let type_name = #name_lit;
           let message_result: Result<Vec<u8>, AppError> =
             serialize(&self)
@@ -159,9 +157,7 @@ fn derive_rust_signal_real(
     quote! {
       impl #name {
         pub fn send_signal_to_dart(self) {
-          use rinf::{
-            AppError, debug_print, send_rust_signal, serialize
-          };
+          use rinf::{AppError, debug_print, send_rust_signal, serialize};
           let type_name = #name_lit;
           let message_result: Result<Vec<u8>, AppError> =
             serialize(&self)
