@@ -4,7 +4,9 @@ import 'dart:async';
 import 'dart:isolate';
 import 'dart:convert';
 import 'load_os.dart';
-import 'interface.dart';
+import 'structure.dart';
+
+final isWeb = false;
 
 /// Sets the exact file path of the dynamic library
 /// compiled from the `hub` crate.

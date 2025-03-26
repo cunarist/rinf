@@ -2,9 +2,10 @@
 library;
 
 import 'dart:typed_data';
-import 'src/exports.dart';
+import 'src/structure.dart';
+import 'src/interface.dart';
 
-export 'src/interface.dart' show RustSignal, useLocalSpaceSymbols;
+export 'src/structure.dart' show RustSignal, useLocalSpaceSymbols;
 
 /// Starts the `main` function in Rust.
 Future<void> initializeRust(

@@ -6,7 +6,9 @@ import 'dart:js_interop_unsafe';
 import 'dart:typed_data';
 import 'dart:convert';
 import 'load_web.dart';
-import 'interface.dart';
+import 'structure.dart';
+
+final isWeb = true;
 
 /// Sets the path to the JavaScript module
 /// that needs to be loaded.

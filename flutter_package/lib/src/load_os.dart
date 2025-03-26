@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:ffi';
 import 'dart:typed_data';
 import 'package:ffi/ffi.dart';
-import 'interface.dart';
+import 'structure.dart';
 
 String? dynamicLibPath;
 
