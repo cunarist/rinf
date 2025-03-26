@@ -1,15 +1,25 @@
 use convert_case::{Case, Casing};
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{DeriveInput, Ident, parse_macro_input};
+use syn::{Data, DeriveInput, Error, Fields, Ident, parse_macro_input};
 
 /// Marks the struct as a signal
 /// that can be nested within other signals.
 /// A `SignalPiece` cannot be sent independently
 /// and is only a partial component of `DartSignal` or `RustSignal`.
 #[proc_macro_derive(SignalPiece)]
-pub fn derive_signal_piece(_input: TokenStream) -> TokenStream {
-  TokenStream::new()
+pub fn derive_signal_piece(input: TokenStream) -> TokenStream {
+  // Collect information about the item.
+  let ast = parse_macro_input!(input as DeriveInput);
+  let name = &ast.ident;
+
+  // Automatically implement the signal trait for the struct.
+  let expanded = quote! {
+    impl rinf::ForeignSignal for #name {}
+  };
+
+  // Convert the generated code into token stream and return it.
+  TokenStream::from(expanded)
 }
 
 // TODO: Hide generated code from intellisense autocomplete.
@@ -31,23 +41,43 @@ pub fn derive_dart_signal_binary(input: TokenStream) -> TokenStream {
 }
 
 fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
+  // Collect information about the item.
   let ast = parse_macro_input!(input as DeriveInput);
   let name = &ast.ident;
   let name_lit = name.to_string();
   let snake_name = name_lit.to_case(Case::Snake);
   let upper_snake_name = name_lit.to_case(Case::UpperSnake);
 
+  // Enforce all fields to implement the signal trait.
+  let Data::Struct(data_struct) = &ast.data else {
+    return Error::new_spanned(
+      ast,
+      "`DartSignal` can only be derived for structs.",
+    )
+    .to_compile_error()
+    .into();
+  };
+  let field_types: Vec<_> = match &data_struct.fields {
+    Fields::Named(fields) => fields.named.iter().map(|f| &f.ty).collect(),
+    Fields::Unnamed(fields) => fields.unnamed.iter().map(|f| &f.ty).collect(),
+    Fields::Unit => vec![],
+  };
+  let where_clause = quote! {
+    where #(#field_types: rinf::ForeignSignal),*
+  };
+
+  // Collect identifiers and names.
   let channel_type_ident = Ident::new(&format!("{}Channel", name), name.span());
   let channel_const_ident =
     Ident::new(&format!("{}_CHANNEL", upper_snake_name), name.span());
-
   let extern_fn_name = &format!("rinf_send_dart_signal_{}", snake_name);
   let extern_fn_ident = Ident::new(extern_fn_name, name.span());
 
   // TODO: Deprecate `get_dart_signal_receiver` and make `listen` method instead.
 
+  // Implement methods and extern functions.
   let expanded = quote! {
-    impl #name {
+    impl #name #where_clause {
       pub fn get_dart_signal_receiver(
       ) -> rinf::SignalReceiver<rinf::DartSignal<Self>> {
         #channel_const_ident.1.clone()
@@ -103,6 +133,7 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
     }
   };
 
+  // Convert the generated code into token stream and return it.
   TokenStream::from(expanded)
 }
 
@@ -126,13 +157,33 @@ fn derive_rust_signal_real(
   input: TokenStream,
   include_binary: bool,
 ) -> TokenStream {
+  // Collect information about the item.
   let ast = parse_macro_input!(input as DeriveInput);
   let name = &ast.ident;
   let name_lit = name.to_string();
 
+  // Enforce all fields to implement the signal trait.
+  let Data::Struct(data_struct) = &ast.data else {
+    return Error::new_spanned(
+      ast,
+      "`RustSignal` can only be derived for structs.",
+    )
+    .to_compile_error()
+    .into();
+  };
+  let field_types: Vec<_> = match &data_struct.fields {
+    Fields::Named(fields) => fields.named.iter().map(|f| &f.ty).collect(),
+    Fields::Unnamed(fields) => fields.unnamed.iter().map(|f| &f.ty).collect(),
+    Fields::Unit => vec![],
+  };
+  let where_clause = quote! {
+    where #(#field_types: rinf::ForeignSignal),*
+  };
+
+  // Implement methods and extern functions.
   let expanded = if include_binary {
     quote! {
-      impl #name {
+      impl #name #where_clause {
         pub fn send_signal_to_dart(self, binary: Vec<u8>) {
           use rinf::{AppError, debug_print, send_rust_signal, serialize};
           let type_name = #name_lit;
@@ -155,7 +206,7 @@ fn derive_rust_signal_real(
     }
   } else {
     quote! {
-      impl #name {
+      impl #name #where_clause {
         pub fn send_signal_to_dart(self) {
           use rinf::{AppError, debug_print, send_rust_signal, serialize};
           let type_name = #name_lit;
@@ -178,7 +229,6 @@ fn derive_rust_signal_real(
     }
   };
 
+  // Convert the generated code into token stream and return it.
   TokenStream::from(expanded)
 }
-
-// TODO: Enforce trait-based type safety

@@ -2,6 +2,7 @@ mod channel;
 mod error;
 mod macros;
 mod shutdown;
+mod signal_trait;
 mod traits;
 
 mod interface;
@@ -14,6 +15,7 @@ pub use channel::{SignalReceiver, SignalSender, signal_channel};
 pub use error::AppError;
 pub use interface::{DartSignal, send_rust_signal, start_rust_logic};
 pub use shutdown::dart_shutdown;
+pub use signal_trait::ForeignSignal;
 
 pub use rinf_proc::{
   DartSignal, DartSignalBinary, RustSignal, RustSignalBinary, SignalPiece,
