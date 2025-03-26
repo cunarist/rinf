@@ -1,6 +1,6 @@
 //! This module is written for Rinf demonstrations.
 
-use crate::{SampleFractal, SampleSchema};
+use crate::signals::{SampleFractal, SampleSchema};
 use anyhow::Result;
 use rinf::debug_print;
 use sample_crate::{

@@ -1,4 +1,4 @@
-use crate::SampleSchema;
+use crate::signals::SampleSchema;
 use rinf::RustSignalBinary;
 use serde::Serialize;
 

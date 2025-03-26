@@ -2,7 +2,7 @@
 //! Copied and modified from
 //! https://github.com/abour/fractal repository.
 
-use crate::ExampleError;
+use crate::error::ExampleError;
 use image::ImageEncoder;
 
 const WIDTH: u32 = 384;

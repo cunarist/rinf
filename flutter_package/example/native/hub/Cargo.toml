@@ -11,6 +11,11 @@ edition = "2024"
 # `staticlib` is for iOS and macOS.
 crate-type = ["lib", "cdylib", "staticlib"]
 
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+wildcard_imports = "deny"
+
 [dependencies]
 rinf = "7.3.0"
 serde = { version = "1.0.218", features = ["derive"] }

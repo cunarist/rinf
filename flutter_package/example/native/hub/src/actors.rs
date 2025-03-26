@@ -5,7 +5,7 @@
 //! To build a solid app, do not communicate by sharing memory;
 //! instead, share memory by communicating.
 
-use crate::{SampleNumberInput, SampleNumberOutput};
+use crate::signals::{SampleNumberInput, SampleNumberOutput};
 use anyhow::Result;
 use async_trait::async_trait;
 use messages::prelude::{Actor, Address, Context, Handler};

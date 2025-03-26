@@ -1,4 +1,4 @@
-use crate::GuardRecovery;
+use crate::traits::GuardRecovery;
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::{Arc, LazyLock, Mutex};

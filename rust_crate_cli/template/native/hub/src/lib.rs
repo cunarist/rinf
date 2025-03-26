@@ -4,8 +4,6 @@
 mod sample_functions;
 mod signals;
 
-use signals::*;
-
 use rinf::{dart_shutdown, write_interface};
 use tokio::task::spawn;
 

@@ -12,6 +12,11 @@ include = ["/src/", "/template/"]
 name = "rinf"
 path = "src/bin/main.rs"
 
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+wildcard_imports = "deny"
+
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 clap = { version = "4.5.32", features = ["derive"] }
 owo-colors = "4.2.0"
@@ -25,7 +30,3 @@ include_dir = "0.7.4"
 convert_case = "0.8.0"
 arboard = "3.4.1"
 notify = "8.0.0"
-
-[lints.clippy]
-unwrap_used = "deny"
-expect_used = "deny"

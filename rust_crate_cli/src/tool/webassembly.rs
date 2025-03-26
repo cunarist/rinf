@@ -1,4 +1,4 @@
-use crate::{SetupError, run_subprocess};
+use crate::tool::{SetupError, run_subprocess};
 use std::path::Path;
 use std::process::Command;
 

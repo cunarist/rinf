@@ -1,4 +1,4 @@
-use crate::{RinfConfigMessage, SetupError};
+use crate::tool::{RinfConfigMessage, SetupError};
 use convert_case::{Case, Casing};
 use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
 use quote::ToTokens;

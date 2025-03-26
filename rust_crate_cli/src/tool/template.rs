@@ -1,4 +1,4 @@
-use crate::{
+use crate::tool::{
   RinfConfigMessage, SetupError, generate_dart_code, run_dart_command,
 };
 use include_dir::{Dir, include_dir};

@@ -1,6 +1,6 @@
 //! This module is written for Rinf demonstrations.
 
-use crate::{SmallNumber, SmallText};
+use crate::signals::{SmallNumber, SmallText};
 use rinf::debug_print;
 
 pub async fn communicate() {

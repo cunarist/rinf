@@ -2,7 +2,4 @@
 mod tool;
 
 #[cfg(not(target_family = "wasm"))]
-use tool::*;
-
-#[cfg(not(target_family = "wasm"))]
 pub use tool::{SetupError, run_command};

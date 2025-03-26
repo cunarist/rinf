@@ -5,9 +5,8 @@ mod actors;
 mod sample_functions;
 mod signals;
 
-use actors::*;
-use sample_functions::*;
-use signals::*;
+use actors::create_actors;
+use sample_functions::{run_debug_tests, stream_fractal};
 
 use rinf::{dart_shutdown, write_interface};
 use tokio::task::spawn;

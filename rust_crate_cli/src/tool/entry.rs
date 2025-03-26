@@ -1,4 +1,4 @@
-use crate::{
+use crate::tool::{
   SetupError, apply_rust_template, build_webassembly,
   check_internet_connection, generate_dart_code, load_verified_rinf_config,
   provide_server_command, read_publish_to, watch_and_generate_dart_code,
