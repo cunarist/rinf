@@ -57,7 +57,8 @@ impl Handler<ClickedLetter> for CountingActor {
     let new_number = self.count + 7;
     self.count = new_number;
 
-    // The send method is generated from a marked Protobuf message.
+    // The send method is generated
+    // on structs that derive `RustSignal`.
     SampleNumberOutput {
       current_number: new_number,
       dummy_one: 11,

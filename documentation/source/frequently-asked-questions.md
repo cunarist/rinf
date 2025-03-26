@@ -12,7 +12,7 @@ Ideally, **Flutter** would deal with the cross-platform user interface while **R
 
 ### How are data passed between Dart and Rust?
 
-Data being sent between Dart and Rust are basically bytes arrays, represented as `Uint8List` in Dart and `Vec<u8>` in Rust. You can send Protobuf messages and any binary data as you wish such as a high-resolution image or some kind of file data.
+Data being sent between Dart and Rust are basically bytes arrays, represented as `Uint8List` in Dart and `Vec<u8>` in Rust. You can send serializable messages and any binary data as you wish such as a high-resolution image or some kind of file data.
 
 ### Where are the library files generated from Rust crates?
 

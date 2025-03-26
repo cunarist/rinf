@@ -63,8 +63,7 @@ class MyHomePage extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           // The `sendSignalToRust` method is generated
-          // from a marked Protobuf message.
-          // TODO: Update comments like this
+          // on structs that derive `DartSignal`.
           SampleNumberInput(
             letter: 'HELLO FROM DART!',
             dummyOne: 25,
@@ -124,7 +123,8 @@ class MyColumn extends StatelessWidget {
         },
       ),
       StreamBuilder(
-        // This stream is generated from a marked Protobuf message.
+        // This stream is generated
+        // on structs that derive `RustSignal`.
         stream: SampleNumberOutput.rustSignalStream,
         builder: (context, snapshot) {
           final rustSignal = snapshot.data;
