@@ -479,6 +479,7 @@ pub fn generate_dart_code(
   Ok(())
 }
 
+// TODO: Clean up CLI output
 // TODO: `watch_and_generate_dart_code` is not tested, so check it later
 
 /// Watches the Rust source directory for changes and regenerates Dart code.
