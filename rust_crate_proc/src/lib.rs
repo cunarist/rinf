@@ -15,9 +15,20 @@ pub fn derive_signal_piece(input: TokenStream) -> TokenStream {
   let ast = parse_macro_input!(input as DeriveInput);
   let name = &ast.ident;
 
+  // Enforce all fields to implement the foreign signal trait.
+  let Data::Struct(data_struct) = &ast.data else {
+    return Error::new_spanned(
+      ast,
+      "`SignalPiece` can only be derived for structs.",
+    )
+    .to_compile_error()
+    .into();
+  };
+  let where_clause = get_fields_where_clause(data_struct);
+
   // Automatically implement the signal trait for the struct.
   let expanded = quote! {
-    impl rinf::ForeignSignal for #name {}
+    impl rinf::ForeignSignal for #name #where_clause {}
   };
 
   // Convert the generated code into token stream and return it.
@@ -48,7 +59,7 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
   let snake_name = name_lit.to_case(Case::Snake);
   let upper_snake_name = name_lit.to_case(Case::UpperSnake);
 
-  // Enforce all fields to implement the signal trait.
+  // Enforce all fields to implement the foreign signal trait.
   let Data::Struct(data_struct) = &ast.data else {
     return Error::new_spanned(
       ast,
@@ -155,7 +166,7 @@ fn derive_rust_signal_real(
   let name = &ast.ident;
   let name_lit = name.to_string();
 
-  // Enforce all fields to implement the signal trait.
+  // Enforce all fields to implement the foreign signal trait.
   let Data::Struct(data_struct) = &ast.data else {
     return Error::new_spanned(
       ast,
