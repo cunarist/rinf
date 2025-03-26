@@ -4,15 +4,15 @@ use crate::signals::{SmallNumber, SmallText};
 use rinf::debug_print;
 
 pub async fn communicate() {
-    // Send signals to Dart like below.
-    SmallNumber { number: 7 }.send_signal_to_dart();
+  // Send signals to Dart like below.
+  SmallNumber { number: 7 }.send_signal_to_dart();
 
-    // Get receivers that listen to Dart signals like below.
-    let receiver = SmallText::get_dart_signal_receiver();
-    while let Some(dart_signal) = receiver.recv().await {
-        let message: SmallText = dart_signal.message;
-        debug_print!("{message:?}");
-    }
+  // Get receivers that listen to Dart signals like below.
+  let receiver = SmallText::get_dart_signal_receiver();
+  while let Some(dart_signal) = receiver.recv().await {
+    let message: SmallText = dart_signal.message;
+    debug_print!("{message:?}");
+  }
 }
 
 // Though async tasks work, using the actor model

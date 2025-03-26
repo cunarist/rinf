@@ -1,5 +1,6 @@
 use crate::tool::{
   RinfConfigMessage, SetupError, generate_dart_code, run_dart_command,
+  run_subprocess,
 };
 use include_dir::{Dir, include_dir};
 use std::fs::{create_dir_all, read_to_string, write};
@@ -16,23 +17,26 @@ pub fn apply_rust_template(
     Err(SetupError::TemplateApplied)?;
   }
 
-  // Copy basic folders needed for Rust to work
+  // Copy basic folders needed for Rust to work.
   dump_template(root_dir)?;
 
-  // Modify `.gitignore`
+  // Modify `.gitignore`.
   update_gitignore(root_dir)?;
 
-  // Modify `README.md`
+  // Modify `README.md`.
   update_readme(root_dir)?;
 
-  // Add Dart dependencies
+  // Add Dart dependencies.
   run_dart_command(&["pub", "add", "meta"])?;
   run_dart_command(&["pub", "add", "tuple"])?;
 
   // Modify `./lib/main.dart`
   update_main_dart(root_dir)?;
 
-  // Generate message code
+  // Format Rust code.
+  run_subprocess("cargo", &["fmt"])?;
+
+  // Generate Dart code.
   generate_dart_code(root_dir, message_config)?;
 
   println!("Rust template is now ready 🎉");
