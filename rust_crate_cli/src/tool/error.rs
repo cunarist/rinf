@@ -11,11 +11,12 @@ pub enum SetupError {
   Clipboard(arboard::Error),
   CodeSyntax(syn::Error),
   WatchingFile(notify::Error),
-  // Below are manually converted variants.
+  // Below are manually constructed variants.
   ReflectionModule,
   PubConfig(String),
   BadFilePath(OsString),
   ProjectStructure(&'static str),
+  TemplateApplied,
 }
 
 impl Error for SetupError {
@@ -52,14 +53,17 @@ impl Display for SetupError {
       SetupError::ReflectionModule => {
         write!(f, "Failed to write reflection modules")
       }
-      SetupError::PubConfig(msg) => {
-        write!(f, "Invalid `pubspec.yaml` config: {}", msg)
+      SetupError::PubConfig(s) => {
+        write!(f, "Invalid `pubspec.yaml` config: {}", s)
       }
-      SetupError::BadFilePath(name) => {
-        write!(f, "Not a valid file path: `{}`", name.to_string_lossy())
+      SetupError::BadFilePath(s) => {
+        write!(f, "Not a valid file path: `{}`", s.to_string_lossy())
       }
-      SetupError::ProjectStructure(msg) => {
-        write!(f, "Invalid project structure: {}", msg)
+      SetupError::ProjectStructure(s) => {
+        write!(f, "Invalid project structure: {}", s)
+      }
+      SetupError::TemplateApplied => {
+        write!(f, "Rust template has already been applied")
       }
     }
   }

@@ -1,6 +1,9 @@
 #[cfg(not(target_family = "wasm"))]
-fn main() -> Result<(), rinf_cli::SetupError> {
-  rinf_cli::run_command()
+fn main() {
+  let result = rinf_cli::run_command();
+  if let Err(err) = result {
+    println!("Error: {err}");
+  }
 }
 
 #[cfg(target_family = "wasm")]

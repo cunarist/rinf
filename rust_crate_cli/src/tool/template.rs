@@ -12,7 +12,9 @@ pub fn apply_rust_template(
   root_dir: &PathBuf,
   message_config: &RinfConfigMessage,
 ) -> Result<(), SetupError> {
-  // TODO: Return error if `native` folder already exists.
+  if root_dir.join("native").is_dir() {
+    Err(SetupError::TemplateApplied)?;
+  }
 
   // Copy basic folders needed for Rust to work
   dump_template(root_dir)?;
