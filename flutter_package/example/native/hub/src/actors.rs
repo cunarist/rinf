@@ -13,8 +13,6 @@ use rinf::debug_print;
 use tokio::spawn;
 use tokio_with_wasm::alias as tokio;
 
-// TODO: Organize imports
-
 // The letter type for communicating with an actor.
 pub struct ClickedLetter;
 
