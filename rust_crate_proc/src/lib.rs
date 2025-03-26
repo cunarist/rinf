@@ -219,6 +219,8 @@ fn derive_rust_signal_real(
   TokenStream::from(expanded)
 }
 
+/// Enforces all fields of a struct to have the foreign signal trait.
+/// This assists type-safe development.
 fn get_fields_where_clause(
   data_struct: &DataStruct,
 ) -> proc_macro2::TokenStream {
