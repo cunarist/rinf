@@ -22,10 +22,10 @@ impl Display for RinfConfigMessage {
     write!(
       f,
       "message:\
-            \n  input_dir: {}\
-            \n  rust_output_dir: {}\
-            \n  dart_output_dir: {}\
-            \n  rust_serde: {}",
+      \n  input_dir: {}\
+      \n  rust_output_dir: {}\
+      \n  dart_output_dir: {}\
+      \n  rust_serde: {}",
       self.input_dir,
       self.rust_output_dir,
       self.dart_output_dir,

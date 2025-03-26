@@ -175,7 +175,7 @@ fn update_main_dart(root_dir: &Path) -> Result<(), SetupError> {
       content = content.replacen(
         "import",
         "import 'package:rinf/rinf.dart';\
-                \nimport 'src/generated/generated.dart';\nimport",
+        \nimport 'src/generated/generated.dart';\nimport",
         1,
       );
     }
