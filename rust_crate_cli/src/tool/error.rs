@@ -22,11 +22,11 @@ pub enum SetupError {
 impl Error for SetupError {
   fn source(&self) -> Option<&(dyn Error + 'static)> {
     match self {
-      SetupError::Io(e) => Some(e),
-      SetupError::Yaml(e) => Some(e),
-      SetupError::Clipboard(e) => Some(e),
-      SetupError::CodeSyntax(e) => Some(e),
-      SetupError::WatchingFile(e) => Some(e),
+      Self::Io(e) => Some(e),
+      Self::Yaml(e) => Some(e),
+      Self::Clipboard(e) => Some(e),
+      Self::CodeSyntax(e) => Some(e),
+      Self::WatchingFile(e) => Some(e),
       _ => None,
     }
   }
@@ -35,34 +35,34 @@ impl Error for SetupError {
 impl Display for SetupError {
   fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
     match self {
-      SetupError::Io(e) => {
+      Self::Io(e) => {
         write!(f, "Failed to operate on file: {}", e)
       }
-      SetupError::Yaml(e) => {
+      Self::Yaml(e) => {
         write!(f, "Failed to parse YAML: {}", e)
       }
-      SetupError::Clipboard(e) => {
+      Self::Clipboard(e) => {
         write!(f, "Failed to use clipboard: {}", e)
       }
-      SetupError::CodeSyntax(e) => {
+      Self::CodeSyntax(e) => {
         write!(f, "Invalid code syntax: {}", e)
       }
-      SetupError::WatchingFile(e) => {
+      Self::WatchingFile(e) => {
         write!(f, "Failed to watch files: {}", e)
       }
-      SetupError::ReflectionModule => {
+      Self::ReflectionModule => {
         write!(f, "Failed to write reflection modules")
       }
-      SetupError::PubConfig(s) => {
+      Self::PubConfig(s) => {
         write!(f, "Invalid `pubspec.yaml` config: {}", s)
       }
-      SetupError::BadFilePath(s) => {
+      Self::BadFilePath(s) => {
         write!(f, "Not a valid file path: `{}`", s.to_string_lossy())
       }
-      SetupError::ProjectStructure(s) => {
+      Self::ProjectStructure(s) => {
         write!(f, "Invalid project structure: {}", s)
       }
-      SetupError::TemplateApplied => {
+      Self::TemplateApplied => {
         write!(f, "Rust template has already been applied")
       }
     }
@@ -71,30 +71,30 @@ impl Display for SetupError {
 
 impl From<std::io::Error> for SetupError {
   fn from(err: std::io::Error) -> Self {
-    SetupError::Io(err)
+    Self::Io(err)
   }
 }
 
 impl From<serde_yml::Error> for SetupError {
   fn from(err: serde_yml::Error) -> Self {
-    SetupError::Yaml(err)
+    Self::Yaml(err)
   }
 }
 
 impl From<arboard::Error> for SetupError {
   fn from(err: arboard::Error) -> Self {
-    SetupError::Clipboard(err)
+    Self::Clipboard(err)
   }
 }
 
 impl From<syn::Error> for SetupError {
   fn from(err: syn::Error) -> Self {
-    SetupError::CodeSyntax(err)
+    Self::CodeSyntax(err)
   }
 }
 
 impl From<notify::Error> for SetupError {
   fn from(err: notify::Error) -> Self {
-    SetupError::WatchingFile(err)
+    Self::WatchingFile(err)
   }
 }
