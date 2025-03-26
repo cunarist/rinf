@@ -47,60 +47,60 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
   // TODO: Deprecate `get_dart_signal_receiver` and make `listen` method instead.
 
   let expanded = quote! {
-      impl #name {
-          pub fn get_dart_signal_receiver(
-          ) -> rinf::SignalReceiver<rinf::DartSignal<Self>> {
-              #channel_const_ident.1.clone()
+    impl #name {
+      pub fn get_dart_signal_receiver(
+      ) -> rinf::SignalReceiver<rinf::DartSignal<Self>> {
+        #channel_const_ident.1.clone()
+      }
+
+      fn send_dart_signal(message_bytes: &[u8], binary: &[u8]) {
+        use rinf::{AppError, debug_print, deserialize};
+        let message_result: Result<#name, AppError> =
+          deserialize(message_bytes)
+          .map_err(|_| AppError::CannotDecodeMessage);
+        let message = match message_result {
+          Ok(inner) => inner,
+          Err(error) => {
+            let type_name = #name_lit;
+            debug_print!("{}: \n{}", type_name, error);
+            return;
           }
-
-          fn send_dart_signal(message_bytes: &[u8], binary: &[u8]) {
-              use rinf::{AppError, debug_print, deserialize};
-              let message_result: Result<#name, AppError> =
-                  deserialize(message_bytes)
-                  .map_err(|_| AppError::CannotDecodeMessage);
-              let message = match message_result {
-                  Ok(inner) => inner,
-                  Err(error) => {
-                      let type_name = #name_lit;
-                      debug_print!("{}: \n{}", type_name, error);
-                      return;
-                  }
-              };
-              let dart_signal = DartSignal {
-                  message,
-                  binary: binary.to_vec(),
-              };
-              #channel_const_ident.0.send(dart_signal);
-          }
+        };
+        let dart_signal = DartSignal {
+          message,
+          binary: binary.to_vec(),
+        };
+        #channel_const_ident.0.send(dart_signal);
       }
+    }
 
-      type #channel_type_ident = std::sync::LazyLock<(
-          rinf::SignalSender<rinf::DartSignal<#name>>,
-          rinf::SignalReceiver<rinf::DartSignal<#name>>,
-      )>;
+    type #channel_type_ident = std::sync::LazyLock<(
+      rinf::SignalSender<rinf::DartSignal<#name>>,
+      rinf::SignalReceiver<rinf::DartSignal<#name>>,
+    )>;
 
-      static #channel_const_ident: #channel_type_ident =
-          std::sync::LazyLock::new(rinf::signal_channel);
+    static #channel_const_ident: #channel_type_ident =
+      std::sync::LazyLock::new(rinf::signal_channel);
 
-      #[cfg(not(target_family = "wasm"))]
-      #[unsafe(no_mangle)]
-      pub unsafe extern "C" fn #extern_fn_ident(
-          message_pointer: *const u8,
-          message_size: usize,
-          binary_pointer: *const u8,
-          binary_size: usize,
-      ) {
-          use std::slice::from_raw_parts;
-          let message_bytes = from_raw_parts(message_pointer, message_size);
-          let binary = from_raw_parts(binary_pointer, binary_size);
-          #name::send_dart_signal(message_bytes, binary);
-      }
+    #[cfg(not(target_family = "wasm"))]
+    #[unsafe(no_mangle)]
+    pub unsafe extern "C" fn #extern_fn_ident(
+      message_pointer: *const u8,
+      message_size: usize,
+      binary_pointer: *const u8,
+      binary_size: usize,
+    ) {
+      use std::slice::from_raw_parts;
+      let message_bytes = from_raw_parts(message_pointer, message_size);
+      let binary = from_raw_parts(binary_pointer, binary_size);
+      #name::send_dart_signal(message_bytes, binary);
+    }
 
-      #[cfg(target_family = "wasm")]
-      #[wasm_bindgen::prelude::wasm_bindgen]
-      pub fn #extern_fn_ident(message_bytes: &[u8], binary: &[u8]) {
-          #name::send_dart_signal(message_bytes, binary);
-      }
+    #[cfg(target_family = "wasm")]
+    #[wasm_bindgen::prelude::wasm_bindgen]
+    pub fn #extern_fn_ident(message_bytes: &[u8], binary: &[u8]) {
+      #name::send_dart_signal(message_bytes, binary);
+    }
   };
 
   TokenStream::from(expanded)
@@ -132,55 +132,53 @@ fn derive_rust_signal_real(
 
   let expanded = if include_binary {
     quote! {
-        impl #name {
-            pub fn send_signal_to_dart(self, binary: Vec<u8>) {
-                use rinf::{
-                    AppError, debug_print, send_rust_signal, serialize
-                };
-                let type_name = #name_lit;
-                let message_result: Result<Vec<u8>, AppError> =
-                    serialize(&self)
-                    .map_err(|_| AppError::CannotEncodeMessage);
-                let message_bytes = match message_result {
-                    Ok(inner) => inner,
-                    Err(error) => {
-                        debug_print!("{}: \n{}", type_name, error);
-                        return;
-                    }
-                };
-                let result =
-                    send_rust_signal(type_name, message_bytes, binary);
-                if let Err(error) = result {
-                    debug_print!("{}: \n{}", type_name, error);
-                }
+      impl #name {
+        pub fn send_signal_to_dart(self, binary: Vec<u8>) {
+          use rinf::{
+            AppError, debug_print, send_rust_signal, serialize
+          };
+          let type_name = #name_lit;
+          let message_result: Result<Vec<u8>, AppError> =
+            serialize(&self)
+            .map_err(|_| AppError::CannotEncodeMessage);
+          let message_bytes = match message_result {
+            Ok(inner) => inner,
+            Err(error) => {
+              debug_print!("{}: \n{}", type_name, error);
+              return;
             }
+          };
+          let result = send_rust_signal(type_name, message_bytes, binary);
+          if let Err(error) = result {
+            debug_print!("{}: \n{}", type_name, error);
+          }
         }
+      }
     }
   } else {
     quote! {
-        impl #name {
-            pub fn send_signal_to_dart(self) {
-                use rinf::{
-                    AppError, debug_print, send_rust_signal, serialize
-                };
-                let type_name = #name_lit;
-                let message_result: Result<Vec<u8>, AppError> =
-                    serialize(&self)
-                    .map_err(|_| AppError::CannotEncodeMessage);
-                let message_bytes = match message_result {
-                    Ok(inner) => inner,
-                    Err(error) => {
-                        debug_print!("{}: \n{}", type_name, error);
-                        return;
-                    }
-                };
-                let result =
-                    send_rust_signal(type_name, message_bytes, Vec::new());
-                if let Err(error) = result {
-                    debug_print!("{}: \n{}", type_name, error);
-                }
+      impl #name {
+        pub fn send_signal_to_dart(self) {
+          use rinf::{
+            AppError, debug_print, send_rust_signal, serialize
+          };
+          let type_name = #name_lit;
+          let message_result: Result<Vec<u8>, AppError> =
+            serialize(&self)
+            .map_err(|_| AppError::CannotEncodeMessage);
+          let message_bytes = match message_result {
+            Ok(inner) => inner,
+            Err(error) => {
+              debug_print!("{}: \n{}", type_name, error);
+              return;
             }
+          };
+          let result = send_rust_signal(type_name, message_bytes, Vec::new());
+          if let Err(error) = result {
+            debug_print!("{}: \n{}", type_name, error);
+          }
         }
+      }
     }
   };
 
