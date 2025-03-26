@@ -30,7 +30,7 @@ macro_rules! write_interface {
 /// Delegates the printing operation to Flutter,
 /// which excels at handling various platforms
 /// including web and mobile emulators.
-/// When debugging, using this macro is recommended over `println!()`,
+/// When debugging, using this macro is recommended over `println!`,
 /// as it seamlessly adapts to different environments.
 /// Note that this macro does nothing in release mode.
 #[macro_export]
