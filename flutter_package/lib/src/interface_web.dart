@@ -8,8 +8,6 @@ import 'dart:convert';
 import 'load_web.dart';
 import 'structure.dart';
 
-final isWeb = true;
-
 /// Sets the path to the JavaScript module
 /// that needs to be loaded.
 void setCompiledLibPathReal(String path) {

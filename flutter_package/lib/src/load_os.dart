@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:ffi';
 import 'dart:typed_data';
 import 'package:ffi/ffi.dart';
-import 'structure.dart';
 
 String? dynamicLibPath;
 
@@ -31,11 +30,38 @@ RustLibrary loadRustLibrary() {
     throw UnsupportedError('This operating system is not supported.');
   }
 
-  if (useLocalSpaceSymbols) {
+  if (useLocalSpaceSymbols()) {
     return RustLibraryLocal(lib);
   } else {
     return RustLibraryGlobal(lib);
   }
+}
+
+/// Whether to search for symbols in the local space of dynamic library.
+/// This is needed because of the different usage of
+/// `RTLD_LOCAL` and `RTLD_GLOBAL` between platforms.
+/// `RTLD_GLOBAL` is preferred as it has less overhead
+/// because extra `malloc` can be avoided in Flutter.
+bool useLocalSpaceSymbols() {
+  // On Android, native library symbols are loaded in local space
+  // because of Flutter's `RTLD_LOCAL` behavior.
+  // Therefore we cannot use the efficient `RustLibraryGlobal`.
+  // - https://github.com/dart-lang/native/issues/923
+  if (Platform.isAndroid) {
+    return true;
+  }
+
+  // On Linux, `RTLD_LOCAL` behavior is required in tests
+  // due to symbol resolution behavior observed across all distributions.
+  // With `RTLD_GLOBAL`, symbols cannot be found.
+  final isTest = Platform.environment.containsKey('FLUTTER_TEST');
+  if (Platform.isLinux && isTest) {
+    return true;
+  }
+
+  // Native library symbols are loaded in global space
+  // thanks to Flutter's `RTLD_GLOBAL` behavior.
+  return false;
 }
 
 /// The central interface for calling native function.

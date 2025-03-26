@@ -6,8 +6,6 @@ import 'dart:convert';
 import 'load_os.dart';
 import 'structure.dart';
 
-final isWeb = false;
-
 /// Sets the exact file path of the dynamic library
 /// compiled from the `hub` crate.
 void setCompiledLibPathReal(String path) {
