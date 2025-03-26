@@ -1,7 +1,9 @@
 use convert_case::{Case, Casing};
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{Data, DeriveInput, Error, Fields, Ident, parse_macro_input};
+use syn::{
+  Data, DataStruct, DeriveInput, Error, Fields, Ident, parse_macro_input,
+};
 
 /// Marks the struct as a signal
 /// that can be nested within other signals.
@@ -55,14 +57,7 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
     .to_compile_error()
     .into();
   };
-  let field_types: Vec<_> = match &data_struct.fields {
-    Fields::Named(fields) => fields.named.iter().map(|f| &f.ty).collect(),
-    Fields::Unnamed(fields) => fields.unnamed.iter().map(|f| &f.ty).collect(),
-    Fields::Unit => vec![],
-  };
-  let where_clause = quote! {
-    where #(#field_types: rinf::ForeignSignal),*
-  };
+  let where_clause = get_fields_where_clause(data_struct);
 
   // Collect identifiers and names.
   let channel_type_ident = Ident::new(&format!("{}Channel", name), name.span());
@@ -169,14 +164,7 @@ fn derive_rust_signal_real(
     .to_compile_error()
     .into();
   };
-  let field_types: Vec<_> = match &data_struct.fields {
-    Fields::Named(fields) => fields.named.iter().map(|f| &f.ty).collect(),
-    Fields::Unnamed(fields) => fields.unnamed.iter().map(|f| &f.ty).collect(),
-    Fields::Unit => vec![],
-  };
-  let where_clause = quote! {
-    where #(#field_types: rinf::ForeignSignal),*
-  };
+  let where_clause = get_fields_where_clause(data_struct);
 
   // Implement methods and extern functions.
   let expanded = if include_binary {
@@ -229,4 +217,17 @@ fn derive_rust_signal_real(
 
   // Convert the generated code into token stream and return it.
   TokenStream::from(expanded)
+}
+
+fn get_fields_where_clause(
+  data_struct: &DataStruct,
+) -> proc_macro2::TokenStream {
+  let field_types: Vec<_> = match &data_struct.fields {
+    Fields::Named(fields) => fields.named.iter().map(|f| &f.ty).collect(),
+    Fields::Unnamed(fields) => fields.unnamed.iter().map(|f| &f.ty).collect(),
+    Fields::Unit => vec![],
+  };
+  quote! {
+    where #(#field_types: rinf::ForeignSignal),*
+  }
 }
