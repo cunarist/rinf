@@ -10,7 +10,7 @@ use anyhow::Result;
 use async_trait::async_trait;
 use messages::prelude::{Actor, Address, Context, Handler};
 use rinf::debug_print;
-use tokio::task::spawn;
+use tokio::spawn;
 use tokio_with_wasm::alias as tokio;
 
 // TODO: Organize imports

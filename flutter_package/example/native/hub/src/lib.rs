@@ -9,7 +9,7 @@ use actors::create_actors;
 use sample_functions::{run_debug_tests, stream_fractal};
 
 use rinf::{dart_shutdown, write_interface};
-use tokio::task::spawn;
+use tokio::spawn;
 use tokio_with_wasm::alias as tokio;
 
 write_interface!();

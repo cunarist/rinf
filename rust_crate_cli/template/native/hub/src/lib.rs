@@ -5,7 +5,7 @@ mod sample_functions;
 mod signals;
 
 use rinf::{dart_shutdown, write_interface};
-use tokio::task::spawn;
+use tokio::spawn;
 
 // Uncomment below to target the web.
 // use tokio_with_wasm::alias as tokio;

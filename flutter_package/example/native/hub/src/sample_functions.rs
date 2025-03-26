@@ -7,7 +7,8 @@ use sample_crate::{
   draw_fractal_image, fetch_from_web_api, get_current_time, get_hardward_id,
 };
 use std::time::Duration;
-use tokio::task::{spawn, spawn_blocking, yield_now};
+use tokio::spawn;
+use tokio::task::{spawn_blocking, yield_now};
 use tokio::time::sleep;
 use tokio_with_wasm::alias as tokio;
 
