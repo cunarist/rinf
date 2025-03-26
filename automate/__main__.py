@@ -21,13 +21,15 @@ def replace_text_once(filepath: Path, change_from: str, change_to: str):
 
 def update_cargokit():
     print("Updating CargoKit...")
-    command = (
-        "git subtree pull"
-        " --prefix flutter_package/cargokit"
-        " https://github.com/irondash/cargokit.git"
-        " main"
+    run_subprocess(
+        (
+            "git subtree pull"
+            " --prefix flutter_package/cargokit"
+            " https://github.com/irondash/cargokit.git"
+            " main"
+        ),
+        ROOT_DIR,
     )
-    run_subprocess(command, ROOT_DIR)
 
 
 def prepare_test_app():
@@ -38,13 +40,19 @@ def prepare_test_app():
     with open(filepath, mode="w", encoding="utf8") as file:
         file.write(content)
 
-    command = "flutter create test_app"
-    run_subprocess(command, ROOT_DIR)
+    run_subprocess(
+        "flutter create test_app",
+        ROOT_DIR,
+    )
 
-    command = "dart pub add rinf --path=../flutter_package"
-    run_subprocess(command, ROOT_DIR / "test_app")
-    command = "rinf template"
-    run_subprocess(command, ROOT_DIR / "test_app")
+    run_subprocess(
+        "dart pub add rinf --path=../flutter_package",
+        ROOT_DIR / "test_app",
+    )
+    run_subprocess(
+        "rinf template",
+        ROOT_DIR / "test_app",
+    )
 
     # Use repository Cargo workspace.
     remove(ROOT_DIR / "test_app" / "Cargo.toml")
@@ -82,13 +90,19 @@ def prepare_user_app():
     with open(filepath, mode="w", encoding="utf8") as file:
         file.write(content)
 
-    command = "flutter create user_app"
-    run_subprocess(command, ROOT_DIR)
+    run_subprocess(
+        "flutter create user_app",
+        ROOT_DIR,
+    )
 
-    command = "flutter pub add rinf"
-    run_subprocess(command, ROOT_DIR / "user_app")
-    command = "rinf template"
-    run_subprocess(command, ROOT_DIR / "user_app")
+    run_subprocess(
+        "flutter pub add rinf",
+        ROOT_DIR / "user_app",
+    )
+    run_subprocess(
+        "rinf template",
+        ROOT_DIR / "user_app",
+    )
 
     # Use repository Cargo workspace.
     remove(ROOT_DIR / "user_app" / "Cargo.toml")
@@ -124,8 +138,10 @@ def prepare_user_app():
 
 
 def prepare_example_app():
-    command = "rinf gen"
-    run_subprocess(command, ROOT_DIR / "flutter_package" / "example")
+    run_subprocess(
+        "rinf gen",
+        ROOT_DIR / "flutter_package" / "example",
+    )
 
 
 def run_command():
