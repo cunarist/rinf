@@ -44,6 +44,8 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
   let extern_fn_name = &format!("rinf_send_dart_signal_{}", snake_name);
   let extern_fn_ident = Ident::new(extern_fn_name, name.span());
 
+  // TODO: Deprecate `get_dart_signal_receiver` and make `listen` method instead.
+
   let expanded = quote! {
       impl #name {
           pub fn get_dart_signal_receiver(
