@@ -80,6 +80,10 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
   // Implement methods and extern functions.
   let expanded = quote! {
     impl #name #where_clause {
+      /// Gets the receiver that listens for signals from Dart.
+      /// If this function is called multiple times,
+      /// only the last receiver remains alive,
+      /// and all previous ones become inactive after receiving `None`.
       pub fn get_dart_signal_receiver(
       ) -> rinf::SignalReceiver<rinf::DartSignal<Self>> {
         #channel_const_ident.1.clone()
@@ -179,6 +183,8 @@ fn derive_rust_signal_real(
   let expanded = if include_binary {
     quote! {
       impl #name #where_clause {
+        /// Sends the signal to Dart with separate binary data.
+        /// Passing data from Dart to Rust is a zero-copy operation.
         pub fn send_signal_to_dart(self, binary: Vec<u8>) {
           use rinf::{AppError, debug_print, send_rust_signal, serialize};
           let type_name = #name_lit;
@@ -202,6 +208,8 @@ fn derive_rust_signal_real(
   } else {
     quote! {
       impl #name #where_clause {
+        /// Sends the signal to Dart.
+        /// Passing data from Dart to Rust is a zero-copy operation.
         pub fn send_signal_to_dart(self) {
           use rinf::{AppError, debug_print, send_rust_signal, serialize};
           let type_name = #name_lit;

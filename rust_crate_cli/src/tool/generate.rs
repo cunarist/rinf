@@ -274,6 +274,9 @@ fn generate_class_extension_code(
     let new_code = format!(
       r#"
 extension {class}DartSignalExt on {class} {{
+  /// Sends the signal to Rust with separate binary data.
+  /// Passing data from Rust to Dart involves a memory copy
+  /// because Rust cannot own data managed by Dart's garbage collector.
   void sendSignalToRust(Uint8List binary) {{
     final messageBytes = bincodeSerialize();
       sendDartSignal(
@@ -291,6 +294,9 @@ extension {class}DartSignalExt on {class} {{
     let new_code = format!(
       r#"
 extension {class}DartSignalExt on {class} {{
+  /// Sends the signal to Rust.
+  /// Passing data from Rust to Dart involves a memory copy
+  /// because Rust cannot own data managed by Dart's garbage collector.
   void sendSignalToRust() {{
     final messageBytes = bincodeSerialize();
     final binary = Uint8List(0);
@@ -338,6 +344,10 @@ final {camel_class}StreamController =
       &format!("class {class} {{"),
       &format!(
         r#"class {class} {{
+  /// An async broadcast stream that listens for signals from Rust.
+  /// It supports multiple listeners.
+  /// Make sure to cancel the subscription when it's no longer needed,
+  /// such as when a widget is disposed.
   static final rustSignalStream =
       {camel_class}StreamController.stream.asBroadcastStream();
 "#
