@@ -127,6 +127,6 @@ jobs:
           flutter build web --verbose
 
       - name: Run unit tests
-        if: matrix.target in ['windows', 'linux', 'macos']
+        if: matrix.target in ['linux', 'windows', 'macos']
         working-directory: flutter_package/example/
         run: flutter test
