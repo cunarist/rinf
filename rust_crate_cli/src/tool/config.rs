@@ -18,9 +18,8 @@ impl Display for RinfConfig {
   fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
     write!(
       f,
-      "message:\
-      \n  input_crates: {}\
-      \n  dart_output_dir: {}",
+      "input_crates: {}\
+      \ndart_output_dir: {}",
       self.input_crates.join(", "),
       self.dart_output_dir,
     )
