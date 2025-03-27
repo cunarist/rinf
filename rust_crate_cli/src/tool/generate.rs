@@ -439,7 +439,7 @@ pub fn generate_dart_code(
   // Analyze the input Rust files and collect type registries.
   let mut registry: Registry = Registry::new();
   let mut signal_attrs = BTreeMap::<String, BTreeSet<SignalAttribute>>::new();
-  for crate_name in &rinf_config.input_crates {
+  for crate_name in &rinf_config.gen_input_crates {
     let source_dir = root_dir.join("native").join(crate_name).join("src");
     visit_rust_files(source_dir, &mut registry, &mut signal_attrs)?;
   }
@@ -447,7 +447,7 @@ pub fn generate_dart_code(
   // TODO: Include comments from original structs with `with_comments` method
 
   // Empty the generation folder.
-  let gen_dir = root_dir.join(rinf_config.dart_output_dir.clone());
+  let gen_dir = root_dir.join(rinf_config.gen_output_dir.clone());
   let _ = remove_dir_all(&gen_dir);
   create_dir_all(&gen_dir)?;
 

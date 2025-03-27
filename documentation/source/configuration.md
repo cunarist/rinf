@@ -4,17 +4,16 @@
 
 You can customize the behavior of Rinf CLI commands by configuring the `pubspec.yaml` file. All fields are optional and it's not necessary to write them.
 
-# TODO: Update the config
-
 ```{code-block} yaml
 :caption: pubspec.yaml
 rinf:
-  message:
-    input_dir: messages/
-    rust_output_dir: native/hub/src/messages/
-    dart_output_dir: lib/messages/
-    rust_serde: true
+  gen_input_crates:
+    - hub
+  gen_output_dir: lib/src/bindings
 ```
+
+- `gen_input_crates`: A list of crate names under the `native` folder. The `rinf gen` command will search for signal structs in these crates. Each crate should be located directly under the `native` folder.
+- `gen_output_dir`: The directory where the generated Dart code will be placed by the `rinf gen` command.
 
 You can check the current configuration status by running the command below in the CLI.
 

@@ -8,20 +8,20 @@ use std::path::Path;
 /// Rinf message configuration structure.
 #[derive(Deserialize)]
 pub struct RinfConfig {
-  #[serde(default = "create_default_input_crates")]
-  pub input_crates: Vec<String>,
-  #[serde(default = "create_default_dart_output_dir")]
-  pub dart_output_dir: String,
+  #[serde(default = "create_default_gen_input_crates")]
+  pub gen_input_crates: Vec<String>,
+  #[serde(default = "create_default_gen_output_dir")]
+  pub gen_output_dir: String,
 }
 
 impl Display for RinfConfig {
   fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
     write!(
       f,
-      "input_crates: {}\
-      \ndart_output_dir: {}",
-      self.input_crates.join(", "),
-      self.dart_output_dir,
+      "gen_input_crates: {}\
+      \ngen_output_dir: {}",
+      self.gen_input_crates.join(", "),
+      self.gen_output_dir,
     )
   }
 }
@@ -29,17 +29,17 @@ impl Display for RinfConfig {
 impl Default for RinfConfig {
   fn default() -> Self {
     Self {
-      input_crates: create_default_input_crates(),
-      dart_output_dir: create_default_dart_output_dir(),
+      gen_input_crates: create_default_gen_input_crates(),
+      gen_output_dir: create_default_gen_output_dir(),
     }
   }
 }
 
-fn create_default_input_crates() -> Vec<String> {
+fn create_default_gen_input_crates() -> Vec<String> {
   vec!["hub".to_owned()]
 }
 
-fn create_default_dart_output_dir() -> String {
+fn create_default_gen_output_dir() -> String {
   "lib/src/bindings".to_owned()
 }
 
