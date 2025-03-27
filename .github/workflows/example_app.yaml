@@ -125,3 +125,8 @@ jobs:
         run: |
           rinf wasm --release
           flutter build web --verbose
+
+      - name: Run unit tests
+        if: matrix.target in ['windows', 'linux', 'macos']
+        working-directory: flutter_package/example/
+        run: flutter test
