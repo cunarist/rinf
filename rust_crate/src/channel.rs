@@ -106,7 +106,7 @@ impl<T> Future for RecvFuture<T> {
         }
         Poll::Ready(Some(msg))
       } else {
-        guard.waker = Some(cx.waker().clone());
+        guard.waker = Some(cx.waker().to_owned());
         Poll::Pending
       }
     } else {
