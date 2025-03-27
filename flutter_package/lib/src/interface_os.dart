@@ -9,7 +9,7 @@ import 'structure.dart';
 /// Sets the exact file path of the dynamic library
 /// compiled from the `hub` crate.
 void setCompiledLibPathReal(String path) {
-  setDynamicLibPath(path);
+  overrideLibPath(path);
 }
 
 Future<void> prepareInterfaceReal(
