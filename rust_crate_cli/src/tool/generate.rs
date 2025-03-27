@@ -345,7 +345,7 @@ final {camel_class}StreamController =
       &format!(
         r#"class {class} {{
   /// An async broadcast stream that listens for signals from Rust.
-  /// It supports multiple listeners.
+  /// It supports multiple subscriptions.
   /// Make sure to cancel the subscription when it's no longer needed,
   /// such as when a widget is disposed.
   static final rustSignalStream =
