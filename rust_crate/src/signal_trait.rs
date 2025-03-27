@@ -10,6 +10,7 @@ use std::hash::Hash;
 #[doc(hidden)]
 pub trait ForeignSignal {}
 
+// Implement the trait for simple primitives.
 impl ForeignSignal for i8 {}
 impl ForeignSignal for i16 {}
 impl ForeignSignal for i32 {}
@@ -27,8 +28,12 @@ impl ForeignSignal for String {}
 impl ForeignSignal for char {}
 impl ForeignSignal for &str {}
 
+// Implement the trait for collection types.
 impl<T> ForeignSignal for Option<T> where T: ForeignSignal {}
 impl<T> ForeignSignal for Vec<T> where T: ForeignSignal {}
+impl<T> ForeignSignal for Box<T> where T: ForeignSignal {}
+impl<T> ForeignSignal for HashSet<T> where T: ForeignSignal + Eq + Hash {}
+impl<T> ForeignSignal for BTreeSet<T> where T: ForeignSignal {}
 impl<K, V> ForeignSignal for HashMap<K, V>
 where
   K: ForeignSignal + Eq + Hash,
@@ -41,6 +46,8 @@ where
   V: ForeignSignal,
 {
 }
+
+// Implement the trait for tuples.
 impl<T1, T2> ForeignSignal for (T1, T2)
 where
   T1: ForeignSignal,
@@ -54,6 +61,3 @@ where
   T3: ForeignSignal,
 {
 }
-impl<T> ForeignSignal for Box<T> where T: ForeignSignal {}
-impl<T> ForeignSignal for HashSet<T> where T: ForeignSignal + Eq + Hash {}
-impl<T> ForeignSignal for BTreeSet<T> where T: ForeignSignal {}
