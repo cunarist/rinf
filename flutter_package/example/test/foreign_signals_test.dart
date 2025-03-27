@@ -11,7 +11,7 @@ void main() async {
 
   // Run the test.
   test('Numbers should be the same', () {
-    expect(1, 2);
+    expect(1, 1);
   });
 }
 
