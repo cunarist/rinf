@@ -202,6 +202,7 @@ Future<void> generateMessageCode({
       'global',
       'activate',
       'protoc_plugin',
+      '^21.0.0',
     ]);
     if (pubGlobalActivateCommand.exitCode != 0) {
       throw Exception(pubGlobalActivateCommand.stderr);

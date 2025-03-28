@@ -139,7 +139,7 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
   await readmeFile.writeAsString(readmeSplitted.join('\n\n') + '\n');
 
   // Add Dart dependencies
-  await Process.run('dart', ['pub', 'add', 'protobuf']);
+  await Process.run('dart', ['pub', 'add', 'protobuf:^3.1.0']);
 
   // Modify `./lib/main.dart`
   final mainFile = File.fromUri(flutterProjectPath.join('lib/main.dart'));
