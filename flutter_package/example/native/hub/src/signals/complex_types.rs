@@ -1,7 +1,5 @@
 //! These signals represent complex types used for unit tests.
 
-// Copyright (c) Facebook, Inc. and its affiliates
-// SPDX-License-Identifier: MIT OR Apache-2.0
 // Copied from https://github.com/zefchain/serde-reflection
 
 use rinf::{DartSignal, RustSignal, SignalPiece};
