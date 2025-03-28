@@ -8,7 +8,7 @@ use super::interface_web::{send_rust_signal_real, start_rust_logic_real};
 /// This contains a message from Dart.
 /// Optionally, a custom binary called `binary` can also be included.
 #[cfg_attr(feature = "bevy", derive(bevy_ecs::event::Event))]
-pub struct DartSignal<T> {
+pub struct DartSignalPack<T> {
   /// The message instance.
   pub message: T,
   /// Binary data included in the signal.

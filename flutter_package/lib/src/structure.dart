@@ -7,7 +7,7 @@ typedef AssignRustSignal = Map<String, Function(Uint8List, Uint8List)>;
 
 /// This contains a message from Rust.
 /// Optionally, a custom binary called `binary` can also be included.
-class RustSignal<T> {
+class RustSignalPack<T> {
   /// The message instance.
   final T message;
 
@@ -16,5 +16,5 @@ class RustSignal<T> {
   /// without the overhead of serialization/deserialization.
   final Uint8List binary;
 
-  RustSignal(this.message, this.binary);
+  RustSignalPack(this.message, this.binary);
 }

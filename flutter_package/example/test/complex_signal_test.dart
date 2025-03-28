@@ -9,10 +9,29 @@ void main() async {
   await Process.run('cargo', ['build'], runInShell: true);
   await initializeRust(assignRustSignal, compiledLibPath: getLibPath());
 
-  // Run the test.
-  test('Numbers should be the same', () {
-    expect(1, 1);
+  // Start the test mechanism in Rust.
+  final duration = Duration(milliseconds: 100);
+  ComplexSignalTestStart().sendSignalToRust();
+  await Future.delayed(duration);
+
+  // Send signals of complex types back and forth.
+  SerdeData.rustSignalStream.listen((signal) async {
+    // Receive a signal from Rust and send it back.
+    final serdeData = signal.message;
+    serdeData.sendSignalToRust();
+    await Future.delayed(duration);
+    final resultSignal = await ComplexSignalTestResult.rustSignalStream.first;
+    test('Signals should remain the same', () {
+      expect(
+        resultSignal.message.value,
+        true,
+        reason: 'Signal data is different from the original:\n${serdeData}',
+      );
+    });
   });
+
+  // Wait for the test to be completed.
+  await ComplexSignalTestEnd.rustSignalStream.first;
 }
 
 /// Gets the expected path of the dynamic library file.

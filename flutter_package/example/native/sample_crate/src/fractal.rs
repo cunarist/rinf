@@ -1,6 +1,6 @@
-//! Code for drawing fractal for performance tests and examples.
-//! Copied and modified from
-//! https://github.com/abour/fractal repository.
+//! CPU-bound code for drawing fractal animations.
+
+// Copied from https://github.com/abour/fractal
 
 use crate::error::ExampleError;
 use image::ImageEncoder;
