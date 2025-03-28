@@ -1,3 +1,7 @@
+## 7.3.1
+
+- Pinned the version of automatically installed `protoc`.
+
 ## 7.3.0
 
 - It is now possible to use other Flutter packages that rely on Rust by removing a mechanism that might cause symbol conflicts.
