@@ -175,7 +175,6 @@ pub async fn send_signals_back_and_forth() {
   // Wait until the start signal arrives.
   let duration = Duration::from_millis(100);
   let start_receiver = ComplexSignalTestStart::get_dart_signal_receiver();
-  sleep(duration).await;
   start_receiver.recv().await;
 
   // Pass signals back and forth.
