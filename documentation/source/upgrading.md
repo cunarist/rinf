@@ -50,8 +50,11 @@ rinf server
 
 # TODO: Fill these in
 
-- Recursive signal derive is needed
 - `cargo uninstall rinf` and `cargo install rinf_cli`
 - New signal code generation
+  - Now you use `rinf gen` instead of `rinf message`
+  - `DartSignal`, `DartSignalBinary`, `RustSignal`, `RustSignalBinary`, `SignalPiece` attributes
+  - Everything else stay the same
 - Requires Rust 2024 edition.
 - Change Rinf config schema
+  - Use `rinf config` to know the status
