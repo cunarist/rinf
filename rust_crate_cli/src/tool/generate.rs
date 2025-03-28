@@ -191,7 +191,7 @@ fn extract_generics(segment: &syn::PathSegment) -> Vec<Type> {
       })
       .collect()
   } else {
-    vec![]
+    Vec::new()
   }
 }
 

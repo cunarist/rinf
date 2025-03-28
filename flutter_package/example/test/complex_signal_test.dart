@@ -19,7 +19,6 @@ void main() async {
     // Receive a signal from Rust and send it back.
     final serdeData = signal.message;
     serdeData.sendSignalToRust();
-    await Future.delayed(duration);
     final resultSignal = await ComplexSignalTestResult.rustSignalStream.first;
     test('Signals should remain the same', () {
       expect(

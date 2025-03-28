@@ -63,6 +63,7 @@ pub struct OtherTypes {
   pub f_int_hashset: HashSet<u64>,
   pub f_int_btreeset: BTreeSet<u64>,
   pub f_nested_seq: Vec<Vec<Struct>>,
+  pub f_boxed_struct: Box<Struct>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, SignalPiece, Clone)]

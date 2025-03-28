@@ -70,6 +70,7 @@ fn get_complex_signals() -> Vec<SerdeData> {
       vec![Struct { x: 4, y: 5 }, Struct { x: 6, y: 7 }],
       vec![Struct { x: 8, y: 9 }],
     ],
+    f_boxed_struct: Box::new(Struct { x: 10, y: 11 }),
   });
 
   let v2bis = SerdeData::OtherTypes(OtherTypes {
@@ -102,7 +103,8 @@ fn get_complex_signals() -> Vec<SerdeData> {
       map.insert(1024);
       map
     },
-    f_nested_seq: vec![],
+    f_nested_seq: Vec::new(),
+    f_boxed_struct: Box::new(Struct { x: 0, y: 0 }),
   });
 
   let v2ter = SerdeData::OtherTypes(OtherTypes {
@@ -129,7 +131,8 @@ fn get_complex_signals() -> Vec<SerdeData> {
         .map(|(i, ())| i as u64)
         .collect()
     },
-    f_nested_seq: vec![],
+    f_nested_seq: Vec::new(),
+    f_boxed_struct: Box::new(Struct { x: 0, y: 0 }),
   });
 
   let v3 = SerdeData::UnitVariant;
@@ -180,12 +183,12 @@ pub async fn send_signals_back_and_forth() {
   let complex_signals = get_complex_signals();
   for sent in complex_signals {
     sent.clone().send_signal_to_dart();
-    sleep(duration).await;
     let Some(received_pack) = signal_receiver.recv().await else {
       continue;
     };
     let received = received_pack.message;
     ComplexSignalTestResult(sent == received).send_signal_to_dart();
+    sleep(duration).await;
   }
 
   // Tell Dart that the test is done.
