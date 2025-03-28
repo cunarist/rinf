@@ -2,7 +2,8 @@ use convert_case::{Case, Casing};
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
-  Data, DataStruct, DeriveInput, Error, Fields, Ident, parse_macro_input,
+  Data, DataEnum, DataStruct, DeriveInput, Error, Fields, Ident,
+  parse_macro_input,
 };
 
 /// Marks the struct as a signal
@@ -15,16 +16,17 @@ pub fn derive_signal_piece(input: TokenStream) -> TokenStream {
   let ast = parse_macro_input!(input as DeriveInput);
   let name = &ast.ident;
 
+  // Ban generic types.
+  if ast.generics.params.iter().count() != 0 {
+    return create_generic_error(ast);
+  }
+
   // Enforce all fields to implement the foreign signal trait.
-  let Data::Struct(data_struct) = &ast.data else {
-    return Error::new_spanned(
-      ast,
-      "`SignalPiece` can only be derived for structs.",
-    )
-    .to_compile_error()
-    .into();
+  let where_clause = match &ast.data {
+    Data::Struct(data_struct) => get_struct_where_clause(data_struct),
+    Data::Enum(data_enum) => get_enum_where_clause(data_enum),
+    _ => return create_item_error(ast),
   };
-  let where_clause = get_fields_where_clause(data_struct);
 
   // Automatically implement the signal trait for the struct.
   let expanded = quote! {
@@ -59,16 +61,17 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
   let snake_name = name_lit.to_case(Case::Snake);
   let upper_snake_name = name_lit.to_case(Case::UpperSnake);
 
+  // Ban generic types.
+  if ast.generics.params.iter().count() != 0 {
+    return create_generic_error(ast);
+  }
+
   // Enforce all fields to implement the foreign signal trait.
-  let Data::Struct(data_struct) = &ast.data else {
-    return Error::new_spanned(
-      ast,
-      "`DartSignal` can only be derived for structs.",
-    )
-    .to_compile_error()
-    .into();
+  let where_clause = match &ast.data {
+    Data::Struct(data_struct) => get_struct_where_clause(data_struct),
+    Data::Enum(data_enum) => get_enum_where_clause(data_enum),
+    _ => return create_item_error(ast),
   };
-  let where_clause = get_fields_where_clause(data_struct);
 
   // Collect identifiers and names.
   let channel_type_ident = Ident::new(&format!("{}Channel", name), name.span());
@@ -85,12 +88,12 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
       /// only the last receiver remains alive,
       /// and all previous ones become inactive after receiving `None`.
       pub fn get_dart_signal_receiver(
-      ) -> rinf::SignalReceiver<rinf::DartSignal<Self>> {
+      ) -> rinf::SignalReceiver<rinf::DartSignalPack<Self>> {
         #channel_const_ident.1.clone()
       }
 
       fn send_dart_signal(message_bytes: &[u8], binary: &[u8]) {
-        use rinf::{AppError, debug_print, deserialize};
+        use rinf::{AppError, DartSignalPack, debug_print, deserialize};
         let message_result: Result<#name, AppError> =
           deserialize(message_bytes)
           .map_err(|_| AppError::CannotDecodeMessage);
@@ -102,7 +105,7 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
             return;
           }
         };
-        let dart_signal = DartSignal {
+        let dart_signal = DartSignalPack {
           message,
           binary: binary.to_vec(),
         };
@@ -111,8 +114,8 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
     }
 
     type #channel_type_ident = std::sync::LazyLock<(
-      rinf::SignalSender<rinf::DartSignal<#name>>,
-      rinf::SignalReceiver<rinf::DartSignal<#name>>,
+      rinf::SignalSender<rinf::DartSignalPack<#name>>,
+      rinf::SignalReceiver<rinf::DartSignalPack<#name>>,
     )>;
 
     static #channel_const_ident: #channel_type_ident =
@@ -168,16 +171,17 @@ fn derive_rust_signal_real(
   let name = &ast.ident;
   let name_lit = name.to_string();
 
+  // Ban generic types.
+  if ast.generics.params.iter().count() != 0 {
+    return create_generic_error(ast);
+  }
+
   // Enforce all fields to implement the foreign signal trait.
-  let Data::Struct(data_struct) = &ast.data else {
-    return Error::new_spanned(
-      ast,
-      "`RustSignal` can only be derived for structs.",
-    )
-    .to_compile_error()
-    .into();
+  let where_clause = match &ast.data {
+    Data::Struct(data_struct) => get_struct_where_clause(data_struct),
+    Data::Enum(data_enum) => get_enum_where_clause(data_enum),
+    _ => return create_item_error(ast),
   };
-  let where_clause = get_fields_where_clause(data_struct);
 
   // Implement methods and extern functions.
   let expanded = if include_binary {
@@ -238,15 +242,53 @@ fn derive_rust_signal_real(
 
 /// Enforces all fields of a struct to have the foreign signal trait.
 /// This assists with type-safe development.
-fn get_fields_where_clause(
+fn get_struct_where_clause(
   data_struct: &DataStruct,
 ) -> proc_macro2::TokenStream {
   let field_types: Vec<_> = match &data_struct.fields {
-    Fields::Named(fields) => fields.named.iter().map(|f| &f.ty).collect(),
-    Fields::Unnamed(fields) => fields.unnamed.iter().map(|f| &f.ty).collect(),
-    Fields::Unit => vec![],
+    // For named structs (struct-like), extract the field types.
+    Fields::Named(all) => all.named.iter().map(|f| &f.ty).collect(),
+    // For unnamed structs (tuple-like), extract the field types.
+    Fields::Unnamed(all) => all.unnamed.iter().map(|f| &f.ty).collect(),
+    // For unit-like structs (without any inner data), do nothing.
+    Fields::Unit => Vec::new(),
   };
   quote! {
     where #(#field_types: rinf::ForeignSignal),*
   }
+}
+
+/// Enforces all fields of an enum variant to have the foreign signal trait.
+/// This assists with type-safe development.
+fn get_enum_where_clause(data_enum: &DataEnum) -> proc_macro2::TokenStream {
+  let variant_types: Vec<_> = data_enum
+    .variants
+    .iter()
+    .flat_map(|variant| {
+      match &variant.fields {
+        // For named variants (struct-like), extract the field types.
+        Fields::Named(all) => all.named.iter().map(|f| &f.ty).collect(),
+        // For unnamed variants (tuple-like), extract the field types.
+        Fields::Unnamed(all) => all.unnamed.iter().map(|f| &f.ty).collect(),
+        // For unit-like variants (without any inner data), do nothing.
+        Fields::Unit => Vec::new(),
+      }
+    })
+    .collect();
+
+  quote! {
+    where #(#variant_types: rinf::ForeignSignal),*
+  }
+}
+
+fn create_generic_error(ast: DeriveInput) -> TokenStream {
+  Error::new_spanned(ast, "A foreign signal type cannot be generic")
+    .to_compile_error()
+    .into()
+}
+
+fn create_item_error(ast: DeriveInput) -> TokenStream {
+  Error::new_spanned(ast, "Only enums and structs can be a foreign signal")
+    .to_compile_error()
+    .into()
 }

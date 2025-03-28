@@ -1,10 +1,11 @@
 use crate::tool::{RinfConfig, SetupError};
 use convert_case::{Case, Casing};
 use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
-use quote::ToTokens;
 use serde_generate::dart::{CodeGenerator, Installer};
 use serde_generate::{CodeGeneratorConfig, Encoding, SourceInstaller};
-use serde_reflection::{ContainerFormat, Format, Named, Registry};
+use serde_reflection::{
+  ContainerFormat, Format, Named, Registry, VariantFormat,
+};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{
   create_dir_all, read_dir, read_to_string, remove_dir_all, rename, write,
@@ -15,12 +16,9 @@ use std::sync::mpsc::channel;
 use std::time::Duration;
 use syn::spanned::Spanned;
 use syn::{
-  Attribute, Expr, ExprLit, File, GenericArgument, Item, ItemStruct, Lit,
-  PathArguments, Type, TypeArray, TypePath, TypeTuple,
+  Attribute, Expr, ExprLit, File, GenericArgument, Item, ItemEnum, ItemStruct,
+  Lit, PathArguments, Type, TypeArray, TypePath, TypeTuple,
 };
-
-// TODO: Handle enums and tuple structs
-// TODO: Write unit tests, like https://github.com/cunarist/rinf/pull/307
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
 enum SignalAttribute {
@@ -93,42 +91,55 @@ fn to_type_format(ty: &Type) -> Format {
           "bool" => Format::Bool,
           "char" => Format::Char,
           "String" => Format::Str,
+          "Box" => {
+            if let Some(inner) = extract_generic(last_segment) {
+              to_type_format(&inner)
+            } else {
+              Format::unknown()
+            }
+          }
           "Option" => {
             if let Some(inner) = extract_generic(last_segment) {
               Format::Option(Box::new(to_type_format(&inner)))
             } else {
-              Format::TypeName("Option<?>".to_string())
+              Format::unknown()
             }
           }
-          "Vec" => {
+          "Vec" | "HashSet" | "BTreeSet" => {
             if let Some(inner) = extract_generic(last_segment) {
               Format::Seq(Box::new(to_type_format(&inner)))
             } else {
-              Format::TypeName("Vec<?>".to_string())
+              Format::unknown()
             }
           }
-          "BTreeMap" => {
-            let mut generics = extract_generics(last_segment);
+          "HashMap" | "BTreeMap" => {
+            let generics = extract_generics(last_segment);
             if generics.len() == 2 {
-              let key = to_type_format(&generics.remove(0));
-              let value = to_type_format(&generics.remove(0));
+              let key = to_type_format(&generics[0].to_owned());
+              let value = to_type_format(&generics[1].to_owned());
               Format::Map {
                 key: Box::new(key),
                 value: Box::new(value),
               }
             } else {
-              Format::TypeName("BTreeMap<?, ?>".to_string())
+              Format::unknown()
             }
           }
           _ => Format::TypeName(ident),
         }
       } else {
-        Format::TypeName(ty.to_token_stream().to_string())
+        Format::unknown()
       }
     }
     Type::Tuple(TypeTuple { elems, .. }) => {
       let formats: Vec<_> = elems.iter().map(to_type_format).collect();
-      Format::Tuple(formats)
+      if formats.is_empty() {
+        Format::Unit
+      } else if formats.len() == 1 {
+        formats[0].to_owned()
+      } else {
+        Format::Tuple(formats)
+      }
     }
     Type::Array(TypeArray { elem, len, .. }) => {
       if let Expr::Lit(ExprLit {
@@ -143,9 +154,9 @@ fn to_type_format(ty: &Type) -> Format {
           };
         }
       }
-      Format::TypeName(ty.to_token_stream().to_string())
+      Format::unknown()
     }
-    _ => Format::TypeName(ty.to_token_stream().to_string()),
+    _ => Format::unknown(),
   }
 }
 
@@ -186,24 +197,100 @@ fn extract_generics(segment: &syn::PathSegment) -> Vec<Type> {
 
 /// Trace a struct by collecting its field names (and a placeholder type)
 /// and record its container format in the registry.
-fn trace_struct(registry: &mut Registry, s: &ItemStruct) {
-  let mut fields = Vec::new();
-  for field in s.fields.iter() {
-    if let Some(ident) = &field.ident {
-      let field_format = to_type_format(&field.ty);
-      fields.push(Named {
-        name: ident.to_string(),
-        value: field_format,
-      });
+fn trace_struct(registry: &mut Registry, item: &ItemStruct) {
+  // Collect basic information about this struct.
+  let type_name = item.ident.to_string();
+
+  // Collect the information about the container.
+  let container = match &item.fields {
+    syn::Fields::Unit => ContainerFormat::UnitStruct,
+    syn::Fields::Unnamed(unnamed) => {
+      let fields: Vec<Format> = unnamed
+        .unnamed
+        .iter()
+        .map(|field| to_type_format(&field.ty))
+        .collect();
+      if fields.is_empty() {
+        ContainerFormat::UnitStruct
+      } else if fields.len() == 1 {
+        ContainerFormat::NewTypeStruct(Box::new(fields[0].to_owned()))
+      } else {
+        ContainerFormat::TupleStruct(fields)
+      }
     }
-  }
+    syn::Fields::Named(named) => {
+      let fields = named
+        .named
+        .iter()
+        .filter_map(|field| {
+          field.ident.as_ref().map(|ident| Named {
+            name: ident.to_string(),
+            value: to_type_format(&field.ty),
+          })
+        })
+        .collect();
+      ContainerFormat::Struct(fields)
+    }
+  };
 
-  // Build the container format for the struct.
-  let container = ContainerFormat::Struct(fields);
+  // Save the information about the container.
+  registry.insert(type_name, container);
+}
 
-  // Insert the struct's container format
-  // into the registry using its identifier as key.
-  let type_name = s.ident.to_string();
+/// Trace an enum by collecting its variant names (and a placeholder type)
+/// and record its container format in the registry.
+fn trace_enum(registry: &mut Registry, item: &ItemEnum) {
+  // Collect basic information about this enum.
+  let type_name = item.ident.to_string();
+
+  // Collect the information about the container.
+  let variants: BTreeMap<u32, Named<VariantFormat>> = item
+    .variants
+    .iter()
+    .map(|variant| {
+      let name = variant.ident.to_string();
+      let variant_format = match &variant.fields {
+        syn::Fields::Unit => VariantFormat::Unit,
+        syn::Fields::Unnamed(unnamed) => {
+          let fields = unnamed
+            .unnamed
+            .iter()
+            .map(|field| to_type_format(&field.ty))
+            .collect::<Vec<_>>();
+          if fields.is_empty() {
+            VariantFormat::Unit
+          } else if fields.len() == 1 {
+            VariantFormat::NewType(Box::new(fields[0].to_owned()))
+          } else {
+            VariantFormat::Tuple(fields)
+          }
+        }
+        syn::Fields::Named(named) => {
+          let fields = named
+            .named
+            .iter()
+            .filter_map(|field| {
+              field.ident.as_ref().map(|ident| Named {
+                name: ident.to_string(),
+                value: to_type_format(&field.ty),
+              })
+            })
+            .collect::<Vec<_>>();
+          VariantFormat::Struct(fields)
+        }
+      };
+      Named {
+        name,
+        value: variant_format,
+      }
+    })
+    .enumerate()
+    .map(|(index, value)| (index as u32, value))
+    .collect();
+
+  let container = ContainerFormat::Enum(variants);
+
+  // Save the information about the container.
   registry.insert(type_name, container);
 }
 
@@ -213,21 +300,26 @@ fn process_items(
   registry: &mut Registry,
   signal_attrs: &mut BTreeMap<String, BTreeSet<SignalAttribute>>,
 ) -> Result<(), SetupError> {
-  let mut structs = Vec::new();
   for item in items {
     match item {
-      Item::Struct(s) => {
-        let extracted_attrs = extract_signal_attribute(&s.attrs)?;
-        if !extracted_attrs.is_empty() {
-          structs.push(s.ident.clone());
-          trace_struct(registry, s);
-          signal_attrs.insert(s.ident.to_string(), extracted_attrs);
-        }
-      }
       Item::Mod(m) if m.content.is_some() => {
         // Recursively process items in nested modules.
         if let Some(inner_items) = m.content.as_ref().map(|p| &p.1) {
           process_items(inner_items, registry, signal_attrs)?;
+        }
+      }
+      Item::Struct(s) => {
+        let extracted_attrs = extract_signal_attribute(&s.attrs)?;
+        if !extracted_attrs.is_empty() {
+          trace_struct(registry, s);
+          signal_attrs.insert(s.ident.to_string(), extracted_attrs);
+        }
+      }
+      Item::Enum(e) => {
+        let extracted_attrs = extract_signal_attribute(&e.attrs)?;
+        if !extracted_attrs.is_empty() {
+          trace_enum(registry, e);
+          signal_attrs.insert(e.ident.to_string(), extracted_attrs);
         }
       }
       _ => {}
@@ -336,7 +428,7 @@ fn generate_class_interface_code(
     let new_code = format!(
       r#"
 final {camel_class}StreamController =
-    StreamController<RustSignal<{class}>>();
+    StreamController<RustSignalPack<{class}>>();
 "#
     );
     code.push_str(&new_code);
@@ -386,7 +478,7 @@ fn generate_shared_code(
       r#"
   '{class}': (Uint8List messageBytes, Uint8List binary) {{
     final message = {class}.bincodeDeserialize(messageBytes);
-    final rustSignal = RustSignal(
+    final rustSignal = RustSignalPack(
       message,
       binary,
     );
@@ -454,7 +546,8 @@ pub fn generate_dart_code(
   // Create the code generator config.
   let gen_config = CodeGeneratorConfig::new("generated".to_string())
     .with_encodings([Encoding::Bincode])
-    .with_package_manifest(false);
+    .with_package_manifest(false)
+    .with_c_style_enums(true);
 
   // Install serialization modules.
   let installer = Installer::new(gen_dir.clone());

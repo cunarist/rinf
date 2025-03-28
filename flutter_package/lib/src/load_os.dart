@@ -3,33 +3,41 @@ import 'dart:ffi';
 import 'dart:typed_data';
 import 'package:ffi/ffi.dart';
 
-String? dynamicLibPath;
+String? libPathOverride;
 
-void setDynamicLibPath(String path) {
-  dynamicLibPath = path;
+void overrideLibPath(String path) {
+  libPathOverride = path;
 }
 
 RustLibrary loadRustLibrary() {
   // Use provided dynamic library path if possible.
   // Otherewise, use the default path.
-  final path = dynamicLibPath;
-  DynamicLibrary lib;
-  if (path != null) {
-    lib = DynamicLibrary.open(path);
-  } else if (Platform.isLinux) {
-    lib = DynamicLibrary.open('libhub.so');
-  } else if (Platform.isAndroid) {
-    lib = DynamicLibrary.open('libhub.so');
-  } else if (Platform.isWindows) {
-    lib = DynamicLibrary.open('hub.dll');
-  } else if (Platform.isIOS) {
-    lib = DynamicLibrary.open('rinf.framework/rinf');
-  } else if (Platform.isMacOS) {
-    lib = DynamicLibrary.open('rinf.framework/rinf');
+  final override = libPathOverride;
+  String libPath;
+  if (override != null) {
+    // Use the override path if provided.
+    libPath = override;
   } else {
-    throw UnsupportedError('This operating system is not supported.');
+    // Load library files from the app bundle.
+    if (Platform.isLinux) {
+      libPath = 'libhub.so';
+    } else if (Platform.isAndroid) {
+      libPath = 'libhub.so';
+    } else if (Platform.isWindows) {
+      libPath = 'hub.dll';
+    } else if (Platform.isIOS) {
+      libPath = 'rinf.framework/rinf';
+    } else if (Platform.isMacOS) {
+      libPath = 'rinf.framework/rinf';
+    } else {
+      throw UnsupportedError('This operating system is not supported');
+    }
   }
 
+  // Load the dynamic library.
+  final lib = DynamicLibrary.open(libPath);
+
+  // Create the FFI wrapper instance.
   if (useLocalSpaceSymbols()) {
     return RustLibraryLocal(lib);
   } else {

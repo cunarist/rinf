@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'src/structure.dart';
 import 'src/interface.dart';
 
-export 'src/structure.dart' show RustSignal;
+export 'src/structure.dart' show RustSignalPack;
 
 /// Starts the `main` function in Rust.
 Future<void> initializeRust(

@@ -3,12 +3,14 @@
 
 mod actors;
 mod sample_functions;
+mod signal_test;
 mod signals;
 
 use actors::create_actors;
 use sample_functions::{run_debug_tests, stream_fractal};
 
 use rinf::{dart_shutdown, write_interface};
+use signal_test::send_signals_back_and_forth;
 use tokio::spawn;
 use tokio_with_wasm::alias as tokio;
 
@@ -26,6 +28,7 @@ async fn main() {
   spawn(stream_fractal());
   spawn(run_debug_tests());
   spawn(create_actors());
+  spawn(send_signals_back_and_forth());
 
   // Keep the main function running until Dart shutdown.
   dart_shutdown().await;
