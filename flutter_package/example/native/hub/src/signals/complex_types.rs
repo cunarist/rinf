@@ -6,7 +6,7 @@
 
 use rinf::{DartSignal, RustSignal, SignalPiece};
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
 #[derive(Serialize, Deserialize, PartialEq, DartSignal, RustSignal, Clone)]
 pub enum SerdeData {
@@ -58,9 +58,10 @@ pub struct OtherTypes {
   pub f_seq: Vec<Struct>,
   pub f_opt_seq: Option<Vec<i32>>,
   pub f_tuple: (u8, u16),
-  pub f_stringmap: BTreeMap<String, u32>,
-  pub f_intset: BTreeMap<u64, ()>,
-  // Avoiding BTreeSet because Serde treats them as sequences.
+  pub f_string_hashmap: HashMap<String, u32>,
+  pub f_string_btreemap: BTreeMap<String, u32>,
+  pub f_int_hashset: HashSet<u64>,
+  pub f_int_btreeset: BTreeSet<u64>,
   pub f_nested_seq: Vec<Vec<Struct>>,
 }
 

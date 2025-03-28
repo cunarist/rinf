@@ -3,7 +3,7 @@ use crate::signals::{
   ComplexSignalTestStart, NewTypeStruct, OtherTypes, PrimitiveTypes, SerdeData,
   Struct, TupleStruct, UnitStruct,
 };
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::time::Duration;
 use tokio::time::sleep;
 use tokio_with_wasm::alias as tokio;
@@ -52,13 +52,20 @@ fn get_complex_signals() -> Vec<SerdeData> {
     f_seq: vec![Struct { x: 1, y: 3 }],
     f_opt_seq: Some(vec![1]),
     f_tuple: (4, 5),
-    f_stringmap: {
+    f_string_hashmap: {
+      let mut map = HashMap::new();
+      map.insert("foo".to_string(), 1);
+      map.insert("bar".to_string(), 2);
+      map
+    },
+    f_string_btreemap: {
       let mut map = BTreeMap::new();
       map.insert("foo".to_string(), 1);
       map.insert("bar".to_string(), 2);
       map
     },
-    f_intset: BTreeMap::new(),
+    f_int_hashset: HashSet::new(),
+    f_int_btreeset: BTreeSet::new(),
     f_nested_seq: vec![
       vec![Struct { x: 4, y: 5 }, Struct { x: 6, y: 7 }],
       vec![Struct { x: 8, y: 9 }],
@@ -73,15 +80,26 @@ fn get_complex_signals() -> Vec<SerdeData> {
     f_seq: Vec::new(),
     f_opt_seq: None,
     f_tuple: (4, 5),
-    f_stringmap: BTreeMap::new(),
-    f_intset: {
-      let mut map = BTreeMap::new();
-      map.insert(1, ());
-      map.insert(5, ());
-      map.insert(16, ());
-      map.insert(64, ());
-      map.insert(257, ());
-      map.insert(1024, ());
+    f_string_hashmap: HashMap::new(),
+    f_string_btreemap: BTreeMap::new(),
+    f_int_hashset: {
+      let mut map = HashSet::new();
+      map.insert(1);
+      map.insert(5);
+      map.insert(16);
+      map.insert(64);
+      map.insert(257);
+      map.insert(1024);
+      map
+    },
+    f_int_btreeset: {
+      let mut map = BTreeSet::new();
+      map.insert(1);
+      map.insert(5);
+      map.insert(16);
+      map.insert(64);
+      map.insert(257);
+      map.insert(1024);
       map
     },
     f_nested_seq: vec![],
@@ -95,12 +113,20 @@ fn get_complex_signals() -> Vec<SerdeData> {
     f_seq: Vec::new(),
     f_opt_seq: None,
     f_tuple: (4, 5),
-    f_stringmap: BTreeMap::new(),
-    f_intset: {
+    f_string_hashmap: HashMap::new(),
+    f_string_btreemap: BTreeMap::new(),
+    f_int_hashset: {
       std::iter::repeat(())
         .take(10)
         .enumerate()
-        .map(|(i, ())| (i as u64, ()))
+        .map(|(i, ())| i as u64)
+        .collect()
+    },
+    f_int_btreeset: {
+      std::iter::repeat(())
+        .take(10)
+        .enumerate()
+        .map(|(i, ())| i as u64)
         .collect()
     },
     f_nested_seq: vec![],
