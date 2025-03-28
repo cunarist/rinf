@@ -99,9 +99,9 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
           .map_err(|_| AppError::CannotDecodeMessage);
         let message = match message_result {
           Ok(inner) => inner,
-          Err(error) => {
+          Err(err) => {
             let type_name = #name_lit;
-            debug_print!("{}: \n{}", type_name, error);
+            debug_print!("{}: \n{}", type_name, err);
             return;
           }
         };
@@ -197,14 +197,14 @@ fn derive_rust_signal_real(
             .map_err(|_| AppError::CannotEncodeMessage);
           let message_bytes = match message_result {
             Ok(inner) => inner,
-            Err(error) => {
-              debug_print!("{}: \n{}", type_name, error);
+            Err(err) => {
+              debug_print!("{}: \n{}", type_name, err);
               return;
             }
           };
           let result = send_rust_signal(type_name, message_bytes, binary);
-          if let Err(error) = result {
-            debug_print!("{}: \n{}", type_name, error);
+          if let Err(err) = result {
+            debug_print!("{}: \n{}", type_name, err);
           }
         }
       }
@@ -222,14 +222,14 @@ fn derive_rust_signal_real(
             .map_err(|_| AppError::CannotEncodeMessage);
           let message_bytes = match message_result {
             Ok(inner) => inner,
-            Err(error) => {
-              debug_print!("{}: \n{}", type_name, error);
+            Err(err) => {
+              debug_print!("{}: \n{}", type_name, err);
               return;
             }
           };
           let result = send_rust_signal(type_name, message_bytes, Vec::new());
-          if let Err(error) = result {
-            debug_print!("{}: \n{}", type_name, error);
+          if let Err(err) = result {
+            debug_print!("{}: \n{}", type_name, err);
           }
         }
       }

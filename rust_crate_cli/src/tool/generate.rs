@@ -16,8 +16,8 @@ use std::sync::mpsc::channel;
 use std::time::Duration;
 use syn::spanned::Spanned;
 use syn::{
-  Attribute, Expr, ExprLit, File, GenericArgument, Item, ItemEnum, ItemStruct,
-  Lit, PathArguments, Type, TypeArray, TypePath, TypeTuple,
+  Attribute, Expr, File, GenericArgument, Item, ItemEnum, ItemStruct, Lit,
+  PathArguments, Type, TypeArray, TypePath, TypeTuple,
 };
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -142,16 +142,14 @@ fn to_type_format(ty: &Type) -> Format {
       }
     }
     Type::Array(TypeArray { elem, len, .. }) => {
-      if let Expr::Lit(ExprLit {
-        lit: Lit::Int(lit_int),
-        ..
-      }) = len
-      {
-        if let Ok(size) = lit_int.base10_parse::<usize>() {
-          return Format::TupleArray {
-            content: Box::new(to_type_format(elem)),
-            size,
-          };
+      if let Expr::Lit(expr_lit) = len {
+        if let Lit::Int(lit_int) = &expr_lit.lit {
+          if let Ok(size) = lit_int.base10_parse::<usize>() {
+            return Format::TupleArray {
+              content: Box::new(to_type_format(elem)),
+              size,
+            };
+          }
         }
       }
       Format::unknown()
@@ -607,8 +605,8 @@ pub fn watch_and_generate_dart_code(
     move |res: Result<Event, notify::Error>| {
       // Send events to the channel.
       let result = sender.send(res);
-      if let Err(error) = result {
-        eprintln!("{}", error);
+      if let Err(err) = result {
+        eprintln!("{err}");
       }
     },
     Config::default(),
@@ -624,8 +622,8 @@ pub fn watch_and_generate_dart_code(
         if should_regenerate(&event) {
           eprintln!("File change detected: {:?}", event);
           let result = generate_dart_code(root_dir, message_config);
-          if let Err(error) = result {
-            eprintln!("{}", error);
+          if let Err(err) = result {
+            eprintln!("{err}");
           }
         }
       }

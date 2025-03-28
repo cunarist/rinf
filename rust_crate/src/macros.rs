@@ -10,8 +10,8 @@ macro_rules! write_interface {
     extern "C" fn rinf_start_rust_logic_extern() {
       use rinf::debug_print;
       let result = $crate::start_rust_logic(main);
-      if let Err(error) = result {
-        debug_print!("{error}");
+      if let Err(err) = result {
+        debug_print!("{err}");
       }
     }
 
@@ -20,8 +20,8 @@ macro_rules! write_interface {
     pub fn rinf_start_rust_logic_extern() {
       use rinf::debug_print;
       let result = $crate::start_rust_logic(main);
-      if let Err(error) = result {
-        debug_print!("{error}");
+      if let Err(err) = result {
+        debug_print!("{err}");
       }
     }
   };
@@ -44,8 +44,8 @@ macro_rules! debug_print {
                 Vec::new(),
                 rust_report.clone().into_bytes(),
             );
-            if let Err(error) = result {
-                println!("{error}\n{rust_report}");
+            if let Err(err) = result {
+                println!("{err}\n{rust_report}");
             }
         }
         #[cfg(not(debug_assertions))]
