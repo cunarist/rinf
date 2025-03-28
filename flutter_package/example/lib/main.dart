@@ -5,7 +5,13 @@ import 'src/bindings/bindings.dart';
 
 void main() async {
   await initializeRust(assignRustSignal);
+  createActors();
   runApp(MyApp());
+}
+
+Future<void> createActors() async {
+  await Future.delayed(Duration(milliseconds: 100));
+  CreateActors().sendSignalToRust();
 }
 
 class MyApp extends StatefulWidget {

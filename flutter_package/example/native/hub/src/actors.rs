@@ -5,7 +5,8 @@
 //! To build a solid app, do not communicate by sharing memory;
 //! instead, share memory by communicating.
 
-use crate::signals::{SampleNumberInput, SampleNumberOutput};
+use crate::sample_functions::{run_debug_tests, stream_fractal};
+use crate::signals::{CreateActors, SampleNumberInput, SampleNumberOutput};
 use anyhow::Result;
 use async_trait::async_trait;
 use messages::prelude::{Actor, Address, Context, Handler};
@@ -69,6 +70,14 @@ impl Handler<ClickedLetter> for CountingActor {
 
 // Creates and spawns the actors in the async system.
 pub async fn create_actors() -> Result<()> {
+  // Wait until the start signal arrives.
+  let start_receiver = CreateActors::get_dart_signal_receiver();
+  start_receiver.recv().await;
+
+  // TODO: Apply actor model everywhere.
+  spawn(stream_fractal());
+  spawn(run_debug_tests());
+
   // Create actor contexts.
   let counting_context = Context::new();
   let counting_addr = counting_context.address();

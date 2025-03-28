@@ -87,12 +87,3 @@ pub enum CStyleEnum {
   D,
   E = 10,
 }
-
-#[derive(Deserialize, DartSignal)]
-pub struct ComplexSignalTestStart;
-
-#[derive(Serialize, RustSignal)]
-pub struct ComplexSignalTestResult(pub bool);
-
-#[derive(Serialize, RustSignal)]
-pub struct ComplexSignalTestEnd;

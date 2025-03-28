@@ -1,7 +1,7 @@
 use crate::signals::{
-  CStyleEnum, ComplexSignalTestEnd, ComplexSignalTestResult,
-  ComplexSignalTestStart, NewTypeStruct, OtherTypes, PrimitiveTypes, SerdeData,
-  Struct, TupleStruct, UnitStruct,
+  CStyleEnum, ComplexSignalTestResult, NewTypeStruct, OtherTypes,
+  PrimitiveTypes, SerdeData, Struct, TupleStruct, UnitStruct, UnitTestEnd,
+  UnitTestStart,
 };
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::time::Duration;
@@ -173,11 +173,11 @@ fn get_complex_signals() -> Vec<SerdeData> {
 /// Sends complex signals to Dart and wait for them to come back.
 pub async fn send_signals_back_and_forth() {
   // Wait until the start signal arrives.
-  let duration = Duration::from_millis(100);
-  let start_receiver = ComplexSignalTestStart::get_dart_signal_receiver();
+  let start_receiver = UnitTestStart::get_dart_signal_receiver();
   start_receiver.recv().await;
 
   // Pass signals back and forth.
+  let duration = Duration::from_millis(100);
   let signal_receiver = SerdeData::get_dart_signal_receiver();
   let complex_signals = get_complex_signals();
   for sent in complex_signals {
@@ -191,5 +191,5 @@ pub async fn send_signals_back_and_forth() {
   }
 
   // Tell Dart that the test is done.
-  ComplexSignalTestEnd.send_signal_to_dart();
+  UnitTestEnd.send_signal_to_dart();
 }

@@ -11,7 +11,7 @@ void main() async {
 
   // Start the test mechanism in Rust.
   final duration = Duration(milliseconds: 100);
-  ComplexSignalTestStart().sendSignalToRust();
+  UnitTestStart().sendSignalToRust();
   await Future.delayed(duration);
 
   // Send signals of complex types back and forth.
@@ -31,7 +31,7 @@ void main() async {
 
   // Wait for the test to be completed.
   await Future.delayed(duration);
-  await ComplexSignalTestEnd.rustSignalStream.first;
+  await UnitTestEnd.rustSignalStream.first;
 }
 
 /// Gets the expected path of the dynamic library file.
