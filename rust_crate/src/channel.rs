@@ -4,6 +4,8 @@ use std::pin::Pin;
 use std::sync::{Arc, Mutex};
 use std::task::{Context, Poll, Waker};
 
+// TODO: Make `listen_to_dart_signals` and use it everywhere.
+
 /// The `SignalSender` is used to send messages into a shared message queue.
 /// It is clonable, and multiple senders can be created to send messages into
 /// the same queue. Each message is sent to a receiver, but only the currently
