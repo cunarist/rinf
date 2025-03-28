@@ -537,6 +537,7 @@ pub fn generate_dart_code(
   }
 
   // TODO: Include comments from original structs with `with_comments` method
+  // TODO: Warn properly when Rust syntax is invalid
 
   // Empty the generation folder.
   let gen_dir = root_dir.join(rinf_config.gen_output_dir.clone());
