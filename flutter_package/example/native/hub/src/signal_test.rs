@@ -171,7 +171,7 @@ fn get_complex_signals() -> Vec<SerdeData> {
 }
 
 /// Sends complex signals to Dart and wait for them to come back.
-pub async fn send_signals_back_and_forth() {
+pub async fn run_unit_tests() {
   // Wait until the start signal arrives.
   let start_receiver = UnitTestStart::get_dart_signal_receiver();
   start_receiver.recv().await;

@@ -9,7 +9,7 @@ mod signals;
 use actors::create_actors;
 
 use rinf::{dart_shutdown, write_interface};
-use signal_test::send_signals_back_and_forth;
+use signal_test::run_unit_tests;
 use tokio::spawn;
 use tokio_with_wasm::alias as tokio;
 
@@ -23,7 +23,7 @@ async fn main() {
   // If you must use blocking code, use `tokio::task::spawn_blocking`
   // or the equivalent provided by your async library.
   spawn(create_actors());
-  spawn(send_signals_back_and_forth());
+  spawn(run_unit_tests());
 
   // Keep the main function running until Dart shutdown.
   dart_shutdown().await;
