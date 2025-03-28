@@ -31,6 +31,7 @@ void main() async {
   });
 
   // Wait for the test to be completed.
+  await Future.delayed(duration);
   await ComplexSignalTestEnd.rustSignalStream.first;
 }
 
