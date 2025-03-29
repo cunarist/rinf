@@ -438,8 +438,6 @@ extension {class}DartSignalExt on {class} {{
   Ok(())
 }
 
-// TODO: Make some generated items private.
-
 fn generate_class_interface_code(
   gen_dir: &Path,
   class: &str,
@@ -457,7 +455,7 @@ fn generate_class_interface_code(
     let camel_class = class.to_case(Case::Camel);
     let new_code = format!(
       r#"
-final {camel_class}StreamController =
+final _{camel_class}StreamController =
     StreamController<RustSignalPack<{class}>>();
 "#
     );
@@ -471,7 +469,7 @@ final {camel_class}StreamController =
   /// Make sure to cancel the subscription when it's no longer needed,
   /// such as when a widget is disposed.
   static final rustSignalStream =
-      {camel_class}StreamController.stream.asBroadcastStream();
+      _{camel_class}StreamController.stream.asBroadcastStream();
 "#
       ),
       1,
@@ -510,7 +508,7 @@ fn generate_shared_code(
       message,
       binary,
     );
-    {camel_class}StreamController.add(rustSignal);
+    _{camel_class}StreamController.add(rustSignal);
   }},"#
     );
     code.push_str(&new_code);
