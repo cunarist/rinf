@@ -23,12 +23,10 @@ impl Actor for FirstActor {}
 impl FirstActor {
   /// Creates the first actor and initializes its fields.
   pub fn new(self_addr: Address<Self>) -> Self {
-    let mut owned_tasks = JoinSet::new();
-    owned_tasks.spawn(Self::listen_to_dart(self_addr.clone()));
-    owned_tasks.spawn(Self::listen_to_timer(self_addr));
-    FirstActor {
-      _owned_tasks: owned_tasks,
-    }
+    let mut _owned_tasks = JoinSet::new();
+    _owned_tasks.spawn(Self::listen_to_dart(self_addr.clone()));
+    _owned_tasks.spawn(Self::listen_to_timer(self_addr));
+    FirstActor { _owned_tasks }
   }
 }
 
@@ -48,7 +46,7 @@ impl Notifiable<SmallText> for FirstActor {
 impl Handler<SmallBool> for FirstActor {
   type Result = bool;
   async fn handle(&mut self, msg: SmallBool, _: &Context<Self>) -> bool {
-    msg.0
+    !msg.0
   }
 }
 
