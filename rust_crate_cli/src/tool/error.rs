@@ -14,7 +14,7 @@ pub enum SetupError {
   ReflectionModule,
   PubConfig(String),
   BadFilePath(PathBuf),
-  ProjectStructure(&'static str),
+  NotFlutterApp,
   TemplateApplied,
   DuplicatedSignal(String),
   CodeSyntax(String),
@@ -56,8 +56,8 @@ impl Display for SetupError {
       Self::BadFilePath(p) => {
         write!(f, "Not a valid file path: `{}`", p.display())
       }
-      Self::ProjectStructure(s) => {
-        write!(f, "Invalid project structure: {}", s)
+      Self::NotFlutterApp => {
+        write!(f, "This is not a Flutter app project")
       }
       Self::TemplateApplied => {
         write!(f, "Rust template has already been applied")

@@ -44,9 +44,7 @@ pub fn run_command() -> Result<(), SetupError> {
   // Check if the current directory is Flutter app's root.
   let root_dir = current_dir()?;
   if !is_flutter_app_project(&root_dir) {
-    Err(SetupError::ProjectStructure(
-      "This is not a Flutter app project",
-    ))?;
+    Err(SetupError::NotFlutterApp)?;
   }
 
   // Run a command from user input.

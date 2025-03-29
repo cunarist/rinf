@@ -629,20 +629,11 @@ pub fn watch_and_generate_dart_code(
   root_dir: &Path,
   rinf_config: &RinfConfig,
 ) -> Result<(), SetupError> {
-  // TODO: Watch crates from rinf config
-
-  // Prepare the source directory for Rust files.
-  let source_dir = root_dir.join("native").join("hub").join("src");
-  if !source_dir.exists() {
-    Err(SetupError::ProjectStructure(
-      "Source directory of the `hub` crate does not exist",
-    ))?;
-  }
-
-  // Create a channel to receive file change events.
+  // Create a channel to pass file change events.
   let (sender, receiver) = channel();
 
-  // Create a file system watcher using the new notify API.
+  // Create file system watchers using the new notify API.
+  dimmedln!("Watching Rust files");
   let mut watcher = RecommendedWatcher::new(
     move |event_result| {
       // Send events to the channel.
@@ -660,10 +651,10 @@ pub fn watch_and_generate_dart_code(
     },
     Config::default(),
   )?;
-
-  // Start watching the source directory recursively.
-  watcher.watch(&source_dir, RecursiveMode::Recursive)?;
-  dimmedln!("Watching Rust files");
+  for crate_name in &rinf_config.gen_input_crates {
+    let source_dir = root_dir.join("native").join(crate_name);
+    watcher.watch(&source_dir, RecursiveMode::Recursive)?;
+  }
 
   loop {
     // Sleep briefly to avoid busy looping.
@@ -688,6 +679,7 @@ pub fn watch_and_generate_dart_code(
       }
     }
   }
+
   Ok(())
 }
 
