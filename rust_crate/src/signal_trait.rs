@@ -6,7 +6,7 @@ use crate::channel::SignalReceiver;
 use crate::interface::DartSignalPack;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
-/// Defines the methods that a struct capable of
+/// Defines the methods that a type capable of
 /// receiving Dart signals must implement.
 pub trait DartSignalBinary<T> {
   /// Returns the receiver that listens for signals from Dart.
@@ -17,7 +17,7 @@ pub trait DartSignalBinary<T> {
   fn get_dart_signal_receiver() -> SignalReceiver<DartSignalPack<T>>;
 }
 
-/// Defines the methods that a struct capable of
+/// Defines the methods that a type capable of
 /// receiving Dart signals must implement.
 pub trait DartSignal<T> {
   /// Returns the receiver that listens for signals from Dart.
@@ -27,7 +27,7 @@ pub trait DartSignal<T> {
   fn get_dart_signal_receiver() -> SignalReceiver<DartSignalPack<T>>;
 }
 
-/// Defines the methods that a struct capable of
+/// Defines the methods that a type capable of
 /// sending Rust signals with binary data must implement.
 pub trait RustSignalBinary {
   /// Sends a signal to Dart with separate binary data.
@@ -35,7 +35,7 @@ pub trait RustSignalBinary {
   fn send_signal_to_dart(self, binary: Vec<u8>);
 }
 
-/// Defines the methods that a struct capable of
+/// Defines the methods that a type capable of
 /// sending Rust signals must implement.
 pub trait RustSignal {
   /// Sends a signal to Dart.
@@ -43,8 +43,8 @@ pub trait RustSignal {
   fn send_signal_to_dart(self);
 }
 
-/// Ensures that structs with derives macros from Rinf
-/// enforce all inner structs to be included in code generation.
+/// Ensures that all inner structs and enums
+/// within signal structs and enums are also signals.
 #[doc(hidden)]
 pub trait SignalPiece {}
 
