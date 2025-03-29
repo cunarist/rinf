@@ -3,9 +3,7 @@ use convert_case::{Case, Casing};
 use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
 use serde_generate::dart::{CodeGenerator, Installer};
 use serde_generate::{CodeGeneratorConfig, Encoding, SourceInstaller};
-use serde_reflection::{
-  ContainerFormat, Format, Named, Registry, VariantFormat,
-};
+use serde_reflection::{ContainerFormat, Format, Named, VariantFormat};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{
   create_dir_all, read_dir, read_to_string, remove_dir_all, rename, write,
@@ -18,6 +16,8 @@ use syn::{
   Attribute, Expr, File, GenericArgument, Item, ItemEnum, ItemStruct, Lit,
   PathArguments, Type, TypeArray, TypePath, TypeTuple,
 };
+
+static MODULE_NAME: &str = "signals";
 
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
 enum SignalAttribute {
@@ -59,6 +59,27 @@ fn extract_signal_attribute(
     })?;
   }
   Ok(extracted_attrs)
+}
+
+fn extract_doc_comment(attrs: &[Attribute]) -> String {
+  let lines: Vec<String> = attrs
+    .iter()
+    .filter_map(|attr| {
+      // Check if the attribute is a doc comment
+      if attr.path().is_ident("doc") {
+        // Parse the attribute as a `MetaNameValue`
+        if let syn::Meta::NameValue(meta) = &attr.meta {
+          if let syn::Expr::Lit(lit) = &meta.value {
+            if let syn::Lit::Str(lit_str) = &lit.lit {
+              return Some(lit_str.value().trim().to_owned());
+            }
+          }
+        }
+      }
+      None
+    })
+    .collect();
+  lines.join("\n")
 }
 
 /// Convert a `syn` field type to a `serde_reflection::Format`.
@@ -194,7 +215,7 @@ fn extract_generics(segment: &syn::PathSegment) -> Vec<Type> {
 
 /// Trace a struct by collecting its field names (and a placeholder type)
 /// and record its container format in the registry.
-fn trace_struct(registry: &mut Registry, item: &ItemStruct) {
+fn trace_struct(traced: &mut Traced, item: &ItemStruct) {
   // Collect basic information about this struct.
   let type_name = item.ident.to_string();
 
@@ -231,12 +252,12 @@ fn trace_struct(registry: &mut Registry, item: &ItemStruct) {
   };
 
   // Save the information about the container.
-  registry.insert(type_name, container);
+  traced.registry.insert(type_name, container);
 }
 
 /// Trace an enum by collecting its variant names (and a placeholder type)
 /// and record its container format in the registry.
-fn trace_enum(registry: &mut Registry, item: &ItemEnum) {
+fn trace_enum(traced: &mut Traced, item: &ItemEnum) {
   // Collect basic information about this enum.
   let type_name = item.ident.to_string();
 
@@ -288,35 +309,42 @@ fn trace_enum(registry: &mut Registry, item: &ItemEnum) {
   let container = ContainerFormat::Enum(variants);
 
   // Save the information about the container.
-  registry.insert(type_name, container);
+  traced.registry.insert(type_name, container);
 }
 
 /// Process AST items and record struct types in the registry.
 fn process_items(
   items: &[Item],
-  registry: &mut Registry,
-  signal_attrs: &mut BTreeMap<String, BTreeSet<SignalAttribute>>,
+  traced: &mut Traced,
 ) -> Result<(), SetupError> {
   for item in items {
     match item {
       Item::Mod(m) if m.content.is_some() => {
         // Recursively process items in nested modules.
         if let Some(inner_items) = m.content.as_ref().map(|p| &p.1) {
-          process_items(inner_items, registry, signal_attrs)?;
+          process_items(inner_items, traced)?;
         }
       }
       Item::Struct(s) => {
-        let extracted_attrs = extract_signal_attribute(&s.attrs)?;
-        if !extracted_attrs.is_empty() {
-          trace_struct(registry, s);
-          signal_attrs.insert(s.ident.to_string(), extracted_attrs);
+        let item_name = s.ident.to_string();
+        let signal_attrs = extract_signal_attribute(&s.attrs)?;
+        if !signal_attrs.is_empty() {
+          trace_struct(traced, s);
+          traced.signal_attrs.insert(item_name.clone(), signal_attrs);
         }
+        let doc_comment = extract_doc_comment(&s.attrs);
+        let item_path = vec![MODULE_NAME.to_owned(), item_name];
+        traced.doc_comments.insert(item_path, doc_comment);
       }
       Item::Enum(e) => {
-        let extracted_attrs = extract_signal_attribute(&e.attrs)?;
-        if !extracted_attrs.is_empty() {
-          trace_enum(registry, e);
-          signal_attrs.insert(e.ident.to_string(), extracted_attrs);
+        let item_name = e.ident.to_string();
+        let signal_attrs = extract_signal_attribute(&e.attrs)?;
+        if !signal_attrs.is_empty() {
+          trace_enum(traced, e);
+          traced.signal_attrs.insert(item_name.clone(), signal_attrs);
+          let doc_comment = extract_doc_comment(&e.attrs);
+          let item_path = vec![MODULE_NAME.to_owned(), item_name];
+          traced.doc_comments.insert(item_path, doc_comment);
         }
       }
       _ => {}
@@ -328,21 +356,26 @@ fn process_items(
 // TODO: Warn overlapping type names
 // TODO: Disallow type names that starts with "Rinf"
 
+struct Traced {
+  registry: BTreeMap<String, ContainerFormat>,
+  signal_attrs: BTreeMap<String, BTreeSet<SignalAttribute>>,
+  doc_comments: BTreeMap<Vec<String>, String>,
+}
+
 fn visit_rust_files(
   dir: PathBuf,
-  registry: &mut Registry,
-  signal_attrs: &mut BTreeMap<String, BTreeSet<SignalAttribute>>,
+  traced: &mut Traced,
 ) -> Result<(), SetupError> {
   let entries = read_dir(dir)?;
   for entry in entries.filter_map(Result::ok) {
     let path = entry.path();
     if path.is_dir() {
       // Recurse into subdirectory.
-      visit_rust_files(path, registry, signal_attrs)?;
+      visit_rust_files(path, traced)?;
     } else {
       let content = read_to_string(path)?;
       let syntax_tree: File = syn::parse_file(&content)?;
-      process_items(&syntax_tree.items, registry, signal_attrs)?;
+      process_items(&syntax_tree.items, traced)?;
     }
   }
   Ok(())
@@ -355,7 +388,7 @@ fn generate_class_extension_code(
 ) -> Result<(), SetupError> {
   let snake_class = class.to_case(Case::Snake);
   let class_file = gen_dir
-    .join("generated")
+    .join(MODULE_NAME)
     .join(format!("{}.dart", snake_class));
   let mut code = read_to_string(&class_file)?;
 
@@ -414,7 +447,7 @@ fn generate_class_interface_code(
 ) -> Result<(), SetupError> {
   let snake_class = class.to_case(Case::Snake);
   let class_file = gen_dir
-    .join("generated")
+    .join(MODULE_NAME)
     .join(format!("{}.dart", snake_class));
   let mut code = read_to_string(&class_file)?;
 
@@ -454,9 +487,7 @@ fn generate_shared_code(
   signal_attrs: &BTreeMap<String, BTreeSet<SignalAttribute>>,
 ) -> Result<(), SetupError> {
   // Write type aliases.
-  let mut code = r#"part of 'generated.dart';
-"#
-  .to_owned();
+  let mut code = format!("part of '{}.dart';\n", MODULE_NAME);
 
   // Write signal handler.
   code.push_str(
@@ -487,7 +518,7 @@ fn generate_shared_code(
   code.push_str("\n};\n");
 
   // Save to a file.
-  let shared_file = gen_dir.join("generated").join("signal_handlers.dart");
+  let shared_file = gen_dir.join(MODULE_NAME).join("signal_handlers.dart");
   write(&shared_file, code)?;
   Ok(())
 }
@@ -503,7 +534,9 @@ fn generate_interface_code(
   }
 
   // Write imports.
-  let top_file = gen_dir.join("generated").join("generated.dart");
+  let top_file = gen_dir
+    .join(MODULE_NAME)
+    .join(format!("{MODULE_NAME}.dart"));
   let mut top_content = read_to_string(&top_file)?;
   top_content = top_content.replacen(
     "export '../serde/serde.dart';",
@@ -526,14 +559,16 @@ pub fn generate_dart_code(
   rinf_config: &RinfConfig,
 ) -> Result<(), SetupError> {
   // Analyze the input Rust files and collect type registries.
-  let mut registry: Registry = Registry::new();
-  let mut signal_attrs = BTreeMap::<String, BTreeSet<SignalAttribute>>::new();
+  let mut traced = Traced {
+    registry: BTreeMap::new(),
+    signal_attrs: BTreeMap::new(),
+    doc_comments: BTreeMap::new(),
+  };
   for crate_name in &rinf_config.gen_input_crates {
     let source_dir = root_dir.join("native").join(crate_name).join("src");
-    visit_rust_files(source_dir, &mut registry, &mut signal_attrs)?;
+    visit_rust_files(source_dir, &mut traced)?;
   }
 
-  // TODO: Include comments from original structs with `with_comments` method
   // TODO: Warn properly when Rust syntax is invalid
 
   // Empty the generation folder.
@@ -542,15 +577,16 @@ pub fn generate_dart_code(
   create_dir_all(&gen_dir)?;
 
   // Create the code generator config.
-  let gen_config = CodeGeneratorConfig::new("generated".to_string())
+  let gen_config = CodeGeneratorConfig::new(MODULE_NAME.to_string())
     .with_encodings([Encoding::Bincode])
     .with_package_manifest(false)
-    .with_c_style_enums(true);
+    .with_c_style_enums(true)
+    .with_comments(traced.doc_comments);
 
   // Install serialization modules.
   let installer = Installer::new(gen_dir.clone());
   installer
-    .install_module(&gen_config, &registry)
+    .install_module(&gen_config, &traced.registry)
     .map_err(|_| SetupError::ReflectionModule)?;
   installer
     .install_serde_runtime()
@@ -561,7 +597,7 @@ pub fn generate_dart_code(
 
   // Generate Dart serialization code from the registry.
   let generator = CodeGenerator::new(&gen_config);
-  generator.output(gen_dir.clone(), &registry)?;
+  generator.output(gen_dir.clone(), &traced.registry)?;
   move_directory_contents(&gen_dir.join("lib").join("src"), &gen_dir)?;
   remove_dir_all(gen_dir.join("lib"))?;
 
@@ -572,11 +608,11 @@ pub fn generate_dart_code(
     .unwrap_or("bindings");
   write(
     gen_dir.join(format!("{gen_dir_name}.dart")),
-    "export 'generated/generated.dart';",
+    format!("export '{}/{}.dart';", MODULE_NAME, MODULE_NAME),
   )?;
 
   // Generate Dart interface code for FFI.
-  generate_interface_code(&gen_dir, &signal_attrs)?;
+  generate_interface_code(&gen_dir, &traced.signal_attrs)?;
   Ok(())
 }
 
