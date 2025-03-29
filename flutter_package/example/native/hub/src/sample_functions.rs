@@ -2,7 +2,7 @@
 
 use crate::signals::{SampleFractal, SampleSchema};
 use anyhow::Result;
-use rinf::debug_print;
+use rinf::{RustSignalBinary, debug_print};
 use sample_crate::{
   draw_fractal_image, fetch_from_web_api, get_current_time, get_hardward_id,
 };

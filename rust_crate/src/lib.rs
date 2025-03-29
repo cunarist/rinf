@@ -15,7 +15,9 @@ pub use channel::{SignalReceiver, SignalSender, signal_channel};
 pub use error::AppError;
 pub use interface::{DartSignalPack, send_rust_signal, start_rust_logic};
 pub use shutdown::dart_shutdown;
-pub use signal_trait::ForeignSignal;
+pub use signal_trait::{
+  DartSignal, DartSignalBinary, RustSignal, RustSignalBinary, SignalPiece,
+};
 
 pub use rinf_proc::{
   DartSignal, DartSignalBinary, RustSignal, RustSignalBinary, SignalPiece,

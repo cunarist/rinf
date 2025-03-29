@@ -2,74 +2,113 @@
 //! in a type-safe way, ensuring that all structs and enums
 //! require their inner structs and enums to implement the signal trait.
 
+use crate::channel::SignalReceiver;
+use crate::interface::DartSignalPack;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
+
+/// Defines the methods that a struct capable of
+/// receiving Dart signals must implement.
+pub trait DartSignalBinary<T> {
+  /// Returns the receiver that listens for signals from Dart.
+  ///
+  /// If this function is called multiple times,
+  /// only the most recent receiver remains active,
+  /// and all previous ones become inactive after receiving `None`.
+  fn get_dart_signal_receiver() -> SignalReceiver<DartSignalPack<T>>;
+}
+
+/// Defines the methods that a struct capable of
+/// receiving Dart signals must implement.
+pub trait DartSignal<T> {
+  /// Returns the receiver that listens for signals from Dart.
+  /// If this function is called multiple times,
+  /// only the most recent receiver remains active,
+  /// and all previous ones become inactive after receiving `None`.
+  fn get_dart_signal_receiver() -> SignalReceiver<DartSignalPack<T>>;
+}
+
+/// Defines the methods that a struct capable of
+/// sending Rust signals with binary data must implement.
+pub trait RustSignalBinary {
+  /// Sends a signal to Dart with separate binary data.
+  /// Passing data from Dart to Rust is a zero-copy operation.
+  fn send_signal_to_dart(self, binary: Vec<u8>);
+}
+
+/// Defines the methods that a struct capable of
+/// sending Rust signals must implement.
+pub trait RustSignal {
+  /// Sends a signal to Dart.
+  /// Passing data from Dart to Rust is a zero-copy operation.
+  fn send_signal_to_dart(self);
+}
 
 /// Ensures that structs with derives macros from Rinf
 /// enforce all inner structs to be included in code generation.
 #[doc(hidden)]
-pub trait ForeignSignal {}
+pub trait SignalPiece {}
 
 // Implement the trait for simple primitives.
-impl ForeignSignal for i8 {}
-impl ForeignSignal for i16 {}
-impl ForeignSignal for i32 {}
-impl ForeignSignal for i64 {}
-impl ForeignSignal for i128 {}
-impl ForeignSignal for u8 {}
-impl ForeignSignal for u16 {}
-impl ForeignSignal for u32 {}
-impl ForeignSignal for u64 {}
-impl ForeignSignal for u128 {}
-impl ForeignSignal for f32 {}
-impl ForeignSignal for f64 {}
-impl ForeignSignal for bool {}
-impl ForeignSignal for char {}
-impl ForeignSignal for String {}
-impl ForeignSignal for &str {}
+impl SignalPiece for i8 {}
+impl SignalPiece for i16 {}
+impl SignalPiece for i32 {}
+impl SignalPiece for i64 {}
+impl SignalPiece for i128 {}
+impl SignalPiece for u8 {}
+impl SignalPiece for u16 {}
+impl SignalPiece for u32 {}
+impl SignalPiece for u64 {}
+impl SignalPiece for u128 {}
+impl SignalPiece for f32 {}
+impl SignalPiece for f64 {}
+impl SignalPiece for bool {}
+impl SignalPiece for char {}
+impl SignalPiece for String {}
+impl SignalPiece for &str {}
 
 // Implement the trait for container types.
-impl<T> ForeignSignal for Box<T> where T: ForeignSignal {}
-impl<T> ForeignSignal for Option<T> where T: ForeignSignal {}
+impl<T> SignalPiece for Box<T> where T: SignalPiece {}
+impl<T> SignalPiece for Option<T> where T: SignalPiece {}
 
 // Implement the trait for collection types.
-impl<T, const N: usize> ForeignSignal for [T; N] where T: ForeignSignal {}
-impl<T> ForeignSignal for Vec<T> where T: ForeignSignal {}
-impl<T> ForeignSignal for HashSet<T> where T: ForeignSignal {}
-impl<T> ForeignSignal for BTreeSet<T> where T: ForeignSignal {}
-impl<K, V> ForeignSignal for HashMap<K, V>
+impl<T, const N: usize> SignalPiece for [T; N] where T: SignalPiece {}
+impl<T> SignalPiece for Vec<T> where T: SignalPiece {}
+impl<T> SignalPiece for HashSet<T> where T: SignalPiece {}
+impl<T> SignalPiece for BTreeSet<T> where T: SignalPiece {}
+impl<K, V> SignalPiece for HashMap<K, V>
 where
-  K: ForeignSignal,
-  V: ForeignSignal,
+  K: SignalPiece,
+  V: SignalPiece,
 {
 }
-impl<K, V> ForeignSignal for BTreeMap<K, V>
+impl<K, V> SignalPiece for BTreeMap<K, V>
 where
-  K: ForeignSignal,
-  V: ForeignSignal,
+  K: SignalPiece,
+  V: SignalPiece,
 {
 }
 
 // Implement the trait for tuples.
-impl ForeignSignal for () {}
-impl<T1> ForeignSignal for (T1,) where T1: ForeignSignal {}
-impl<T1, T2> ForeignSignal for (T1, T2)
+impl SignalPiece for () {}
+impl<T1> SignalPiece for (T1,) where T1: SignalPiece {}
+impl<T1, T2> SignalPiece for (T1, T2)
 where
-  T1: ForeignSignal,
-  T2: ForeignSignal,
+  T1: SignalPiece,
+  T2: SignalPiece,
 {
 }
-impl<T1, T2, T3> ForeignSignal for (T1, T2, T3)
+impl<T1, T2, T3> SignalPiece for (T1, T2, T3)
 where
-  T1: ForeignSignal,
-  T2: ForeignSignal,
-  T3: ForeignSignal,
+  T1: SignalPiece,
+  T2: SignalPiece,
+  T3: SignalPiece,
 {
 }
-impl<T1, T2, T3, T4> ForeignSignal for (T1, T2, T3, T4)
+impl<T1, T2, T3, T4> SignalPiece for (T1, T2, T3, T4)
 where
-  T1: ForeignSignal,
-  T2: ForeignSignal,
-  T3: ForeignSignal,
-  T4: ForeignSignal,
+  T1: SignalPiece,
+  T2: SignalPiece,
+  T3: SignalPiece,
+  T4: SignalPiece,
 {
 }

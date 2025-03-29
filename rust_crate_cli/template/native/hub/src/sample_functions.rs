@@ -1,7 +1,7 @@
 //! This module is written for Rinf demonstrations.
 
 use crate::signals::{SmallNumber, SmallText};
-use rinf::debug_print;
+use rinf::{DartSignal, RustSignal, debug_print};
 
 pub async fn communicate() {
   // Send signals to Dart like below.

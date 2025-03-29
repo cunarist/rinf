@@ -38,7 +38,7 @@ pub fn derive_signal_piece(input: TokenStream) -> TokenStream {
 
   // Automatically implement the signal trait for the struct.
   let expanded = quote! {
-    impl rinf::ForeignSignal for #name #where_clause {}
+    impl rinf::SignalPiece for #name #where_clause {}
   };
 
   // Convert the generated code into token stream and return it.
@@ -50,7 +50,7 @@ pub fn derive_signal_piece(input: TokenStream) -> TokenStream {
 /// This can be marked on any type that implements `Deserialize`.
 #[proc_macro_derive(DartSignal)]
 pub fn derive_dart_signal(input: TokenStream) -> TokenStream {
-  derive_dart_signal_real(input)
+  derive_dart_signal_real(input, false)
 }
 
 /// Marks the struct as a signal endpoint
@@ -58,10 +58,13 @@ pub fn derive_dart_signal(input: TokenStream) -> TokenStream {
 /// This can be marked on any type that implements `Deserialize`.
 #[proc_macro_derive(DartSignalBinary)]
 pub fn derive_dart_signal_binary(input: TokenStream) -> TokenStream {
-  derive_dart_signal_real(input)
+  derive_dart_signal_real(input, true)
 }
 
-fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
+fn derive_dart_signal_real(
+  input: TokenStream,
+  include_binary: bool,
+) -> TokenStream {
   // Collect information about the item.
   let ast = parse_macro_input!(input as DeriveInput);
   let name = &ast.ident;
@@ -94,17 +97,20 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
   let extern_fn_ident = Ident::new(extern_fn_name, name.span());
 
   // Implement methods and extern functions.
+  let signal_trait = if include_binary {
+    quote! { rinf::DartSignalBinary<#name> }
+  } else {
+    quote! { rinf::DartSignal<#name> }
+  };
   let expanded = quote! {
-    impl #name #where_clause {
-      /// Gets the receiver that listens for signals from Dart.
-      /// If this function is called multiple times,
-      /// only the last receiver remains alive,
-      /// and all previous ones become inactive after receiving `None`.
-      pub fn get_dart_signal_receiver(
+    impl #signal_trait for #name #where_clause {
+      fn get_dart_signal_receiver(
       ) -> rinf::SignalReceiver<rinf::DartSignalPack<Self>> {
         #channel_const_ident.1.clone()
       }
+    }
 
+    impl #name #where_clause {
       fn send_dart_signal(message_bytes: &[u8], binary: &[u8]) {
         use rinf::{AppError, DartSignalPack, debug_print, deserialize};
         let message_result: Result<#name, AppError> =
@@ -204,10 +210,8 @@ fn derive_rust_signal_real(
   // Implement methods and extern functions.
   let expanded = if include_binary {
     quote! {
-      impl #name #where_clause {
-        /// Sends the signal to Dart with separate binary data.
-        /// Passing data from Dart to Rust is a zero-copy operation.
-        pub fn send_signal_to_dart(self, binary: Vec<u8>) {
+      impl rinf::RustSignalBinary for #name #where_clause {
+        fn send_signal_to_dart(self, binary: Vec<u8>) {
           use rinf::{AppError, debug_print, send_rust_signal, serialize};
           let type_name = #name_lit;
           let message_result: Result<Vec<u8>, AppError> =
@@ -229,10 +233,8 @@ fn derive_rust_signal_real(
     }
   } else {
     quote! {
-      impl #name #where_clause {
-        /// Sends the signal to Dart.
-        /// Passing data from Dart to Rust is a zero-copy operation.
-        pub fn send_signal_to_dart(self) {
+      impl rinf::RustSignal for #name #where_clause {
+        fn send_signal_to_dart(self) {
           use rinf::{AppError, debug_print, send_rust_signal, serialize};
           let type_name = #name_lit;
           let message_result: Result<Vec<u8>, AppError> =
@@ -272,7 +274,7 @@ fn get_struct_where_clause(
     Fields::Unit => Vec::new(),
   };
   quote! {
-    where #(#field_types: rinf::ForeignSignal),*
+    where #(#field_types: rinf::SignalPiece),*
   }
 }
 
@@ -295,7 +297,7 @@ fn get_enum_where_clause(data_enum: &DataEnum) -> proc_macro2::TokenStream {
     .collect();
 
   quote! {
-    where #(#variant_types: rinf::ForeignSignal),*
+    where #(#variant_types: rinf::SignalPiece),*
   }
 }
 

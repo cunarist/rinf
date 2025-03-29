@@ -3,6 +3,7 @@ use crate::signals::{
   PrimitiveTypes, SerdeData, Struct, TupleStruct, UnitStruct, UnitTestEnd,
   UnitTestStart,
 };
+use rinf::{DartSignal, RustSignal};
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::time::Duration;
 use tokio::time::sleep;

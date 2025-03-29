@@ -55,6 +55,7 @@ rinf server
   - Now you use `rinf gen` instead of `rinf message`
   - `DartSignal`, `DartSignalBinary`, `RustSignal`, `RustSignalBinary`, `SignalPiece` attributes
   - Everything else stay the same
+  - You need to import traits to call signal methods
 - Requires Rust 2024 edition.
 - Change Rinf config schema
   - Use `rinf config` to know the status
