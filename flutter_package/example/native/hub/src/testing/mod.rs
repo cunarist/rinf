@@ -22,10 +22,10 @@ pub async fn run_unit_tests() {
   let complex_signals = get_complex_signals();
   for sent in complex_signals {
     sent.clone().send_signal_to_dart();
-    let Some(received_pack) = signal_receiver.recv().await else {
+    let Some(signal_pack) = signal_receiver.recv().await else {
       continue;
     };
-    let received = received_pack.message;
+    let received = signal_pack.message;
     ComplexSignalTestResult(sent == received).send_signal_to_dart();
     sleep(duration).await;
   }

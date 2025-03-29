@@ -43,11 +43,11 @@ MyMessage {
 StreamBuilder(
   stream: MyMessage.rustSignalStream,
   builder: (context, snapshot) {
-    final rustSignal = snapshot.data;
-    if (rustSignal == null) {
+    final signalPack = snapshot.data;
+    if (signalPack == null) {
       return Text('Nothing received yet');
     }
-    final myMessage = rustSignal.message;
+    final myMessage = signalPack.message;
     return Text(myMessage.currentNumber.toString());
   },
 ),

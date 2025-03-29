@@ -55,8 +55,8 @@ impl FirstActor {
   /// Listen to an external source, which in this case is Dart.
   async fn listen_to_dart(mut self_addr: Address<Self>) {
     let receiver = SmallText::get_dart_signal_receiver();
-    while let Some(dart_signal) = receiver.recv().await {
-      let _ = self_addr.notify(dart_signal.message).await;
+    while let Some(signal_pack) = receiver.recv().await {
+      let _ = self_addr.notify(signal_pack.message).await;
     }
   }
 

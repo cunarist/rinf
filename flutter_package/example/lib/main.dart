@@ -96,8 +96,8 @@ class MyColumn extends StatelessWidget {
       StreamBuilder(
         stream: SampleFractal.rustSignalStream,
         builder: (context, snapshot) {
-          final rustSignal = snapshot.data;
-          if (rustSignal == null) {
+          final signalPack = snapshot.data;
+          if (signalPack == null) {
             return Container(
               margin: const EdgeInsets.all(20),
               width: 256,
@@ -108,7 +108,7 @@ class MyColumn extends StatelessWidget {
               ),
             );
           }
-          final imageData = rustSignal.binary;
+          final imageData = signalPack.binary;
           return Container(
             margin: const EdgeInsets.all(20),
             width: 256,
@@ -133,16 +133,16 @@ class MyColumn extends StatelessWidget {
         // on structs that derive `RustSignal`.
         stream: SampleNumberOutput.rustSignalStream,
         builder: (context, snapshot) {
-          final rustSignal = snapshot.data;
+          final signalPack = snapshot.data;
           // If the app has just started and widget is built
           // without receiving a Rust signal,
           // the snapshot data will be null.
           // It's when the widget is being built for the first time.
-          if (rustSignal == null) {
+          if (signalPack == null) {
             // Return the initial widget if the snapshot data is null.
             return Text('Initial value 0');
           }
-          final sampleNumberOutput = rustSignal.message;
+          final sampleNumberOutput = signalPack.message;
           final currentNumber = sampleNumberOutput.currentNumber;
           return Text('Current value is $currentNumber');
         },

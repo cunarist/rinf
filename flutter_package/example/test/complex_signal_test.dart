@@ -15,14 +15,14 @@ void main() async {
   await Future.delayed(duration);
 
   // Send signals of complex types back and forth.
-  SerdeData.rustSignalStream.listen((signal) async {
+  SerdeData.rustSignalStream.listen((signalPack) async {
     // Receive a signal from Rust and send it back.
-    final serdeData = signal.message;
+    final serdeData = signalPack.message;
     serdeData.sendSignalToRust();
-    final resultSignal = await ComplexSignalTestResult.rustSignalStream.first;
+    final resultPack = await ComplexSignalTestResult.rustSignalStream.first;
     test('Signals should remain the same', () {
       expect(
-        resultSignal.message.value,
+        resultPack.message.value,
         true,
         reason: 'Signal data is different from the original:\n${serdeData}',
       );

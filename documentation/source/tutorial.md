@@ -71,8 +71,8 @@ use rinf::debug_print;
 
 pub async fn calculate_precious_data() {
   let receiver = MyPreciousData::get_dart_signal_receiver(); // GENERATED
-  while let Some(dart_signal) = receiver.recv().await {
-    let my_precious_data = dart_signal.message;
+  while let Some(signal_pack) = receiver.recv().await {
+    let my_precious_data = signal_pack.message;
 
     let new_numbers: Vec<i32> = my_precious_data
       .input_numbers
@@ -171,11 +171,11 @@ children: [
   StreamBuilder(
     stream: MyAmazingNumber.rustSignalStream, // GENERATED
     builder: (context, snapshot) {
-      final rustSignal = snapshot.data;
-      if (rustSignal == null) {
+      final signalPack = snapshot.data;
+      if (signalPack == null) {
         return Text('Nothing received yet');
       }
-      final myAmazingNumber = rustSignal.message;
+      final myAmazingNumber = signalPack.message;
       final currentNumber = myAmazingNumber.currentNumber;
       return Text(currentNumber.toString());
     },
@@ -212,11 +212,11 @@ children: [
   StreamBuilder(
     stream: MyTreasureOutput.rustSignalStream, // GENERATED
     builder: (context, snapshot) {
-      final rustSignal = snapshot.data;
-      if (rustSignal == null) {
+      final signalPack = snapshot.data;
+      if (signalPack == null) {
         return Text('No value yet');
       }
-      final myTreasureOutput = rustSignal.message;
+      final myTreasureOutput = signalPack.message;
       final currentNumber = myTreasureOutput.currentValue;
       return Text('Output value is $currentNumber');
     },

@@ -25,8 +25,8 @@ impl CountingActor {
 
   async fn listen_to_button_click(mut self_addr: Address<Self>) {
     let receiver = SampleNumberInput::get_dart_signal_receiver();
-    while let Some(dart_signal) = receiver.recv().await {
-      let message = dart_signal.message;
+    while let Some(signal_pack) = receiver.recv().await {
+      let message = signal_pack.message;
       let _ = self_addr.notify(message).await;
     }
   }

@@ -28,20 +28,21 @@ MyDataOutput { my_field: true }.send_signal_to_dart();
 StreamBuilder(
   stream: MyDataOutput.rustSignalStream,
   builder: (context, snapshot) {
-    final rustSignal = snapshot.data;
-    if (rustSignal == null) {
+    final signalPack = snapshot.data;
+    if (signalPack == null) {
       // Return an empty widget.
     }
-    MyDataOutput message = rustSignal.message;
+    MyDataOutput message = signalPack.message;
     // Below requires `RustSignalBinary`.
-    Uint8List binary = rustSignal.binary;
+    Uint8List binary = signalPack.binary;
     // Return a filled widget.
   },
 );
 
 // Alternatively, handle every Rust signal.
-MyDataOutput.rustSignalStream.listen((rustSignal) {
-  MyDataOutput message = rustSignal.message;
+// Don't forget to cancel the subscription when it's no longer needed!
+final subscription = MyDataOutput.rustSignalStream.listen((signalPack) {
+  MyDataOutput message = signalPack.message;
 })
 ```
 
@@ -63,10 +64,10 @@ MyDataInput(my_field: true).sendSignalToRust();
 ```{code-block} rust
 :caption: Rust
 let receiver = MyDataInput::get_dart_signal_receiver();
-while let Some(dart_signal) = receiver.recv().await {
-  let message: MyDataInput = dart_signal.message;
+while let Some(signal_pack) = receiver.recv().await {
+  let message: MyDataInput = signal_pack.message;
   // Below requires `DartSignalBinary`.
-  let binary: Vec<u8> = dart_signal.binary;
+  let binary: Vec<u8> = signal_pack.binary;
   // Custom Rust logic goes here.
 }
 ```
