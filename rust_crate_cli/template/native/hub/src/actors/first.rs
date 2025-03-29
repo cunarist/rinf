@@ -21,7 +21,7 @@ pub struct FirstActor {
 impl Actor for FirstActor {}
 
 impl FirstActor {
-  /// Creates the first actor and initializes its fields.
+  /// Creates the actor and initializes its fields.
   pub fn new(self_addr: Address<Self>) -> Self {
     let mut _owned_tasks = JoinSet::new();
     _owned_tasks.spawn(Self::listen_to_dart(self_addr.clone()));
