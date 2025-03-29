@@ -49,9 +49,9 @@ use anyhow::{Context, Result};
 fn get_cluster_info() -> Result<ClusterMap> {
   // `anyhow::Error` can be created from any error type.
   // By using the `?` operator, the conversion happens automatically.
+  let config = std::fs::read_to_string("cluster.json")?;
   // By using the `context` method, you can wrap the original error
   // with additional information.
-  let config = std::fs::read_to_string("cluster.json")?;
   let map: ClusterMap = serde_json::from_str(&config)
     .context("Failed to parse cluster configuration as JSON")?;
   Ok(map)
