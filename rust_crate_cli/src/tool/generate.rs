@@ -331,10 +331,10 @@ fn process_items(
         if !signal_attrs.is_empty() {
           trace_struct(traced, s);
           traced.signal_attrs.insert(item_name.clone(), signal_attrs);
+          let doc_comment = extract_doc_comment(&s.attrs);
+          let item_path = vec![MODULE_NAME.to_owned(), item_name];
+          traced.doc_comments.insert(item_path, doc_comment);
         }
-        let doc_comment = extract_doc_comment(&s.attrs);
-        let item_path = vec![MODULE_NAME.to_owned(), item_name];
-        traced.doc_comments.insert(item_path, doc_comment);
       }
       Item::Enum(e) => {
         let item_name = e.ident.to_string();
