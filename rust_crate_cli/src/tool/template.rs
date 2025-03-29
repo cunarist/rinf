@@ -31,7 +31,7 @@ pub fn apply_rust_template(
   run_dart_command(&["pub", "add", "meta"])?;
   run_dart_command(&["pub", "add", "tuple"])?;
 
-  // Modify `./lib/main.dart`
+  // Modify `lib/main.dart`
   update_main_dart(root_dir)?;
 
   // Format Rust code.
@@ -161,7 +161,7 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
 fn update_main_dart(root_dir: &Path) -> Result<(), SetupError> {
   let main_path = root_dir.join("lib/main.dart");
   if main_path.exists() {
-    run_dart_command(&["format", "./lib/main.dart"])?;
+    run_dart_command(&["format", "lib/main.dart"])?;
     let mut content = read_to_string(&main_path)?;
     if !content.contains("messages/all.dart") {
       content = content.replacen(
@@ -179,7 +179,7 @@ fn update_main_dart(root_dir: &Path) -> Result<(), SetupError> {
       );
     }
     write(main_path, content)?;
-    run_dart_command(&["format", "./lib/main.dart"])?;
+    run_dart_command(&["format", "lib/main.dart"])?;
   }
   Ok(())
 }

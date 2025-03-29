@@ -69,7 +69,7 @@ fn compile_wasm(
   let mut wasm_pack_args = vec![
     "--quiet",
     "build",
-    "./native/hub",
+    "native/hub",
     "--out-dir",
     out_string,
     "--out-name",

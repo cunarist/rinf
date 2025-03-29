@@ -54,8 +54,8 @@ After running the command, you'll have new files and folders as your starter Rus
 
 Various comments are written in the actual code to help you understand the whole structure.
 
-If you already have a Rust crate that you want to use here, just put it inside `./native` and set it as a dependency of the `hub` crate.
+If you already have a Rust crate that you want to use here, just put it inside `native` and set it as a dependency of the `hub` crate.
 
-Now, by heading over to `./native/hub/src/lib.rs`, you can start writing Rust!
+Now, by heading over to `native/hub/src/lib.rs`, you can start writing Rust!
 
 Example code for guidance can be found [here](https://github.com/cunarist/rinf/tree/main/flutter_package/example).

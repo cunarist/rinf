@@ -115,4 +115,4 @@ jobs:
           dry: True
           prettier_options: >
             --write
-            ./**/*.{md,yaml}
+            **/*.{md,yaml}

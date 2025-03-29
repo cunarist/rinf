@@ -145,7 +145,7 @@ def prepare_user_app():
     )
     replace_text_once(
         ROOT_DIR / "Cargo.toml",
-        'rinf = { path = "./rust_crate" }',
+        'rinf = { path = "rust_crate" }',
         "",
     )
 
