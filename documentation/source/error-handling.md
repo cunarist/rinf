@@ -15,18 +15,18 @@ We recommend that you _not_ write panicking code at all, since Rust has the idio
 ```{code-block} rust
 :caption: Rust
 fn not_good() {
-    let option = get_option();
-    let value_a = option.unwrap(); // This code can panic
-    let result = get_result();
-    let value_b = result.expect("This code can panic");
+  let option = get_option();
+  let value_a = option.unwrap(); // This code can panic
+  let result = get_result();
+  let value_b = result.expect("This code can panic");
 }
 
 fn good() -> Result<(), SomeError> {
-    let option = get_option();
-    let value_a = option.ok_or(SomeError)?;
-    let result = get_result();
-    let value_b = result?;
-    Ok(())
+  let option = get_option();
+  let value_a = option.ok_or(SomeError)?;
+  let result = get_result();
+  let value_b = result?;
+  Ok(())
 }
 ```
 
@@ -43,73 +43,18 @@ Therefore, it is advisable to utilize a single, flexible error type. You can def
 - [anyhow](https://crates.io/crates/anyhow)
 
 ```{code-block} rust
-use anyhow::Result;
+:caption: Rust
+use anyhow::{Context, Result};
 
 fn get_cluster_info() -> Result<ClusterMap> {
-    // `anyhow::Error` can be created from any error type.
-    // By using the `?` operator, the conversion happens automatically.
-    let config = std::fs::read_to_string("cluster.json")?;
-    let map: ClusterMap = serde_json::from_str(&config)?;
-    Ok(map)
-}
-```
-
-## Reporting to Dart
-
-You might need to notify the user through the UI that an error occurred in Rust, providing hints on how to mitigate the problem, such as checking the network connection, trying again later, or verifying the username and password. The code below can serve as a good starting point for reporting Rust errors to Dart.
-
-```{code-block} proto
-:caption: Protobuf
-// [RUST-SIGNAL]
-// Your implementation of an error.
-// It might include a message, an error code, etc.
-message ErrorReport  {
-    string message = 1; // Human-readable explanation of the error
-    int32 error_code = 2; // An error code to distinguish problems
-}
-```
-
-```{code-block} rust
-:caption: Rust
-use anyhow::Result;
-use crate::messages::*;
-
-// Define a trait for reporting errors.
-pub trait Report {
-    fn report(self);
-}
-
-// Implement the Report trait for `Result<()>`.
-impl Report for Result<()>
-{
-    // Report the error to Dart.
-    // A Flutter widget might draw the error info on the screen.
-    fn report(self) {
-        if let Err(err) = self {
-            ErrorReport {
-                message: format!("Rust error: {:?}", err),
-                error_code: 25,
-            }
-            .send_signal_to_dart()
-        }
-    }
-}
-
-async fn make_http_request() -> Result<MyResponse> {
-    // Implementation for making an HTTP request.
-    // It can be any kind of failable function.
-}
-
-async fn top_level() -> Result<()> {
-    let my_response = make_http_request().await?;
-    // Do something with `my_response`.
-    // Additional processing may be written here.
-    Ok(())
-}
-
-async fn main_task() {
-    let result = top_level().await;
-    result.report();
+  // `anyhow::Error` can be created from any error type.
+  // By using the `?` operator, the conversion happens automatically.
+  let config = std::fs::read_to_string("cluster.json")?;
+  // By using the `context` method, you can wrap the original error
+  // with additional information.
+  let map: ClusterMap = serde_json::from_str(&config)
+    .context("Failed to parse cluster configuration as JSON")?;
+  Ok(map)
 }
 ```
 

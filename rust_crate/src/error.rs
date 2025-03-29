@@ -1,31 +1,31 @@
 use std::error::Error;
-use std::fmt;
+use std::fmt::{Display, Formatter};
 
 #[derive(Debug)]
-pub enum RinfError {
-    NoDartIsolate,
-    CannotDecodeMessage,
-    NoSignalHandler,
-    NoBindings,
+pub enum AppError {
+  NoDartIsolate,
+  CannotEncodeMessage,
+  CannotDecodeMessage,
+  NoBindings,
 }
 
-impl fmt::Display for RinfError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::NoDartIsolate => {
-                write!(f, "Dart isolate for Rust signals was not created")
-            }
-            Self::CannotDecodeMessage => {
-                write!(f, "Could not decode the message")
-            }
-            Self::NoSignalHandler => {
-                write!(f, "Could not find the handler for Dart signal")
-            }
-            Self::NoBindings => {
-                write!(f, "Rinf bindings are not ready")
-            }
-        }
+impl Error for AppError {}
+
+impl Display for AppError {
+  fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    match self {
+      Self::NoDartIsolate => {
+        write!(f, "Dart isolate for Rust signals was not created")
+      }
+      Self::CannotDecodeMessage => {
+        write!(f, "Could not decode the message")
+      }
+      Self::CannotEncodeMessage => {
+        write!(f, "Could not encode the message")
+      }
+      Self::NoBindings => {
+        write!(f, "Rinf bindings are not ready")
+      }
     }
+  }
 }
-
-impl Error for RinfError {}

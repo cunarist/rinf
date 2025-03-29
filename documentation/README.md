@@ -8,8 +8,8 @@ Generate the static documentation files for publication on the web.
 uv run sphinx-build -M dirhtml source dist
 ```
 
-Activate a test server.
+Automatically apply changes while writing.
 
 ```shell
-uv run -m http.server 8000 --directory dist/dirhtml
+uv run sphinx-autobuild source dist --builder dirhtml
 ```

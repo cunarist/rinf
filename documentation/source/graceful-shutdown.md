@@ -1,6 +1,6 @@
 # Graceful Shutdown
 
-When the Flutter app is closed, the entire `tokio` async runtime on the Rust side doesn't get dropped by default.
+When the Flutter app is closed, the entire async runtime on the Rust side doesn't get dropped by default.
 
 In some cases, you might need to drop all Rust resources properly before closing the app. This could include instances of structs that implement the `Drop` trait, which have roles like saving files or disposing of resources.
 
@@ -26,7 +26,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _listener = AppLifecycleListener(
       onExitRequested: () async {
-        finalizeRust(); // Shut down the `tokio` Rust runtime.
+        finalizeRust(); // Shut down the async Rust runtime.
         return AppExitResponse.exit;
       },
     );

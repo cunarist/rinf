@@ -2,4 +2,7 @@ include: package:lints/core.yaml
 
 linter:
   rules:
-    - prefer_single_quotes
+    # TODO: Reactivate the rule below
+    prefer_single_quotes: false
+    # TODO: Delete the rule below
+    hash_and_equals: false

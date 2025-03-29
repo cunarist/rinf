@@ -1,7 +1,12 @@
 [package]
 name = "sample_crate"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+wildcard_imports = "deny"
 
 [target.'cfg(any(target_os = "windows", target_os = "macos", target_os = "linux"))'.dependencies]
 machineid-rs = "1.2.4"
