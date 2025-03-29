@@ -91,8 +91,7 @@ impl PerformingActor {
     }
   }
 
-  /// Draws a single fractal animation frame
-  /// and sends them to the owning actor.
+  /// Draws a single fractal animation frame.
   async fn draw_fractal(draw_scale: f64) -> Option<ImageInfo> {
     // Calculate the fractal image
     // parallelly in a separate thread pool.
