@@ -11,10 +11,10 @@ def run_subprocess(command: str, cwd: Path):
     run(command, cwd=cwd, check=True, shell=True)
 
 
-def replace_text_once(file_path: Path, change_from: str, change_to: str):
+def replace_text_once(file_path: Path, before: str, after: str):
     with open(file_path, mode="r", encoding="utf8") as file:
         content: str = file.read()
-    content = content.replace(change_from, change_to, 1)
+    content = content.replace(before, after, 1)
     with open(file_path, mode="w", encoding="utf8") as file:
         file.write(content)
 
