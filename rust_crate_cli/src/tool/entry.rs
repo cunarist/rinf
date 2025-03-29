@@ -59,6 +59,7 @@ pub fn run_command() -> Result<(), SetupError> {
     CliCommand::Template => {
       let rinf_config = load_verified_rinf_config(&root_dir)?;
       apply_rust_template(&root_dir, &rinf_config)?;
+      println!("Rust template is now ready 🎉");
     }
     CliCommand::Gen { watch } => {
       let rinf_config = load_verified_rinf_config(&root_dir)?;
@@ -66,13 +67,26 @@ pub fn run_command() -> Result<(), SetupError> {
         watch_and_generate_dart_code(&root_dir, &rinf_config)?;
       } else {
         generate_dart_code(&root_dir, &rinf_config)?;
+        println!("Dart signal classes were generated successfully 🎉");
       }
     }
     CliCommand::Wasm { release } => {
       build_webassembly(&root_dir, release, is_internet_connected)?;
+      println!(
+        "WebAssembly module has been built and is ready in `web/pkg` 🎉"
+      );
+      println!(
+        "{}",
+        "To get the Flutter web server command, run `rinf server`".dimmed()
+      );
     }
     CliCommand::Server => {
       provide_server_command()?;
+      let full_guide = concat!(
+        "Full `flutter run` command for the web",
+        " has been copied to the clipboard"
+      );
+      println!("{}", full_guide.dimmed());
     }
   }
 

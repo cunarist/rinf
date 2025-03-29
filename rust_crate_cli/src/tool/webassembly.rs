@@ -34,12 +34,6 @@ pub fn build_webassembly(
   );
   compile_wasm(root_dir, is_release_mode)?;
 
-  println!(
-    "[{}/{}] WebAssembly module is now ready 🎉",
-    step, total_steps
-  );
-  println!("To get the Flutter web server command, run `rinf server`");
-
   Ok(())
 }
 
@@ -96,6 +90,5 @@ fn compile_wasm(
     panic!("Wasm compilation failed");
   }
 
-  println!("Saved `.wasm` and `.js` files to `web/pkg/`");
   Ok(())
 }

@@ -38,7 +38,6 @@ pub fn apply_rust_template(
   // Generate Dart code.
   generate_dart_code(root_dir, message_config)?;
 
-  println!("Rust template is now ready 🎉");
   Ok(())
 }
 

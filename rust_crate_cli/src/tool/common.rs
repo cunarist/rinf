@@ -1,6 +1,6 @@
 use crate::SetupError;
 use std::net::ToSocketAddrs;
-use std::process::Command;
+use std::process::{Command, Stdio};
 
 pub fn run_dart_command(args: &[&str]) -> Result<(), SetupError> {
   #[cfg(target_family = "windows")]
@@ -11,7 +11,10 @@ pub fn run_dart_command(args: &[&str]) -> Result<(), SetupError> {
 }
 
 pub fn run_subprocess(cmd: &str, args: &[&str]) -> Result<(), SetupError> {
-  Command::new(cmd).args(args).status()?;
+  Command::new(cmd)
+    .args(args)
+    .stdout(Stdio::null())
+    .output()?;
   Ok(())
 }
 
