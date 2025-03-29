@@ -9,6 +9,31 @@ use std::time::Duration;
 use tokio::time::sleep;
 use tokio_with_wasm::alias as tokio;
 
+/// Sends complex signals to Dart and wait for them to come back.
+/// This function is used for unit testing.
+pub async fn run_unit_tests() {
+  // Wait until the start signal arrives.
+  let start_receiver = UnitTestStart::get_dart_signal_receiver();
+  start_receiver.recv().await;
+
+  // Pass signals back and forth.
+  let duration = Duration::from_millis(100);
+  let signal_receiver = SerdeData::get_dart_signal_receiver();
+  let complex_signals = get_complex_signals();
+  for sent in complex_signals {
+    sent.clone().send_signal_to_dart();
+    let Some(received_pack) = signal_receiver.recv().await else {
+      continue;
+    };
+    let received = received_pack.message;
+    ComplexSignalTestResult(sent == received).send_signal_to_dart();
+    sleep(duration).await;
+  }
+
+  // Tell Dart that the test is done.
+  UnitTestEnd.send_signal_to_dart();
+}
+
 /// Manually generate sample values.
 fn get_complex_signals() -> Vec<SerdeData> {
   let v0 = SerdeData::PrimitiveTypes(PrimitiveTypes {
@@ -169,28 +194,4 @@ fn get_complex_signals() -> Vec<SerdeData> {
   vec![
     v0, v1, v2, v2bis, v2ter, v3, v4, v5, v6, v9, v10, v12, v13, v14, v15,
   ]
-}
-
-/// Sends complex signals to Dart and wait for them to come back.
-pub async fn run_unit_tests() {
-  // Wait until the start signal arrives.
-  let start_receiver = UnitTestStart::get_dart_signal_receiver();
-  start_receiver.recv().await;
-
-  // Pass signals back and forth.
-  let duration = Duration::from_millis(100);
-  let signal_receiver = SerdeData::get_dart_signal_receiver();
-  let complex_signals = get_complex_signals();
-  for sent in complex_signals {
-    sent.clone().send_signal_to_dart();
-    let Some(received_pack) = signal_receiver.recv().await else {
-      continue;
-    };
-    let received = received_pack.message;
-    ComplexSignalTestResult(sent == received).send_signal_to_dart();
-    sleep(duration).await;
-  }
-
-  // Tell Dart that the test is done.
-  UnitTestEnd.send_signal_to_dart();
 }

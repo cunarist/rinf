@@ -11,7 +11,13 @@ const BUF_SIZE: u32 = WIDTH * HEIGHT * 3;
 const SIZE: f64 = 0.000000001;
 const MAX_ITER: u32 = 1000;
 
-pub fn draw_fractal_image(scale: f64) -> Result<Vec<u8>, ExampleError> {
+/// Contains the generated fractal image information.
+pub struct ImageInfo {
+  pub scale: f64,
+  pub data: Vec<u8>,
+}
+
+pub fn draw_fractal_image(scale: f64) -> Result<ImageInfo, ExampleError> {
   let point_x: f64 = -0.5557506;
   let point_y: f64 = -0.55560;
   let mut buffer: Vec<u8> = vec![0; BUF_SIZE as usize];
@@ -27,8 +33,12 @@ pub fn draw_fractal_image(scale: f64) -> Result<Vec<u8>, ExampleError> {
     image::ExtendedColorType::Rgb8,
   );
 
+  let image_info = ImageInfo {
+    scale,
+    data: image_data,
+  };
   match result {
-    Ok(_) => Ok(image_data),
+    Ok(_) => Ok(image_info),
     Err(_) => Err(ExampleError::Fractal),
   }
 }

@@ -2,14 +2,13 @@
 //! entry point of the Rust logic.
 
 mod actors;
-mod sample_functions;
-mod signal_test;
 mod signals;
+mod testing;
 
 use actors::create_actors;
 
 use rinf::{dart_shutdown, write_interface};
-use signal_test::run_unit_tests;
+use testing::run_unit_tests;
 use tokio::spawn;
 use tokio_with_wasm::alias as tokio;
 
