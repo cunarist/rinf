@@ -27,7 +27,7 @@ pub enum SerdeData {
   EmptyStructVariant {},
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, SignalPiece, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, SignalPiece, Clone)]
 pub struct PrimitiveTypes {
   pub f_bool: bool,
   pub f_u8: u8,
@@ -47,7 +47,7 @@ pub struct PrimitiveTypes {
   pub f_char: Option<char>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, SignalPiece, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, SignalPiece, Clone)]
 pub struct OtherTypes {
   pub f_string: String,
   pub f_bytes: Vec<u8>,
@@ -64,22 +64,22 @@ pub struct OtherTypes {
   pub f_boxed_struct: Box<Struct>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, SignalPiece, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, SignalPiece, Clone)]
 pub struct UnitStruct;
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, SignalPiece, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, SignalPiece, Clone)]
 pub struct NewTypeStruct(pub u64);
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, SignalPiece, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, SignalPiece, Clone)]
 pub struct TupleStruct(pub u32, pub u64);
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, SignalPiece, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, SignalPiece, Clone)]
 pub struct Struct {
   pub x: u32,
   pub y: u64,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, SignalPiece, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, SignalPiece, Clone)]
 pub enum CStyleEnum {
   A,
   B,

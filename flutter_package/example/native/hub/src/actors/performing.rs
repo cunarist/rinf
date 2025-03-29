@@ -21,8 +21,6 @@ pub struct PerformingActor {
   _owned_tasks: JoinSet<()>,
 }
 
-// Implementing the `Actor` trait for `CountingActor`.
-// This defines `CountingActor` as an actor in the async system.
 impl Actor for PerformingActor {}
 
 impl PerformingActor {
@@ -38,7 +36,7 @@ impl PerformingActor {
 
 #[async_trait]
 impl Notifiable<ImageInfo> for PerformingActor {
-  async fn notify(&mut self, msg: ImageInfo, _context: &Context<Self>) {
+  async fn notify(&mut self, msg: ImageInfo, _: &Context<Self>) {
     // Send the image data to Dart.
     SampleFractal {
       current_scale: msg.scale,

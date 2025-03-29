@@ -1,9 +1,9 @@
 use rinf::{DartSignal, RustSignal};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, DartSignal)]
+#[derive(Deserialize, DartSignal, Clone)]
 pub struct SmallText {
-  pub _text: String,
+  pub text: String,
 }
 
 #[derive(Serialize, RustSignal)]

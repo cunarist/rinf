@@ -1,4 +1,4 @@
-from os import remove
+from os import remove, walk
 from pathlib import Path
 from subprocess import run
 from sys import argv
@@ -33,7 +33,7 @@ def update_cargokit():
 
 
 def prepare_test_app():
-    filepath = ".gitignore"
+    filepath = ROOT_DIR / ".gitignore"
     with open(filepath, mode="r", encoding="utf8") as file:
         content: str = file.read()
     content += "\n/test_app/"
@@ -58,21 +58,19 @@ def prepare_test_app():
     remove(ROOT_DIR / "test_app" / "Cargo.toml")
 
     # Enable the web target, since it's not enabled by default.
+    crate_path = ROOT_DIR / "test_app" / "native" / "hub"
     replace_text_once(
-        ROOT_DIR / "test_app" / "native" / "hub" / "src" / "lib.rs",
-        "// use tokio_with_wasm::alias as tokio;",
-        "use tokio_with_wasm::alias as tokio;",
-    )
-    replace_text_once(
-        ROOT_DIR / "test_app" / "native" / "hub" / "Cargo.toml",
+        crate_path / "Cargo.toml",
         "# tokio_with_wasm",
         "tokio_with_wasm",
     )
-    replace_text_once(
-        ROOT_DIR / "test_app" / "native" / "hub" / "Cargo.toml",
-        "# wasm-bindgen",
-        "wasm-bindgen",
-    )
+    for root, _, files in walk(crate_path / "src"):
+        for file in files:
+            replace_text_once(
+                Path(root) / file,
+                "// use tokio_with_wasm::alias as tokio;",
+                "use tokio_with_wasm::alias as tokio;",
+            )
 
     # Update workspace members.
     replace_text_once(
@@ -83,7 +81,7 @@ def prepare_test_app():
 
 
 def prepare_user_app():
-    filepath = ".gitignore"
+    filepath = ROOT_DIR / ".gitignore"
     with open(filepath, mode="r", encoding="utf8") as file:
         content: str = file.read()
     content += "\n/user_app/"

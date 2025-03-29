@@ -5,16 +5,12 @@ use rinf::{DartSignal, RustSignal, debug_print};
 use tokio::task::JoinSet;
 use tokio_with_wasm::alias as tokio;
 
-/// The actor that holds the counter state and handles messages.
+/// The actor that holds the counter state.
 pub struct CountingActor {
-  /// The counter number.
   count: i32,
-  /// Owned tasks that are canceled when the actor is dropped.
   _owned_tasks: JoinSet<()>,
 }
 
-// Implementing the `Actor` trait for `CountingActor`.
-// This defines `CountingActor` as an actor in the async system.
 impl Actor for CountingActor {}
 
 impl CountingActor {
@@ -29,7 +25,6 @@ impl CountingActor {
 
   async fn listen_to_button_click(mut self_addr: Address<Self>) {
     let receiver = SampleNumberInput::get_dart_signal_receiver();
-    // Continuously listen for signals and notify the actor.
     while let Some(dart_signal) = receiver.recv().await {
       let message = dart_signal.message;
       let _ = self_addr.notify(message).await;
@@ -39,13 +34,12 @@ impl CountingActor {
 
 #[async_trait]
 impl Notifiable<SampleNumberInput> for CountingActor {
-  async fn notify(&mut self, msg: SampleNumberInput, _context: &Context<Self>) {
+  async fn notify(&mut self, msg: SampleNumberInput, _: &Context<Self>) {
     // Increase the counter number.
     debug_print!("{}", msg.letter);
     self.count += 7;
 
-    // The send method is generated
-    // on structs that derive `RustSignal`.
+    // The send method is generated on structs that derive `RustSignal`.
     SampleNumberOutput {
       current_number: self.count,
       dummy_one: 11,

@@ -1,10 +1,3 @@
-//! The actor model is highly recommended for state management,
-//! as it provides modularity and scalability.
-//! This module demonstrates how to use actors
-//! within the async system in Rust.
-//! To build a solid app, do not communicate by sharing memory;
-//! instead, share memory by communicating.
-
 mod counting;
 mod performing;
 
@@ -17,7 +10,7 @@ use tokio_with_wasm::alias as tokio;
 
 pub use counting::*;
 
-// Creates and spawns the actors in the async system.
+/// Spawns the actors.
 pub async fn create_actors() {
   // Wait until the start signal arrives.
   let start_receiver = CreateActors::get_dart_signal_receiver();
