@@ -82,7 +82,7 @@ pub async fn do_something_with_state() {
     // Use the global variable by acquiring the guard.
     let guard = VECTOR.lock().await;
     let length = guard.len();
-    debug_print!("{length}");
+    debug_print!("{}", length);
 }
 ```
 

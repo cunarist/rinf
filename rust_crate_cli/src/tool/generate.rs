@@ -640,13 +640,13 @@ pub fn watch_and_generate_dart_code(
       let event = match event_result {
         Ok(inner) => inner,
         Err(err) => {
-          eprintln!("Watch error: {err}");
+          eprintln!("Watch error: {}", err);
           return;
         }
       };
       let send_result = sender.send(event);
       if let Err(err) = send_result {
-        eprintln!("{err}");
+        eprintln!("{}", err);
       }
     },
     Config::default(),
@@ -669,12 +669,12 @@ pub fn watch_and_generate_dart_code(
           );
           let result = generate_dart_code(root_dir, rinf_config);
           if let Err(err) = result {
-            eprintln!("{err}");
+            eprintln!("{}", err);
           }
         }
       }
       Err(err) => {
-        eprintln!("{err}");
+        eprintln!("{}", err);
         break;
       }
     }

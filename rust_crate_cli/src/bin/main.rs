@@ -2,7 +2,7 @@
 fn main() {
   let result = rinf_cli::run_command();
   if let Err(err) = result {
-    eprintln!("Error: {err}");
+    eprintln!("Error: {}", err);
   }
 }
 

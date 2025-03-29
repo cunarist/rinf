@@ -83,8 +83,8 @@ pub async fn calculate_precious_data() {
             .collect();
         let new_string = my_precious_data.input_string.to_uppercase();
 
-        debug_print!("{new_numbers:?}");
-        debug_print!("{new_string}");
+        debug_print!("{:?}", new_numbers);
+        debug_print!("{}", new_string);
     }
 }
 ```

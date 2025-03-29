@@ -54,7 +54,7 @@ where
     #[cfg(not(feature = "backtrace"))]
     {
       set_hook(Box::new(|panic_info| {
-        debug_print!("A panic occurred in Rust.\n{panic_info}");
+        debug_print!("A panic occurred in Rust.\n{}", panic_info);
       }));
     }
     #[cfg(feature = "backtrace")]
@@ -62,7 +62,11 @@ where
       use backtrace::Backtrace;
       set_hook(Box::new(|panic_info| {
         let backtrace = Backtrace::new();
-        debug_print!("A panic occurred in Rust.\n{panic_info}\n{backtrace:?}");
+        debug_print!(
+          "A panic occurred in Rust.\n{}\n{:?}",
+          panic_info,
+          backtrace
+        );
       }));
     }
   }

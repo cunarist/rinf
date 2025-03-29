@@ -157,7 +157,7 @@ impl PerformingActor {
       yield_now().await;
       let time_passed = get_current_time() - last_time;
       if time_passed.num_milliseconds() > 1000 {
-        debug_print!("Counted to {count}, yielding regularly.");
+        debug_print!("Counted to {}, yielding regularly.", count);
         last_time = get_current_time();
         steps_finished += 1;
         if steps_finished == 10 {
@@ -174,16 +174,16 @@ impl PerformingActor {
 
     // Get the current time.
     let current_time = get_current_time();
-    debug_print!("System time: {current_time}");
+    debug_print!("System time: {}", current_time);
 
     // Fetch data from a web API.
     let url = "http://jsonplaceholder.typicode.com/todos/1";
     let web_response = fetch_from_web_api(url).await?;
-    debug_print!("Response from a web API: {web_response:?}");
+    debug_print!("Response from a web API: {:?}", web_response);
 
     // Use a crate that accesses operating system APIs.
     let hwid = get_hardward_id()?;
-    debug_print!("Hardware ID: {hwid:?}");
+    debug_print!("Hardware ID: {:?}", hwid);
 
     Ok(())
   }
@@ -225,7 +225,7 @@ impl PerformingActor {
     }
     for join_handle in join_handles {
       if let Ok(text) = join_handle.await {
-        debug_print!("{text}");
+        debug_print!("{}", text);
       }
     }
   }

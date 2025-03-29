@@ -11,7 +11,7 @@ macro_rules! write_interface {
       use rinf::debug_print;
       let result = $crate::start_rust_logic(main);
       if let Err(err) = result {
-        debug_print!("{err}");
+        debug_print!("{}", err);
       }
     }
 
@@ -21,7 +21,7 @@ macro_rules! write_interface {
       use rinf::debug_print;
       let result = $crate::start_rust_logic(main);
       if let Err(err) = result {
-        debug_print!("{err}");
+        debug_print!("{}", err);
       }
     }
   };
@@ -45,7 +45,7 @@ macro_rules! debug_print {
                 rust_report.clone().into_bytes(),
             );
             if let Err(err) = result {
-                println!("{err}\n{rust_report}");
+                println!("{}\n{}", err, rust_report);
             }
         }
         #[cfg(not(debug_assertions))]

@@ -16,7 +16,7 @@ where
     use crate::debug_print;
     use std::panic::set_hook;
     set_hook(Box::new(|panic_info| {
-      debug_print!("A panic occurred in Rust.\n{panic_info}");
+      debug_print!("A panic occurred in Rust.\n{}", panic_info);
     }));
   }
 
