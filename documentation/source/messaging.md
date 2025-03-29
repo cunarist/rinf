@@ -2,16 +2,18 @@
 
 There are special comments that you can mark messages with.
 
-## Channels
+## Channel Signals
 
-`[RUST-SIGNAL]` generates a message channel from Rust to Dart.[^1] Use `[RUST-SIGNAL-BINARY]` to include binary data without the overhead of serialization.
+The `RustSignal` trait generates a message channel from Rust to Dart.[^1] Use the `RustSignalBinary` trait to include binary data without the overhead of serialization.
 
 [^1]: It’s important to note that when using [`StreamBuilder`](https://api.flutter.dev/flutter/widgets/StreamBuilder-class.html), it may only process the latest message from the stream to trigger a widget rebuild on the next render frame. Since widget builders are primarily focused on building widgets, they might skip some messages if multiple messages arrive within a single frame, typically around 16 milliseconds. To ensure that all messages from the stream are handled, you should consider using the [`Stream.listen`](https://api.flutter.dev/flutter/dart-async/Stream/listen.html) method instead.
 
-```{code-block} proto
-:caption: Protobuf
-// [RUST-SIGNAL]
-message MyDataOutput { bool my_field = 1; }
+```{code-block} rust
+:caption: Rust
+#[derive(Serialize, RustSignal)]
+struct MyDataOutput {
+  my_field: bool,
+}
 ```
 
 ```{code-block} rust
@@ -31,7 +33,7 @@ StreamBuilder(
       // Return an empty widget.
     }
     MyDataOutput message = rustSignal.message;
-    // Below requires `[RUST-SIGNAL-BINARY]`.
+    // Below requires `RustSignalBinary`.
     Uint8List binary = rustSignal.binary;
     // Return a filled widget.
   },
@@ -43,12 +45,14 @@ MyDataOutput.rustSignalStream.listen((rustSignal) {
 })
 ```
 
-`[DART-SIGNAL]` generates a message channel from Dart to Rust. Use `[DART-SIGNAL-BINARY]` to include binary data without the overhead of serialization.
+The `DartSignal` trait generates a message channel from Dart to Rust. Use the `DartSignalBinary` trait to include binary data without the overhead of serialization.
 
-```{code-block} proto
-:caption: Protobuf
-// [DART-SIGNAL]
-message MyDataInput { bool my_field = 1; }
+```{code-block} rust
+:caption: Rust
+#[derive(Deserialize, DartSignal)]
+struct MyDataInput {
+  my_field: bool,
+}
 ```
 
 ```{code-block} dart
@@ -60,19 +64,31 @@ MyDataInput(my_field: true).sendSignalToRust();
 :caption: Rust
 let receiver = MyDataInput::get_dart_signal_receiver();
 while let Some(dart_signal) = receiver.recv().await {
-    let message: MyDataInput = dart_signal.message;
-    // Below requires `[DART-SIGNAL-BINARY]`.
-    let binary: Vec<u8> = dart_signal.binary;
-    // Custom Rust logic goes here.
+  let message: MyDataInput = dart_signal.message;
+  // Below requires `DartSignalBinary`.
+  let binary: Vec<u8> = dart_signal.binary;
+  // Custom Rust logic goes here.
 }
 ```
 
-## Attributes
+## Nested Signals
 
-`[RUST-ATTRIBUTE(...)]` writes an attribute above the generated message struct in Rust. This is useful when you want to automatically implement a trait for the message struct in Rust.
+To nest a struct inside a signal struct, use the `SignalPiece` trait. A `SignalPiece` cannot be passed between languages independently, but it allows it to be nested inside a `RustSignal`, `DartSignal`, or another `SignalPiece`.
 
-```{code-block} proto
-:caption: Protobuf
-// [RUST-ATTRIBUTE(#[derive(Hash)])]
-message MyDataInput { bool my_field = 1; }
+```{code-block} rust
+:caption: Rust
+#[derive(Serialize, Deserialize, RustSignal, DartSignal)]
+struct Outer {
+  middle: Middle,
+}
+
+#[derive(Serialize, Deserialize, SignalPiece)]
+struct Middle {
+  inner: Inner,
+}
+
+#[derive(Serialize, Deserialize, SignalPiece)]
+struct Inner {
+  my_field: bool,
+}
 ```

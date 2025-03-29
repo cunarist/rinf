@@ -97,16 +97,6 @@ A Rust panic doesn't crash the app; it simply cancels the spawned async task. Yo
 
 ### How do I make Rust-analyzer lint in webassembly mode?
 
-There might be various Rust codes with these attribute above:
-
-```{code-block} rust
-:caption: Rust
-#[cfg(target_family = "wasm")]
-{}
-#[cfg(not(target_family = "wasm"))]
-{}
-```
-
 Since the environments of the web and native platforms are so different, there are times when you need to use these attributes to include and exclude parts of the code depending on whether they are targeting web or not.
 
 By default, Rust-analyzer runs in native mode. To make it run in webassembly mode, create the configuration file:
@@ -173,7 +163,7 @@ Exception has occurred.
 ArgumentError (Invalid argument(s): Failed to load dynamic library 'libhub.so': dlopen failed: cannot locate symbol "..." referenced by ...
 ```
 
-This happens when one or some of your Rust dependencies expect to have C or C++ libraries linked to the `hub` crate. Not all Rust crates on `crates.io` are written in pure Rust, and some depends on C code with `libc++`, `libstdc++`, etc.
+This can happen when one or some of your Rust dependencies expect to have C or C++ libraries linked to the `hub` crate. Not all Rust crates on `crates.io` are written in pure Rust, and some depends on C code with `libc++`, `libstdc++`, etc.
 
 To make `cargo` link those C or C++ libraries to your native library, create your `build.rs` file like below.
 
@@ -214,10 +204,10 @@ In this case, you can specify a path that points to the compiled Rust library. S
 
 ```{code-block} dart
 :caption: lib/main.dart
-import 'generated.dart';
+import 'src/bindings/bindings.dart';
 
 async void main() {
-  await initializeRust(compiledLibPath: '/path/to/library/libhub.so');
+  await initializeRust(compiledLibPath: 'path/to/library/libhub.so');
 }
 ```
 

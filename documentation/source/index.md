@@ -20,9 +20,8 @@
    printing-for-debugging.md
    graceful-shutdown.md
    configuration.md
+   unit-testing.md
    upgrading.md
    frequently-asked-questions.md
    contribution.md
 ```
-
-# TODO: Add a page about Flutter test

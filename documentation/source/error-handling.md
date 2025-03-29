@@ -15,18 +15,18 @@ We recommend that you _not_ write panicking code at all, since Rust has the idio
 ```{code-block} rust
 :caption: Rust
 fn not_good() {
-    let option = get_option();
-    let value_a = option.unwrap(); // This code can panic
-    let result = get_result();
-    let value_b = result.expect("This code can panic");
+  let option = get_option();
+  let value_a = option.unwrap(); // This code can panic
+  let result = get_result();
+  let value_b = result.expect("This code can panic");
 }
 
 fn good() -> Result<(), SomeError> {
-    let option = get_option();
-    let value_a = option.ok_or(SomeError)?;
-    let result = get_result();
-    let value_b = result?;
-    Ok(())
+  let option = get_option();
+  let value_a = option.ok_or(SomeError)?;
+  let result = get_result();
+  let value_b = result?;
+  Ok(())
 }
 ```
 
@@ -43,14 +43,16 @@ Therefore, it is advisable to utilize a single, flexible error type. You can def
 - [anyhow](https://crates.io/crates/anyhow)
 
 ```{code-block} rust
-use anyhow::Result;
+:caption: Rust
+use anyhow::{Context, Result};
 
 fn get_cluster_info() -> Result<ClusterMap> {
-    // `anyhow::Error` can be created from any error type.
-    // By using the `?` operator, the conversion happens automatically.
-    let config = std::fs::read_to_string("cluster.json")?;
-    let map: ClusterMap = serde_json::from_str(&config)?;
-    Ok(map)
+  // `anyhow::Error` can be created from any error type.
+  // By using the `?` operator, the conversion happens automatically.
+  let config = std::fs::read_to_string("cluster.json")?;
+  let map: ClusterMap = serde_json::from_str(&config)
+    .context("Failed to parse cluster configuration as JSON")?;
+  Ok(map)
 }
 ```
 

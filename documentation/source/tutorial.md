@@ -14,7 +14,7 @@ child: Column(
 
 ## From Dart to Rust
 
-# TODO: Update the tutorial and messaging section
+### TODO: Update the tutorial and messaging section
 
 Let's say that you want to create a new button in Dart that sends an array of numbers and a string to Rust. We need a signal to notify Rust that a user event has occurred.
 
@@ -69,23 +69,21 @@ use crate::common::*;
 use crate::messages::*;
 use rinf::debug_print;
 
-// TODO: Organize imports in code snippets
-
 pub async fn calculate_precious_data() {
-    let receiver = MyPreciousData::get_dart_signal_receiver(); // GENERATED
-    while let Some(dart_signal) = receiver.recv().await {
-        let my_precious_data = dart_signal.message;
+  let receiver = MyPreciousData::get_dart_signal_receiver(); // GENERATED
+  while let Some(dart_signal) = receiver.recv().await {
+    let my_precious_data = dart_signal.message;
 
-        let new_numbers: Vec<i32> = my_precious_data
-            .input_numbers
-            .into_iter()
-            .map(|x| x + 1)
-            .collect();
-        let new_string = my_precious_data.input_string.to_uppercase();
+    let new_numbers: Vec<i32> = my_precious_data
+      .input_numbers
+      .into_iter()
+      .map(|x| x + 1)
+      .collect();
+    let new_string = my_precious_data.input_string.to_uppercase();
 
-        debug_print!("{:?}", new_numbers);
-        debug_print!("{}", new_string);
-    }
+    debug_print!("{:?}", new_numbers);
+    debug_print!("{}", new_string);
+  }
 }
 ```
 
@@ -95,8 +93,8 @@ mod tutorial_functions;
 
 #[tokio::main]
 async fn main() {
-    tokio::spawn(tutorial_functions::calculate_precious_data());
-    rinf::dart_shutdown().await;
+  tokio::spawn(tutorial_functions::calculate_precious_data());
+  rinf::dart_shutdown().await;
 }
 ```
 
@@ -143,12 +141,12 @@ use crate::messages::*;
 use std::time::Duration;
 
 pub async fn stream_amazing_number() {
-    let mut current_number: i32 = 1;
-    loop {
-        tokio::time::sleep(Duration::from_secs(1)).await;
-        MyAmazingNumber { current_number }.send_signal_to_dart(); // GENERATED
-        current_number += 1;
-    }
+  let mut current_number: i32 = 1;
+  loop {
+    tokio::time::sleep(Duration::from_secs(1)).await;
+    MyAmazingNumber { current_number }.send_signal_to_dart(); // GENERATED
+    current_number += 1;
+  }
 }
 ```
 
@@ -158,8 +156,8 @@ mod tutorial_functions;
 
 #[tokio::main]
 async fn main() {
-    tokio::spawn(tutorial_functions::stream_amazing_number());
-    rinf::dart_shutdown().await;
+  tokio::spawn(tutorial_functions::stream_amazing_number());
+  rinf::dart_shutdown().await;
 }
 ```
 
@@ -238,13 +236,13 @@ use crate::common::*;
 use crate::messages::*;
 
 pub async fn tell_treasure() {
-    let mut current_value: i32 = 1;
+  let mut current_value: i32 = 1;
 
-    let receiver = MyTreasureInput::get_dart_signal_receiver(); // GENERATED
-    while let Some(_) = receiver.recv().await {
-        MyTreasureOutput { current_value }.send_signal_to_dart(); // GENERATED
-        current_value += 1;
-    }
+  let receiver = MyTreasureInput::get_dart_signal_receiver(); // GENERATED
+  while let Some(_) = receiver.recv().await {
+    MyTreasureOutput { current_value }.send_signal_to_dart(); // GENERATED
+    current_value += 1;
+  }
 }
 ```
 
@@ -254,7 +252,7 @@ mod tutorial_functions;
 
 #[tokio::main]
 async fn main() {
-    tokio::spawn(tutorial_functions::tell_treasure());
-    rinf::dart_shutdown().await;
+  tokio::spawn(tutorial_functions::tell_treasure());
+  rinf::dart_shutdown().await;
 }
 ```

@@ -14,8 +14,8 @@ Explicitly bind the `main` function in Rust with the async runtime of your choic
 :caption: Rust
 [tokio::main]
 async fn main() {
-    // Do whatever you want here.
-    rinf::dart_shutdown().await;
+  // Do whatever you want here.
+  rinf::dart_shutdown().await;
 }
 ```
 
@@ -36,7 +36,7 @@ import 'generated.dart';
 
 ```{code-block} rust
 :caption: Rust
-use crate::messages::*;
+use crate::messages::{MyMessage, AnotherMessage};
 ```
 
 When you need to run a Flutter web server, use `rinf server` to get the complete Flutter command with the necessary arguments.
@@ -48,7 +48,7 @@ rinf server
 
 ## Migrating from 7 to 8
 
-# TODO: Fill these in
+### TODO: Elaborate below
 
 - `cargo uninstall rinf` and `cargo install rinf_cli`
 - New signal code generation
