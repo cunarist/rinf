@@ -11,12 +11,21 @@ def run_subprocess(command: str, cwd: Path):
     run(command, cwd=cwd, check=True, shell=True)
 
 
-def replace_text_once(filepath: Path, change_from: str, change_to: str):
-    with open(filepath, mode="r", encoding="utf8") as file:
+def replace_text_once(file_path: Path, change_from: str, change_to: str):
+    with open(file_path, mode="r", encoding="utf8") as file:
         content: str = file.read()
     content = content.replace(change_from, change_to, 1)
-    with open(filepath, mode="w", encoding="utf8") as file:
+    with open(file_path, mode="w", encoding="utf8") as file:
         file.write(content)
+
+
+def search_all_files(dir: Path) -> list[Path]:
+    all_files: list[Path] = []
+    for root, _, files in walk(dir):
+        root_path = Path(root)
+        for file in files:
+            all_files.append(root_path / file)
+    return all_files
 
 
 def update_cargokit():
@@ -33,11 +42,11 @@ def update_cargokit():
 
 
 def prepare_test_app():
-    filepath = ROOT_DIR / ".gitignore"
-    with open(filepath, mode="r", encoding="utf8") as file:
+    file_path = ROOT_DIR / ".gitignore"
+    with open(file_path, mode="r", encoding="utf8") as file:
         content: str = file.read()
     content += "\n/test_app/"
-    with open(filepath, mode="w", encoding="utf8") as file:
+    with open(file_path, mode="w", encoding="utf8") as file:
         file.write(content)
 
     run_subprocess(
@@ -64,13 +73,17 @@ def prepare_test_app():
         "# tokio_with_wasm",
         "tokio_with_wasm",
     )
-    for root, _, files in walk(crate_path / "src"):
-        for file in files:
-            replace_text_once(
-                Path(root) / file,
-                "// use tokio_with_wasm::alias as tokio;",
-                "use tokio_with_wasm::alias as tokio;",
-            )
+    replace_text_once(
+        crate_path / "Cargo.toml",
+        "# wasm-bindgen",
+        "wasm-bindgen",
+    )
+    for file_path in search_all_files(crate_path / "src"):
+        replace_text_once(
+            file_path,
+            "// use tokio_with_wasm::alias as tokio;",
+            "use tokio_with_wasm::alias as tokio;",
+        )
 
     # Update workspace members.
     replace_text_once(
@@ -81,11 +94,11 @@ def prepare_test_app():
 
 
 def prepare_user_app():
-    filepath = ROOT_DIR / ".gitignore"
-    with open(filepath, mode="r", encoding="utf8") as file:
+    file_path = ROOT_DIR / ".gitignore"
+    with open(file_path, mode="r", encoding="utf8") as file:
         content: str = file.read()
     content += "\n/user_app/"
-    with open(filepath, mode="w", encoding="utf8") as file:
+    with open(file_path, mode="w", encoding="utf8") as file:
         file.write(content)
 
     run_subprocess(
