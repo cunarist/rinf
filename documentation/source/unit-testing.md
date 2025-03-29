@@ -17,6 +17,11 @@ async fn async_function() -> i32 {
 }
 ```
 
+```{code-block} shell
+:caption: CLI
+cargo test
+```
+
 ## Dart and Rust
 
 Writing tests that pass signals between Dart and Rust requires a few extra lines of code. First, you need to build the `hub` crate so that it is located in the `target` directory, and then load the dynamic library.
@@ -52,4 +57,9 @@ String getLibPath() {
     throw UnsupportedError('This operating system is not for tests');
   }
 }
+```
+
+```{code-block} shell
+:caption: CLI
+flutter test
 ```
