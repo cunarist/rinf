@@ -13,8 +13,6 @@ use tokio::spawn;
 // Uncomment below to target the web.
 // use tokio_with_wasm::alias as tokio;
 
-pub use first::*;
-
 /// Creates and spawns the actors in the async system.
 pub async fn create_actors() {
   // Though simple async tasks work, using the actor model

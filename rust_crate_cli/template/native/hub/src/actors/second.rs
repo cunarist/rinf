@@ -1,4 +1,5 @@
-use crate::actors::{FirstActor, SmallBool};
+use crate::actors::FirstActor;
+use crate::signals::{BigBool, SmallBool};
 use messages::prelude::{Actor, Address};
 use rinf::debug_print;
 use std::time::Duration;
@@ -20,10 +21,13 @@ impl SecondActor {
 }
 
 impl SecondActor {
-  async fn ask_first_actor(mut other_addr: Address<FirstActor>) {
+  async fn ask_first_actor(mut first_addr: Address<FirstActor>) {
     sleep(Duration::from_secs(10)).await;
-    let small_bool = SmallBool(true);
-    if let Ok(response) = other_addr.send(small_bool).await {
+    let big_bool = BigBool {
+      member: true,
+      nested: SmallBool(true),
+    };
+    if let Ok(response) = first_addr.send(big_bool).await {
       debug_print!("{}", response);
     }
   }

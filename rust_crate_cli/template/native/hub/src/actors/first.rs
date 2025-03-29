@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use crate::signals::{SmallNumber, SmallText};
+use crate::signals::{BigBool, SmallNumber, SmallText};
 use async_trait::async_trait;
 use messages::prelude::{Actor, Address, Context, Handler, Notifiable};
 use rinf::{DartSignal, RustSignal, debug_print};
@@ -43,10 +43,11 @@ impl Notifiable<SmallText> for FirstActor {
 // Implementing the `Handler` trait
 // allows an actor's loop to respond to a specific message type.
 #[async_trait]
-impl Handler<SmallBool> for FirstActor {
+impl Handler<BigBool> for FirstActor {
   type Result = bool;
-  async fn handle(&mut self, msg: SmallBool, _: &Context<Self>) -> bool {
-    !msg.0
+  async fn handle(&mut self, msg: BigBool, _: &Context<Self>) -> bool {
+    msg.send_signal_to_dart();
+    false
   }
 }
 
@@ -63,13 +64,9 @@ impl FirstActor {
   async fn listen_to_timer(mut self_addr: Address<Self>) {
     let mut time_interval = interval(Duration::from_secs(3));
     let text = "From an owned task".to_owned();
-    let small_text = SmallText { text };
     loop {
       time_interval.tick().await;
-      let _ = self_addr.notify(small_text.clone()).await;
+      let _ = self_addr.notify(SmallText { text: text.clone() }).await;
     }
   }
 }
-
-/// Simple wrapper struct for a boolean value.
-pub struct SmallBool(pub bool);
