@@ -666,6 +666,8 @@ pub fn watch_and_generate_dart_code(
   dimmedln!("Watching Rust files");
 
   loop {
+    // Sleep briefly to avoid busy looping.
+    std::thread::sleep(Duration::from_millis(100));
     // Block until an event is received.
     match receiver.recv() {
       Ok(event) => {
@@ -685,9 +687,6 @@ pub fn watch_and_generate_dart_code(
         break;
       }
     }
-
-    // Optional: sleep briefly to avoid busy looping (if necessary).
-    std::thread::sleep(Duration::from_millis(100));
   }
   Ok(())
 }
