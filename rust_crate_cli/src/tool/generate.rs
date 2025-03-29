@@ -10,7 +10,6 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{
   create_dir_all, read_dir, read_to_string, remove_dir_all, rename, write,
 };
-use std::hash::Hash;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::channel;
 use std::time::Duration;
@@ -20,7 +19,7 @@ use syn::{
   PathArguments, Type, TypeArray, TypePath, TypeTuple,
 };
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(PartialEq, Eq, PartialOrd, Ord)]
 enum SignalAttribute {
   SignalPiece,
   DartSignal,
