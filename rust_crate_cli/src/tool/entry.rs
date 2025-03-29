@@ -23,7 +23,7 @@ enum CliCommand {
   Template,
   /// Generate Dart code from Rust structs with attributes
   Gen {
-    /// Continuously watche Rust files
+    /// Continuously watch Rust files
     #[arg(short, long)]
     watch: bool,
   },
