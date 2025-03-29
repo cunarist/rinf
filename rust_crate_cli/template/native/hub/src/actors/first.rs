@@ -36,7 +36,7 @@ impl FirstActor {
 impl Notifiable<SmallText> for FirstActor {
   async fn notify(&mut self, msg: SmallText, _: &Context<Self>) {
     debug_print!("{}", msg.text);
-    Self::send_to_dart();
+    SmallNumber { number: 7 }.send_signal_to_dart();
   }
 }
 
@@ -51,11 +51,6 @@ impl Handler<SmallBool> for FirstActor {
 }
 
 impl FirstActor {
-  /// Sends a signal to Dart.
-  fn send_to_dart() {
-    SmallNumber { number: 7 }.send_signal_to_dart();
-  }
-
   /// Listen to an external source, which in this case is Dart.
   async fn listen_to_dart(mut self_addr: Address<Self>) {
     let receiver = SmallText::get_dart_signal_receiver();
