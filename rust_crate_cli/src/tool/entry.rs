@@ -1,10 +1,10 @@
+use crate::dimmedln;
 use crate::tool::{
   SetupError, apply_rust_template, build_webassembly,
   check_internet_connection, generate_dart_code, load_verified_rinf_config,
   provide_server_command, read_publish_to, watch_and_generate_dart_code,
 };
 use clap::{Parser, Subcommand};
-use owo_colors::OwoColorize;
 use std::env::current_dir;
 use std::path::Path;
 
@@ -54,7 +54,7 @@ pub fn run_command() -> Result<(), SetupError> {
   match cli.command {
     CliCommand::Config => {
       let rinf_config = load_verified_rinf_config(&root_dir)?;
-      println!("{}", rinf_config.dimmed());
+      dimmedln!("{}", rinf_config);
     }
     CliCommand::Template => {
       let rinf_config = load_verified_rinf_config(&root_dir)?;
@@ -72,13 +72,8 @@ pub fn run_command() -> Result<(), SetupError> {
     }
     CliCommand::Wasm { release } => {
       build_webassembly(&root_dir, release, is_internet_connected)?;
-      println!(
-        "WebAssembly module has been built and is ready in `web/pkg` 🎉"
-      );
-      println!(
-        "{}",
-        "To get the Flutter web server command, run `rinf server`".dimmed()
-      );
+      dimmedln!("To get the Flutter web server command, run `rinf server`");
+      println!("The WebAssembly module has been built to `web/pkg` 🎉");
     }
     CliCommand::Server => {
       provide_server_command()?;
@@ -86,7 +81,7 @@ pub fn run_command() -> Result<(), SetupError> {
         "Full `flutter run` command for the web",
         " has been copied to the clipboard"
       );
-      println!("{}", full_guide.dimmed());
+      dimmedln!("{}", full_guide);
     }
   }
 

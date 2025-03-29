@@ -24,3 +24,10 @@ pub fn check_internet_connection() -> bool {
     .map(|mut addrs| addrs.next().is_some())
     .unwrap_or(false)
 }
+
+#[macro_export]
+macro_rules! dimmedln {
+  ($($arg:tt)*) => {
+      println!("{}", owo_colors::OwoColorize::dimmed(&format!($($arg)*)));
+  };
+}

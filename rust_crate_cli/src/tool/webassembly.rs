@@ -1,3 +1,4 @@
+use crate::dimmedln;
 use crate::tool::{SetupError, run_subprocess};
 use std::path::Path;
 use std::process::Command;
@@ -10,27 +11,34 @@ pub fn build_webassembly(
   let total_steps = 3;
   let mut step = 0;
 
+  step += 1;
   if is_internet_connected {
-    step += 1;
-    println!(
+    dimmedln!(
       "[{}/{}] Installing Rust toolchain for the web",
-      step, total_steps
+      step,
+      total_steps
     );
     install_wasm_toolchain()?;
   } else {
-    println!("Skipping ensurement of Rust toolchain for the web");
+    dimmedln!(
+      "[{}/{}] Skipping ensurement of Rust toolchain for the web",
+      step,
+      total_steps
+    );
   }
 
   step += 1;
-  println!(
+  dimmedln!(
     "[{}/{}] Preparing WebAssembly output path",
-    step, total_steps
+    step,
+    total_steps
   );
 
   step += 1;
-  println!(
+  dimmedln!(
     "[{}/{}] Compiling Rust with `wasm-pack` to `web` target",
-    step, total_steps
+    step,
+    total_steps
   );
   compile_wasm(root_dir, is_release_mode)?;
 
