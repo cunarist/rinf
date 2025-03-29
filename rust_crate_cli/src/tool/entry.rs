@@ -23,18 +23,22 @@ enum CliCommand {
   Template,
   /// Generate Dart code from Rust structs with attributes
   Gen {
-    /// Continuously watches Rust files
+    /// Continuously watche Rust files
     #[arg(short, long)]
     watch: bool,
   },
   /// Build the WebAssembly module for the web
   Wasm {
-    /// Builds in release mode
+    /// Build in release mode
     #[arg(short, long)]
     release: bool,
   },
   /// Get full `flutter run` command with web headers
-  Server,
+  Server {
+    /// Include the release mode argument
+    #[arg(short, long)]
+    release: bool,
+  },
 }
 
 pub fn run_command() -> Result<(), SetupError> {
@@ -73,8 +77,8 @@ pub fn run_command() -> Result<(), SetupError> {
       dimmedln!("To get the Flutter web server command, run `rinf server`");
       println!("The WebAssembly module has been built to `web/pkg` 🎉");
     }
-    CliCommand::Server => {
-      provide_server_command()?;
+    CliCommand::Server { release } => {
+      provide_server_command(release)?;
       let full_guide = concat!(
         "Full `flutter run` command for the web",
         " has been copied to the clipboard"
