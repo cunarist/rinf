@@ -1,4 +1,5 @@
-use crate::tool::{RinfConfig, SetupError};
+use crate::dimmedln;
+use crate::tool::{CleanFileName, RinfConfig, SetupError};
 use convert_case::{Case, Casing};
 use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
 use serde_generate::dart::{CodeGenerator, Installer};
@@ -381,10 +382,7 @@ fn visit_rust_files(
   let entries = read_dir(dir)?;
   for entry in entries.filter_map(Result::ok) {
     let entry_path = entry.path();
-    let file_name_os = entry.file_name();
-    let file_name = file_name_os
-      .to_str()
-      .ok_or_else(|| SetupError::BadFilePath(entry.path()))?;
+    let file_name = entry_path.clean_file_name()?;
     if entry_path.is_dir() {
       // Recurse into subdirectory.
       visit_rust_files(entry_path, traced)?;
@@ -392,7 +390,7 @@ fn visit_rust_files(
       let content = read_to_string(&entry_path)?;
       let syntax_tree: File = syn::parse_file(&content)
         .map_err(|_| SetupError::CodeSyntax(file_name.to_owned()))?;
-      process_items_in_module(&syntax_tree.items, traced, file_name)?;
+      process_items_in_module(&syntax_tree.items, traced, &file_name)?;
     }
   }
   Ok(())
@@ -615,10 +613,7 @@ pub fn generate_dart_code(
   remove_dir_all(gen_dir.join("lib"))?;
 
   // Write the export file.
-  let gen_dir_name = gen_dir
-    .file_name()
-    .and_then(|s| s.to_str())
-    .unwrap_or("bindings");
+  let gen_dir_name = gen_dir.clean_file_name()?;
   write(
     gen_dir.join(format!("{gen_dir_name}.dart")),
     format!("export '{}/{}.dart';", MODULE_NAME, MODULE_NAME),
@@ -629,13 +624,13 @@ pub fn generate_dart_code(
   Ok(())
 }
 
-// TODO: `watch_and_generate_dart_code` is not tested, so check it later
-
 /// Watches the Rust source directory for changes and regenerates Dart code.
 pub fn watch_and_generate_dart_code(
   root_dir: &Path,
-  message_config: &RinfConfig,
+  rinf_config: &RinfConfig,
 ) -> Result<(), SetupError> {
+  // TODO: Watch crates from rinf config
+
   // Prepare the source directory for Rust files.
   let source_dir = root_dir.join("native").join("hub").join("src");
   if !source_dir.exists() {
@@ -649,10 +644,17 @@ pub fn watch_and_generate_dart_code(
 
   // Create a file system watcher using the new notify API.
   let mut watcher = RecommendedWatcher::new(
-    move |res: Result<Event, notify::Error>| {
+    move |event_result| {
       // Send events to the channel.
-      let result = sender.send(res);
-      if let Err(err) = result {
+      let event = match event_result {
+        Ok(inner) => inner,
+        Err(err) => {
+          eprintln!("Watch error: {err}");
+          return;
+        }
+      };
+      let send_result = sender.send(event);
+      if let Err(err) = send_result {
         eprintln!("{err}");
       }
     },
@@ -661,25 +663,25 @@ pub fn watch_and_generate_dart_code(
 
   // Start watching the source directory recursively.
   watcher.watch(&source_dir, RecursiveMode::Recursive)?;
+  dimmedln!("Watching Rust files");
 
   loop {
     // Block until an event is received.
     match receiver.recv() {
-      Ok(Ok(event)) => {
+      Ok(event) => {
         if should_regenerate(&event) {
-          eprintln!("File change detected: {:?}", event);
-          let result = generate_dart_code(root_dir, message_config);
+          dimmedln!(
+            "Change detected in file `{}`",
+            event.paths[0].clean_file_name()?
+          );
+          let result = generate_dart_code(root_dir, rinf_config);
           if let Err(err) = result {
             eprintln!("{err}");
           }
         }
       }
-      Ok(Err(e)) => {
-        eprintln!("Watch error: {:?}", e);
-        break;
-      }
-      Err(e) => {
-        eprintln!("Channel receive error: {:?}", e);
+      Err(err) => {
+        eprintln!("{err}");
         break;
       }
     }

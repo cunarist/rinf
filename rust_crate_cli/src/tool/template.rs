@@ -5,12 +5,14 @@ use include_dir::{Dir, include_dir};
 use std::fs::{create_dir_all, read_to_string, write};
 use std::path::Path;
 
+use super::CleanFileName;
+
 static TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/template");
 
 /// Creates new folders and files in an existing Flutter project folder.
 pub fn apply_rust_template(
   root_dir: &Path,
-  message_config: &RinfConfig,
+  rinf_config: &RinfConfig,
 ) -> Result<(), SetupError> {
   if root_dir.join("native").is_dir() {
     Err(SetupError::TemplateApplied)?;
@@ -36,7 +38,7 @@ pub fn apply_rust_template(
   run_subprocess("cargo", &["fmt"])?;
 
   // Generate Dart code.
-  generate_dart_code(root_dir, message_config)?;
+  generate_dart_code(root_dir, rinf_config)?;
 
   Ok(())
 }
@@ -63,13 +65,7 @@ fn dump_entry(
     }
     include_dir::DirEntry::File(file) => {
       let mut file_path = dest_path.join(file.path());
-      let file_name_os = file_path
-        .file_name()
-        .ok_or_else(|| SetupError::BadFilePath(file_path.clone()))?;
-      let file_name = file_name_os
-        .to_str()
-        .ok_or_else(|| SetupError::BadFilePath(file_path.clone()))?
-        .to_owned();
+      let file_name = file_path.clean_file_name()?;
       // The existence of files like `Cargo.toml` prevents us
       // from including the folder in the crate.
       // That's why we add the `.template` extension to them.
