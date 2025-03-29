@@ -1,6 +1,6 @@
 use std::error::Error;
-use std::ffi::OsString;
 use std::fmt::{Display, Formatter};
+use std::path::PathBuf;
 
 /// Error type for Rinf configuration loading.
 #[derive(Debug)]
@@ -9,15 +9,15 @@ pub enum SetupError {
   Io(std::io::Error),
   Yaml(serde_yml::Error),
   Clipboard(arboard::Error),
-  CodeSyntax(syn::Error),
   WatchingFile(notify::Error),
   // Below are manually constructed variants.
   ReflectionModule,
   PubConfig(String),
-  BadFilePath(OsString),
+  BadFilePath(PathBuf),
   ProjectStructure(&'static str),
   TemplateApplied,
   DuplicatedSignal(String),
+  CodeSyntax(String),
 }
 
 impl Error for SetupError {
@@ -26,7 +26,6 @@ impl Error for SetupError {
       Self::Io(e) => Some(e),
       Self::Yaml(e) => Some(e),
       Self::Clipboard(e) => Some(e),
-      Self::CodeSyntax(e) => Some(e),
       Self::WatchingFile(e) => Some(e),
       _ => None,
     }
@@ -45,9 +44,6 @@ impl Display for SetupError {
       Self::Clipboard(e) => {
         write!(f, "Failed to use clipboard: {}", e)
       }
-      Self::CodeSyntax(e) => {
-        write!(f, "Invalid code syntax: {}", e)
-      }
       Self::WatchingFile(e) => {
         write!(f, "Failed to watch files: {}", e)
       }
@@ -57,8 +53,8 @@ impl Display for SetupError {
       Self::PubConfig(s) => {
         write!(f, "Invalid `pubspec.yaml` config: {}", s)
       }
-      Self::BadFilePath(s) => {
-        write!(f, "Not a valid file path: `{}`", s.to_string_lossy())
+      Self::BadFilePath(p) => {
+        write!(f, "Not a valid file path: `{}`", p.display())
       }
       Self::ProjectStructure(s) => {
         write!(f, "Invalid project structure: {}", s)
@@ -68,6 +64,9 @@ impl Display for SetupError {
       }
       Self::DuplicatedSignal(n) => {
         write!(f, "Duplicated signals named `{}` were found", n)
+      }
+      Self::CodeSyntax(n) => {
+        write!(f, "Invalid syntax in file `{}`", n)
       }
     }
   }
@@ -88,12 +87,6 @@ impl From<serde_yml::Error> for SetupError {
 impl From<arboard::Error> for SetupError {
   fn from(err: arboard::Error) -> Self {
     Self::Clipboard(err)
-  }
-}
-
-impl From<syn::Error> for SetupError {
-  fn from(err: syn::Error) -> Self {
-    Self::CodeSyntax(err)
   }
 }
 

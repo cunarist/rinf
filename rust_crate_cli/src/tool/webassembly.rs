@@ -63,7 +63,7 @@ fn compile_wasm(
   let out_path = root_dir.join("web").join("pkg");
   let out_string = out_path
     .to_str()
-    .ok_or_else(|| SetupError::BadFilePath(out_path.as_os_str().into()))?;
+    .ok_or_else(|| SetupError::BadFilePath(out_path.clone()))?;
   let mut wasm_pack_args = vec![
     "--quiet",
     "build",

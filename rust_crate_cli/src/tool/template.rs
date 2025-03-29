@@ -66,12 +66,10 @@ fn dump_entry(
       let mut file_path = dest_path.join(file.path());
       let file_name_os = file_path
         .file_name()
-        .ok_or_else(|| SetupError::BadFilePath(file_path.as_os_str().into()))?;
-      let file_name = file_path
-        .file_name()
-        .ok_or_else(|| SetupError::BadFilePath(file_name_os.into()))?
+        .ok_or_else(|| SetupError::BadFilePath(file_path.clone()))?;
+      let file_name = file_name_os
         .to_str()
-        .ok_or_else(|| SetupError::BadFilePath(file_name_os.into()))?
+        .ok_or_else(|| SetupError::BadFilePath(file_path.clone()))?
         .to_owned();
       // The existence of files like `Cargo.toml` prevents us
       // from including the folder in the crate.

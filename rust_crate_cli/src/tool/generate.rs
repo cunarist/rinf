@@ -28,37 +28,39 @@ enum SignalAttribute {
   RustSignalBinary,
 }
 
-fn extract_signal_attribute(
+fn extract_signal_attributes(
   attrs: &[Attribute],
-) -> Result<BTreeSet<SignalAttribute>, SetupError> {
+) -> Option<BTreeSet<SignalAttribute>> {
   let mut extracted_attrs = BTreeSet::new();
   for attr in attrs.iter() {
     if !attr.path().is_ident("derive") {
       continue;
     }
-    attr.parse_nested_meta(|meta| {
-      let Some(last_segment) = meta.path.segments.last() else {
-        return Err(syn::Error::new(
-          meta.path.span(),
-          "Missing derive item name",
-        ));
-      };
-      let ident: &str = &last_segment.ident.to_string();
-      let signal_attr_op = match ident {
-        "SignalPiece" => Some(SignalAttribute::SignalPiece),
-        "DartSignal" => Some(SignalAttribute::DartSignal),
-        "DartSignalBinary" => Some(SignalAttribute::DartSignalBinary),
-        "RustSignal" => Some(SignalAttribute::RustSignalBinary),
-        "RustSignalBinary" => Some(SignalAttribute::RustSignalBinary),
-        _ => None,
-      };
-      if let Some(signal_attr) = signal_attr_op {
-        extracted_attrs.insert(signal_attr);
-      }
-      Ok(())
-    })?;
+    attr
+      .parse_nested_meta(|meta| {
+        let Some(last_segment) = meta.path.segments.last() else {
+          return Err(syn::Error::new(
+            meta.path.span(),
+            "Missing derive item name",
+          ));
+        };
+        let ident: &str = &last_segment.ident.to_string();
+        let signal_attr_op = match ident {
+          "SignalPiece" => Some(SignalAttribute::SignalPiece),
+          "DartSignal" => Some(SignalAttribute::DartSignal),
+          "DartSignalBinary" => Some(SignalAttribute::DartSignalBinary),
+          "RustSignal" => Some(SignalAttribute::RustSignalBinary),
+          "RustSignalBinary" => Some(SignalAttribute::RustSignalBinary),
+          _ => None,
+        };
+        if let Some(signal_attr) = signal_attr_op {
+          extracted_attrs.insert(signal_attr);
+        }
+        Ok(())
+      })
+      .ok()?;
   }
-  Ok(extracted_attrs)
+  Some(extracted_attrs)
 }
 
 fn extract_doc_comment(attrs: &[Attribute]) -> String {
@@ -321,22 +323,24 @@ fn check_signal_name(name: &str, traced: &Traced) -> Result<(), SetupError> {
 }
 
 /// Process AST items and record struct types in the registry.
-fn process_items(
+fn process_items_in_module(
   items: &[Item],
   traced: &mut Traced,
+  file_name: &str,
 ) -> Result<(), SetupError> {
   for item in items {
     match item {
       Item::Mod(m) if m.content.is_some() => {
         // Recursively process items in nested modules.
         if let Some(inner_items) = m.content.as_ref().map(|p| &p.1) {
-          process_items(inner_items, traced)?;
+          process_items_in_module(inner_items, traced, file_name)?;
         }
       }
       Item::Struct(s) => {
         let item_name = s.ident.to_string();
         check_signal_name(&item_name, traced)?;
-        let signal_attrs = extract_signal_attribute(&s.attrs)?;
+        let signal_attrs = extract_signal_attributes(&s.attrs)
+          .ok_or(SetupError::CodeSyntax(file_name.to_owned()))?;
         if !signal_attrs.is_empty() {
           trace_struct(traced, s);
           traced.signal_attrs.insert(item_name.clone(), signal_attrs);
@@ -348,7 +352,8 @@ fn process_items(
       Item::Enum(e) => {
         let item_name = e.ident.to_string();
         check_signal_name(&item_name, traced)?;
-        let signal_attrs = extract_signal_attribute(&e.attrs)?;
+        let signal_attrs = extract_signal_attributes(&e.attrs)
+          .ok_or(SetupError::CodeSyntax(file_name.to_owned()))?;
         if !signal_attrs.is_empty() {
           trace_enum(traced, e);
           traced.signal_attrs.insert(item_name.clone(), signal_attrs);
@@ -375,14 +380,19 @@ fn visit_rust_files(
 ) -> Result<(), SetupError> {
   let entries = read_dir(dir)?;
   for entry in entries.filter_map(Result::ok) {
-    let path = entry.path();
-    if path.is_dir() {
+    let entry_path = entry.path();
+    let file_name_os = entry.file_name();
+    let file_name = file_name_os
+      .to_str()
+      .ok_or_else(|| SetupError::BadFilePath(entry.path()))?;
+    if entry_path.is_dir() {
       // Recurse into subdirectory.
-      visit_rust_files(path, traced)?;
+      visit_rust_files(entry_path, traced)?;
     } else {
-      let content = read_to_string(path)?;
-      let syntax_tree: File = syn::parse_file(&content)?;
-      process_items(&syntax_tree.items, traced)?;
+      let content = read_to_string(&entry_path)?;
+      let syntax_tree: File = syn::parse_file(&content)
+        .map_err(|_| SetupError::CodeSyntax(file_name.to_owned()))?;
+      process_items_in_module(&syntax_tree.items, traced, file_name)?;
     }
   }
   Ok(())
@@ -573,8 +583,6 @@ pub fn generate_dart_code(
     let source_dir = root_dir.join("native").join(crate_name).join("src");
     visit_rust_files(source_dir, &mut traced)?;
   }
-
-  // TODO: Warn properly when Rust syntax is invalid
 
   // Empty the generation folder.
   let gen_dir = root_dir.join(rinf_config.gen_output_dir.clone());
