@@ -6,7 +6,7 @@ use syn::{
   parse_macro_input,
 };
 
-static BANNED_PREFIX: &str = "Rinf";
+static BANNED_LOWER_PREFIX: &str = "rinf";
 
 /// Marks the struct as a signal
 /// that can be nested within other signals.
@@ -20,7 +20,7 @@ pub fn derive_signal_piece(input: TokenStream) -> TokenStream {
   let name_lit = name.to_string();
 
   // Check the name.
-  if name_lit.starts_with(BANNED_PREFIX) {
+  if name_lit.to_lowercase().starts_with(BANNED_LOWER_PREFIX) {
     return create_name_error(ast);
   }
 
@@ -73,7 +73,7 @@ fn derive_dart_signal_real(
   let upper_snake_name = name_lit.to_case(Case::UpperSnake);
 
   // Check the name.
-  if name_lit.starts_with(BANNED_PREFIX) {
+  if name_lit.to_lowercase().starts_with(BANNED_LOWER_PREFIX) {
     return create_name_error(ast);
   }
 
@@ -191,7 +191,7 @@ fn derive_rust_signal_real(
   let name_lit = name.to_string();
 
   // Check the name.
-  if name_lit.starts_with(BANNED_PREFIX) {
+  if name_lit.to_lowercase().starts_with(BANNED_LOWER_PREFIX) {
     return create_name_error(ast);
   }
 
@@ -312,7 +312,7 @@ fn create_name_error(ast: DeriveInput) -> TokenStream {
     ast.ident,
     format!(
       "The name of a foreign signal cannot start with `{}`",
-      BANNED_PREFIX
+      BANNED_LOWER_PREFIX
     ),
   )
   .to_compile_error()
