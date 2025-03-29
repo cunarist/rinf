@@ -312,6 +312,14 @@ fn trace_enum(traced: &mut Traced, item: &ItemEnum) {
   traced.registry.insert(type_name, container);
 }
 
+/// Checks that the name of newly found signal is usable.
+fn check_signal_name(name: &str, traced: &Traced) -> Result<(), SetupError> {
+  if traced.registry.contains_key(name) {
+    Err(SetupError::DuplicatedSignal(name.to_owned()))?
+  }
+  Ok(())
+}
+
 /// Process AST items and record struct types in the registry.
 fn process_items(
   items: &[Item],
@@ -327,6 +335,7 @@ fn process_items(
       }
       Item::Struct(s) => {
         let item_name = s.ident.to_string();
+        check_signal_name(&item_name, traced)?;
         let signal_attrs = extract_signal_attribute(&s.attrs)?;
         if !signal_attrs.is_empty() {
           trace_struct(traced, s);
@@ -338,6 +347,7 @@ fn process_items(
       }
       Item::Enum(e) => {
         let item_name = e.ident.to_string();
+        check_signal_name(&item_name, traced)?;
         let signal_attrs = extract_signal_attribute(&e.attrs)?;
         if !signal_attrs.is_empty() {
           trace_enum(traced, e);
@@ -352,9 +362,6 @@ fn process_items(
   }
   Ok(())
 }
-
-// TODO: Warn overlapping type names
-// TODO: Disallow type names that starts with "Rinf"
 
 struct Traced {
   registry: BTreeMap<String, ContainerFormat>,

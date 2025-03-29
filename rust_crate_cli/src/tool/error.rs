@@ -17,6 +17,7 @@ pub enum SetupError {
   BadFilePath(OsString),
   ProjectStructure(&'static str),
   TemplateApplied,
+  DuplicatedSignal(String),
 }
 
 impl Error for SetupError {
@@ -64,6 +65,9 @@ impl Display for SetupError {
       }
       Self::TemplateApplied => {
         write!(f, "Rust template has already been applied")
+      }
+      Self::DuplicatedSignal(n) => {
+        write!(f, "Duplicated signals named `{}` were found", n)
       }
     }
   }

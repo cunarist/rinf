@@ -6,6 +6,8 @@ use syn::{
   parse_macro_input,
 };
 
+static BANNED_PREFIX: &str = "Rinf";
+
 /// Marks the struct as a signal
 /// that can be nested within other signals.
 /// A `SignalPiece` cannot be sent independently
@@ -15,6 +17,12 @@ pub fn derive_signal_piece(input: TokenStream) -> TokenStream {
   // Collect information about the item.
   let ast = parse_macro_input!(input as DeriveInput);
   let name = &ast.ident;
+  let name_lit = name.to_string();
+
+  // Check the name.
+  if name_lit.starts_with(BANNED_PREFIX) {
+    return create_name_error(ast);
+  }
 
   // Ban generic types.
   if ast.generics.params.iter().count() != 0 {
@@ -25,7 +33,7 @@ pub fn derive_signal_piece(input: TokenStream) -> TokenStream {
   let where_clause = match &ast.data {
     Data::Struct(data_struct) => get_struct_where_clause(data_struct),
     Data::Enum(data_enum) => get_enum_where_clause(data_enum),
-    _ => return create_item_error(ast),
+    _ => return TokenStream::new(),
   };
 
   // Automatically implement the signal trait for the struct.
@@ -61,6 +69,11 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
   let snake_name = name_lit.to_case(Case::Snake);
   let upper_snake_name = name_lit.to_case(Case::UpperSnake);
 
+  // Check the name.
+  if name_lit.starts_with(BANNED_PREFIX) {
+    return create_name_error(ast);
+  }
+
   // Ban generic types.
   if ast.generics.params.iter().count() != 0 {
     return create_generic_error(ast);
@@ -70,7 +83,7 @@ fn derive_dart_signal_real(input: TokenStream) -> TokenStream {
   let where_clause = match &ast.data {
     Data::Struct(data_struct) => get_struct_where_clause(data_struct),
     Data::Enum(data_enum) => get_enum_where_clause(data_enum),
-    _ => return create_item_error(ast),
+    _ => return TokenStream::new(),
   };
 
   // Collect identifiers and names.
@@ -171,6 +184,11 @@ fn derive_rust_signal_real(
   let name = &ast.ident;
   let name_lit = name.to_string();
 
+  // Check the name.
+  if name_lit.starts_with(BANNED_PREFIX) {
+    return create_name_error(ast);
+  }
+
   // Ban generic types.
   if ast.generics.params.iter().count() != 0 {
     return create_generic_error(ast);
@@ -180,7 +198,7 @@ fn derive_rust_signal_real(
   let where_clause = match &ast.data {
     Data::Struct(data_struct) => get_struct_where_clause(data_struct),
     Data::Enum(data_enum) => get_enum_where_clause(data_enum),
-    _ => return create_item_error(ast),
+    _ => return TokenStream::new(),
   };
 
   // Implement methods and extern functions.
@@ -282,13 +300,19 @@ fn get_enum_where_clause(data_enum: &DataEnum) -> proc_macro2::TokenStream {
 }
 
 fn create_generic_error(ast: DeriveInput) -> TokenStream {
-  Error::new_spanned(ast, "A foreign signal type cannot be generic")
+  Error::new_spanned(ast.generics, "A foreign signal type cannot be generic")
     .to_compile_error()
     .into()
 }
 
-fn create_item_error(ast: DeriveInput) -> TokenStream {
-  Error::new_spanned(ast, "Only enums and structs can be a foreign signal")
-    .to_compile_error()
-    .into()
+fn create_name_error(ast: DeriveInput) -> TokenStream {
+  Error::new_spanned(
+    ast.ident,
+    format!(
+      "The name of a foreign signal cannot start with `{}`",
+      BANNED_PREFIX
+    ),
+  )
+  .to_compile_error()
+  .into()
 }
