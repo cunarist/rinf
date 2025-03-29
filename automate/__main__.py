@@ -42,6 +42,7 @@ def update_cargokit():
 
 
 def prepare_test_app():
+    # Prevent side effects.
     file_path = ROOT_DIR / ".gitignore"
     with open(file_path, mode="r", encoding="utf8") as file:
         content: str = file.read()
@@ -49,11 +50,11 @@ def prepare_test_app():
     with open(file_path, mode="w", encoding="utf8") as file:
         file.write(content)
 
+    # Initialize a Flutter app.
     run_subprocess(
         "flutter create test_app",
         ROOT_DIR,
     )
-
     run_subprocess(
         "dart pub add rinf --path=../flutter_package",
         ROOT_DIR / "test_app",
@@ -94,6 +95,7 @@ def prepare_test_app():
 
 
 def prepare_user_app():
+    # Prevent side effects.
     file_path = ROOT_DIR / ".gitignore"
     with open(file_path, mode="r", encoding="utf8") as file:
         content: str = file.read()
@@ -101,11 +103,11 @@ def prepare_user_app():
     with open(file_path, mode="w", encoding="utf8") as file:
         file.write(content)
 
+    # Initialize a Flutter app.
     run_subprocess(
         "flutter create user_app",
         ROOT_DIR,
     )
-
     run_subprocess(
         "flutter pub add rinf",
         ROOT_DIR / "user_app",
