@@ -14,7 +14,7 @@ child: Column(
 
 ## From Dart to Rust
 
-### TODO: Update the tutorial and messaging section
+TODO: Update the tutorial and messaging section
 
 Let's say that you want to create a new button in Dart that sends an array of numbers and a string to Rust. We need a signal to notify Rust that a user event has occurred.
 
