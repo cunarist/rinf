@@ -69,38 +69,26 @@ cargo install rinf_cli
 
 Modify your dependencies:
 
-```{code-block} yaml
-:caption: pubspec.yaml (Before)
-dependencies:
+```{code-block} diff
+:caption: pubspec.yaml
+  dependencies:
+    # ...
+-   rinf: ^7.0.0
+-   protobuf: ^3.1.0
+-   fixnum: ^1.1.0
++   rinf: ^8.0.0
++   tuple: ^2.0.2
++   meta: ^1.16.0
+```
+
+```{code-block} diff
+:caption: native/hub/Cargo.toml
+  [dependencies]
   # ...
-  rinf: ^7.0.0
-  protobuf: ^3.1.0
-  fixnum: ^1.1.0
-```
-
-```{code-block} yaml
-:caption: pubspec.yaml (After)
-dependencies:
-  # ...
-  rinf: ^8.0.0
-  tuple: ^2.0.2
-  meta: ^1.16.0
-```
-
-```{code-block} toml
-:caption: native/hub/Cargo.toml (Before)
-[dependencies]
-# ...
-rinf = "7.0.0"
-prost = "0.12.6"
-```
-
-```{code-block} toml
-:caption: native/hub/Cargo.toml (After)
-[dependencies]
-# ...
-rinf = "8.0.0"
-serde = "1.0.202"
+- rinf = "7.0.0"
+- prost = "0.12.6"
++ rinf = "8.0.0"
++ serde = "1.0.202"
 ```
 
 Move all Protobuf messages into the `hub` crate. Placing them inside `native/hub/src/signals/mod.rs` can be a good starting point, though any location within the `hub` crate is acceptable:
@@ -140,30 +128,20 @@ rinf gen
 
 Import generated classes in Dart from the `bindings` module:
 
-```{code-block} dart
-:caption: Dart (Before)
-import 'package:my_app/messages/all.dart';
-```
-
-```{code-block} dart
-:caption: Dart (After)
-import 'package:my_app/src/bindings/bindings.dart';
+```{code-block} diff
+:caption: Dart
+- import 'package:my_app/messages/all.dart';
++ import 'package:my_app/src/bindings/bindings.dart';
 ```
 
 The methods of signal structs are the same, but they have now become trait methods. You should explicitly import the traits to ensure the methods still work:
 
-```{code-block} rust
-:caption: Rust (Before)
-SomeMessage {}.send_signal_to_dart();
-let receiver = SomeMessage::get_dart_signal_receiver();
-```
+```{code-block} diff
+:caption: Rust
++ use rinf::{DartSignal, RustSignal};
 
-```{code-block} rust
-:caption: Rust (After)
-use rinf::{DartSignal, RustSignal};
-
-SomeMessage {}.send_signal_to_dart();
-let receiver = SomeMessage::get_dart_signal_receiver();
+  SomeMessage {}.send_signal_to_dart();
+  let receiver = SomeMessage::get_dart_signal_receiver();
 ```
 
 Finally, verify that your Rinf configurations in `pubspec.yaml` conform to the new format, if present. Don't forget to update the `.gitignore` and `README.md` files as well!
