@@ -211,7 +211,7 @@ fn derive_rust_signal_real(
   let expanded = if include_binary {
     quote! {
       impl rinf::RustSignalBinary for #name #where_clause {
-        fn send_signal_to_dart(self, binary: Vec<u8>) {
+        fn send_signal_to_dart(&self, binary: Vec<u8>) {
           use rinf::{AppError, debug_print, send_rust_signal, serialize};
           let type_name = #name_lit;
           let message_result: Result<Vec<u8>, AppError> =
@@ -234,7 +234,7 @@ fn derive_rust_signal_real(
   } else {
     quote! {
       impl rinf::RustSignal for #name #where_clause {
-        fn send_signal_to_dart(self) {
+        fn send_signal_to_dart(&self) {
           use rinf::{AppError, debug_print, send_rust_signal, serialize};
           let type_name = #name_lit;
           let message_result: Result<Vec<u8>, AppError> =

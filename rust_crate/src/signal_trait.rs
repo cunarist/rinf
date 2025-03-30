@@ -32,7 +32,7 @@ pub trait DartSignal<T> {
 pub trait RustSignalBinary {
   /// Sends a signal to Dart with separate binary data.
   /// Passing data from Dart to Rust is a zero-copy operation.
-  fn send_signal_to_dart(self, binary: Vec<u8>);
+  fn send_signal_to_dart(&self, binary: Vec<u8>);
 }
 
 /// Defines the methods that a type capable of
@@ -40,7 +40,7 @@ pub trait RustSignalBinary {
 pub trait RustSignal {
   /// Sends a signal to Dart.
   /// Passing data from Dart to Rust is a zero-copy operation.
-  fn send_signal_to_dart(self);
+  fn send_signal_to_dart(&self);
 }
 
 /// Ensures that all inner structs and enums
