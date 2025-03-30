@@ -121,21 +121,23 @@ def prepare_user_app():
     remove(ROOT_DIR / "user_app" / "Cargo.toml")
 
     # Enable the web target, since it's not enabled by default.
+    crate_path = ROOT_DIR / "user_app" / "native" / "hub"
     replace_text_once(
-        ROOT_DIR / "user_app" / "native" / "hub" / "src" / "lib.rs",
-        "// use tokio_with_wasm::alias as tokio;",
-        "use tokio_with_wasm::alias as tokio;",
-    )
-    replace_text_once(
-        ROOT_DIR / "user_app" / "native" / "hub" / "Cargo.toml",
+        crate_path / "Cargo.toml",
         "# tokio_with_wasm",
         "tokio_with_wasm",
     )
     replace_text_once(
-        ROOT_DIR / "user_app" / "native" / "hub" / "Cargo.toml",
+        crate_path / "Cargo.toml",
         "# wasm-bindgen",
         "wasm-bindgen",
     )
+    for file_path in search_all_files(crate_path / "src"):
+        replace_text_once(
+            file_path,
+            "// use tokio_with_wasm::alias as tokio;",
+            "use tokio_with_wasm::alias as tokio;",
+        )
 
     # Update workspace members.
     replace_text_once(
