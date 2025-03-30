@@ -57,12 +57,12 @@ jobs:
       - name: Check Rust crates
         run: |
           cargo publish --dry-run --manifest-path rust_crate_proc/Cargo.toml
-          cargo publish --dry-run --manifest-path rust_crate_command/Cargo.toml
+          cargo publish --dry-run --manifest-path rust_crate_cli/Cargo.toml
           cargo publish --dry-run --manifest-path rust_crate/Cargo.toml
 
       - name: Publish Rust crates
         run: |
           cargo login ${{ secrets.CRATES_IO_API_TOKEN }}
           cargo publish --manifest-path rust_crate_proc/Cargo.toml
-          cargo publish --manifest-path rust_crate_command/Cargo.toml
+          cargo publish --manifest-path rust_crate_cli/Cargo.toml
           cargo publish --manifest-path rust_crate/Cargo.toml
