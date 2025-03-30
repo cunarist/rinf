@@ -45,7 +45,6 @@ pub trait RustSignal {
 
 /// Ensures that all inner structs and enums
 /// within signal structs and enums are also signals.
-#[doc(hidden)]
 pub trait SignalPiece {}
 
 // Implement the trait for simple primitives.
