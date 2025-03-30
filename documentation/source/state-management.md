@@ -8,60 +8,59 @@ Rinf performs best when the application logic is written entirely in Rust, with 
 
 The actor model is highly recommended for managing asynchronous state in Rust. By encapsulating state and behavior within actor structs, which maintain ownership and handle their own async tasks, the actor model provides a scalable and modular way to manage complex state interactions.
 
-Here’s a basic example using the [`messages`](https://crates.io/crates/messages) crate, which is a flexible and runtime-agnostic actor library that works nicely with Rinf.
+The default Rust template provided by Rinf provides a good starting point. Below is a short example of how actors work:
 
 ```{code-block} rust
 :caption: native/hub/src/lib.rs
-use messages::prelude::*;
-use rinf::debug_print;
+use async_trait::async_trait;
+use messages::prelude::{Actor, Address, Context, Notifiable};
+use rinf::{dart_shutdown, debug_print};
+use tokio::spawn;
 
 rinf::write_interface!();
 
-// Represents a message to calculate the sum of two numbers.
+/// Represents a message to calculate the sum of two numbers.
 struct Sum(usize, usize);
 
-// Actor definition that will hold state in real apps.
-struct Calculator;
+/// Actor definition that will hold state in real apps.
+struct MyActor {
+  count: i32,
+}
 
-// Implement `Actor` trait for `Calculator`.
-impl Actor for Calculator {}
+impl Actor for MyActor {}
 
-// Implement `Handler` for `Calculator` to handle `Sum` messages.
+impl MyActor {
+  pub fn new() -> Self {
+    Self { count: 0 }
+  }
+}
+
 #[async_trait]
-impl Handler<Sum> for Calculator {
-    type Result = usize;
-    async fn handle(&mut self, msg: Sum, _: &Context<Self>) -> Self::Result {
-        msg.0 + msg.1
-    }
+impl Notifiable<Sum> for MyActor {
+  async fn notify(&mut self, msg: Sum, _: &Context<Self>) {
+    self.count += 1;
+    debug_print!("{}: {}", msg.0 + msg.1, self.count);
+  }
 }
 
-// Implement the start method for `Calculator`.
-impl Calculator {
-    pub fn start() -> Address<Self> {
-        let context = Context::new();
-        let actor = Self {};
-        let addr = context.address();
-        tokio::spawn(context.run(actor));
-        addr
-    }
+fn create_actors() -> Address<MyActor> {
+  let context = Context::new();
+  let addr = context.address();
+  let actor = MyActor::new();
+  spawn(context.run(actor));
+  addr
 }
 
-// Main function to start the business logic.
+/// Main function to start the business logic.
 #[tokio::main]
 async fn main() {
-    let mut addr = Calculator::start();
-    let result = addr.send(Sum(10, 5)).await;
-    match result {
-        Ok(inner) => debug_print!("SUM: {}", inner),
-        _ => debug_print!("Communication to the actor has failed"),
-    }
-    rinf::dart_shutdown().await;
+  let mut addr = create_actors();
+  let _ = addr.notify(Sum(10, 5)).await;
+  dart_shutdown().await;
 }
 ```
 
-Several crates on `crates.io` provide building blocks for implementing the actor model in Rust. Consider exploring these crates to find one that aligns with your requirements.
-
-Please refer to the [example code](https://github.com/cunarist/rinf/tree/main/flutter_package/example) for detailed usage.
+Please refer to the [example app](https://github.com/cunarist/rinf/tree/main/flutter_package/example) for detailed usage.
 
 ## Static Variables
 
@@ -75,12 +74,13 @@ use tokio::sync::Mutex;
 static VECTOR: Mutex<Vec<bool>> = Mutex::const_new(Vec::new());
 
 pub async fn do_something_with_state() {
-    VECTOR.lock().await.push(true);
+  // Use the global variable by locking it temporarily.
+  VECTOR.lock().await.push(true);
 
-    // Use the global variable by acquiring the guard.
-    let guard = VECTOR.lock().await;
-    let length = guard.len();
-    debug_print!("{length}");
+  // Use the global variable by acquiring the guard.
+  let guard = VECTOR.lock().await;
+  let length = guard.len();
+  debug_print!("{}", length);
 }
 ```
 

@@ -23,16 +23,15 @@ flutter doctor
 You also need to have the CLI tool for Rinf ready.
 
 ```shell
-cargo install rinf
+cargo install rinf_cli
 ```
 
-Messages sent between Dart and Rust are implemented using Protobuf.
-If you have newly cloned the project repository
-or made changes to the `.proto` files in the `./messages` directory,
-run the following command:
+Signals sent between Dart and Rust are implemented using signal attributes.
+If you've modified the signal structs, run the following command
+to generate the corresponding Dart classes:
 
 ```shell
-rinf message
+rinf gen
 ```
 
 Now you can run and build this app just like any other Flutter projects.

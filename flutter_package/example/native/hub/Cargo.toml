@@ -2,7 +2,7 @@
 # Do not change the name of this crate.
 name = "hub"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [lib]
 # `lib` is required for non-library targets,
@@ -11,9 +11,14 @@ edition = "2021"
 # `staticlib` is for iOS and macOS.
 crate-type = ["lib", "cdylib", "staticlib"]
 
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+wildcard_imports = "deny"
+
 [dependencies]
-rinf = "7.3.1"
-prost = "0.13.0"
+rinf = "8.0.0-alpha"
+serde = { version = "1", features = ["derive"] }
 tokio = { version = "1", features = ["rt", "sync", "time", "macros"] }
 tokio_with_wasm = { version = "0.8.1", features = [
     "rt",
@@ -21,7 +26,8 @@ tokio_with_wasm = { version = "0.8.1", features = [
     "time",
     "macros",
 ] }
-wasm-bindgen = "0.2.95"
+wasm-bindgen = "0.2.100"
+async-trait = "0.1.87"
 messages = "0.3.1"
 anyhow = "1.0.89"
 sample_crate = { path = "../sample_crate" }

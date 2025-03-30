@@ -28,8 +28,8 @@ migrate_working_dir/
 build/
 
 # Rust related
-.cargo/
-target/
+/.cargo/
+/target/
 
 # Others
 *.lock

@@ -1,4 +1,4 @@
-# Basic Tutorial
+# Tutorial
 
 To grasp the basic concepts, it's beneficial to follow a step-by-step tutorial.
 
@@ -6,7 +6,7 @@ Before we start, make sure that there's a `Column` somewhere in your widget tree
 
 ```{code-block} dart
 :caption: lib/main.dart
-child: Column(
+Column(
   mainAxisAlignment: MainAxisAlignment.center,
   children: [],
 )
@@ -16,34 +16,34 @@ child: Column(
 
 Let's say that you want to create a new button in Dart that sends an array of numbers and a string to Rust. We need a signal to notify Rust that a user event has occurred.
 
-Write a new `.proto` file in the `./messages` directory with a new message. Note that the message should have the comment `[DART-SIGNAL]` above it.
+Write a new signal struct in the `hub` crate. Note that the message should have the attribute `DartSignal` above it.
 
-```{code-block} proto
-:caption: messages/tutorial_messages.proto
-syntax = "proto3";
-package tutorial_messages;
+```{code-block} rust
+:caption: native/hub/src/signals/mod.rs
+use rinf::DartSignal;
+use serde::Deserialize;
 
-// [DART-SIGNAL]
-message MyPreciousData {
-  repeated int32 input_numbers = 1;
-  string input_string = 2;
+#[derive(Deserialize, DartSignal)]
+pub struct MyPreciousData {
+  pub input_numbers: Vec<i32>,
+  pub input_string: String,
 }
 ```
 
-Next, generate Dart and Rust message code from `.proto` files.
+Next, generate Dart code from annotated signal structs.
 
 ```{code-block} shell
 :caption: CLI
-rinf message
+rinf gen
 ```
 
 Create a button widget in Dart that accepts the user input.
 
 ```{code-block} dart
 :caption: lib/main.dart
-import 'package:test_app/messages/all.dart';
+import 'package:my_app/src/bindings/bindings.dart';
 
-child: Column(
+Column(
   mainAxisAlignment: MainAxisAlignment.center,
   children: [
     ElevatedButton(
@@ -63,25 +63,24 @@ Let's listen to this message in Rust. This simple function will add one to each 
 
 ```{code-block} rust
 :caption: native/hub/src/tutorial_functions.rs
-use crate::common::*;
-use crate::messages::*;
-use rinf::debug_print;
+use crate::signals::MyPreciousData;
+use rinf::{DartSignal, debug_print};
 
 pub async fn calculate_precious_data() {
-    let receiver = MyPreciousData::get_dart_signal_receiver(); // GENERATED
-    while let Some(dart_signal) = receiver.recv().await {
-        let my_precious_data = dart_signal.message;
+  let receiver = MyPreciousData::get_dart_signal_receiver(); // GENERATED
+  while let Some(signal_pack) = receiver.recv().await {
+    let my_precious_data = signal_pack.message;
 
-        let new_numbers: Vec<i32> = my_precious_data
-            .input_numbers
-            .into_iter()
-            .map(|x| x + 1)
-            .collect();
-        let new_string = my_precious_data.input_string.to_uppercase();
+    let new_numbers: Vec<i32> = my_precious_data
+      .input_numbers
+      .into_iter()
+      .map(|x| x + 1)
+      .collect();
+    let new_string = my_precious_data.input_string.to_uppercase();
 
-        debug_print!("{new_numbers:?}");
-        debug_print!("{new_string}");
-    }
+    debug_print!("{:?}", new_numbers);
+    debug_print!("{}", new_string);
+  }
 }
 ```
 
@@ -89,10 +88,13 @@ pub async fn calculate_precious_data() {
 :caption: native/hub/src/lib.rs
 mod tutorial_functions;
 
+use tokio::spawn;
+use tutorial_functions::calculate_precious_data;
+
 #[tokio::main]
 async fn main() {
-    tokio::spawn(tutorial_functions::calculate_precious_data());
-    rinf::dart_shutdown().await;
+  spawn(calculate_precious_data());
+  dart_shutdown().await;
 }
 ```
 
@@ -108,43 +110,43 @@ flutter: ZERO-COST ABSTRACTION
 
 Let's say that you want to send increasing numbers every second from Rust to Dart.
 
-Define the message. Note that the message should have the comment `[RUST-SIGNAL]` above it.
+Define the signal struct. Note that the struct should have the attribute `RustSignal` above it.
 
-```{code-block} proto
-:caption: messages/tutorial_messages.proto
-syntax = "proto3";
-package tutorial_messages;
+```{code-block} rust
+:caption: native/hub/src/signals/mod.rs
+use rinf::RustSignal;
+use serde::Serialize;
 
-// [RUST-SIGNAL]
-message MyAmazingNumber { int32 current_number = 1; }
+#[derive(Serialize, RustSignal)]
+pub struct MyAmazingNumber {
+  pub current_number: i32,
+}
 ```
 
-Generate Dart and Rust message code from `.proto` files.
+Generate Dart signal classes.
 
 ```{code-block} shell
 :caption: CLI
-rinf message
+rinf gen
 ```
 
 Define an async Rust function that runs forever, sending numbers to Dart every second.
 
-```{code-block} toml
-:caption: "native/hub/Cargo.toml"
-tokio = { version = "1", features = ["sync", "rt", "time"] }
-```
-
 ```{code-block} rust
 :caption: native/hub/src/tutorial_functions.rs
-use crate::messages::*;
+use crate::signals::MyAmazingNumber;
+use rinf::RustSignal;
 use std::time::Duration;
+use tokio::time::interval;
 
 pub async fn stream_amazing_number() {
-    let mut current_number: i32 = 1;
-    loop {
-        tokio::time::sleep(Duration::from_secs(1)).await;
-        MyAmazingNumber { current_number }.send_signal_to_dart(); // GENERATED
-        current_number += 1;
-    }
+  let mut current_number: i32 = 1;
+  let mut time_interval = interval(Duration::from_secs(1));
+  loop {
+    time_interval.tick().await;
+    MyAmazingNumber { current_number }.send_signal_to_dart(); // GENERATED
+    current_number += 1;
+  }
 }
 ```
 
@@ -152,10 +154,14 @@ pub async fn stream_amazing_number() {
 :caption: native/hub/src/lib.rs
 mod tutorial_functions;
 
+use tokio::spawn;
+use tutorial_functions::stream_amazing_number;
+
 #[tokio::main]
 async fn main() {
-    tokio::spawn(tutorial_functions::stream_amazing_number());
-    rinf::dart_shutdown().await;
+  // ...
+  tokio::spawn(stream_amazing_number());
+  dart_shutdown().await;
 }
 ```
 
@@ -163,58 +169,65 @@ Finally, receive the signals in Dart with `StreamBuilder` and rebuild the widget
 
 ```{code-block} dart
 :caption: lib/main.dart
-import 'package:test_app/messages/all.dart';
+import 'package:my_app/src/bindings/bindings.dart';
 
-children: [
-  StreamBuilder(
-    stream: MyAmazingNumber.rustSignalStream, // GENERATED
-    builder: (context, snapshot) {
-      final rustSignal = snapshot.data;
-      if (rustSignal == null) {
-        return Text('Nothing received yet');
-      }
-      final myAmazingNumber = rustSignal.message;
-      final currentNumber = myAmazingNumber.currentNumber;
-      return Text(currentNumber.toString());
-    },
-  ),
-]
+Column(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [
+    // ...
+    StreamBuilder(
+      stream: MyAmazingNumber.rustSignalStream, // GENERATED
+      builder: (context, snapshot) {
+        final signalPack = snapshot.data;
+        if (signalPack == null) {
+          return Text('Nothing received yet');
+        }
+        final myAmazingNumber = signalPack.message;
+        final currentNumber = myAmazingNumber.currentNumber;
+        return Text(currentNumber.toString());
+      },
+    ),
+  ],
+),
 ```
 
 ## Back and Forth
 
 You can easily show the updated state on the screen by combining those two ways of message passing.
 
-```{code-block} proto
-:caption: messages/tutorial_messages.proto
-syntax = "proto3";
-package tutorial_messages;
+```{code-block} rust
+:caption: native/hub/src/signals/mod.rs
+use rinf::{DartSignal, RustSignal};
+use serde::{Deserialize, Serialize};
 
-// [DART-SIGNAL]
-message MyTreasureInput {}
+#[derive(Deserialize, DartSignal)]
+pub struct MyTreasureInput {}
 
-// [RUST-SIGNAL]
-message MyTreasureOutput { int32 current_value = 1; }
+#[derive(Serialize, RustSignal)]
+pub struct MyTreasureOutput {
+  pub current_value: i32,
+}
 ```
 
 ```{code-block} shell
 :caption: CLI
-rinf message
+rinf gen
 ```
 
 ```{code-block} dart
 :caption: lib/main.dart
-import 'package:test_app/messages/all.dart';
+import 'package:my_app/src/bindings/bindings.dart';
 
 children: [
+  // ...
   StreamBuilder(
     stream: MyTreasureOutput.rustSignalStream, // GENERATED
     builder: (context, snapshot) {
-      final rustSignal = snapshot.data;
-      if (rustSignal == null) {
+      final signalPack = snapshot.data;
+      if (signalPack == null) {
         return Text('No value yet');
       }
-      final myTreasureOutput = rustSignal.message;
+      final myTreasureOutput = signalPack.message;
       final currentNumber = myTreasureOutput.currentValue;
       return Text('Output value is $currentNumber');
     },
@@ -230,17 +243,17 @@ children: [
 
 ```{code-block} rust
 :caption: native/hub/src/tutorial_functions.rs
-use crate::common::*;
-use crate::messages::*;
+use crate::signals::{MyTreasureInput, MyTreasureOutput};
+use rinf::{DartSignal, RustSignal};
 
 pub async fn tell_treasure() {
-    let mut current_value: i32 = 1;
+  let mut current_value: i32 = 1;
 
-    let receiver = MyTreasureInput::get_dart_signal_receiver(); // GENERATED
-    while let Some(_) = receiver.recv().await {
-        MyTreasureOutput { current_value }.send_signal_to_dart(); // GENERATED
-        current_value += 1;
-    }
+  let receiver = MyTreasureInput::get_dart_signal_receiver(); // GENERATED
+  while let Some(_) = receiver.recv().await {
+    MyTreasureOutput { current_value }.send_signal_to_dart(); // GENERATED
+    current_value += 1;
+  }
 }
 ```
 
@@ -248,9 +261,13 @@ pub async fn tell_treasure() {
 :caption: native/hub/src/lib.rs
 mod tutorial_functions;
 
+use tokio::spawn;
+use tutorial_functions::tell_treasure;
+
 #[tokio::main]
 async fn main() {
-    tokio::spawn(tutorial_functions::tell_treasure());
-    rinf::dart_shutdown().await;
+  // ...
+  spawn(tell_treasure());
+  dart_shutdown().await;
 }
 ```

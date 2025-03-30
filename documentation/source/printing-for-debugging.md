@@ -7,7 +7,7 @@ When writing Rust code in the `hub` crate, you can simply print your debug messa
 ```{code-block} rust
 :caption: Rust
 use rinf::debug_print;
-debug_print!("My object is {my_object:?}");
+debug_print!("My object is {:?}", my_object);
 ```
 
 `debug_print!` is also better than `println!` because it only works in debug mode, resulting in a smaller and cleaner release binary.

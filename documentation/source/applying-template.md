@@ -17,12 +17,10 @@ Now install the command executable to easily run Rinf commands in the CLI.[^1]
 
 ```{code-block} shell
 :caption: CLI
-cargo install rinf
+cargo install rinf_cli
 ```
 
-Then, simply run this in the command-line[^2] from your Flutter project's directory.
-
-[^2]: If you encounter issues with the automated `protoc` installation, likely due to GitHub API access restrictions, you can [manually install it](https://grpc.io/docs/protoc-installation/) on your machine and add it to PATH. You can verify the installation by running the command `protoc --version` to ensure that the Protobuf compiler is ready on your machine. Rinf will detect and use the manually installed `protoc` if it exists.
+Then, simply run this in the command-line from your Flutter project's directory.
 
 ```{code-block} shell
 :caption: CLI
@@ -40,9 +38,6 @@ After running the command, you'll have new files and folders as your starter Rus
 *   │   ├── main.dart
     │   └── ...
     ├── linux/
-+   ├── messages/
-+   │   ├── basic.proto
-+   │   └── README.md
 +   ├── native/
 +   │   ├── hub/
 +   │   │   ├── src/
@@ -59,8 +54,8 @@ After running the command, you'll have new files and folders as your starter Rus
 
 Various comments are written in the actual code to help you understand the whole structure.
 
-If you already have a Rust crate that you want to use here, just put it inside `./native` and set it as a dependency of the `hub` crate.
+If you already have a Rust crate that you want to use here, just put it inside `native` and set it as a dependency of the `hub` crate.
 
-Now, by heading over to `./native/hub/src/lib.rs`, you can start writing Rust!
+Now, by heading over to `native/hub/src/lib.rs`, you can start writing Rust!
 
 Example code for guidance can be found [here](https://github.com/cunarist/rinf/tree/main/flutter_package/example).

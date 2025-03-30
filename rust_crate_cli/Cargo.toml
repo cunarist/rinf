@@ -1,0 +1,32 @@
+[package]
+name = "rinf_cli"
+version = "8.0.0-alpha"
+edition = "2024"
+license = "MIT"
+description = "Rust for native business logic, Flutter for flexible and beautiful GUI"
+repository = "https://github.com/cunarist/rinf"
+documentation = "https://rinf.cunarist.com"
+include = ["/src/", "/template/"]
+
+[[bin]]
+name = "rinf"
+path = "src/bin/main.rs"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+wildcard_imports = "deny"
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+serde = { version = "1", features = ["derive"] }
+clap = { version = "4.5.32", features = ["derive"] }
+owo-colors = "4.2.0"
+syn = { version = "2.0.98", features = ["full"] }
+quote = "1.0.38"
+serde_yml = "0.0.12"
+serde-reflection = "0.5.0"
+serde-generate = "0.29.0"
+include_dir = "0.7.4"
+convert_case = "0.8.0"
+arboard = "3.4.1"
+notify = "8.0.0"

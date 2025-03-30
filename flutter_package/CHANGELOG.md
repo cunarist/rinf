@@ -1,3 +1,7 @@
+## 8.0.0-alpha
+
+- This is an alpha version.
+
 ## 7.3.1
 
 - Pinned the version of automatically installed `protoc`.
