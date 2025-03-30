@@ -74,7 +74,7 @@ while let Some(signal_pack) = receiver.recv().await {
 
 ## Nested Signals
 
-To nest a struct inside a signal struct, use the `SignalPiece` trait. A `SignalPiece` cannot be passed between languages independently, but it allows the struct to be nested inside a `RustSignal`, `DartSignal`, or another `SignalPiece`.
+To nest a struct inside a signal struct, use the `SignalPiece` trait. A `SignalPiece` cannot be passed between languages independently, but it can be nested inside a `RustSignal`, `DartSignal`, or another `SignalPiece`.
 
 ```{code-block} rust
 :caption: Rust
