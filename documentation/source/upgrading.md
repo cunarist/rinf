@@ -112,11 +112,13 @@ message MessageA {}
 
 // [RUST-SIGNAL]
 message MessageB {}
+
+message MessageC {}
 ```
 
 ```{code-block} rust
 :caption: Rust (After)
-use rinf::{DartSignal, RustSignal};
+use rinf::{DartSignal, RustSignal, SignalPiece};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, DartSignal)]
@@ -124,6 +126,9 @@ struct MessageA {}
 
 #[derive(Serialize, RustSignal)]
 struct MessageB {}
+
+#[derive(SignalPiece)] // Add `Serialize` or `Deserialize` as necessary
+struct MessageC {}
 ```
 
 To generate the corresponding Dart code, use `rinf gen` instead of `rinf message`. After the new Dart code is generated in `lib/src/bindings`, you might need to manually remove the `lib/messages` and `native/hub/src/messages` directories:
