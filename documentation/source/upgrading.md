@@ -126,7 +126,7 @@ struct MessageA {}
 struct MessageB {}
 ```
 
-To generate the corresponding Dart code, use `rinf gen` instead of `rinf message`:
+To generate the corresponding Dart code, use `rinf gen` instead of `rinf message`. After the new Dart code is generated in `lib/src/bindings`, you might need to manually remove the `lib/messages` and `native/hub/src/messages` directories:
 
 ```{code-block} shell
 :caption: CLI
