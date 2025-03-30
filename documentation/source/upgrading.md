@@ -49,7 +49,7 @@ rinf server
 
 ## Migrating from 7 to 8
 
-The way signal messages are used remains unchanged, but their declaration has become much cleaner. Now, we define the structs in Rust and annotate them with signal trait attributes. Protobuf is no longer used.
+The way signal messages are used remains unchanged, but their declaration has become much cleaner. Now, we define Rust structs and annotate them with signal trait attributes. Protobuf is no longer used.
 
 Replace the Rinf CLI tool with the new one.
 
@@ -57,6 +57,42 @@ Replace the Rinf CLI tool with the new one.
 :caption: CLI
 cargo uninstall rinf
 cargo install rinf_cli
+```
+
+Modify your dependencies.
+
+```{code-block} yaml
+:caption: pubspec.yaml (Before)
+dependencies:
+  # ...
+  rinf: ^7.0.0
+  protobuf: ^3.1.0
+  fixnum: ^1.1.0
+```
+
+```{code-block} yaml
+:caption: pubspec.yaml (After)
+dependencies:
+  # ...
+  rinf: ^8.0.0
+  tuple: ^2.0.2
+  meta: ^1.16.0
+```
+
+```{code-block} toml
+:caption: native/hub/Cargo.toml (Before)
+[dependencies]
+# ...
+rinf = "7.0.0"
+prost = "0.12.6"
+```
+
+```{code-block} toml
+:caption: native/hub/Cargo.toml (After)
+[dependencies]
+# ...
+rinf = "8.0.0"
+serde = "1.0.202"
 ```
 
 Move all Protobuf messages into the `hub` crate. Placing them inside `native/hub/src/signals/mod.rs` can be a good starting point, though any location within the `hub` crate is acceptable.
@@ -81,14 +117,6 @@ struct MessageA {}
 #[derive(Serialize, RustSignal)]
 struct MessageB {}
 ```
-
-There are 5 signal attributes, as follows:
-
-- `DartSignal`
-- `DartSignalBinary`
-- `RustSignal`
-- `RustSignalBinary`
-- `SignalPiece`
 
 To generate the corresponding Dart code, use `rinf gen` instead of `rinf message`.
 
@@ -133,7 +161,7 @@ rustup update
 rustc --version
 ```
 
-Finally, verify that your Rinf configurations in `pubspec.yaml` conform to the new format, if present.
+Finally, verify that your Rinf configurations in `pubspec.yaml` conform to the new format, if present. Don't forget to update the `.gitignore` and `README.md` files as well!
 
 ```{code-block} shell
 :caption: CLI
