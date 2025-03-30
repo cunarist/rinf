@@ -51,7 +51,15 @@ rinf server
 
 The way signal messages are used remains unchanged, but their declaration has become much cleaner. Now, we define Rust structs and annotate them with signal trait attributes. Protobuf is no longer used.
 
-Replace the Rinf CLI tool with the new one.
+First, Rinf now requires Rust 1.85 with the 2024 edition. Run the following commands to update:
+
+```{code-block} shell
+:caption: CLI
+rustup update
+rustc --version
+```
+
+Replace the Rinf CLI tool with the new one:
 
 ```{code-block} shell
 :caption: CLI
@@ -59,7 +67,7 @@ cargo uninstall rinf
 cargo install rinf_cli
 ```
 
-Modify your dependencies.
+Modify your dependencies:
 
 ```{code-block} yaml
 :caption: pubspec.yaml (Before)
@@ -95,7 +103,7 @@ rinf = "8.0.0"
 serde = "1.0.202"
 ```
 
-Move all Protobuf messages into the `hub` crate. Placing them inside `native/hub/src/signals/mod.rs` can be a good starting point, though any location within the `hub` crate is acceptable.
+Move all Protobuf messages into the `hub` crate. Placing them inside `native/hub/src/signals/mod.rs` can be a good starting point, though any location within the `hub` crate is acceptable:
 
 ```{code-block} proto
 :caption: Protobuf (Before)
@@ -118,7 +126,7 @@ struct MessageA {}
 struct MessageB {}
 ```
 
-To generate the corresponding Dart code, use `rinf gen` instead of `rinf message`.
+To generate the corresponding Dart code, use `rinf gen` instead of `rinf message`:
 
 ```{code-block} shell
 :caption: CLI
@@ -137,7 +145,7 @@ import 'package:my_app/messages/all.dart';
 import 'package:my_app/src/bindings/bindings.dart';
 ```
 
-The methods of signal structs are the same, but they have now become trait methods. You should explicitly import the traits to ensure the methods still work.
+The methods of signal structs are the same, but they have now become trait methods. You should explicitly import the traits to ensure the methods still work:
 
 ```{code-block} rust
 :caption: Rust (Before)
@@ -151,14 +159,6 @@ use rinf::{DartSignal, RustSignal};
 
 SomeMessage {}.send_signal_to_dart();
 let receiver = SomeMessage::get_dart_signal_receiver();
-```
-
-Also, Rinf now requires Rust 1.85 with the 2024 edition:
-
-```{code-block} shell
-:caption: CLI
-rustup update
-rustc --version
 ```
 
 Finally, verify that your Rinf configurations in `pubspec.yaml` conform to the new format, if present. Don't forget to update the `.gitignore` and `README.md` files as well!
