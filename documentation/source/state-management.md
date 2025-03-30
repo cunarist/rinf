@@ -27,17 +27,14 @@ struct MyActor {
   count: i32,
 }
 
-// Implement `Actor` trait for `MyActor`.
 impl Actor for MyActor {}
 
-// Implement the start method for `MyActor`.
 impl MyActor {
   pub fn new() -> Self {
     Self { count: 0 }
   }
 }
 
-// Implement `Handler` for `MyActor` to handle `Sum` messages.
 #[async_trait]
 impl Notifiable<Sum> for MyActor {
   async fn notify(&mut self, msg: Sum, _: &Context<Self>) {
