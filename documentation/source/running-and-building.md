@@ -17,7 +17,7 @@ To build the app for a specific platform:
 
 ```{code-block} shell
 :caption: CLI
-flutter build [platform] # Replace it with a platform name
+flutter build [platform]
 ```
 
 ## For the Web
@@ -29,7 +29,6 @@ You need to manually build webassembly module from Rust before running or buildi
 To serve[^3] the web application[^4]:
 
 [^3]: Note that Flutter apps in debug mode are known to be quite slow on the web. It is recommended to use profile mode when testing on a web browser.
-
 [^4]: Since repeatedly writing web header arguments during development can be overwhelming, Rinf provides a convenient command `rinf server` that prints the full Flutter web command.
 
 ```{code-block} shell
