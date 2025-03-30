@@ -1,6 +1,6 @@
 [package]
 name = "rinf_cli"
-version = "7.3.0"
+version = "8.0.0-alpha"
 edition = "2024"
 license = "MIT"
 description = "Rust for native business logic, Flutter for flexible and beautiful GUI"
