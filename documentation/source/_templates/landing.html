@@ -34,43 +34,56 @@
     justify-content: center;
     text-align: center;
   }
-  .preview-image {
-    border-radius: 2.5%;
+  .preview-frame {
+    border-radius: 12px;
     box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.4);
-    width: 400px;
-    max-width: 60svw;
-    outline: 1px solid rgba(122, 122, 122, 1);
-    outline-offset: -1px;
-    filter: grayscale();
-    margin: 24px;
+    width: round(80svw, 1px);
+    max-width: 600px;
+    height: round(60svh, 1px);
+    max-height: 600px;
+    border: 1px solid rgba(122, 122, 122, 0.5);
+    border-width: 30px 1px 1px 1px;
   }
   .project-title {
     margin: 0em;
     font-size: 2.4em;
     font-weight: 200;
+    text-shadow: 0px 0px 16px black, 0px 0px 16px black, 0px 0px 16px black,
+      0px 0px 16px black, 0px 0px 16px black, 0px 0px 16px black;
   }
   .project-info {
-    opacity: 0.6;
+    text-shadow: 0px 0px 16px black, 0px 0px 16px black, 0px 0px 16px black,
+      0px 0px 16px black;
   }
   .spacing {
-    height: 48px;
+    height: 12px;
+  }
+  .stack-layers {
+    position: relative;
+  }
+  .text-overlay {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
   }
 </style>
 
 <div class="outermost">
-  <div class="spacing"></div>
-  <div>
-    <a href="https://rinf-demo.cunarist.com" target="_blank" title="Visit demo">
-      <img
-        src="/_static/preview.webp"
-        loop
-        class="preview-image"
-        draggable="false"
-      />
-    </a>
-  </div>
-  <div>
-    <p class="project-title">Rinf</p>
-    <p class="project-info"><strong>RUST IN FLUTTER</strong></p>
+  <div class="stack-layers"></div>
+  <div style="position: relative">
+    <iframe src="/_static/web_app/" class="preview-frame"></iframe>
+    <div class="text-overlay">
+      <div class="spacing"></div>
+      <p class="project-title">Rinf</p>
+      <p class="project-info"><strong>RUST IN FLUTTER</strong></p>
+    </div>
   </div>
 </div>
