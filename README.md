@@ -33,8 +33,8 @@ Below is Rust code with business logic, and following that is Dart code with wid
 
 ```rust
 MyMessage {
-    current_number: 7,
-    other_bool: true,
+  current_number: 7,
+  other_bool: true,
 }
 .send_signal_to_dart();
 ```
