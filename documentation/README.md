@@ -8,6 +8,12 @@ Generate the static documentation files for publication on the web.
 uv run sphinx-build -M dirhtml source dist
 ```
 
+Serve the built files locally.
+
+```shell
+uv run python server.py
+```
+
 Automatically apply changes while writing.
 
 ```shell
