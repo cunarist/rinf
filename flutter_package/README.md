@@ -14,7 +14,7 @@ Rinf is a framework for creating beautiful and performant cross-platform apps us
 
 ## 📖 Documentation
 
-Visit the [documentation](https://rinf.cunarist.com) to learn everything about using this framework. A demo web app is also available.
+Visit the [documentation](https://rinf.cunarist.com) to learn everything about using this framework. You can also explore the [example code](https://github.com/cunarist/rinf/tree/main/flutter_package/example).
 
 ## 🖥️ Platform Support
 
