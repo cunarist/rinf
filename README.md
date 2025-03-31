@@ -12,9 +12,9 @@
 
 Rinf is a framework for creating beautiful and performant cross-platform apps using Flutter and Rust with batteries fully included. Simply add this framework to your app project, and you're all set to write Flutter and Rust together!
 
-## 🎮 Demo
+## 📖 Documentation
 
-Visit the [demo](https://rinf-demo.cunarist.com/) running on the web to experience the smoothness and delightfulness that comes from the combination of Flutter and Rust. You can also dive into the [example code](https://github.com/cunarist/rinf/tree/main/flutter_package/example).
+Visit the [documentation](https://rinf.cunarist.com) to learn everything about using this framework. A demo web app is also available.
 
 ## 🖥️ Platform Support
 
@@ -80,10 +80,6 @@ Flutter is a powerful and versatile framework that has gained immense popularity
 While Dart excels as an amazing object-oriented language for GUI apps, its non-native garbage collection may not always meet demanding performance requirements, and it may lack advanced data manipulation packages. This is where Rust steps in, offering an incredible speed advantage of roughly [2~40 times faster](https://programming-language-benchmarks.vercel.app/dart-vs-rust) than Dart, alongside the ability to leverage multiple threads and various crates that get the job done.
 
 Rust has garnered a devoted following, being [the most loved programming language](https://survey.stackoverflow.co/2022#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages) on Stack Overflow. Its native performance, thanks to the zero-cost abstraction philosophy, ensures high productivity. Many developers foresee Rust potentially replacing C++ in the future. Rust's simplicity, memory safety, superior performance in various scenarios, vibrant community, and robust tooling support contribute to its growing popularity.
-
-## 📖 Documentation
-
-Check out the [documentation](https://rinf.cunarist.com) for everything you need to know about how to use this thing.
 
 ## 👥 Contribution
 
