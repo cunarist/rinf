@@ -20,7 +20,7 @@ Future<void> initializeRust(
 
   // Add the print delegation endpoint.
   assignRustSignal['RinfOut'] = (messageBytes, binary) {
-    String rustReport = utf8.decode(binary);
+    final rustReport = utf8.decode(binary);
     print(rustReport);
   };
 
