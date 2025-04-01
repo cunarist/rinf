@@ -18,11 +18,15 @@ Future<void> initializeRust(
     setCompiledLibPathReal(compiledLibPath);
   }
 
-  // Add the print delegation endpoint.
-  assignRustSignal['RinfOut'] = (messageBytes, binary) {
-    final rustReport = utf8.decode(binary);
-    print(rustReport);
-  };
+  // Add the print delegation endpoint
+  // when the app is running in debug mode.
+  assert(() {
+    assignRustSignal['RinfPrint'] = (messageBytes, binary) {
+      final rustReport = utf8.decode(binary);
+      print(rustReport);
+    };
+    return true;
+  }());
 
   // Prepare the interface with Rust.
   await prepareInterfaceReal(assignRustSignal);
