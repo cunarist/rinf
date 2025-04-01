@@ -1,3 +1,7 @@
+## 8.0.0-beta
+
+- This is a beta version.
+
 ## 8.0.0-alpha
 
 - This is an alpha version.
