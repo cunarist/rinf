@@ -1,5 +1,5 @@
 use crate::dimmedln;
-use crate::tool::{SetupError, run_subprocess};
+use crate::tool::{CaptureError, SetupError};
 use std::path::Path;
 use std::process::Command;
 
@@ -46,15 +46,30 @@ pub fn build_webassembly(
 }
 
 fn install_wasm_toolchain() -> Result<(), SetupError> {
-  run_subprocess("rustup", &["toolchain", "install", "nightly"])?;
-  run_subprocess("rustup", &["+nightly", "component", "add", "rust-src"])?;
-  run_subprocess(
-    "rustup",
-    &["+nightly", "target", "add", "wasm32-unknown-unknown"],
-  )?;
-  run_subprocess("rustup", &["target", "add", "wasm32-unknown-unknown"])?;
-  run_subprocess("cargo", &["install", "wasm-pack"])?;
-  run_subprocess("cargo", &["install", "wasm-bindgen-cli"])?;
+  Command::new("rustup")
+    .args(["toolchain", "install", "nightly"])
+    .output()?
+    .capture_err()?;
+  Command::new("rustup")
+    .args(["+nightly", "component", "add", "rust-src"])
+    .output()?
+    .capture_err()?;
+  Command::new("rustup")
+    .args(["+nightly", "target", "add", "wasm32-unknown-unknown"])
+    .output()?
+    .capture_err()?;
+  Command::new("rustup")
+    .args(["target", "add", "wasm32-unknown-unknown"])
+    .output()?
+    .capture_err()?;
+  Command::new("cargo")
+    .args(["install", "wasm-pack"])
+    .output()?
+    .capture_err()?;
+  Command::new("cargo")
+    .args(["install", "wasm-bindgen-cli"])
+    .output()?
+    .capture_err()?;
   Ok(())
 }
 
@@ -78,25 +93,21 @@ fn compile_wasm(
     "--target",
     "web",
     "--",
-    "-Z",
-    "build-std=std,panic_abort",
+    "-Zbuild-std=std,panic_abort",
   ];
   if !is_release_mode {
     wasm_pack_args.insert(7, "--dev");
   }
 
-  let status = Command::new("wasm-pack")
+  Command::new("wasm-pack")
     .args(&wasm_pack_args)
     .env("RUSTUP_TOOLCHAIN", "nightly")
     .env(
       "RUSTFLAGS",
       "-C target-feature=+atomics,+bulk-memory,+mutable-globals",
     )
-    .status()?;
-
-  if !status.success() {
-    panic!("Wasm compilation failed");
-  }
+    .output()?
+    .capture_err()?;
 
   Ok(())
 }

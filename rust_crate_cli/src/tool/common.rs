@@ -1,24 +1,17 @@
+use owo_colors::OwoColorize;
+
 use crate::SetupError;
 use std::ffi::OsStr;
+use std::io::Write;
+use std::io::stderr;
 use std::net::ToSocketAddrs;
 use std::path::PathBuf;
-use std::process::{Command, Stdio};
+use std::process::Output;
 
-pub fn run_dart_command(args: &[&str]) -> Result<(), SetupError> {
-  #[cfg(target_family = "windows")]
-  let cmd = "dart.bat";
-  #[cfg(target_family = "unix")]
-  let cmd = "dart";
-  run_subprocess(cmd, args)
-}
-
-pub fn run_subprocess(cmd: &str, args: &[&str]) -> Result<(), SetupError> {
-  Command::new(cmd)
-    .args(args)
-    .stdout(Stdio::null())
-    .output()?;
-  Ok(())
-}
+#[cfg(target_family = "windows")]
+pub static DART_BIN: &str = "dart.bat";
+#[cfg(target_family = "unix")]
+pub static DART_BIN: &str = "dart";
 
 pub fn check_internet_connection() -> bool {
   "pub.dev:80"
@@ -46,5 +39,23 @@ impl CleanFileName for PathBuf {
       .ok_or_else(|| SetupError::BadFilePath(self.to_owned()))?
       .to_owned();
     Ok(file_name)
+  }
+}
+
+pub trait CaptureError {
+  fn capture_err(self) -> Result<(), SetupError>;
+}
+
+impl CaptureError for Output {
+  fn capture_err(self) -> Result<(), SetupError> {
+    if self.status.success() {
+      Ok(())
+    } else {
+      let colored = String::from_utf8_lossy(&self.stderr).red().to_string();
+      stderr()
+        .write_all(colored.as_bytes())
+        .map_err(|_| SetupError::SubprocessError)?;
+      Err(SetupError::SubprocessError)
+    }
   }
 }

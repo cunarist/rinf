@@ -18,6 +18,7 @@ pub enum SetupError {
   TemplateApplied,
   DuplicatedSignal(String),
   CodeSyntax(String),
+  SubprocessError,
 }
 
 impl Error for SetupError {
@@ -54,7 +55,7 @@ impl Display for SetupError {
         write!(f, "Invalid `pubspec.yaml` config: {}", s)
       }
       Self::BadFilePath(p) => {
-        write!(f, "Not a valid file path: `{}`", p.display())
+        write!(f, "Invalid file path: `{}`", p.display())
       }
       Self::NotFlutterApp => {
         write!(f, "This is not a Flutter app project")
@@ -67,6 +68,9 @@ impl Display for SetupError {
       }
       Self::CodeSyntax(n) => {
         write!(f, "Invalid syntax in file `{}`", n)
+      }
+      Self::SubprocessError => {
+        write!(f, "A subprocess did not exit successfully")
       }
     }
   }

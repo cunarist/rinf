@@ -1,9 +1,9 @@
 use crate::AppError;
 
 #[cfg(not(target_family = "wasm"))]
-use super::interface_os::{send_rust_signal_real, start_rust_logic_real};
+use crate::interface_os::{send_rust_signal_real, start_rust_logic_real};
 #[cfg(target_family = "wasm")]
-use super::interface_web::{send_rust_signal_real, start_rust_logic_real};
+use crate::interface_web::{send_rust_signal_real, start_rust_logic_real};
 
 /// This contains a message from Dart.
 /// Optionally, a custom binary called `binary` can also be included.
