@@ -37,13 +37,15 @@ Future<void> loadJsFile() async {
     loadCompleter.complete();
   }).toJS;
 
+  // Get the domain and the base path.
   // Flutter app doesn't always have the top-level path of the domain.
   // Sometimes, the flutter app might be placed in a lower path.
-  // This variable includes domain and the base path.
   final baseHref = Uri.base;
   final path = jsLibPath ?? 'pkg/hub.js';
   final fullUrl = baseHref.resolve(path);
 
+  // Insert the script element into the document head.
+  // This will load the webassembly module.
   final scriptElement = HTMLScriptElement();
   scriptElement.type = 'module';
   scriptElement.innerHTML = '''
@@ -56,6 +58,6 @@ delete rinfBindings.completeRinfLoad;
       .toJS;
   document.head!.append(scriptElement);
 
+  // Await for the module to load.
   await loadCompleter.future;
-  print("DONE!");
 }
