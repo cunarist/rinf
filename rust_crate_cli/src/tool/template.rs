@@ -1,11 +1,11 @@
 use crate::tool::{
-  RinfConfig, SetupError, generate_dart_code, run_dart_command, run_subprocess,
+  CaptureError, CleanFileName, DART_BIN, RinfConfig, SetupError,
+  generate_dart_code,
 };
 use include_dir::{Dir, include_dir};
 use std::fs::{create_dir_all, read_to_string, write};
 use std::path::Path;
-
-use super::CleanFileName;
+use std::process::Command;
 
 static TEMPLATE_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/template");
 
@@ -28,14 +28,23 @@ pub fn apply_rust_template(
   update_readme(root_dir)?;
 
   // Add Dart dependencies.
-  run_dart_command(&["pub", "add", "meta"])?;
-  run_dart_command(&["pub", "add", "tuple"])?;
+  Command::new(DART_BIN)
+    .args(["pub", "add", "meta"])
+    .output()?
+    .capture_err()?;
+  Command::new(DART_BIN)
+    .args(["pub", "add", "tuple"])
+    .output()?
+    .capture_err()?;
 
   // Modify `lib/main.dart`
   update_main_dart(root_dir)?;
 
   // Format Rust code.
-  run_subprocess("cargo", &["fmt"])?;
+  Command::new("cargo")
+    .args(["fmt"])
+    .output()?
+    .capture_err()?;
 
   // Generate Dart code.
   generate_dart_code(root_dir, rinf_config)?;
@@ -161,7 +170,10 @@ please refer to Rinf's [documentation](https://rinf.cunarist.com).
 fn update_main_dart(root_dir: &Path) -> Result<(), SetupError> {
   let main_path = root_dir.join("lib/main.dart");
   if main_path.exists() {
-    run_dart_command(&["format", "lib/main.dart"])?;
+    Command::new(DART_BIN)
+      .args(["format", "lib/main.dart"])
+      .output()?
+      .capture_err()?;
     let mut content = read_to_string(&main_path)?;
     if !content.contains("messages/all.dart") {
       content = content.replacen(
@@ -179,7 +191,10 @@ fn update_main_dart(root_dir: &Path) -> Result<(), SetupError> {
       );
     }
     write(main_path, content)?;
-    run_dart_command(&["format", "lib/main.dart"])?;
+    Command::new(DART_BIN)
+      .args(["format", "lib/main.dart"])
+      .output()?
+      .capture_err()?;
   }
   Ok(())
 }
