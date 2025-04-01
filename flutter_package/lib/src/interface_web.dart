@@ -28,12 +28,6 @@ Future<void> prepareInterfaceReal(
   ) {
     final messageBytes = (messageBytesJS as JSUint8Array).toDart;
     final binary = (binaryJS as JSUint8Array).toDart;
-
-    if (endpoint == 'RinfPrint') {
-      final rustReport = utf8.decode(binary);
-      print(rustReport);
-      return;
-    }
     assignRustSignal[endpoint]!(messageBytes, binary);
   }).toJS;
 }

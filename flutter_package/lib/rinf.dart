@@ -2,6 +2,7 @@
 library;
 
 import 'dart:typed_data';
+import 'dart:convert';
 import 'src/structure.dart';
 import 'src/interface.dart';
 
@@ -12,9 +13,18 @@ Future<void> initializeRust(
   AssignRustSignal assignRustSignal, {
   String? compiledLibPath,
 }) async {
+  // Override the default library path if provided.
   if (compiledLibPath != null) {
     setCompiledLibPathReal(compiledLibPath);
   }
+
+  // Add the print delegation endpoint.
+  assignRustSignal['RinfOut'] = (messageBytes, binary) {
+    String rustReport = utf8.decode(binary);
+    print(rustReport);
+  };
+
+  // Prepare the interface with Rust.
   await prepareInterfaceReal(assignRustSignal);
   startRustLogicReal();
 }

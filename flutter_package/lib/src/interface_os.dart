@@ -2,7 +2,6 @@ import 'dart:ffi';
 import 'dart:typed_data';
 import 'dart:async';
 import 'dart:isolate';
-import 'dart:convert';
 import 'load_os.dart';
 import 'structure.dart';
 
@@ -23,18 +22,14 @@ Future<void> prepareInterfaceReal(
     String endpoint = rustSignalRaw[0];
     Uint8List? messageBytes = rustSignalRaw[1];
     Uint8List? binary = rustSignalRaw[2];
+
     // Rust will send null if the vector is empty.
     // Converting is needed on the Dart side.
     binary ??= Uint8List(0);
-    if (rustSignalRaw[0] == 'RinfPrint') {
-      // -1 is a special message ID for Rust reports.
-      String rustReport = utf8.decode(binary);
-      print(rustReport);
-      return;
-    }
     // Rust will send null if the vector is empty.
     // Converting is needed on the Dart side.
     messageBytes ??= Uint8List(0);
+
     assignRustSignal[endpoint]!(messageBytes, binary);
   });
 
