@@ -62,6 +62,8 @@ class _MyAppState extends State<MyApp> {
 }
 
 class MyHomePage extends StatelessWidget {
+  const MyHomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,6 +90,8 @@ class MyHomePage extends StatelessWidget {
 }
 
 class MyColumn extends StatelessWidget {
+  const MyColumn({super.key});
+
   @override
   Widget build(BuildContext context) {
     final children = [

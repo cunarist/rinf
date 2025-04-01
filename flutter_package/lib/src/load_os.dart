@@ -149,18 +149,22 @@ class RustLibraryGlobal extends RustLibrary {
     int port,
   );
 
+  @override
   void startRustLogic() {
     startRustLogicExtern();
   }
 
+  @override
   void stopRustLogic() {
     stopRustLogicExtern();
   }
 
+  @override
   void prepareIsolate(PostCObjectPtr storePostObject, int port) {
     prepareIsolateExtern(storePostObject, port);
   }
 
+  @override
   void sendDartSignal(
     String endpointSymbol,
     Uint8List messageBytes,
@@ -213,32 +217,34 @@ class RustLibraryLocal extends RustLibrary {
   final Map<String, SendDartSignalWrapped> sendDartSignalExterns = {};
 
   RustLibraryLocal(this.lib) {
-    this.startRustLogicExtern =
-        lib.lookupFunction<Void Function(), void Function()>(
+    startRustLogicExtern = lib.lookupFunction<Void Function(), void Function()>(
       'rinf_start_rust_logic_extern',
     );
-    this.stopRustLogicExtern =
-        lib.lookupFunction<Void Function(), void Function()>(
+    stopRustLogicExtern = lib.lookupFunction<Void Function(), void Function()>(
       'rinf_stop_rust_logic_extern',
     );
-    this.prepareIsolateExtern =
+    prepareIsolateExtern =
         lib.lookupFunction<PrepareIsolateExtern, PrepareIsolateWrapped>(
       'rinf_prepare_isolate_extern',
     );
   }
 
+  @override
   void startRustLogic() {
     startRustLogicExtern();
   }
 
+  @override
   void stopRustLogic() {
     stopRustLogicExtern();
   }
 
+  @override
   void prepareIsolate(PostCObjectPtr storePostObject, int port) {
     prepareIsolateExtern(storePostObject, port);
   }
 
+  @override
   void sendDartSignal(
     String endpointSymbol,
     Uint8List messageBytes,
