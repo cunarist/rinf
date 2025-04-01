@@ -1,8 +1,6 @@
-include: package:lints/core.yaml
+include: package:flutter_lints/flutter.yaml
 
 linter:
   rules:
-    # TODO: Reactivate the rule below
-    prefer_single_quotes: false
-    # TODO: Delete the rule below
-    hash_and_equals: false
+    prefer_single_quotes: true
+    avoid_print: false

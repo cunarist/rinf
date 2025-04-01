@@ -19,7 +19,7 @@ Future<void> loadJsFile() async {
   // When Dart performs hot restart,
   // the `rinfBindings` JavaScript object is already defined
   // as a global JavaScript variable.
-  wasAlreadyLoaded = globalContext.hasProperty('rinfBindings'.toJS) as bool;
+  wasAlreadyLoaded = globalContext.hasProperty('rinfBindings'.toJS).toDart;
 
   // Stop loading if it already has been done.
   if (wasAlreadyLoaded) {

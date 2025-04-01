@@ -9,7 +9,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{
   create_dir_all, read_dir, read_to_string, remove_dir_all, rename, write,
 };
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::sync::mpsc::channel;
 use std::time::Duration;
 use syn::spanned::Spanned;
@@ -18,7 +18,7 @@ use syn::{
   PathArguments, Type, TypeArray, TypePath, TypeTuple,
 };
 
-static MODULE_NAME: &str = "signals";
+static GEN_MOD: &str = "signals";
 
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
 enum SignalAttribute {
@@ -346,7 +346,7 @@ fn process_items_in_module(
           trace_struct(traced, s);
           traced.signal_attrs.insert(item_name.clone(), signal_attrs);
           let doc_comment = extract_doc_comment(&s.attrs);
-          let item_path = vec![MODULE_NAME.to_owned(), item_name];
+          let item_path = vec![GEN_MOD.to_owned(), item_name];
           traced.doc_comments.insert(item_path, doc_comment);
         }
       }
@@ -359,7 +359,7 @@ fn process_items_in_module(
           trace_enum(traced, e);
           traced.signal_attrs.insert(item_name.clone(), signal_attrs);
           let doc_comment = extract_doc_comment(&e.attrs);
-          let item_path = vec![MODULE_NAME.to_owned(), item_name];
+          let item_path = vec![GEN_MOD.to_owned(), item_name];
           traced.doc_comments.insert(item_path, doc_comment);
         }
       }
@@ -375,17 +375,14 @@ struct Traced {
   doc_comments: BTreeMap<Vec<String>, String>,
 }
 
-fn visit_rust_files(
-  dir: PathBuf,
-  traced: &mut Traced,
-) -> Result<(), SetupError> {
+fn visit_rust_files(dir: &Path, traced: &mut Traced) -> Result<(), SetupError> {
   let entries = read_dir(dir)?;
   for entry in entries.filter_map(Result::ok) {
     let entry_path = entry.path();
     let file_name = entry_path.clean_file_name()?;
     if entry_path.is_dir() {
       // Recurse into subdirectory.
-      visit_rust_files(entry_path, traced)?;
+      visit_rust_files(&entry_path, traced)?;
     } else {
       let content = read_to_string(&entry_path)?;
       let syntax_tree: File = syn::parse_file(&content)
@@ -402,9 +399,7 @@ fn generate_class_extension_code(
   extracted_attrs: &BTreeSet<SignalAttribute>,
 ) -> Result<(), SetupError> {
   let snake_class = class.to_case(Case::Snake);
-  let class_file = gen_dir
-    .join(MODULE_NAME)
-    .join(format!("{}.dart", snake_class));
+  let class_file = gen_dir.join(GEN_MOD).join(format!("{}.dart", snake_class));
   let mut code = read_to_string(&class_file)?;
 
   if extracted_attrs.contains(&SignalAttribute::DartSignalBinary) {
@@ -459,9 +454,7 @@ fn generate_class_interface_code(
   extracted_attrs: &BTreeSet<SignalAttribute>,
 ) -> Result<(), SetupError> {
   let snake_class = class.to_case(Case::Snake);
-  let class_file = gen_dir
-    .join(MODULE_NAME)
-    .join(format!("{}.dart", snake_class));
+  let class_file = gen_dir.join(GEN_MOD).join(format!("{}.dart", snake_class));
   let mut code = read_to_string(&class_file)?;
 
   let has_rust_signal = extracted_attrs.contains(&SignalAttribute::RustSignal)
@@ -500,7 +493,7 @@ fn generate_shared_code(
   signal_attrs: &BTreeMap<String, BTreeSet<SignalAttribute>>,
 ) -> Result<(), SetupError> {
   // Write type aliases.
-  let mut code = format!("part of '{}.dart';\n", MODULE_NAME);
+  let mut code = format!("part of '{}.dart';\n", GEN_MOD);
 
   // Write signal handler.
   code.push_str(
@@ -531,7 +524,7 @@ fn generate_shared_code(
   code.push_str("\n};\n");
 
   // Save to a file.
-  let shared_file = gen_dir.join(MODULE_NAME).join("signal_handlers.dart");
+  let shared_file = gen_dir.join(GEN_MOD).join("signal_handlers.dart");
   write(&shared_file, code)?;
   Ok(())
 }
@@ -547,9 +540,7 @@ fn generate_interface_code(
   }
 
   // Write imports.
-  let top_file = gen_dir
-    .join(MODULE_NAME)
-    .join(format!("{MODULE_NAME}.dart"));
+  let top_file = gen_dir.join(GEN_MOD).join(format!("{GEN_MOD}.dart"));
   let mut top_content = read_to_string(&top_file)?;
   top_content = top_content.replacen(
     "export '../serde/serde.dart';",
@@ -579,7 +570,7 @@ pub fn generate_dart_code(
   };
   for crate_name in &rinf_config.gen_input_crates {
     let source_dir = root_dir.join("native").join(crate_name).join("src");
-    visit_rust_files(source_dir, &mut traced)?;
+    visit_rust_files(&source_dir, &mut traced)?;
   }
 
   // Empty the generation folder.
@@ -588,7 +579,7 @@ pub fn generate_dart_code(
   create_dir_all(&gen_dir)?;
 
   // Create the code generator config.
-  let gen_config = CodeGeneratorConfig::new(MODULE_NAME.to_string())
+  let gen_config = CodeGeneratorConfig::new(GEN_MOD.to_string())
     .with_encodings([Encoding::Bincode])
     .with_package_manifest(false)
     .with_c_style_enums(true)
@@ -606,17 +597,20 @@ pub fn generate_dart_code(
     .install_bincode_runtime()
     .map_err(|_| SetupError::ReflectionModule)?;
 
-  // Generate Dart serialization code from the registry.
+  // Generate Dart class code from the registry.
   let generator = CodeGenerator::new(&gen_config);
   generator.output(gen_dir.clone(), &traced.registry)?;
   move_directory_contents(&gen_dir.join("lib").join("src"), &gen_dir)?;
   remove_dir_all(gen_dir.join("lib"))?;
 
+  // Remove lint warnings from generated code
+  remove_lint_warnings(&gen_dir)?;
+
   // Write the export file.
   let gen_dir_name = gen_dir.clean_file_name()?;
   write(
     gen_dir.join(format!("{gen_dir_name}.dart")),
-    format!("export '{}/{}.dart';", MODULE_NAME, MODULE_NAME),
+    format!("export '{}/{}.dart';", GEN_MOD, GEN_MOD),
   )?;
 
   // Generate Dart interface code for FFI.
@@ -712,5 +706,21 @@ fn move_directory_contents(
       rename(&src_path, &dest_path)?;
     }
   }
+  Ok(())
+}
+
+fn remove_lint_warnings(gen_dir: &Path) -> Result<(), SetupError> {
+  write_lint_ignore(&gen_dir.join("serde").join("serde.dart"))?;
+  write_lint_ignore(&gen_dir.join("bincode").join("bincode.dart"))?;
+  write_lint_ignore(&gen_dir.join(GEN_MOD).join(format!("{}.dart", GEN_MOD)))?;
+  Ok(())
+}
+
+fn write_lint_ignore(file_path: &Path) -> Result<(), SetupError> {
+  let content = read_to_string(file_path)?;
+  write(
+    file_path,
+    format!("// ignore_for_file: type=lint, type=warning\n{}", content),
+  )?;
   Ok(())
 }

@@ -24,7 +24,7 @@ void main() async {
       expect(
         resultPack.message.value,
         true,
-        reason: 'Signal data is different from the original:\n${serdeData}',
+        reason: 'Signal data is different from the original:\n$serdeData',
       );
     });
   });

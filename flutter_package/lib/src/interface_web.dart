@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
 import 'dart:typed_data';
-import 'dart:convert';
 import 'load_web.dart';
 import 'structure.dart';
 
@@ -28,12 +27,6 @@ Future<void> prepareInterfaceReal(
   ) {
     final messageBytes = (messageBytesJS as JSUint8Array).toDart;
     final binary = (binaryJS as JSUint8Array).toDart;
-
-    if (endpoint == 'RinfPrint') {
-      final rustReport = utf8.decode(binary);
-      print(rustReport);
-      return;
-    }
     assignRustSignal[endpoint]!(messageBytes, binary);
   }).toJS;
 }
