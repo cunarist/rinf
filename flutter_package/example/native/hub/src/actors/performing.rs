@@ -108,8 +108,10 @@ impl PerformingActor {
     if !Self::IS_DEBUG_MODE {
       return;
     }
-    let _ = Self::call_debug_functions().await;
-    debug_print!("Debug tests completed!");
+    match Self::call_debug_functions().await {
+      Ok(_) => debug_print!("Debug tests completed!"),
+      Err(err) => debug_print!("Debug test error: {}", err),
+    }
     // On the web (`wasm32-unknown-unknown`),
     // catching and unwinding panics is not possible.
     // It is better to avoid panicking code at all costs on the web.
