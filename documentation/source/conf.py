@@ -9,7 +9,7 @@
 project = "Rinf"
 copyright = "2025, Cunarist"
 author = "Cunarist"
-release = "8.0.0-beta"
+release = "8.0.0-rc"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

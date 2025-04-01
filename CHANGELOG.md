@@ -1,3 +1,7 @@
+## 8.0.0-rc
+
+- This is a release candidate.
+
 ## 8.0.0-beta
 
 - This is a beta version.
