@@ -33,17 +33,17 @@ Future<void> loadJsFile() async {
 
   // Prepare to await the module load.
   final loadCompleter = Completer<void>();
-  rinfBindingsObject['completeRinfLoad'] = loadCompleter.complete.jsify();
+  rinfBindingsObject['completeRinfLoad'] = (() {
+    loadCompleter.complete();
+  }).toJS;
 
   // Flutter app doesn't always have the top-level path of the domain.
   // Sometimes, the flutter app might be placed in a lower path.
   // This variable includes domain and the base path.
   final baseHref = Uri.base;
-
-  // Use the default JavaScript path unless provided.
   final path = jsLibPath ?? 'pkg/hub.js';
-
   final fullUrl = baseHref.resolve(path);
+
   final scriptElement = HTMLScriptElement();
   scriptElement.type = 'module';
   scriptElement.innerHTML = '''
@@ -57,4 +57,5 @@ delete rinfBindings.completeRinfLoad;
   document.head!.append(scriptElement);
 
   await loadCompleter.future;
+  print("DONE!");
 }
