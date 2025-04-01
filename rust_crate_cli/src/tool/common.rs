@@ -2,8 +2,6 @@ use owo_colors::OwoColorize;
 
 use crate::SetupError;
 use std::ffi::OsStr;
-use std::io::Write;
-use std::io::stderr;
 use std::net::ToSocketAddrs;
 use std::path::PathBuf;
 use std::process::Output;
@@ -51,10 +49,7 @@ impl CaptureError for Output {
     if self.status.success() {
       Ok(())
     } else {
-      let colored = String::from_utf8_lossy(&self.stderr).red().to_string();
-      stderr()
-        .write_all(colored.as_bytes())
-        .map_err(|_| SetupError::SubprocessError)?;
+      eprintln!("{}", String::from_utf8_lossy(&self.stderr).red());
       Err(SetupError::SubprocessError)
     }
   }
