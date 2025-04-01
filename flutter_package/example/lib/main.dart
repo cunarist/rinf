@@ -10,7 +10,6 @@ void main() async {
 }
 
 Future<void> createActors() async {
-  await Future.delayed(Duration(milliseconds: 100));
   CreateActors().sendSignalToRust();
 }
 
