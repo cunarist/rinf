@@ -36,19 +36,21 @@ macro_rules! write_interface {
 #[macro_export]
 macro_rules! debug_print {
   ( $( $t:tt )* ) => {
-    let rust_report = format!( $( $t )* );
-    #[cfg(debug_assertions)]
     {
-      let result = $crate::send_rust_signal(
-        "RinfOut", // Special message ID for Rust output
-        Vec::new(),
-        rust_report.clone().into_bytes(),
-      );
-      if let Err(err) = result {
-        println!("{}\n{}", err, rust_report);
+      let rust_report = format!( $( $t )* );
+      #[cfg(debug_assertions)]
+      {
+        let result = $crate::send_rust_signal(
+          "RinfOut", // Special message ID for Rust output
+          Vec::new(),
+          rust_report.clone().into_bytes(),
+        );
+        if let Err(err) = result {
+          println!("{}\n{}", err, rust_report);
+        }
       }
+      #[cfg(not(debug_assertions))]
+      let _ = rust_report;
     }
-    #[cfg(not(debug_assertions))]
-    let _ = rust_report;
   }
 }
