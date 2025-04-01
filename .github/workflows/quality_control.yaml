@@ -94,6 +94,8 @@ jobs:
 
       - name: Install the Python environment manager
         uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: false
 
       - name: Run Pyright
         run: uv run pyright

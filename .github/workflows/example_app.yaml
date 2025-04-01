@@ -85,6 +85,8 @@ jobs:
 
       - name: Install the Python environment manager
         uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: false
 
       - name: Install the CLI tool
         run: cargo install --path rust_crate_cli
