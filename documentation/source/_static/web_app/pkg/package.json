@@ -1,0 +1,13 @@
+{
+  "name": "hub",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "hub_bg.wasm",
+    "hub.js"
+  ],
+  "main": "hub.js",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
