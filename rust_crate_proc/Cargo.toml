@@ -1,6 +1,6 @@
 [package]
 name = "rinf_proc"
-version = "8.0.0-rc"
+version = "8.0.0"
 edition = "2024"
 license = "MIT"
 description = "Rust for native business logic, Flutter for flexible and beautiful GUI"

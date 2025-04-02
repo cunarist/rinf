@@ -1,3 +1,10 @@
+## 8.0.0
+
+- To migrate from Rinf version 7, refer to [this section](https://rinf.cunarist.com/upgrading/) in the documentation.
+- Rinf no longer uses Protobuf. It now uses Serde. You should annotate Rust structs to define signal endpoints between Dart and Rust.
+- Fixed an issue with loading the app on the web.
+- Improved documentation in various areas.
+
 ## 8.0.0-rc
 
 - This is a release candidate.
