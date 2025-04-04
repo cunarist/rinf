@@ -5,6 +5,7 @@ use crate::signals::{
 };
 use rinf::{DartSignal, RustSignal};
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
+use std::iter::repeat_n;
 use std::time::Duration;
 use tokio::time::sleep;
 use tokio_with_wasm::alias as tokio;
@@ -143,18 +144,14 @@ fn get_complex_signals() -> Vec<SerdeData> {
     f_tuple: (4, 5),
     f_string_hashmap: HashMap::new(),
     f_string_btreemap: BTreeMap::new(),
-    f_int_hashset: {
-      std::iter::repeat_n((), 10)
-        .enumerate()
-        .map(|(i, ())| i as u64)
-        .collect()
-    },
-    f_int_btreeset: {
-      std::iter::repeat_n((), 10)
-        .enumerate()
-        .map(|(i, ())| i as u64)
-        .collect()
-    },
+    f_int_hashset: repeat_n((), 10)
+      .enumerate()
+      .map(|(i, ())| i as u64)
+      .collect(),
+    f_int_btreeset: repeat_n((), 10)
+      .enumerate()
+      .map(|(i, ())| i as u64)
+      .collect(),
     f_nested_seq: Vec::new(),
     f_boxed_struct: Box::new(Struct { x: 0, y: 0 }),
   });
