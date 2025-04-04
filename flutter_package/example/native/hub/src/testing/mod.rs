@@ -144,15 +144,13 @@ fn get_complex_signals() -> Vec<SerdeData> {
     f_string_hashmap: HashMap::new(),
     f_string_btreemap: BTreeMap::new(),
     f_int_hashset: {
-      std::iter::repeat(())
-        .take(10)
+      std::iter::repeat_n((), 10)
         .enumerate()
         .map(|(i, ())| i as u64)
         .collect()
     },
     f_int_btreeset: {
-      std::iter::repeat(())
-        .take(10)
+      std::iter::repeat_n((), 10)
         .enumerate()
         .map(|(i, ())| i as u64)
         .collect()
