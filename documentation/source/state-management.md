@@ -14,10 +14,10 @@ The default Rust template provided by Rinf provides a good starting point. Below
 :caption: native/hub/src/lib.rs
 use async_trait::async_trait;
 use messages::prelude::{Actor, Address, Context, Notifiable};
-use rinf::{dart_shutdown, debug_print};
+use rinf::{dart_shutdown, debug_print, write_interface};
 use tokio::spawn;
 
-rinf::write_interface!();
+write_interface!();
 
 /// Represents a message to calculate the sum of two numbers.
 struct Sum(usize, usize);
