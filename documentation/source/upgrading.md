@@ -110,13 +110,13 @@ use rinf::{DartSignal, RustSignal, SignalPiece};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, DartSignal)]
-struct MessageA {}
+pub struct MessageA {}
 
 #[derive(Serialize, RustSignal)]
-struct MessageB {}
+pub struct MessageB {}
 
 #[derive(SignalPiece)] // Add `Serialize` or `Deserialize` as necessary
-struct MessageC {}
+pub struct MessageC {}
 ```
 
 To generate the corresponding Dart code, use `rinf gen` instead of `rinf message`. After the new Dart code is generated in `lib/src/bindings`, you might need to manually remove the `lib/messages` and `native/hub/src/messages` directories:
@@ -144,9 +144,11 @@ The methods of signal structs are the same, but they have now become trait metho
   let receiver = SomeMessage::get_dart_signal_receiver();
 ```
 
-Finally, verify that your Rinf configurations in `pubspec.yaml` conform to the new format, if present. Don't forget to update the `.gitignore` and `README.md` files as well!
+Finally, verify that your Rinf configurations in `pubspec.yaml` conform to the new format, if present.
 
 ```{code-block} shell
 :caption: CLI
 rinf config
 ```
+
+Don't forget to update the `.gitignore` and `README.md` files as well!
