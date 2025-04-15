@@ -469,16 +469,17 @@ final _{camel_class}StreamController =
     );
     code.push_str(&new_code);
     code = code.replacen(
-      &format!("class {class} {{"),
+      &format!("class {} {{", class),
       &format!(
-        r#"class {class} {{
+        r#"class {} {{
   /// An async broadcast stream that listens for signals from Rust.
   /// It supports multiple subscriptions.
   /// Make sure to cancel the subscription when it's no longer needed,
   /// such as when a widget is disposed.
   static final rustSignalStream =
-      _{camel_class}StreamController.stream.asBroadcastStream();
-"#
+      _{}StreamController.stream.asBroadcastStream();
+"#,
+        class, camel_class
       ),
       1,
     );
@@ -540,7 +541,7 @@ fn generate_interface_code(
   }
 
   // Write imports.
-  let top_file = gen_dir.join(GEN_MOD).join(format!("{GEN_MOD}.dart"));
+  let top_file = gen_dir.join(GEN_MOD).join(format!("{}.dart", GEN_MOD));
   let mut top_content = read_to_string(&top_file)?;
   top_content = top_content.replacen(
     "export '../serde/serde.dart';",
@@ -609,7 +610,7 @@ pub fn generate_dart_code(
   // Write the export file.
   let gen_dir_name = gen_dir.clean_file_name()?;
   write(
-    gen_dir.join(format!("{gen_dir_name}.dart")),
+    gen_dir.join(format!("{}.dart", gen_dir_name)),
     format!("export '{}/{}.dart';", GEN_MOD, GEN_MOD),
   )?;
 
