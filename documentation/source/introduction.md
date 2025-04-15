@@ -2,7 +2,7 @@
 
 ## About Rinf
 
-Rinf combines Flutter's UI ease with Rust's speed, enabling efficient, scalable cross-platform apps.
+Rinf enables building cross-platform Rust apps, combining it with Flutter's UI ecosystem.
 
 ```{eval-rst}
 .. raw:: html
@@ -11,7 +11,9 @@ Rinf combines Flutter's UI ease with Rust's speed, enabling efficient, scalable 
 
 ## Design
 
-Rinf expects the application's main logic to be written in Rust, with Flutter solely managing the GUI.
+Rinf expects the entire business logic to be written in Rust, with Flutter only serving as the UI layer.[^1]
+
+[^1]: If your business logic is written in Dart, Rinf may not be a suitable choice. Consider other solutions in such cases.
 
 ![Rinf design](_static/rinf_design.png)
 
