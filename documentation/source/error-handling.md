@@ -79,7 +79,7 @@ pub trait ReportError {
 impl ReportError for Result<()> {
   fn report(self) {
     if let Err(any_error) = self {
-      error!("{any_error}");
+      error!("{}", any_error);
     };
   }
 }
