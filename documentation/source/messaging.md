@@ -1,10 +1,10 @@
 # Messaging
 
-There are special comments that you can mark messages with.
+Use signal traits to mark struct as a stream endpoint.
 
 ## Channel Signals
 
-The `RustSignal` trait generates a message channel from Rust to Dart.[^1] Use the `RustSignalBinary` trait to include binary data without the overhead of serialization.
+The `RustSignal` trait generates a signal stream from Rust to Dart.[^1] Use the `RustSignalBinary` trait to include binary data without the overhead of serialization.
 
 [^1]: It’s important to note that when using [`StreamBuilder`](https://api.flutter.dev/flutter/widgets/StreamBuilder-class.html), it may only process the latest message from the stream to trigger a widget rebuild on the next render frame. Since widget builders are primarily focused on building widgets, they might skip some messages if multiple messages arrive within a single frame, typically around 16 milliseconds. To ensure that all messages from the stream are handled, you should consider using the [`Stream.listen`](https://api.flutter.dev/flutter/dart-async/Stream/listen.html) method instead.
 
@@ -46,7 +46,7 @@ final subscription = MyDataOutput.rustSignalStream.listen((signalPack) {
 })
 ```
 
-The `DartSignal` trait generates a message channel from Dart to Rust. Use the `DartSignalBinary` trait to include binary data without the overhead of serialization.
+The `DartSignal` trait generates a signal stream from Dart to Rust. Use the `DartSignalBinary` trait to include binary data without the overhead of serialization.
 
 ```{code-block} rust
 :caption: Rust
