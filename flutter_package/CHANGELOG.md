@@ -1,3 +1,7 @@
+## 8.1.0
+
+- `DartSignal` and `DartSignalBinary` are now non-generic traits. This allows for cleaner and more straightforward signal handling.
+
 ## 8.0.0
 
 - To migrate from Rinf version 7, refer to [this section](https://rinf.cunarist.com/upgrading/) in the documentation.
