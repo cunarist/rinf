@@ -98,9 +98,9 @@ fn derive_dart_signal_real(
 
   // Implement methods and extern functions.
   let signal_trait = if include_binary {
-    quote! { rinf::DartSignalBinary<#name> }
+    quote! { rinf::DartSignalBinary }
   } else {
-    quote! { rinf::DartSignal<#name> }
+    quote! { rinf::DartSignal }
   };
   let expanded = quote! {
     impl #signal_trait for #name #where_clause {

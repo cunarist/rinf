@@ -8,23 +8,29 @@ use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
 /// Defines the methods that a type capable of
 /// receiving Dart signals must implement.
-pub trait DartSignalBinary<T> {
+pub trait DartSignalBinary
+where
+  Self: Sized,
+{
   /// Returns the receiver that listens for signals from Dart.
   ///
   /// If this function is called multiple times,
   /// only the most recent receiver remains active,
   /// and all previous ones become inactive after receiving `None`.
-  fn get_dart_signal_receiver() -> SignalReceiver<DartSignalPack<T>>;
+  fn get_dart_signal_receiver() -> SignalReceiver<DartSignalPack<Self>>;
 }
 
 /// Defines the methods that a type capable of
 /// receiving Dart signals must implement.
-pub trait DartSignal<T> {
+pub trait DartSignal
+where
+  Self: Sized,
+{
   /// Returns the receiver that listens for signals from Dart.
   /// If this function is called multiple times,
   /// only the most recent receiver remains active,
   /// and all previous ones become inactive after receiving `None`.
-  fn get_dart_signal_receiver() -> SignalReceiver<DartSignalPack<T>>;
+  fn get_dart_signal_receiver() -> SignalReceiver<DartSignalPack<Self>>;
 }
 
 /// Defines the methods that a type capable of
