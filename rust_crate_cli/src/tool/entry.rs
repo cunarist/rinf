@@ -92,10 +92,11 @@ pub fn run_command() -> Result<(), SetupError> {
 
 fn is_flutter_app_project(root_dir: &Path) -> bool {
   let spec_file = root_dir.join("pubspec.yaml");
-  let Some(publish_to) = read_publish_to(&spec_file) else {
+  let publish_to = match read_publish_to(&spec_file) {
+    Some(inner) => inner,
     // If the field is not readable,
     // just treat this directory as a Flutter app project.
-    return true;
+    None => return true,
   };
   publish_to == "none"
 }
