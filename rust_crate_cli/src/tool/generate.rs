@@ -314,7 +314,7 @@ fn trace_enum(traced: &mut Traced, item: &ItemEnum) {
 /// Checks that the name of newly found signal is usable.
 fn check_signal_name(name: &str, traced: &Traced) -> Result<(), SetupError> {
   if traced.registry.contains_key(name) {
-    Err(SetupError::DuplicatedSignal(name.to_owned()))?
+    return Err(SetupError::DuplicatedSignal(name.to_owned()));
   }
   Ok(())
 }
