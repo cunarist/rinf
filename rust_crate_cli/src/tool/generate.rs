@@ -39,11 +39,14 @@ fn extract_signal_attributes(
     }
     attr
       .parse_nested_meta(|meta| {
-        let Some(last_segment) = meta.path.segments.last() else {
-          return Err(syn::Error::new(
-            meta.path.span(),
-            "Missing derive item name",
-          ));
+        let last_segment = match meta.path.segments.last() {
+          Some(inner) => inner,
+          None => {
+            return Err(syn::Error::new(
+              meta.path.span(),
+              "Missing derive item name",
+            ));
+          }
         };
         let ident: &str = &last_segment.ident.to_string();
         let signal_attr_op = match ident {
@@ -95,63 +98,56 @@ fn to_type_format(ty: &Type) -> Format {
     Type::Path(TypePath { path, .. }) => {
       // Get last segment
       // (e.g., for `std::collections::BTreeMap`, get `BTreeMap`).
-      if let Some(last_segment) = path.segments.last() {
-        let ident = last_segment.ident.to_string();
-
-        match ident.as_str() {
-          "u8" => Format::U8,
-          "u16" => Format::U16,
-          "u32" => Format::U32,
-          "u64" => Format::U64,
-          "u128" => Format::U128,
-          "i8" => Format::I8,
-          "i16" => Format::I16,
-          "i32" => Format::I32,
-          "i64" => Format::I64,
-          "i128" => Format::I128,
-          "f32" => Format::F32,
-          "f64" => Format::F64,
-          "bool" => Format::Bool,
-          "char" => Format::Char,
-          "String" => Format::Str,
-          "Box" => {
-            if let Some(inner) = extract_generic(last_segment) {
-              to_type_format(&inner)
-            } else {
-              Format::unknown()
-            }
-          }
-          "Option" => {
-            if let Some(inner) = extract_generic(last_segment) {
-              Format::Option(Box::new(to_type_format(&inner)))
-            } else {
-              Format::unknown()
-            }
-          }
-          "Vec" | "HashSet" | "BTreeSet" => {
-            if let Some(inner) = extract_generic(last_segment) {
-              Format::Seq(Box::new(to_type_format(&inner)))
-            } else {
-              Format::unknown()
-            }
-          }
-          "HashMap" | "BTreeMap" => {
-            let generics = extract_generics(last_segment);
-            if generics.len() == 2 {
-              let key = to_type_format(&generics[0].to_owned());
-              let value = to_type_format(&generics[1].to_owned());
-              Format::Map {
-                key: Box::new(key),
-                value: Box::new(value),
+      match path.segments.last() {
+        Some(last_segment) => {
+          let ident = last_segment.ident.to_string();
+          match ident.as_str() {
+            "u8" => Format::U8,
+            "u16" => Format::U16,
+            "u32" => Format::U32,
+            "u64" => Format::U64,
+            "u128" => Format::U128,
+            "i8" => Format::I8,
+            "i16" => Format::I16,
+            "i32" => Format::I32,
+            "i64" => Format::I64,
+            "i128" => Format::I128,
+            "f32" => Format::F32,
+            "f64" => Format::F64,
+            "bool" => Format::Bool,
+            "char" => Format::Char,
+            "String" => Format::Str,
+            "Box" => match extract_generic(last_segment) {
+              Some(inner) => to_type_format(&inner),
+              None => Format::unknown(),
+            },
+            "Option" => match extract_generic(last_segment) {
+              Some(inner) => Format::Option(Box::new(to_type_format(&inner))),
+              None => Format::unknown(),
+            },
+            "Vec" | "HashSet" | "BTreeSet" => {
+              match extract_generic(last_segment) {
+                Some(inner) => Format::Seq(Box::new(to_type_format(&inner))),
+                None => Format::unknown(),
               }
-            } else {
-              Format::unknown()
             }
+            "HashMap" | "BTreeMap" => {
+              let generics = extract_generics(last_segment);
+              if generics.len() == 2 {
+                let key = to_type_format(&generics[0].to_owned());
+                let value = to_type_format(&generics[1].to_owned());
+                Format::Map {
+                  key: Box::new(key),
+                  value: Box::new(value),
+                }
+              } else {
+                Format::unknown()
+              }
+            }
+            _ => Format::TypeName(ident),
           }
-          _ => Format::TypeName(ident),
         }
-      } else {
-        Format::unknown()
+        None => Format::unknown(),
       }
     }
     Type::Tuple(TypeTuple { elems, .. }) => {
@@ -318,7 +314,7 @@ fn trace_enum(traced: &mut Traced, item: &ItemEnum) {
 /// Checks that the name of newly found signal is usable.
 fn check_signal_name(name: &str, traced: &Traced) -> Result<(), SetupError> {
   if traced.registry.contains_key(name) {
-    Err(SetupError::DuplicatedSignal(name.to_owned()))?
+    return Err(SetupError::DuplicatedSignal(name.to_owned()));
   }
   Ok(())
 }

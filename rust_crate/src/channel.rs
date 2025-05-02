@@ -37,9 +37,9 @@ impl<T> SignalSender<T> {
   pub fn send(&self, msg: T) {
     let mut guard = self.inner.lock().recover();
 
-    // Enqueue the message
+    // Enqueue the message.
     guard.queue.push_back(msg);
-    // Wake up the previous receiver making it receive `None`, if any
+    // Wake up the previous receiver making it receive `None`, if any.
     if let Some(waker) = guard.waker.take() {
       waker.wake();
     }
@@ -96,21 +96,24 @@ impl<T> Future for RecvFuture<T> {
   fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
     let mut guard = self.inner.lock().recover();
 
-    // Only allow the current active receiver to receive messages
+    // Only allow the current active receiver to receive messages.
     if guard.active_receiver_id == self.receiver_id {
-      if let Some(msg) = guard.queue.pop_front() {
-        // Check if more messages are in the queue
-        if !guard.queue.is_empty() {
-          // If so, wake the current task immediately
-          cx.waker().wake_by_ref();
+      match guard.queue.pop_front() {
+        Some(msg) => {
+          // Check if more messages are in the queue.
+          if !guard.queue.is_empty() {
+            // If so, wake the current task immediately.
+            cx.waker().wake_by_ref();
+          }
+          Poll::Ready(Some(msg))
         }
-        Poll::Ready(Some(msg))
-      } else {
-        guard.waker = Some(cx.waker().to_owned());
-        Poll::Pending
+        None => {
+          guard.waker = Some(cx.waker().to_owned());
+          Poll::Pending
+        }
       }
     } else {
-      // Return None if this receiver is not the current active one
+      // Return None if this receiver is not the current active one.
       Poll::Ready(None)
     }
   }

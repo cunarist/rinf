@@ -16,5 +16,8 @@ class RustSignalPack<T> {
   /// without the overhead of serialization/deserialization.
   final Uint8List binary;
 
+  /// Constructs a packed data transfer object that includes
+  /// the message and the binary data from Rust.
+  /// This constructor is not intended for external use outside the library.
   RustSignalPack(this.message, this.binary);
 }

@@ -23,8 +23,9 @@ pub async fn run_unit_tests() {
   let complex_signals = get_complex_signals();
   for sent in complex_signals {
     sent.clone().send_signal_to_dart();
-    let Some(signal_pack) = signal_receiver.recv().await else {
-      continue;
+    let signal_pack = match signal_receiver.recv().await {
+      Some(inner) => inner,
+      None => continue,
     };
     let received = signal_pack.message;
     ComplexSignalTestResult(sent == received).send_signal_to_dart();
