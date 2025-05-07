@@ -91,7 +91,15 @@ impl<T> ReportError<T> for Result<T> {
 }
 
 fn example_function() {
-  let number_result: Result<i32> = function_that_returns_result();
-  number_result.report();
+  let empty_result: Result<()> = returns_empty_result();
+  empty_result.report();
+  for _ in range 0..5 {
+    let number_result: Result<i32> = returns_number_result();
+    let number = match number_result.report() {
+      Some(inner) => inner,
+      None => continue,
+    }
+    use_number(number);
+  }
 }
 ```
