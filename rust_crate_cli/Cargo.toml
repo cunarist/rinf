@@ -18,7 +18,7 @@ expect_used = "deny"
 wildcard_imports = "deny"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-serde = { version = "1", features = ["derive"] }
+serde = { version = "1.0.219", features = ["derive"] }
 clap = { version = "4.5.32", features = ["derive"] }
 owo-colors = "4.2.0"
 syn = { version = "2.0.98", features = ["full"] }

@@ -4,11 +4,12 @@
 
 use crate::channel::SignalReceiver;
 use crate::interface::DartSignalPack;
+use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
 /// Defines the methods that a type capable of
 /// receiving Dart signals must implement.
-pub trait DartSignalBinary: Sized {
+pub trait DartSignalBinary: for<'a> Deserialize<'a> {
   /// Returns the receiver that listens for signals from Dart.
   ///
   /// If this function is called multiple times,
@@ -19,7 +20,7 @@ pub trait DartSignalBinary: Sized {
 
 /// Defines the methods that a type capable of
 /// receiving Dart signals must implement.
-pub trait DartSignal: Sized {
+pub trait DartSignal: for<'a> Deserialize<'a> {
   /// Returns the receiver that listens for signals from Dart.
   /// If this function is called multiple times,
   /// only the most recent receiver remains active,
@@ -29,7 +30,7 @@ pub trait DartSignal: Sized {
 
 /// Defines the methods that a type capable of
 /// sending Rust signals with binary data must implement.
-pub trait RustSignalBinary {
+pub trait RustSignalBinary: Serialize {
   /// Sends a signal to Dart with separate binary data.
   /// Passing data from Dart to Rust is a zero-copy operation.
   fn send_signal_to_dart(&self, binary: Vec<u8>);
@@ -37,7 +38,7 @@ pub trait RustSignalBinary {
 
 /// Defines the methods that a type capable of
 /// sending Rust signals must implement.
-pub trait RustSignal {
+pub trait RustSignal: Serialize {
   /// Sends a signal to Dart.
   /// Passing data from Dart to Rust is a zero-copy operation.
   fn send_signal_to_dart(&self);

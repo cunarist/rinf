@@ -88,7 +88,7 @@ Modify your dependencies:
 - rinf = "7.0.0"
 - prost = "0.12.6"
 + rinf = "8.0.0"
-+ serde = "1.0.202"
++ serde = "1.0.219"
 ```
 
 Move all Protobuf messages into the `hub` crate. Placing them inside `native/hub/src/signals/mod.rs` can be a good starting point, though any location within the `hub` crate is acceptable:
