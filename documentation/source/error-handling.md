@@ -89,16 +89,22 @@ impl<T> ReportError<T> for Result<T> {
     }
   }
 }
+```
 
+```{code-block} rust
+:caption: Rust
 fn example_function() {
+  // Report from a top-level function.
   let empty_result: Result<()> = returns_empty_result();
   empty_result.report();
-  for _ in range 0..5 {
+
+  // Report before consuming the result value.
+  for _ in 0..5 {
     let number_result: Result<i32> = returns_number_result();
     let number = match number_result.report() {
       Some(inner) => inner,
       None => continue,
-    }
+    };
     use_number(number);
   }
 }
