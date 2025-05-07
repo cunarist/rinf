@@ -19,6 +19,7 @@ wildcard_imports = "deny"
 
 [dependencies]
 rinf_proc = { version = "8.1.0" }
+serde = "1.0.219"
 bincode = "1.3.3"
 bevy_ecs = { version = "0.16", optional = true }
 
