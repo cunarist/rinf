@@ -1,3 +1,8 @@
+## 8.2.0
+
+- The trait bounds of signal traits have been reorganized.
+- Internal code structure has been improved.
+
 ## 8.1.0
 
 - `DartSignal` and `DartSignalBinary` are now non-generic traits. This allows for cleaner and more straightforward signal handling.
