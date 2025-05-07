@@ -67,25 +67,31 @@ You may want to log errors to the console or a file. Several crates can help wit
 
 Using a centralized trait for logging errors can be helpful. By calling a common method for logging, you can handle the propagated error consistently. Rust automatically warns you about unused `Result`s, making it easier to handle all errors in your code.
 
+The trait below demonstrates how to consume only the error variant for logging.
+
 ```{code-block} rust
 :caption: Rust
 use anyhow::Result;
 use tracing::error;
 
-pub trait ReportError {
-  fn report(self);
+pub trait ReportError<T> {
+  fn report(self) -> Option<T>;
 }
 
-impl ReportError for Result<()> {
-  fn report(self) {
-    if let Err(err) = self {
-      error!("{}", err);
-    };
+impl<T> ReportError<T> for Result<T> {
+  fn report(self) -> Option<T> {
+    match self {
+      Ok(inner) => Some(inner),
+      Err(err) => {
+        error!("{:?}", err);
+        None
+      }
+    }
   }
 }
 
 fn example_function() {
-  let result: Result<()> = function_that_returns_result();
-  result.report();
+  let number_result: Result<i32> = function_that_returns_result();
+  number_result.report();
 }
 ```
