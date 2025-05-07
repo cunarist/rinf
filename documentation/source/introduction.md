@@ -17,7 +17,7 @@ Rinf expects the entire business logic to be written in Rust, with Flutter only 
 
 ![Rinf design](_static/rinf_design.png)
 
-Rinf uses a two-way, stream-based message-passing mechanism instead of function calls. This decouples the business logic from the UI, ensuring a clear separation of concerns.
+The communication system is made up of a two-way, stream-based message-passing mechanism instead of function calls. This decouples the business logic from the UI, ensuring a clear separation of concerns.
 
 It is recommended to use the actor model on the Rust side and tree-based state management techniques such as `InheritedWidget` or `provider` in Flutter for efficient state propagation.
 
