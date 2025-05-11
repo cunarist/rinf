@@ -94,7 +94,7 @@ Now Let's delve into the meaning of each field of a signal.
 
 - **Field `binary`:** This is a field designed to handle large binary data, potentially up to a few gigabytes. You can send any kind of binary data you wish, such as a high-resolution image or file data. This field carries empty `Uint8List` or `Vec<u8>` if the message is not marked as binary signal.
 
-It's important to note that creating a signal larger than a few megabytes is not recommended. For large data, split them into multiple signals, or use the `binary` field instead.[^2]
+It's important to note that creating a signal larger than a few megabytes is not recommended. For large data, split it into multiple signals or use the `binary` field provided by the `RustSignalBinary` or `DartSignalBinary` traits instead.[^2]
 
 [^2]: Sending a serialized message or binary data is a zero-copy operation from Rust to Dart, while it involves a copy operation from Dart to Rust in memory. Keep in mind that Serde's serialization and deserialization does involve memory copy.
 
