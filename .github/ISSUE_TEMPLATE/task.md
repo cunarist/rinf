@@ -8,8 +8,8 @@ assignees: ""
 
 ## Current Status
 
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
-If it's a fresh new idea, please write it as a discussion rather than an issue.
+Provide a clear and concise description of what is currently missing.
+If this is a completely new idea, consider writing it as a discussion instead of an issue.
 
 ## Describe the Task
 
