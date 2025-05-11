@@ -9,7 +9,7 @@ assignees: ""
 ## Describe the Bug
 
 A clear and concise description of what the bug is.
-If it's not a bug, please write it as a discussion rather than an issue.
+If it's not a bug, please leave a discussion instead of an issue.
 
 ## To Reproduce
 

@@ -9,7 +9,7 @@ assignees: ""
 ## Current Status
 
 Provide a clear and concise description of what is currently missing.
-If this is a completely new idea, consider writing it as a discussion instead of an issue.
+If this is a completely new idea, please leave a discussion instead of an issue.
 
 ## Describe the Task
 
