@@ -32,7 +32,7 @@ If applicable, add screenshots to help explain your problem.
 
 Output from the command below with markdown codeblock syntax.
 
-```{code-block} shell
+```shell
 rustc --version
 flutter doctor
 ```
