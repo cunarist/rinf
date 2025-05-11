@@ -104,17 +104,17 @@ To nest a struct inside a signal struct, use the `SignalPiece` trait. A `SignalP
 
 ```{code-block} rust
 :caption: Rust
-#[derive(Serialize, Deserialize, RustSignal, DartSignal)]
+#[derive(Serialize, RustSignal)]
 struct Outer {
   middle: Middle,
 }
 
-#[derive(Serialize, Deserialize, SignalPiece)]
+#[derive(Serialize, SignalPiece)]
 struct Middle {
   inner: Inner,
 }
 
-#[derive(Serialize, Deserialize, SignalPiece)]
+#[derive(Serialize, SignalPiece)]
 struct Inner {
   my_field: bool,
 }
