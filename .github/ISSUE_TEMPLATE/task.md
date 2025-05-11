@@ -13,7 +13,7 @@ If this is a completely new idea, please leave a discussion instead of an issue.
 
 ## Describe the Task
 
-A clear and concise description of what will to happen.
+A clear and concise description of the improvements.
 
 ## Describe Alternatives You've Considered
 
