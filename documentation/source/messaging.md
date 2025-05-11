@@ -88,7 +88,7 @@ while let Some(signal_pack) = receiver.recv().await {
 }
 ```
 
-Now Let's delve into the meaning of each field of a signal.
+Now let's delve into the meaning of each field of a signal.
 
 - **Field `message`:** It represents a message of a type annotated by a signal trait. This field is always filled.
 
