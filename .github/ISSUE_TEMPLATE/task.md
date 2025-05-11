@@ -9,6 +9,7 @@ assignees: ""
 ## Current Status
 
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+If it's a fresh new idea, please write it as a discussion rather than an issue.
 
 ## Describe the Task
 
