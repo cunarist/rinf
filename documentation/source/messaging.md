@@ -2,7 +2,7 @@
 
 You can use signal traits to mark a struct as a stream endpoint.
 
-When you generate message code using the `rinf gen` command, the resulting Dart modules will be placed under `lib/src/bindings` folder by default.
+When you generate Dart signal class code from Rust structs using the `rinf gen` command, the `hub` crate is analyzed, and the resulting Dart modules are placed in `lib/src/bindings` folder by default.
 
 ```{code-block} shell
 :caption: CLI
