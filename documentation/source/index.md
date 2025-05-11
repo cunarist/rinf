@@ -13,6 +13,7 @@
    applying-template.md
    running-and-building.md
    messaging.md
+   field-types.md
    tutorial.md
    state-management.md
    error-handling.md
