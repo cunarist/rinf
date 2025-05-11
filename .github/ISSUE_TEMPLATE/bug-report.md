@@ -30,7 +30,7 @@ If applicable, add screenshots to help explain your problem.
 
 ## Additional Context
 
-Output from the command below with markdown codeblock syntax.
+Output from the command below, shown in a Markdown code block.
 
 ```shell
 rustc --version
