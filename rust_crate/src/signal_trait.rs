@@ -7,19 +7,21 @@ use crate::interface::DartSignalPack;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
-/// Defines the methods that a type capable of
-/// receiving Dart signals must implement.
-pub trait DartSignalBinary: for<'a> Deserialize<'a> {
-  /// Returns the receiver that listens for signals from Dart.
-  ///
-  /// If this function is called multiple times,
-  /// only the most recent receiver remains active,
-  /// and all previous ones become inactive after receiving `None`.
-  fn get_dart_signal_receiver() -> SignalReceiver<DartSignalPack<Self>>;
+/// Capability of sending signals from Rust to Dart.
+pub trait RustSignal: Serialize {
+  /// Sends a signal to Dart.
+  /// Passing data from Dart to Rust is a zero-copy operation.
+  fn send_signal_to_dart(&self);
 }
 
-/// Defines the methods that a type capable of
-/// receiving Dart signals must implement.
+/// Capability of sending signals from Rust to Dart with binary data.
+pub trait RustSignalBinary: Serialize {
+  /// Sends a signal to Dart with separate binary data.
+  /// Passing data from Dart to Rust is a zero-copy operation.
+  fn send_signal_to_dart(&self, binary: Vec<u8>);
+}
+
+/// Capability of sending signals from Dart to Rust.
 pub trait DartSignal: for<'a> Deserialize<'a> {
   /// Returns the receiver that listens for signals from Dart.
   /// If this function is called multiple times,
@@ -28,20 +30,13 @@ pub trait DartSignal: for<'a> Deserialize<'a> {
   fn get_dart_signal_receiver() -> SignalReceiver<DartSignalPack<Self>>;
 }
 
-/// Defines the methods that a type capable of
-/// sending Rust signals with binary data must implement.
-pub trait RustSignalBinary: Serialize {
-  /// Sends a signal to Dart with separate binary data.
-  /// Passing data from Dart to Rust is a zero-copy operation.
-  fn send_signal_to_dart(&self, binary: Vec<u8>);
-}
-
-/// Defines the methods that a type capable of
-/// sending Rust signals must implement.
-pub trait RustSignal: Serialize {
-  /// Sends a signal to Dart.
-  /// Passing data from Dart to Rust is a zero-copy operation.
-  fn send_signal_to_dart(&self);
+/// Capability of sending signals from Dart to Rust with binary data.
+pub trait DartSignalBinary: for<'a> Deserialize<'a> {
+  /// Returns the receiver that listens for signals from Dart.
+  /// If this function is called multiple times,
+  /// only the most recent receiver remains active,
+  /// and all previous ones become inactive after receiving `None`.
+  fn get_dart_signal_receiver() -> SignalReceiver<DartSignalPack<Self>>;
 }
 
 /// Ensures that all inner structs and enums
