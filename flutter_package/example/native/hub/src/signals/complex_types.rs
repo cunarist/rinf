@@ -9,7 +9,7 @@ use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 #[derive(Serialize, Deserialize, PartialEq, DartSignal, RustSignal, Clone)]
 pub enum SerdeData {
   PrimitiveTypes(PrimitiveTypes),
-  OtherTypes(OtherTypes),
+  OtherTypes(Box<OtherTypes>),
   UnitVariant,
   NewTypeVariant(String),
   TupleVariant(u32, u64),
