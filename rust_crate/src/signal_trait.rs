@@ -39,8 +39,7 @@ pub trait DartSignalBinary: for<'a> Deserialize<'a> {
   fn get_dart_signal_receiver() -> SignalReceiver<DartSignalPack<Self>>;
 }
 
-/// Ensures that all inner structs and enums
-/// within signal structs and enums are also signals.
+/// Enables a type to be nested within a signal struct or enum.
 pub trait SignalPiece {}
 
 // Implement the trait for simple primitives.
