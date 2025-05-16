@@ -72,7 +72,7 @@ fn get_complex_signals() -> Vec<SerdeData> {
     f_char: None,
   });
 
-  let v2 = SerdeData::OtherTypes(OtherTypes {
+  let v2 = SerdeData::OtherTypes(Box::new(OtherTypes {
     f_string: "test".to_string(),
     f_bytes: b"bytes".to_vec(),
     f_option: Some(Struct { x: 2, y: 3 }),
@@ -99,9 +99,9 @@ fn get_complex_signals() -> Vec<SerdeData> {
       vec![Struct { x: 8, y: 9 }],
     ],
     f_boxed_struct: Box::new(Struct { x: 10, y: 11 }),
-  });
+  }));
 
-  let v2bis = SerdeData::OtherTypes(OtherTypes {
+  let v2bis = SerdeData::OtherTypes(Box::new(OtherTypes {
     f_string: "".to_string(),
     f_bytes: b"".to_vec(),
     f_option: None,
@@ -133,9 +133,9 @@ fn get_complex_signals() -> Vec<SerdeData> {
     },
     f_nested_seq: Vec::new(),
     f_boxed_struct: Box::new(Struct { x: 0, y: 0 }),
-  });
+  }));
 
-  let v2ter = SerdeData::OtherTypes(OtherTypes {
+  let v2ter = SerdeData::OtherTypes(Box::new(OtherTypes {
     f_string: "".to_string(),
     f_bytes: vec![1u8; 129],
     f_option: None,
@@ -155,7 +155,7 @@ fn get_complex_signals() -> Vec<SerdeData> {
       .collect(),
     f_nested_seq: Vec::new(),
     f_boxed_struct: Box::new(Struct { x: 0, y: 0 }),
-  });
+  }));
 
   let v3 = SerdeData::UnitVariant;
 
