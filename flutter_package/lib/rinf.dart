@@ -30,7 +30,7 @@ Future<void> initializeRust(
 }
 
 /// Terminates all Rust tasks by dropping the async runtime.
-/// This function blocks the Dart thread
+/// This function very briefly blocks the Dart thread
 /// until the async runtime in Rust is completely dropped.
 /// It's recommended to call this before closing your Flutter app
 /// to prevent potential resource leaks from Rust.
