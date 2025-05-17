@@ -1,5 +1,7 @@
 # Python scripts manage code and automate tests.
 # We avoid shell scripts because they are platform-dependent.
+# You can run the automation scripts with
+# `uv run automate [command_type]`.
 
 [dependency-groups]
 dev = ["ruff", "pyright"]
