@@ -1,3 +1,9 @@
+## 8.3.0
+
+- Now `finalizeRust` properly blocks the Dart thread until Rust async runtime is completely dropped.
+- Several Dart functions have been changed to non-async, which is more appropriate for their functionality.
+- Documentation comments have been improved.
+
 ## 8.2.0
 
 - The trait bounds of signal traits have been reorganized.
