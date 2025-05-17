@@ -184,9 +184,15 @@ fn update_main_dart(root_dir: &Path) -> Result<(), SetupError> {
       );
     }
     if !content.contains("initializeRust(assignRustSignal)") {
+      // Make sure that the main function is async.
+      content =
+        content.replacen("void main() {", "Future<void> main() async {", 1);
+      content =
+        content.replacen("int main() {", "Future<int> main() async {", 1);
+      // Insert the call to `initializeRust`.
       content = content.replacen(
-        "void main() {",
-        "Future<void> main() async {\
+        "main() async {",
+        "main() async {\
         \n  await initializeRust(assignRustSignal);",
         1,
       );
