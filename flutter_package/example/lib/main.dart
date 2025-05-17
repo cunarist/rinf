@@ -9,7 +9,7 @@ Future<void> main() async {
   runApp(MyApp());
 }
 
-Future<void> createActors() async {
+void createActors() {
   CreateActors().sendSignalToRust();
 }
 
@@ -68,7 +68,7 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
       body: Center(child: MyColumn()),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
+        onPressed: () {
           // The `sendSignalToRust` method is generated
           // on structs that derive `DartSignal`.
           SampleNumberInput(
