@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:rinf/rinf.dart';
 import 'src/bindings/bindings.dart';
 
-void main() async {
+Future<void> main() async {
   await initializeRust(assignRustSignal);
   createActors();
   runApp(MyApp());
 }
 
-Future<void> createActors() async {
+void createActors() {
   CreateActors().sendSignalToRust();
 }
 
@@ -68,7 +68,7 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
       body: Center(child: MyColumn()),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
+        onPressed: () {
           // The `sendSignalToRust` method is generated
           // on structs that derive `DartSignal`.
           SampleNumberInput(

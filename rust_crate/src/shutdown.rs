@@ -92,9 +92,8 @@ impl Event {
   /// this method will return immediately.
   /// Otherwise, it will block until `set` is called by another thread.
   pub fn wait(&self) {
-    let event_blocking =
-      EventBlocking::new(self.inner.clone(), self.condvar.clone());
-    event_blocking.wait();
+    let blocking = EventBlocking::new(self.inner.clone(), self.condvar.clone());
+    blocking.wait();
   }
 }
 
@@ -106,7 +105,7 @@ struct EventInner {
 }
 
 impl EventInner {
-  fn new() -> Self {
+  pub fn new() -> Self {
     EventInner {
       flag: false,
       session: 0,
@@ -125,7 +124,7 @@ struct EventBlocking {
 
 #[cfg(not(target_family = "wasm"))]
 impl EventBlocking {
-  fn new(inner: Arc<Mutex<EventInner>>, condvar: Arc<Condvar>) -> Self {
+  pub fn new(inner: Arc<Mutex<EventInner>>, condvar: Arc<Condvar>) -> Self {
     let guard = inner.lock().recover();
     EventBlocking {
       inner: inner.clone(),

@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 import 'package:rinf/rinf.dart';
 import 'package:example_app/src/bindings/bindings.dart';
 
-void main() async {
+Future<void> main() async {
   // Build the dynamic library and load it.
   await Process.run('cargo', ['build'], runInShell: true);
   await initializeRust(assignRustSignal, compiledLibPath: getLibPath());

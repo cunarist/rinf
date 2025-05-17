@@ -106,6 +106,7 @@ where
 #[unsafe(no_mangle)]
 extern "C" fn rinf_stop_rust_logic_extern() {
   SHUTDOWN_EVENTS.dart_stopped.set();
+  SHUTDOWN_EVENTS.rust_stopped.wait();
 }
 
 pub fn send_rust_signal_real(

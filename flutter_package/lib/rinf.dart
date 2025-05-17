@@ -30,11 +30,13 @@ Future<void> initializeRust(
 }
 
 /// Terminates all Rust tasks by dropping the async runtime.
-/// Calling this function before closing the Flutter app
-/// can prevent potential resource leaks.
-/// Please note that on the web, this function does not have any effect,
-/// as tasks are managed by the JavaScript runtime, not Rust.
-void finalizeRust() async {
+/// This function very briefly blocks the Dart thread
+/// until the async runtime in Rust is completely dropped.
+/// It's recommended to call this before closing your Flutter app
+/// to prevent potential resource leaks from Rust.
+/// On the web, this function has no effect as tasks are managed by
+/// the JavaScript runtime rather than the Rust async runtime.
+void finalizeRust() {
   stopRustLogicReal();
 }
 
@@ -44,7 +46,7 @@ void sendDartSignal(
   String endpointSymbol,
   Uint8List messageBytes,
   Uint8List binary,
-) async {
+) {
   sendDartSignalReal(
     endpointSymbol,
     messageBytes,
