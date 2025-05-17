@@ -34,7 +34,7 @@ Future<void> initializeRust(
 /// can prevent potential resource leaks.
 /// Please note that on the web, this function does not have any effect,
 /// as tasks are managed by the JavaScript runtime, not Rust.
-void finalizeRust() async {
+void finalizeRust() {
   stopRustLogicReal();
 }
 
@@ -44,7 +44,7 @@ void sendDartSignal(
   String endpointSymbol,
   Uint8List messageBytes,
   Uint8List binary,
-) async {
+) {
   sendDartSignalReal(
     endpointSymbol,
     messageBytes,

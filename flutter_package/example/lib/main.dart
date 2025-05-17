@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:rinf/rinf.dart';
 import 'src/bindings/bindings.dart';
 
-void main() async {
+Future<void> main() async {
   await initializeRust(assignRustSignal);
   createActors();
   runApp(MyApp());

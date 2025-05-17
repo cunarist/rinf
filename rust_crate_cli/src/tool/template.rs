@@ -185,8 +185,8 @@ fn update_main_dart(root_dir: &Path) -> Result<(), SetupError> {
     }
     if !content.contains("initializeRust(assignRustSignal)") {
       content = content.replacen(
-        "main() {",
-        "main() async {\n    await initializeRust(assignRustSignal);",
+        "void main() {",
+        "Future<void> main() async {\n  await initializeRust(assignRustSignal);",
         1,
       );
     }
