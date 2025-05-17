@@ -2,7 +2,7 @@
 name: Task
 about: Write something to do for this project
 title: ""
-labels: todo
+labels: enhancement
 assignees: ""
 ---
 
