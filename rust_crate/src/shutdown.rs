@@ -38,7 +38,7 @@ pub fn dart_shutdown() -> impl Future<Output = ()> {
 pub struct Event {
   inner: Arc<Mutex<EventInner>>,
   #[cfg(not(target_family = "wasm"))]
-  condvar: Arc<Condvar>,
+  condvar: Condvar,
 }
 
 impl Event {
@@ -52,7 +52,7 @@ impl Event {
     Event {
       inner: Arc::new(Mutex::new(inner)),
       #[cfg(not(target_family = "wasm"))]
-      condvar: Arc::new(Condvar::new()),
+      condvar: Condvar::new(),
     }
   }
 
