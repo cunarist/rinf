@@ -44,8 +44,13 @@ pub struct Event {
 impl Event {
   /// Creates a new `Event` with the initial flag state.
   pub fn new() -> Self {
+    let inner = EventInner {
+      flag: false,
+      session: 0,
+      wakers: Vec::new(),
+    };
     Event {
-      inner: Arc::new(Mutex::new(EventInner::new())),
+      inner: Arc::new(Mutex::new(inner)),
       #[cfg(not(target_family = "wasm"))]
       condvar: Arc::new(Condvar::new()),
     }
@@ -111,16 +116,6 @@ struct EventInner {
   flag: bool,         // Current flag state
   session: usize,     // Session count to detect changes
   wakers: Vec<Waker>, // List of wakers to be notified
-}
-
-impl EventInner {
-  pub fn new() -> Self {
-    EventInner {
-      flag: false,
-      session: 0,
-      wakers: Vec::new(),
-    }
-  }
 }
 
 /// Future that resolves when the `Event` flag is set to `true`.
