@@ -92,8 +92,17 @@ impl Event {
   /// this method will return immediately.
   /// Otherwise, it will block until `set` is called by another thread.
   pub fn wait(&self) {
-    let blocking = EventBlocking::new(self.inner.clone(), self.condvar.clone());
-    blocking.wait();
+    // Lock the inner state and wait on the condition variable
+    let mut guard = self.inner.lock().recover();
+    let started_session = guard.session;
+    loop {
+      // Check if the condition is met
+      if guard.flag || guard.session != started_session {
+        break;
+      }
+      // Wait on the condition variable and reassign the guard
+      guard = self.condvar.wait(guard).recover();
+    }
   }
 }
 
@@ -110,39 +119,6 @@ impl EventInner {
       flag: false,
       session: 0,
       wakers: Vec::new(),
-    }
-  }
-}
-
-/// Struct to handle waiting with session tracking.
-#[cfg(not(target_family = "wasm"))]
-struct EventBlocking {
-  inner: Arc<Mutex<EventInner>>,
-  condvar: Arc<Condvar>,
-  started_session: usize,
-}
-
-#[cfg(not(target_family = "wasm"))]
-impl EventBlocking {
-  pub fn new(inner: Arc<Mutex<EventInner>>, condvar: Arc<Condvar>) -> Self {
-    let guard = inner.lock().recover();
-    EventBlocking {
-      inner: inner.clone(),
-      condvar,
-      started_session: guard.session,
-    }
-  }
-
-  pub fn wait(&self) {
-    // Lock the inner state and wait on the condition variable
-    let mut guard = self.inner.lock().recover();
-    loop {
-      // Check if the condition is met
-      if guard.flag || guard.session != self.started_session {
-        break;
-      }
-      // Wait on the condition variable and reassign the guard
-      guard = self.condvar.wait(guard).recover();
     }
   }
 }
