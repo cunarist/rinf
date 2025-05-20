@@ -20,7 +20,7 @@ wildcard_imports = "deny"
 rinf = "8.3.0"
 serde = { version = "1.0.219", features = ["derive"] }
 tokio = { version = "1.45.0", features = ["rt", "sync", "time", "macros"] }
-tokio_with_wasm = { version = "0.8.2", features = [
+tokio_with_wasm = { version = "0.8.5", features = [
     "rt",
     "sync",
     "time",

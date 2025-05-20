@@ -24,5 +24,5 @@ async-trait = "0.1.87"
 messages = "0.3.1"
 
 # Uncomment below to target the web.
-# tokio_with_wasm = { version = "0.8.2", features = ["rt", "macros", "time"] }
+# tokio_with_wasm = { version = "0.8.5", features = ["rt", "macros", "time"] }
 # wasm-bindgen = "0.2.100"
