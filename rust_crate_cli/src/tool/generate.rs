@@ -1,6 +1,6 @@
 use crate::dimmedln;
 use crate::tool::{CleanFileName, RinfConfig, SetupError};
-use convert_case::{Case, Casing};
+use heck::{ToLowerCamelCase, ToSnakeCase};
 use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
 use serde_generate::dart::{CodeGenerator, Installer};
 use serde_generate::{CodeGeneratorConfig, Encoding, SourceInstaller};
@@ -394,7 +394,7 @@ fn generate_class_extension_code(
   class: &str,
   extracted_attrs: &BTreeSet<SignalAttribute>,
 ) -> Result<(), SetupError> {
-  let snake_class = class.to_case(Case::Snake);
+  let snake_class = class.to_snake_case();
   let class_file = gen_dir.join(GEN_MOD).join(format!("{}.dart", snake_class));
   let mut code = read_to_string(&class_file)?;
 
@@ -448,14 +448,14 @@ fn generate_class_interface_code(
   class: &str,
   extracted_attrs: &BTreeSet<SignalAttribute>,
 ) -> Result<(), SetupError> {
-  let snake_class = class.to_case(Case::Snake);
+  let snake_class = class.to_snake_case();
   let class_file = gen_dir.join(GEN_MOD).join(format!("{}.dart", snake_class));
   let mut code = read_to_string(&class_file)?;
 
   let has_rust_signal = extracted_attrs.contains(&SignalAttribute::RustSignal)
     || extracted_attrs.contains(&SignalAttribute::RustSignalBinary);
   if has_rust_signal {
-    let camel_class = class.to_case(Case::Camel);
+    let camel_class = class.to_lower_camel_case();
     let new_code = format!(
       r#"
 final _{camel_class}StreamController =
@@ -503,7 +503,7 @@ fn generate_shared_code(
     if !has_rust_signal {
       continue;
     }
-    let camel_class = class.to_case(Case::Camel);
+    let camel_class = class.to_lower_camel_case();
     let new_code = format!(
       r#"
   '{class}': (Uint8List messageBytes, Uint8List binary) {{

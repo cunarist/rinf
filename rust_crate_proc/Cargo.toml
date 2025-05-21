@@ -18,5 +18,5 @@ wildcard_imports = "deny"
 [dependencies]
 syn = "2.0.98"
 quote = "1.0.38"
-convert_case = "0.8.0"
+heck = "0.5.0"
 proc-macro2 = "1.0.94"

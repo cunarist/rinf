@@ -1,4 +1,4 @@
-use convert_case::{Case, Casing};
+use heck::{ToShoutySnakeCase, ToSnakeCase};
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
@@ -69,8 +69,8 @@ fn derive_dart_signal_real(
   let ast = parse_macro_input!(input as DeriveInput);
   let name = &ast.ident;
   let name_lit = name.to_string();
-  let snake_name = name_lit.to_case(Case::Snake);
-  let upper_snake_name = name_lit.to_case(Case::UpperSnake);
+  let snake_name = name_lit.to_snake_case();
+  let upper_snake_name = name_lit.to_shouty_snake_case();
 
   // Check the name.
   if name_lit.to_lowercase().starts_with(BANNED_LOWER_PREFIX) {
