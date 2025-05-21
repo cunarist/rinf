@@ -1,3 +1,8 @@
+## 8.3.1
+
+- Now signal structs with numbers in their names work properly with `rinf gen`.
+- Fixed an issue where `DartSignalBinary` generated code contained an extra curly bracket.
+
 ## 8.3.0
 
 - Now `finalizeRust` properly blocks the Dart thread until Rust async runtime is completely dropped.
