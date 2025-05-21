@@ -407,12 +407,11 @@ extension {class}DartSignalExt on {class} {{
   /// because Rust cannot own data managed by Dart's garbage collector.
   void sendSignalToRust(Uint8List binary) {{
     final messageBytes = bincodeSerialize();
-      sendDartSignal(
-        'rinf_send_dart_signal_{snake_class}',
-        messageBytes,
-        binary,
-      );
-    }}
+    sendDartSignal(
+      'rinf_send_dart_signal_{snake_class}',
+      messageBytes,
+      binary,
+    );
   }}
 }}
 "#
