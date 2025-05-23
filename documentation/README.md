@@ -1,27 +1,21 @@
 # Documentation
 
-In order to preview and build this documentation, you need to have Python and [Poetry](https://python-poetry.org/docs/) installed on your system.
+In order to preview and build this documentation, you need to have [uv](https://docs.astral.sh/uv/getting-started/installation/) installed on your system.
 
-Activate the virtual environment.
+Generate the static documentation files for publication on the web.
 
-```bash
-poetry shell
+```shell
+uv run sphinx-build -M dirhtml source dist
 ```
 
-Install Python dependencies.
+Serve the built files locally.
 
-```bash
-poetry install
+```shell
+uv run python server.py
 ```
 
-Activate test server during development.
+Automatically apply changes while writing.
 
-```bash
-mkdocs serve
-```
-
-Activate test server during development.
-
-```bash
-mkdocs build
+```shell
+uv run sphinx-autobuild source dist --builder dirhtml
 ```

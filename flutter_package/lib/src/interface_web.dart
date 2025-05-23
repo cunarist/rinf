@@ -1,11 +1,11 @@
 // ignore_for_file: avoid_web_libraries_in_flutter
 
-import 'load_web.dart';
-import 'dart:typed_data';
-import 'dart:js' as js;
-import 'interface.dart';
 import 'dart:async';
-import 'dart:convert';
+import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
+import 'dart:typed_data';
+import 'load_web.dart';
+import 'structure.dart';
 
 /// Sets the path to the JavaScript module
 /// that needs to be loaded.
@@ -16,31 +16,26 @@ void setCompiledLibPathReal(String path) {
 Future<void> prepareInterfaceReal(
   AssignRustSignal assignRustSignal,
 ) async {
+  // Load the JavaScript module.
   await loadJsFile();
 
-  // Listen to Rust via JavaScript
-  final jsObject = js.context['rinf'] as js.JsObject;
-  jsObject['send_rust_signal_extern'] = (
-    int messageId,
-    Uint8List messageBytes,
-    Uint8List binary,
+  // Listen to Rust via JavaScript.
+  rinfBindingsObject['rinf_send_rust_signal_extern'] = ((
+    String endpoint,
+    JSObject messageBytesJS,
+    JSObject binaryJS,
   ) {
-    if (messageId == -1) {
-      // -1 is a special message ID for Rust reports.
-      String rustReport = utf8.decode(binary);
-      print(rustReport);
-      return;
-    }
-    assignRustSignal(messageId, messageBytes, binary);
-  };
+    final messageBytes = (messageBytesJS as JSUint8Array).toDart;
+    final binary = (binaryJS as JSUint8Array).toDart;
+    assignRustSignal[endpoint]!(messageBytes, binary);
+  }).toJS;
 }
 
 void startRustLogicReal() {
   if (wasAlreadyLoaded) {
     return;
   }
-  final jsObject = js.context['rinf'] as js.JsObject;
-  jsObject.callMethod('start_rust_logic_extern', []);
+  wasmBindingsObject.callMethod('rinf_start_rust_logic_extern'.toJS);
 }
 
 void stopRustLogicReal() {
@@ -48,14 +43,13 @@ void stopRustLogicReal() {
 }
 
 void sendDartSignalReal(
-  int messageId,
+  String endpointSymbol,
   Uint8List messageBytes,
   Uint8List binary,
 ) {
-  final jsObject = js.context['rinf'] as js.JsObject;
-  jsObject.callMethod('send_dart_signal_extern', [
-    messageId,
-    messageBytes,
-    binary,
-  ]);
+  wasmBindingsObject.callMethod(
+    endpointSymbol.toJS,
+    messageBytes.toJS,
+    binary.toJS,
+  );
 }

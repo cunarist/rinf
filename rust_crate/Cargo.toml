@@ -1,29 +1,34 @@
 [package]
 name = "rinf"
-version = "6.15.0"
-edition = "2021"
+version = "8.3.2"
+edition = "2024"
 license = "MIT"
 description = "Rust for native business logic, Flutter for flexible and beautiful GUI"
 repository = "https://github.com/cunarist/rinf"
 documentation = "https://rinf.cunarist.com"
-rust-version = "1.80"
+rust-version = "1.85"
 
 [features]
 show-backtrace = ["backtrace"]
 bevy = ["bevy_ecs"]
 
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+wildcard_imports = "deny"
+
 [dependencies]
-bevy_ecs = { version = "0.14", optional = true }
+rinf_proc = { version = "8.3.2" }
+serde = "1.0.219"
+bincode = "1.3.3"
+bevy_ecs = { version = "0.16", optional = true }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
+allo-isolate = "0.1.26"
 os-thread-local = "0.1.3"
 backtrace = { version = "0.3.69", optional = true }
-protoc-prebuilt = "0.3.0"
-home = "0.5.9"
-which = "6.0.0"
-allo-isolate = "0.1.25"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-js-sys = "0.3.70"
-wasm-bindgen = "0.2.93"
-wasm-bindgen-futures = "0.4.43"
+js-sys = "0.3.77"
+wasm-bindgen = "0.2.100"
+wasm-bindgen-futures = "0.4.50"

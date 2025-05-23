@@ -1,7 +1,7 @@
 # Publish packages online.
 # This is performed only when a new Git tag
 # with version information is added.
-name: publication
+name: Publication
 
 # With default Git settings, Unix-like systems use LF (`\n`) for new lines,
 # while Windows uses CRLF (`\r\n`) in local repositories.
@@ -43,23 +43,29 @@ jobs:
 
       # https://dart.dev/tools/pub/automated-publishing
 
-      - name: Check the Flutter FFI plugin
+      - name: Publish the Flutter package
         working-directory: flutter_package/
-        run: dart pub publish --dry-run
-
-      - name: Publish the Flutter FFI plugin
-        working-directory: flutter_package/
-        run: dart pub publish --force
+        run: |
+          dart pub publish --dry-run
+          dart pub publish --force
 
       # Save the `crates.io` API token at
       # `GitHub repo - Settings - Security - Secrets and variables - Actions`.
 
-      - name: Check the Rust crate
-        working-directory: rust_crate/
-        run: cargo publish --dry-run
+      - name: Login to the crates registry
+        run: cargo login ${{ secrets.CRATES_IO_API_TOKEN }}
 
-      - name: Publish the Rust crate
-        working-directory: rust_crate/
+      - name: Publish the procedural macro crate
         run: |
-          cargo login ${{ secrets.CRATES_IO_API_TOKEN }}
-          cargo publish
+          cargo publish --manifest-path rust_crate_proc/Cargo.toml --dry-run
+          cargo publish --manifest-path rust_crate_proc/Cargo.toml
+
+      - name: Publish the binary crate
+        run: |
+          cargo publish --manifest-path rust_crate_cli/Cargo.toml --dry-run
+          cargo publish --manifest-path rust_crate_cli/Cargo.toml
+
+      - name: Publish the library crate
+        run: |
+          cargo publish --manifest-path rust_crate/Cargo.toml --dry-run
+          cargo publish --manifest-path rust_crate/Cargo.toml

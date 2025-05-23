@@ -28,9 +28,11 @@ migrate_working_dir/
 build/
 
 # Rust related
-.cargo/
-target/
+/.cargo/
+/target/
 
 # Others
 *.lock
-/documentation/site/
+.python-version
+/documentation/dist/
+/documentation/*.egg-info/

@@ -1,3 +1,101 @@
+## 8.3.2
+
+- The problem of `libhub.so` not being found on Android has been fixed. This was because of the new Flutter template updated by Google. If you experience any issues, we recommend replacing the `android` directory under the Flutter project with the latest one.
+
+## 8.3.1
+
+- Now signal structs with numbers in their names work properly with `rinf gen`.
+- Fixed an issue where `DartSignalBinary` generated code contained an extra curly bracket.
+
+## 8.3.0
+
+- Now `finalizeRust` properly blocks the Dart thread until Rust async runtime is completely dropped.
+- Several Dart functions have been changed to non-async, which is more appropriate for their functionality.
+- Documentation comments have been improved.
+
+## 8.2.0
+
+- The trait bounds of signal traits have been reorganized.
+- Internal code structure has been improved.
+
+## 8.1.0
+
+- `DartSignal` and `DartSignalBinary` are now non-generic traits. This allows for cleaner and more straightforward signal handling.
+
+## 8.0.0
+
+- To migrate from Rinf version 7, refer to [this section](https://rinf.cunarist.com/upgrading/) in the documentation.
+- Rinf no longer uses Protobuf. It now uses Serde. You should annotate Rust structs to define signal endpoints between Dart and Rust.
+- Fixed an issue with loading the app on the web.
+- Improved documentation in various areas.
+
+## 8.0.0-rc
+
+- This is a release candidate.
+
+## 8.0.0-beta
+
+- This is a beta version.
+
+## 8.0.0-alpha
+
+- This is an alpha version.
+
+## 7.3.1
+
+- Pinned the version of automatically installed `protoc`.
+
+## 7.3.0
+
+- It is now possible to use other Flutter packages that rely on Rust by removing a mechanism that might cause symbol conflicts.
+
+## 7.2.0
+
+- Flutter tests now run on Linux, just as they do on other platforms.
+
+## 7.1.1
+
+- Now, generated Rust message files are automatically formatted. Thanks @2bndy5!
+- Deprecated `dart:js` and `dart:html` have been replaced with `dart:js_interop` and `package:web`.
+
+## 7.1.0
+
+- Fixed JavaScript bindings on the web, resolving errors related to the missing `rinf` JavaScript object in web workers.
+- Cleaned up the usage of the global JavaScript namespace on the web.
+
+## 7.0.4
+
+- Upgraded `allo-isolate` to fix crashes on Android.
+
+## 7.0.3
+
+- Fixed a problem where generated Rust message structs were unable to import other messages.
+
+## 7.0.2
+
+- Optimized certain async APIs in the `rinf` crate for better performance.
+
+## 7.0.1
+
+- The initial template and example code has been improved.
+
+## 7.0.0
+
+- To migrate from Rinf version 6, please refer to [this section](https://rinf.cunarist.com/upgrading/) in the documentation.
+- Rinf no longer relies on `tokio`. While it is provided by default in the template, you can now choose whichever async runtime you prefer.
+- The CLI output is now more compact and includes animations.
+- The full `flutter run` command with the necessary arguments can now be obtained by running `rinf server`.
+- It is now recommended to import compiled message classes and structs from the root messages module.
+- Memory copying for messages sent from Dart to Rust has been reduced. This was achieved using Dart's FFI feature called 'leaf calls.'
+
+## 7.0.0-beta
+
+- This is a beta version.
+
+## 7.0.0-alpha
+
+- This is an alpha version.
+
 ## 6.15.0
 
 - Now it's possible to add attributes to generated message structs in Rust. Thanks @H2Sxxa!
@@ -60,7 +158,7 @@
 
 ## 6.9.0
 
-- This version supports Flutter 3.22
+- This version supports Flutter 3.22.
 - The new version of Flutter has a little different way of resolving paths. This release adapts to this change.
 
 ## 6.8.0

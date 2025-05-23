@@ -1,0 +1,22 @@
+[package]
+name = "rinf_proc"
+version = "8.3.2"
+edition = "2024"
+license = "MIT"
+description = "Rust for native business logic, Flutter for flexible and beautiful GUI"
+repository = "https://github.com/cunarist/rinf"
+documentation = "https://rinf.cunarist.com"
+
+[lib]
+proc-macro = true
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+wildcard_imports = "deny"
+
+[dependencies]
+syn = "2.0.98"
+quote = "1.0.38"
+heck = "0.5.0"
+proc-macro2 = "1.0.94"

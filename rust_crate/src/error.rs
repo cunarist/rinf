@@ -1,39 +1,31 @@
 use std::error::Error;
-use std::fmt;
+use std::fmt::{Display, Formatter};
 
 #[derive(Debug)]
-pub enum RinfError {
-    LockDartIsolate,
-    NoDartIsolate,
-    LockShutdownReceiver,
-    NoShutdownReceiver,
-    DecodeMessage,
-    NoSignalHandler,
+pub enum AppError {
+  NoDartIsolate,
+  CannotEncodeMessage,
+  CannotDecodeMessage,
+  NoBindings,
 }
 
-impl fmt::Display for RinfError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            RinfError::LockDartIsolate => {
-                write!(f, "Could not acquire the Dart isolate lock.")
-            }
-            RinfError::NoDartIsolate => {
-                write!(f, "Dart isolate for Rust signals was not created.")
-            }
-            RinfError::LockShutdownReceiver => {
-                write!(f, "Could not acquire the shutdown receiver lock.")
-            }
-            RinfError::NoShutdownReceiver => {
-                write!(f, "Shutdown receiver was not created.")
-            }
-            RinfError::DecodeMessage => {
-                write!(f, "Could not decode the message.")
-            }
-            RinfError::NoSignalHandler => {
-                write!(f, "Could not find the handler for Dart signal.")
-            }
-        }
+impl Error for AppError {}
+
+impl Display for AppError {
+  fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    match self {
+      Self::NoDartIsolate => {
+        write!(f, "Dart isolate for Rust signals was not created")
+      }
+      Self::CannotDecodeMessage => {
+        write!(f, "Could not decode the message")
+      }
+      Self::CannotEncodeMessage => {
+        write!(f, "Could not encode the message")
+      }
+      Self::NoBindings => {
+        write!(f, "Rinf bindings are not ready")
+      }
     }
+  }
 }
-
-impl Error for RinfError {}

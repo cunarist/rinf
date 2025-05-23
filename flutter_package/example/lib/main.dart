@@ -1,11 +1,16 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:rinf/rinf.dart';
-import './messages/exports.dart';
+import 'src/bindings/bindings.dart';
 
-void main() async {
+Future<void> main() async {
   await initializeRust(assignRustSignal);
+  createActors();
   runApp(MyApp());
+}
+
+void createActors() {
+  CreateActors().sendSignalToRust();
 }
 
 class MyApp extends StatefulWidget {
@@ -56,14 +61,16 @@ class _MyAppState extends State<MyApp> {
 }
 
 class MyHomePage extends StatelessWidget {
+  const MyHomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(child: MyColumn()),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
+        onPressed: () {
           // The `sendSignalToRust` method is generated
-          // from a marked Protobuf message.
+          // on structs that derive `DartSignal`.
           SampleNumberInput(
             letter: 'HELLO FROM DART!',
             dummyOne: 25,
@@ -82,59 +89,63 @@ class MyHomePage extends StatelessWidget {
 }
 
 class MyColumn extends StatelessWidget {
+  const MyColumn({super.key});
+
   @override
   Widget build(BuildContext context) {
     final children = [
       // `StreamBuilder` listens to a stream
       // and rebuilds the widget accordingly.
       StreamBuilder(
-          stream: SampleFractal.rustSignalStream,
-          builder: (context, snapshot) {
-            final rustSignal = snapshot.data;
-            if (rustSignal == null) {
-              return Container(
-                margin: const EdgeInsets.all(20),
-                width: 256,
-                height: 256,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(24.0),
-                  color: Colors.black,
-                ),
-              );
-            }
-            final imageData = rustSignal.binary;
+        stream: SampleFractal.rustSignalStream,
+        builder: (context, snapshot) {
+          final signalPack = snapshot.data;
+          if (signalPack == null) {
             return Container(
               margin: const EdgeInsets.all(20),
               width: 256,
               height: 256,
-              child: ClipRRect(
+              decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(24.0),
-                child: FittedBox(
-                  fit: BoxFit.contain,
-                  child: Image.memory(
-                    imageData,
-                    width: 256,
-                    height: 256,
-                    gaplessPlayback: true,
-                  ),
-                ),
+                color: Colors.black,
               ),
             );
-          }),
+          }
+          final imageData = signalPack.binary;
+          return Container(
+            margin: const EdgeInsets.all(20),
+            width: 256,
+            height: 256,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24.0),
+              child: FittedBox(
+                fit: BoxFit.contain,
+                child: Image.memory(
+                  imageData,
+                  width: 256,
+                  height: 256,
+                  gaplessPlayback: true,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
       StreamBuilder(
-        // This stream is generated from a marked Protobuf message.
+        // This stream is generated
+        // on structs that derive `RustSignal`.
         stream: SampleNumberOutput.rustSignalStream,
         builder: (context, snapshot) {
-          final rustSignal = snapshot.data;
+          final signalPack = snapshot.data;
           // If the app has just started and widget is built
           // without receiving a Rust signal,
           // the snapshot data will be null.
           // It's when the widget is being built for the first time.
-          if (rustSignal == null) {
+          if (signalPack == null) {
             // Return the initial widget if the snapshot data is null.
             return Text('Initial value 0');
           }
-          final sampleNumberOutput = rustSignal.message;
+          final sampleNumberOutput = signalPack.message;
           final currentNumber = sampleNumberOutput.currentNumber;
           return Text('Current value is $currentNumber');
         },

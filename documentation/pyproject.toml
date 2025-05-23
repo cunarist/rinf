@@ -1,10 +1,10 @@
-[tool.poetry]
-package-mode = false
-
-[tool.poetry.dependencies]
-python = "^3.10"
-mkdocs = "^1.5.2"
-mkdocs-material = "^9.1.21"
-mkdocs-awesome-pages-plugin = "^2.9.1"
-mkdocs-glightbox = "^0.3.4"
-mkdocs-git-revision-date-localized-plugin = "^1.2.2"
+[project]
+name = "documentation"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "Sphinx~=8.2.0",
+    "furo~=2024.8.6",
+    "myst-parser~=4.0.1",
+    "sphinx-autobuild~=2024.10.3",
+]

@@ -15,29 +15,28 @@ installed on your system.
 You can check that your system is ready with the commands below.
 Note that all the Flutter subcomponents should be installed.
 
-```bash
+```shell
 rustc --version
 flutter doctor
 ```
 
 You also need to have the CLI tool for Rinf ready.
 
-```bash
-cargo install rinf
+```shell
+cargo install rinf_cli
 ```
 
-Messages sent between Dart and Rust are implemented using Protobuf.
-If you have newly cloned the project repository
-or made changes to the `.proto` files in the `./messages` directory,
-run the following command:
+Signals sent between Dart and Rust are implemented using signal attributes.
+If you've modified the signal structs, run the following command
+to generate the corresponding Dart classes:
 
-```bash
-rinf message
+```shell
+rinf gen
 ```
 
 Now you can run and build this app just like any other Flutter projects.
 
-```bash
+```shell
 flutter run
 ```
 
