@@ -1,3 +1,7 @@
+## 8.3.2
+
+- The problem of `libhub.so` not being found on Android has been fixed. This was because of the new Flutter template updated by Google. If you experience any issues, we recommend replacing the `android` directory under the Flutter project with the latest one.
+
 ## 8.3.1
 
 - Now signal structs with numbers in their names work properly with `rinf gen`.
