@@ -188,7 +188,7 @@ Column(
       },
     ),
   ],
-),
+)
 ```
 
 ## Back and Forth
