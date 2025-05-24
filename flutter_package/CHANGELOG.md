@@ -1,3 +1,7 @@
+## 8.4.0
+
+- Experimental support for [eLinux](https://github.com/sony/flutter-elinux) has been added.
+
 ## 8.3.2
 
 - The problem of `libhub.so` not being found on Android has been fixed. This was because of the new Flutter template updated by Google. If you experience any issues, we recommend replacing the `android` directory under the Flutter project with the latest one.
@@ -55,7 +59,7 @@
 
 ## 7.1.1
 
-- Now, generated Rust message files are automatically formatted. Thanks @2bndy5!
+- Now, generated Rust message files are automatically formatted.
 - Deprecated `dart:js` and `dart:html` have been replaced with `dart:js_interop` and `package:web`.
 
 ## 7.1.0
@@ -98,7 +102,7 @@
 
 ## 6.15.0
 
-- Now it's possible to add attributes to generated message structs in Rust. Thanks @H2Sxxa!
+- Now it's possible to add attributes to generated message structs in Rust.
 
 ## 6.14.2
 
@@ -111,7 +115,7 @@
 
 ## 6.14.0
 
-- New feature `bevy` for treating Dart signals as Bevy events was added. Thanks @Deep-co-de!
+- New feature `bevy` for treating Dart signals as Bevy events was added.
 
 ## 6.13.0
 
@@ -127,9 +131,9 @@
 ## 6.12.0
 
 - Generated message channels are now more efficient.
-- Minimum Android SDK version increased from 16 to 21. Thanks @debanjanbasu!
+- Minimum Android SDK version increased from 16 to 21.
 - The `finalizeRust()` function in Dart has been removed. The `tokio` async runtime, which holds Rust logic, still drops automatically when the app ends.
-- Bumped `prost` version to 0.12.6. Thanks @yeoupooh!
+- Bumped `prost` version to 0.12.6.
 - Internal code has been organized.
 
 ## 6.11.1
@@ -146,7 +150,7 @@
 - Early Dart signals are now stored in the tokio channel instead of being ignored. Their performance is also slightly better.
 - Excessive sample code is not included in the template from the `rinf template` command anymore.
 - Now `tokio` is enabled by default in the template, not `tokio_with_wasm`.
-- A configuration option, `rinf.message.rust_serde`, was added to make generated Rust message files compatible with `serde`. Thanks @NeoVance!
+- A configuration option, `rinf.message.rust_serde`, was added to make generated Rust message files compatible with `serde`.
 
 ## 6.9.2
 
@@ -168,11 +172,11 @@
 
 ## 6.7.0
 
-- Allowed `enum` and `oneof` statements to work in Protobuf message files. Thanks @yeoupooh!
+- Allowed `enum` and `oneof` statements to work in Protobuf message files.
 
 ## 6.6.3
 
-- Fixed a linting issue. Thanks @romanseo1!
+- Fixed a linting issue.
 
 ## 6.6.2
 
@@ -183,7 +187,7 @@
 
 - Added support for some Linux distributions where patching Flutter SDK is not possible.
 - Fixed a problem with the web sector not working. To use this new version, it's recommended to discard all Git changes in Flutter SDK's directory, or simply run `flutter upgrade --force`.
-- Fixed a problem with `cd` error on Windows. Thanks @H2Sxxa!
+- Fixed a problem with `cd` error on Windows.
 - Fixed `pub.dev` package score.
 
 ## 6.6.0
@@ -209,12 +213,12 @@
 
 ## 6.2.0
 
-- Now custom installation of `protoc` works. This is useful when you don't have full access to GitHub APIs, which is needed for automatic `protoc` installation. Thanks @TENX-S!
+- Now custom installation of `protoc` works. This is useful when you don't have full access to GitHub APIs, which is needed for automatic `protoc` installation.
 - Signal handling has become more efficient.
 
 ## 6.1.0
 
-- Now `rustSignalStream`s `listen` can be called multiple times. Thanks @rabbitson87!
+- Now `rustSignalStream`s `listen` can be called multiple times.
 
 ## 6.0.1
 
@@ -225,8 +229,8 @@
 
 - You need to run `rinf template`, `cargo install rinf` again to use this new version.
 - Now the communication between Dart and Rust is much simpler. You can mark messages in `.proto` files so that Rinf's code generator can generate channels in-between. This new system is not compatible with older Rinf versions, so please check the docs before you upgrade.
-- Added the ability to customize Rinf's behaviors by writing fields inside `pubspec.yaml` file. Thanks @thlorenz!
-- Allowed users to check when the documentation page was made and edited. Thanks @VictorieeMan!
+- Added the ability to customize Rinf's behaviors by writing fields inside `pubspec.yaml` file.
+- Allowed users to check when the documentation page was made and edited.
 - Now it's possible to quit `rinf message --watch` by pressing `q` on your keyboard.
 - Internal code has been organized.
 
@@ -296,11 +300,11 @@
 
 ## 4.17.1
 
-- Now `rinf message --watch` works on all platforms. Thanks @bookshiyi!
+- Now `rinf message --watch` works on all platforms.
 
 ## 4.17.0
 
-- New command `rinf message --watch` for automatic message code generation. Thanks @bookshiyi!
+- New command `rinf message --watch` for automatic message code generation.
 
 ## 4.16.3
 
@@ -328,7 +332,7 @@
 
 ## 4.15.0
 
-- Allowed setting custom timeout when using `requestToRust()`. Thanks @cipherchabon!
+- Allowed setting custom timeout when using `requestToRust()`.
 
 ## 4.14.0
 
@@ -451,7 +455,7 @@
 
 - New `debug_print!` macro that works on all environments, including web and mobile emulators, with the power of Flutter debuggers. To use this, you need to run `rifs template` again.
 - Now panic information in Rust will be properly printed to the CLI. Note that Rust panics don't crash the app and do not hinder stability.
-- Improved docs. There are also more guides about well-known types in Protobuf. Thanks @LucaCoduriV!
+- Improved docs. There are also more guides about well-known types in Protobuf.
 
 ## 4.5.0
 
@@ -481,7 +485,7 @@
 
 ## 4.2.0
 
-- New command `rifs --help`. Thanks @bookshiyi!
+- New command `rifs --help`.
 
 ## 4.1.4
 
@@ -489,7 +493,7 @@
 
 ## 4.1.3
 
-- Made `rifs message` command read `PUB_CACHE` enviornment variable if present. Thanks @rabbitson87!
+- Made `rifs message` command read `PUB_CACHE` enviornment variable if present.
 
 ## 4.1.2
 
@@ -651,11 +655,11 @@
 
 ## 3.0.0
 
-- Adopted Protobuf for message serialization. Now communication between Dart and Rust is much more type-safe and faster than before. Because the template has now changed, you need to run `dart run rust_in_flutter template` again when migrating from version 2. Thanks @wheregmis` and @bookshiyi!
+- Adopted Protobuf for message serialization. Now communication between Dart and Rust is much more type-safe and faster than before. Because the template has now changed, you need to run `dart run rust_in_flutter template` again when migrating from version 2.
 
 ## 2.9.0
 
-- Removed `corrosion`. Now this package solely relies on `cargokit` and is much more slimmer. Thanks @bookshiyi!
+- Removed `corrosion`. Now this package solely relies on `cargokit` and is much more slimmer.
 - Removed unneeded files from pub.dev publication.
 
 ## 2.8.5
@@ -696,19 +700,19 @@
 
 ## 2.7.1
 
-- Organized guides. Thanks @bookshiyi!
+- Organized guides.
 
 ## 2.7.0
 
-- Stabilized web-related Rust toolchain's auto-installation. Thanks @bookshiyi!
+- Stabilized web-related Rust toolchain's auto-installation.
 
 ## 2.6.0
 
-- Applied continuous integration for checking builds and improving project stability. Thanks @bookshiyi!
+- Applied continuous integration for checking builds and improving project stability.
 
 ## 2.5.6
 
-- Updated Cargokit. Thanks @bookshiyi!
+- Updated Cargokit.
 
 ## 2.5.5
 
@@ -841,7 +845,7 @@
 
 ## 1.3.2
 
-- Added Chinese guides. Thanks @moluopro!
+- Added Chinese guides.
 - Added Korean guides.
 - Added guides about build tool version issues.
 - Added guides about library bundling.
