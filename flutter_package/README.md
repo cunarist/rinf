@@ -26,6 +26,7 @@ All platforms available with Flutter are [tested](https://github.com/cunarist/ri
 - ✅ macOS: Tested and supported
 - ✅ iOS: Tested and supported
 - ✅ Web: Tested and supported
+- 🔄 [eLinux](https://github.com/sony/flutter-elinux): Currently experimental
 
 ## 📞 Communication
 
