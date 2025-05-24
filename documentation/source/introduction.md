@@ -33,3 +33,4 @@ Rinf enables seamless development across major platforms:
 - ✅ macOS: Tested and supported
 - ✅ iOS: Tested and supported
 - ✅ Web: Tested and supported
+- 🔄 [eLinux](https://github.com/sony/flutter-elinux): Currently experimental
