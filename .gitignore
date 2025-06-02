@@ -32,7 +32,6 @@ build/
 /target/
 
 # Others
-*.lock
 .python-version
 /documentation/dist/
 /documentation/*.egg-info/
