@@ -40,7 +40,13 @@ pub trait DartSignalBinary: for<'a> Deserialize<'a> {
 }
 
 /// Enables a type to be nested within a signal struct or enum.
-pub trait SignalPiece {}
+pub trait SignalPiece {
+  /// This function is a no-op.
+  /// It's purely used for checking that
+  /// a field implements the `SignalPiece` trait.
+  #[doc(hidden)]
+  fn be_signal_piece(&self) {}
+}
 
 // Implement the trait for simple primitives.
 impl SignalPiece for i8 {}

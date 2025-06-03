@@ -13,22 +13,17 @@ void setCompiledLibPathReal(String path) {
   setJsLibPath(path);
 }
 
-Future<void> prepareInterfaceReal(
-  AssignRustSignal assignRustSignal,
-) async {
+Future<void> prepareInterfaceReal(AssignRustSignal assignRustSignal) async {
   // Load the JavaScript module.
   await loadJsFile();
 
   // Listen to Rust via JavaScript.
-  rinfBindingsObject['rinf_send_rust_signal_extern'] = ((
-    String endpoint,
-    JSObject messageBytesJS,
-    JSObject binaryJS,
-  ) {
-    final messageBytes = (messageBytesJS as JSUint8Array).toDart;
-    final binary = (binaryJS as JSUint8Array).toDart;
-    assignRustSignal[endpoint]!(messageBytes, binary);
-  }).toJS;
+  rinfBindingsObject['rinf_send_rust_signal_extern'] =
+      ((String endpoint, JSObject messageBytesJS, JSObject binaryJS) {
+        final messageBytes = (messageBytesJS as JSUint8Array).toDart;
+        final binary = (binaryJS as JSUint8Array).toDart;
+        assignRustSignal[endpoint]!(messageBytes, binary);
+      }).toJS;
 }
 
 void startRustLogicReal() {

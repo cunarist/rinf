@@ -47,9 +47,5 @@ void sendDartSignal(
   Uint8List messageBytes,
   Uint8List binary,
 ) {
-  sendDartSignalReal(
-    endpointSymbol,
-    messageBytes,
-    binary,
-  );
+  sendDartSignalReal(endpointSymbol, messageBytes, binary);
 }

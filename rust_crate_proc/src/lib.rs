@@ -2,7 +2,7 @@ use heck::{ToShoutySnakeCase, ToSnakeCase};
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
-  Data, DataEnum, DataStruct, DeriveInput, Error, Fields, Ident,
+  Data, DataEnum, DataStruct, DeriveInput, Error, Fields, Ident, Index,
   parse_macro_input,
 };
 
@@ -30,15 +30,10 @@ pub fn derive_signal_piece(input: TokenStream) -> TokenStream {
   }
 
   // Enforce all fields to implement the foreign signal trait.
-  let where_clause = match &ast.data {
-    Data::Struct(data_struct) => get_struct_where_clause(data_struct),
-    Data::Enum(data_enum) => get_enum_where_clause(data_enum),
+  let expanded = match &ast.data {
+    Data::Struct(data_struct) => get_struct_signal_impl(data_struct, name),
+    Data::Enum(data_enum) => get_enum_signal_impl(data_enum, name),
     _ => return TokenStream::new(),
-  };
-
-  // Automatically implement the signal trait for the struct.
-  let expanded = quote! {
-    impl rinf::SignalPiece for #name #where_clause {}
   };
 
   // Convert the generated code into token stream and return it.
@@ -298,6 +293,103 @@ fn get_enum_where_clause(data_enum: &DataEnum) -> proc_macro2::TokenStream {
 
   quote! {
     where #(#variant_types: rinf::SignalPiece),*
+  }
+}
+
+fn get_struct_signal_impl(
+  data_struct: &DataStruct,
+  name: &Ident,
+) -> proc_macro2::TokenStream {
+  match &data_struct.fields {
+    Fields::Named(named_fields) => {
+      let fields = named_fields
+        .named
+        .iter()
+        .filter_map(|field| field.ident.clone());
+      quote! {
+        impl rinf::SignalPiece for #name {
+          fn be_signal_piece(&self) {
+            use rinf::SignalPiece;
+            #(SignalPiece::be_signal_piece(&self.#fields);)*
+          }
+        }
+      }
+    }
+    Fields::Unnamed(unnamed_fields) => {
+      let field_indices: Vec<Index> =
+        (0..unnamed_fields.unnamed.len()).map(Index::from).collect();
+      quote! {
+        impl rinf::SignalPiece for #name {
+          fn be_signal_piece(&self) {
+            use rinf::SignalPiece;
+            #(SignalPiece::be_signal_piece(&self.#field_indices);)*
+          }
+        }
+      }
+    }
+    Fields::Unit => {
+      quote! {
+        impl rinf::SignalPiece for #name {
+          fn be_signal_piece(&self) {
+            // Unit struct has no fields to check
+          }
+        }
+      }
+    }
+  }
+}
+
+fn get_enum_signal_impl(
+  data_enum: &DataEnum,
+  name: &Ident,
+) -> proc_macro2::TokenStream {
+  let variants = data_enum.variants.iter().map(|variant| {
+    let variant_ident = &variant.ident;
+    match &variant.fields {
+      Fields::Named(named_fields) => {
+        let fields: Vec<Ident> = named_fields
+          .named
+          .iter()
+          .filter_map(|field| field.ident.clone())
+          .collect();
+        quote! {
+          Self::#variant_ident { #(#fields),* } => {
+            use rinf::SignalPiece;
+            #(SignalPiece::be_signal_piece(#fields);)*
+          }
+        }
+      }
+      Fields::Unnamed(unnamed_fields) => {
+        let field_indices: Vec<Index> =
+          (0..unnamed_fields.unnamed.len()).map(Index::from).collect();
+        let field_vars: Vec<Ident> = field_indices
+          .iter()
+          .map(|i| {
+            Ident::new(&format!("field_{}", i.index), variant_ident.span())
+          })
+          .collect();
+        quote! {
+          Self::#variant_ident(#(#field_vars),*) => {
+            use rinf::SignalPiece;
+            #(SignalPiece::be_signal_piece(#field_vars);)*
+          }
+        }
+      }
+      Fields::Unit => {
+        quote! {
+          Self::#variant_ident => {}
+        }
+      }
+    }
+  });
+  quote! {
+    impl rinf::SignalPiece for #name {
+      fn be_signal_piece(&self) {
+        match self {
+          #( #variants )*
+        }
+      }
+    }
   }
 }
 
