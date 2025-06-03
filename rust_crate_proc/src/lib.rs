@@ -2,8 +2,8 @@ use heck::{ToShoutySnakeCase, ToSnakeCase};
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
-  Data, DataEnum, DataStruct, DeriveInput, Error, Fields, Ident, Index,
-  parse_macro_input,
+  Attribute, Data, DataEnum, DataStruct, DeriveInput, Error, Field, Fields,
+  Ident, Index, Token, Variant, parse_macro_input, punctuated::Punctuated,
 };
 
 static BANNED_LOWER_PREFIX: &str = "rinf";
@@ -29,7 +29,12 @@ pub fn derive_signal_piece(input: TokenStream) -> TokenStream {
     return create_generic_error(ast);
   }
 
-  // Enforce all fields to implement the foreign signal trait.
+  // Check the attributes of the variants / fields.
+  if let Err(error) = check_invalid_attrs(&ast.data) {
+    return error.to_compile_error().into();
+  }
+
+  // Require that all included fields implement the signal trait.
   let expanded = match &ast.data {
     Data::Struct(data_struct) => get_struct_signal_impl(data_struct, name),
     Data::Enum(data_enum) => get_enum_signal_impl(data_enum, name),
@@ -77,7 +82,12 @@ fn derive_dart_signal_real(
     return create_generic_error(ast);
   }
 
-  // Enforce all fields to implement the foreign signal trait.
+  // Check the attributes of the variants / fields.
+  if let Err(error) = check_invalid_attrs(&ast.data) {
+    return error.to_compile_error().into();
+  }
+
+  // Require that all included fields implement the signal trait.
   let where_clause = match &ast.data {
     Data::Struct(data_struct) => get_struct_where_clause(data_struct),
     Data::Enum(data_enum) => get_enum_where_clause(data_enum),
@@ -195,7 +205,12 @@ fn derive_rust_signal_real(
     return create_generic_error(ast);
   }
 
-  // Enforce all fields to implement the foreign signal trait.
+  // Check the attributes of the variants / fields.
+  if let Err(error) = check_invalid_attrs(&ast.data) {
+    return error.to_compile_error().into();
+  }
+
+  // Require that all included fields implement the signal trait.
   let where_clause = match &ast.data {
     Data::Struct(data_struct) => get_struct_where_clause(data_struct),
     Data::Enum(data_enum) => get_enum_where_clause(data_enum),
@@ -255,16 +270,67 @@ fn derive_rust_signal_real(
   TokenStream::from(expanded)
 }
 
-/// Enforces all fields of a struct to have the foreign signal trait.
+/// Checks if the attributes of the variants / fields are unsupported.
+fn check_invalid_attrs(data: &Data) -> syn::Result<()> {
+  fn check_fields(fields: &Fields) -> syn::Result<()> {
+    match fields {
+      Fields::Named(fields) => check_attrs(&fields.named),
+      Fields::Unnamed(fields) => check_attrs(&fields.unnamed),
+      Fields::Unit => Ok(()),
+    }
+  }
+
+  fn check_attrs<T: GetAttrs>(
+    items: &Punctuated<T, Token![,]>,
+  ) -> syn::Result<()> {
+    items.iter().try_for_each(|item| {
+      item.get_attrs().iter().try_for_each(|attr| {
+        if !attr.path().is_ident("serde") {
+          return Ok(());
+        }
+        attr.parse_nested_meta(|meta| match meta.path.get_ident() {
+          Some(ident)
+            if ident == "skip_serializing"
+              || ident == "skip_serializing_if"
+              || ident == "skip_deserializing" =>
+          {
+            Err(meta.error(format!(
+              "`{ident}` is not supported within rinf signal data"
+            )))
+          }
+          _ => Ok(()),
+        })
+      })
+    })
+  }
+
+  match data {
+    Data::Struct(data) => check_fields(&data.fields),
+    Data::Enum(data) => {
+      check_attrs(&data.variants)?;
+      data
+        .variants
+        .iter()
+        .try_for_each(|variant| check_fields(&variant.fields))
+    }
+    Data::Union(_) => Ok(()), // Serde does not support derive for unions
+  }
+}
+
+/// Require that all included fields of a struct implement the [`SignalPiece`] trait.
 /// This assists with type-safe development.
 fn get_struct_where_clause(
   data_struct: &DataStruct,
 ) -> proc_macro2::TokenStream {
   let field_types: Vec<_> = match &data_struct.fields {
     // For named structs (struct-like), extract the field types.
-    Fields::Named(all) => all.named.iter().map(|f| &f.ty).collect(),
+    Fields::Named(all) => {
+      all.named.iter().filter(is_kept).map(|f| &f.ty).collect()
+    }
     // For unnamed structs (tuple-like), extract the field types.
-    Fields::Unnamed(all) => all.unnamed.iter().map(|f| &f.ty).collect(),
+    Fields::Unnamed(all) => {
+      all.unnamed.iter().filter(is_kept).map(|f| &f.ty).collect()
+    }
     // For unit-like structs (without any inner data), do nothing.
     Fields::Unit => Vec::new(),
   };
@@ -273,18 +339,23 @@ fn get_struct_where_clause(
   }
 }
 
-/// Enforces all fields of an enum variant to have the foreign signal trait.
+/// Require that all included variants of an enum implement the [`SignalPiece`] trait.
 /// This assists with type-safe development.
 fn get_enum_where_clause(data_enum: &DataEnum) -> proc_macro2::TokenStream {
   let variant_types: Vec<_> = data_enum
     .variants
     .iter()
+    .filter(is_kept)
     .flat_map(|variant| {
       match &variant.fields {
         // For named variants (struct-like), extract the field types.
-        Fields::Named(all) => all.named.iter().map(|f| &f.ty).collect(),
+        Fields::Named(all) => {
+          all.named.iter().filter(is_kept).map(|f| &f.ty).collect()
+        }
         // For unnamed variants (tuple-like), extract the field types.
-        Fields::Unnamed(all) => all.unnamed.iter().map(|f| &f.ty).collect(),
+        Fields::Unnamed(all) => {
+          all.unnamed.iter().filter(is_kept).map(|f| &f.ty).collect()
+        }
         // For unit-like variants (without any inner data), do nothing.
         Fields::Unit => Vec::new(),
       }
@@ -305,6 +376,7 @@ fn get_struct_signal_impl(
       let fields = named_fields
         .named
         .iter()
+        .filter(is_kept)
         .filter_map(|field| field.ident.clone());
       quote! {
         impl rinf::SignalPiece for #name {
@@ -316,8 +388,13 @@ fn get_struct_signal_impl(
       }
     }
     Fields::Unnamed(unnamed_fields) => {
-      let field_indices: Vec<Index> =
-        (0..unnamed_fields.unnamed.len()).map(Index::from).collect();
+      let field_indices: Vec<Index> = unnamed_fields
+        .unnamed
+        .iter()
+        .enumerate()
+        .filter(is_kept)
+        .map(|(index, _)| Index::from(index))
+        .collect();
       quote! {
         impl rinf::SignalPiece for #name {
           fn be_signal_piece(&self) {
@@ -343,35 +420,42 @@ fn get_enum_signal_impl(
   data_enum: &DataEnum,
   name: &Ident,
 ) -> proc_macro2::TokenStream {
-  let variants = data_enum.variants.iter().map(|variant| {
+  let variants = data_enum.variants.iter().filter(is_kept).map(|variant| {
     let variant_ident = &variant.ident;
     match &variant.fields {
       Fields::Named(named_fields) => {
         let fields: Vec<Ident> = named_fields
           .named
           .iter()
+          .filter(is_kept)
           .filter_map(|field| field.ident.clone())
           .collect();
         quote! {
-          Self::#variant_ident { #(#fields),* } => {
+          Self::#variant_ident { #(#fields, )* .. } => {
             use rinf::SignalPiece;
             #(SignalPiece::be_signal_piece(#fields);)*
           }
         }
       }
       Fields::Unnamed(unnamed_fields) => {
-        let field_indices: Vec<Index> =
-          (0..unnamed_fields.unnamed.len()).map(Index::from).collect();
-        let field_vars: Vec<Ident> = field_indices
+        let field_vars: Vec<Ident> = unnamed_fields
+          .unnamed
           .iter()
-          .map(|i| {
-            Ident::new(&format!("field_{}", i.index), variant_ident.span())
+          .enumerate()
+          .map(|(index, field)| match is_kept(field) {
+            true => Ident::new(&format!("field_{index}"), variant_ident.span()),
+            false => Ident::new("_", variant_ident.span()),
           })
+          .collect();
+        let field_vars_filtered: Vec<Ident> = field_vars
+          .iter()
+          .filter(|&ident| ident != "_")
+          .cloned()
           .collect();
         quote! {
           Self::#variant_ident(#(#field_vars),*) => {
             use rinf::SignalPiece;
-            #(SignalPiece::be_signal_piece(#field_vars);)*
+            #(SignalPiece::be_signal_piece(#field_vars_filtered);)*
           }
         }
       }
@@ -387,9 +471,57 @@ fn get_enum_signal_impl(
       fn be_signal_piece(&self) {
         match self {
           #( #variants )*
+          _ => {}
         }
       }
     }
+  }
+}
+
+/// Returns `false` if Serde skips `item` during serialization.
+fn is_kept<T: GetAttrs>(item: &T) -> bool {
+  !item.get_attrs().iter().any(|attr| {
+    if !attr.path().is_ident("serde") {
+      return false;
+    }
+    let mut skip = false;
+    let _ = attr.parse_nested_meta(|meta| {
+      if meta.path.is_ident("skip") {
+        skip = true;
+      }
+      Ok(())
+    });
+    skip
+  })
+}
+
+/// Helper trait required for [`check_invalid_attrs`] and [`is_kept`].
+trait GetAttrs {
+  fn get_attrs(&self) -> &Vec<Attribute>;
+}
+impl GetAttrs for Field {
+  fn get_attrs(&self) -> &Vec<Attribute> {
+    &self.attrs
+  }
+}
+impl GetAttrs for &Field {
+  fn get_attrs(&self) -> &Vec<Attribute> {
+    &self.attrs
+  }
+}
+impl GetAttrs for Variant {
+  fn get_attrs(&self) -> &Vec<Attribute> {
+    &self.attrs
+  }
+}
+impl GetAttrs for &Variant {
+  fn get_attrs(&self) -> &Vec<Attribute> {
+    &self.attrs
+  }
+}
+impl GetAttrs for (usize, &Field) {
+  fn get_attrs(&self) -> &Vec<Attribute> {
+    &self.1.attrs
   }
 }
 
