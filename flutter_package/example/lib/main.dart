@@ -74,10 +74,7 @@ class MyHomePage extends StatelessWidget {
           SampleNumberInput(
             letter: 'HELLO FROM DART!',
             dummyOne: 25,
-            dummyTwo: SampleSchema(
-              sampleFieldOne: true,
-              sampleFieldTwo: false,
-            ),
+            dummyTwo: SampleSchema(sampleFieldOne: true, sampleFieldTwo: false),
             dummyThree: [4, 5, 6],
           ).sendSignalToRust();
         },
