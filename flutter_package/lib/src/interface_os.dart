@@ -11,9 +11,7 @@ void setCompiledLibPathReal(String path) {
   overrideLibPath(path);
 }
 
-Future<void> prepareInterfaceReal(
-  AssignRustSignal assignRustSignal,
-) async {
+Future<void> prepareInterfaceReal(AssignRustSignal assignRustSignal) async {
   // Prepare ports for communication over isolates.
   final rustSignalPort = ReceivePort();
 

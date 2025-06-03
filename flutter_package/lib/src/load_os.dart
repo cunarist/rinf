@@ -82,28 +82,17 @@ typedef PostCObjectInner = Int8 Function(Int64, Pointer<Dart_CObject>);
 typedef PostCObjectPtr = Pointer<NativeFunction<PostCObjectInner>>;
 typedef PrepareIsolateExtern = Void Function(PostCObjectPtr, Int64);
 typedef PrepareIsolateWrapped = void Function(PostCObjectPtr, int);
-typedef SendDartSignalExtern = Void Function(
-  Pointer<Uint8>,
-  UintPtr,
-  Pointer<Uint8>,
-  UintPtr,
-);
-typedef SendDartSignalWrapped = void Function(
-  Pointer<Uint8>,
-  int,
-  Pointer<Uint8>,
-  int,
-);
+typedef SendDartSignalExtern =
+    Void Function(Pointer<Uint8>, UintPtr, Pointer<Uint8>, UintPtr);
+typedef SendDartSignalWrapped =
+    void Function(Pointer<Uint8>, int, Pointer<Uint8>, int);
 
 /// Abstract class for unifying the interface
 /// for calling native functions.
 abstract class RustLibrary {
   void startRustLogic();
   void stopRustLogic();
-  void prepareIsolate(
-    PostCObjectPtr storePostObject,
-    int port,
-  );
+  void prepareIsolate(PostCObjectPtr storePostObject, int port);
   void sendDartSignal(
     String endpointSymbol,
     Uint8List messageBytes,
@@ -128,16 +117,10 @@ class RustLibraryGlobal extends RustLibrary {
 
   RustLibraryGlobal(this.lib);
 
-  @Native<Void Function()>(
-    isLeaf: true,
-    symbol: 'rinf_start_rust_logic_extern',
-  )
+  @Native<Void Function()>(isLeaf: true, symbol: 'rinf_start_rust_logic_extern')
   external static void startRustLogicExtern();
 
-  @Native<Void Function()>(
-    isLeaf: true,
-    symbol: 'rinf_stop_rust_logic_extern',
-  )
+  @Native<Void Function()>(isLeaf: true, symbol: 'rinf_stop_rust_logic_extern')
   external static void stopRustLogicExtern();
 
   @Native<PrepareIsolateExtern>(
@@ -186,10 +169,10 @@ class RustLibraryGlobal extends RustLibrary {
     // to reduce symbol lookup overhead.
     var sendDartSignalExtern = sendDartSignalExterns[endpointSymbol];
     if (sendDartSignalExtern == null) {
-      sendDartSignalExtern =
-          lib.lookupFunction<SendDartSignalExtern, SendDartSignalWrapped>(
-        endpointSymbol,
-      );
+      sendDartSignalExtern = lib
+          .lookupFunction<SendDartSignalExtern, SendDartSignalWrapped>(
+            endpointSymbol,
+          );
       sendDartSignalExterns[endpointSymbol] = sendDartSignalExtern;
     }
 
@@ -223,10 +206,10 @@ class RustLibraryLocal extends RustLibrary {
     stopRustLogicExtern = lib.lookupFunction<Void Function(), void Function()>(
       'rinf_stop_rust_logic_extern',
     );
-    prepareIsolateExtern =
-        lib.lookupFunction<PrepareIsolateExtern, PrepareIsolateWrapped>(
-      'rinf_prepare_isolate_extern',
-    );
+    prepareIsolateExtern = lib
+        .lookupFunction<PrepareIsolateExtern, PrepareIsolateWrapped>(
+          'rinf_prepare_isolate_extern',
+        );
   }
 
   @override
@@ -260,10 +243,10 @@ class RustLibraryLocal extends RustLibrary {
     // to reduce symbol lookup overhead.
     var sendDartSignalExtern = sendDartSignalExterns[endpointSymbol];
     if (sendDartSignalExtern == null) {
-      sendDartSignalExtern =
-          lib.lookupFunction<SendDartSignalExtern, SendDartSignalWrapped>(
-        endpointSymbol,
-      );
+      sendDartSignalExtern = lib
+          .lookupFunction<SendDartSignalExtern, SendDartSignalWrapped>(
+            endpointSymbol,
+          );
       sendDartSignalExterns[endpointSymbol] = sendDartSignalExtern;
     }
 
