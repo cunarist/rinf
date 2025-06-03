@@ -1,3 +1,7 @@
+## 8.5.0
+
+- Now `SignalPiece` can be derived on structs with recursive structure.
+
 ## 8.4.0
 
 - Experimental support for [eLinux](https://github.com/sony/flutter-elinux) has been added.
