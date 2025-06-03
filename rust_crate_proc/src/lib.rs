@@ -353,7 +353,7 @@ fn get_enum_signal_impl(
           .filter_map(|field| field.ident.clone())
           .collect();
         quote! {
-          Self::#variant_ident { #(ref #fields),* } => {
+          Self::#variant_ident { #(#fields),* } => {
             use rinf::SignalPiece;
             #(SignalPiece::be_signal_piece(#fields);)*
           }
@@ -369,7 +369,7 @@ fn get_enum_signal_impl(
           })
           .collect();
         quote! {
-          Self::#variant_ident(#(ref #field_vars),*) => {
+          Self::#variant_ident(#(#field_vars),*) => {
             use rinf::SignalPiece;
             #(SignalPiece::be_signal_piece(#field_vars);)*
           }

@@ -1,7 +1,7 @@
 use crate::signals::{
-  CStyleEnum, ComplexSignalTestResult, NewTypeStruct, OtherTypes,
-  PrimitiveTypes, SerdeData, Struct, TupleStruct, UnitStruct, UnitTestEnd,
-  UnitTestStart,
+  CStyleEnum, ComplexSignalTestResult, List, NewTypeStruct, OtherTypes,
+  PrimitiveTypes, SerdeData, SimpleList, Struct, Tree, TupleStruct, UnitStruct,
+  UnitTestEnd, UnitTestStart,
 };
 use rinf::{DartSignal, RustSignal};
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
@@ -172,9 +172,51 @@ fn get_complex_signals() -> Vec<SerdeData> {
     f3: Struct { x: 4, y: 5 },
   };
 
+  let v7 = SerdeData::ListWithMutualRecursion(List::Empty);
+
+  let v8 = SerdeData::TreeWithMutualRecursion(Tree {
+    value: Box::new(SerdeData::PrimitiveTypes(PrimitiveTypes {
+      f_bool: false,
+      f_u8: 0,
+      f_u16: 1,
+      f_u32: 2,
+      f_u64: 3,
+      f_u128: 4,
+      f_i8: 5,
+      f_i16: 6,
+      f_i32: 7,
+      f_i64: 8,
+      f_i128: 9,
+      f_f32: None,
+      f_f64: None,
+      f_char: None,
+    })),
+    children: vec![Tree {
+      value: Box::new(SerdeData::PrimitiveTypes(PrimitiveTypes {
+        f_bool: false,
+        f_u8: 0,
+        f_u16: 0,
+        f_u32: 0,
+        f_u64: 0,
+        f_u128: 0,
+        f_i8: 0,
+        f_i16: 0,
+        f_i32: 0,
+        f_i64: 0,
+        f_i128: 0,
+        f_f32: None,
+        f_f64: None,
+        f_char: None,
+      })),
+      children: vec![],
+    }],
+  });
+
   let v9 = SerdeData::TupleArray([0, 2, 3]);
 
   let v10 = SerdeData::UnitVector(vec![(); 1000]);
+
+  let v11 = SerdeData::SimpleList(SimpleList(Some(Box::new(SimpleList(None)))));
 
   let v12 = SerdeData::CStyleEnum(CStyleEnum::C);
 
@@ -188,6 +230,7 @@ fn get_complex_signals() -> Vec<SerdeData> {
   let v15 = SerdeData::EmptyStructVariant {};
 
   vec![
-    v0, v1, v2, v2bis, v2ter, v3, v4, v5, v6, v9, v10, v12, v13, v14, v15,
+    v0, v1, v2, v2bis, v2ter, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13,
+    v14, v15,
   ]
 }

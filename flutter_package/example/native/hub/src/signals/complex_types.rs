@@ -6,7 +6,9 @@ use rinf::{DartSignal, RustSignal, SignalPiece};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
-#[derive(Serialize, Deserialize, PartialEq, DartSignal, RustSignal, Clone)]
+#[derive(
+  Serialize, Deserialize, PartialEq, DartSignal, RustSignal, SignalPiece, Clone,
+)]
 pub enum SerdeData {
   PrimitiveTypes(PrimitiveTypes),
   OtherTypes(Box<OtherTypes>),
@@ -19,8 +21,11 @@ pub enum SerdeData {
     f2: TupleStruct,
     f3: Struct,
   },
+  ListWithMutualRecursion(List),
+  TreeWithMutualRecursion(Tree),
   TupleArray([u32; 3]),
   UnitVector(Vec<()>),
+  SimpleList(SimpleList),
   CStyleEnum(CStyleEnum),
   ComplexMap(BTreeMap<([u32; 2], [u8; 4]), ()>),
   EmptyTupleVariant(),
@@ -78,6 +83,21 @@ pub struct Struct {
   pub x: u32,
   pub y: u64,
 }
+
+#[derive(Serialize, Deserialize, PartialEq, SignalPiece, Clone)]
+pub enum List {
+  Empty,
+  Node(Box<SerdeData>, Box<List>),
+}
+
+#[derive(Serialize, Deserialize, PartialEq, SignalPiece, Clone)]
+pub struct Tree {
+  pub value: Box<SerdeData>,
+  pub children: Vec<Tree>,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, SignalPiece, Clone)]
+pub struct SimpleList(pub Option<Box<SimpleList>>);
 
 #[derive(Serialize, Deserialize, PartialEq, SignalPiece, Clone)]
 pub enum CStyleEnum {
