@@ -1,10 +1,11 @@
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from os import chdir
+from typing import override
 
 
 class RequestHandler(SimpleHTTPRequestHandler):
+    @override
     def end_headers(self):
-        # Add custom headers here
         self.send_header("Cross-Origin-Opener-Policy", "same-origin")
         self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
         super().end_headers()

@@ -225,7 +225,7 @@ fn trace_struct(traced: &mut Traced, item: &ItemStruct) {
       let fields: Vec<Format> = unnamed
         .unnamed
         .iter()
-        .filter(is_kept)
+        .filter(is_exposed)
         .map(|field| to_type_format(&field.ty))
         .collect();
       if fields.is_empty() {
@@ -240,7 +240,7 @@ fn trace_struct(traced: &mut Traced, item: &ItemStruct) {
       let fields = named
         .named
         .iter()
-        .filter(is_kept)
+        .filter(is_exposed)
         .filter_map(|field| {
           field.ident.as_ref().map(|ident| Named {
             name: ident.to_string(),
@@ -266,7 +266,7 @@ fn trace_enum(traced: &mut Traced, item: &ItemEnum) {
   let variants: BTreeMap<u32, Named<VariantFormat>> = item
     .variants
     .iter()
-    .filter(is_kept)
+    .filter(is_exposed)
     .map(|variant| {
       let name = variant.ident.to_string();
       let variant_format = match &variant.fields {
@@ -275,7 +275,7 @@ fn trace_enum(traced: &mut Traced, item: &ItemEnum) {
           let fields = unnamed
             .unnamed
             .iter()
-            .filter(is_kept)
+            .filter(is_exposed)
             .map(|field| to_type_format(&field.ty))
             .collect::<Vec<_>>();
           if fields.is_empty() {
@@ -290,7 +290,7 @@ fn trace_enum(traced: &mut Traced, item: &ItemEnum) {
           let fields = named
             .named
             .iter()
-            .filter(is_kept)
+            .filter(is_exposed)
             .filter_map(|field| {
               field.ident.as_ref().map(|ident| Named {
                 name: ident.to_string(),
@@ -316,8 +316,8 @@ fn trace_enum(traced: &mut Traced, item: &ItemEnum) {
   traced.registry.insert(type_name, container);
 }
 
-/// Returns `false` if Serde skips `item` during serialization.
-fn is_kept<T: GetAttrs>(item: &T) -> bool {
+/// Returns `false` if Serde skips the field item during serialization.
+fn is_exposed<T: GetAttrs>(item: &T) -> bool {
   !item.get_attrs().iter().any(|attr| {
     if !attr.path().is_ident("serde") {
       return false;
@@ -333,15 +333,17 @@ fn is_kept<T: GetAttrs>(item: &T) -> bool {
   })
 }
 
-/// Helper trait required for [`is_kept`].
+/// Helper trait required for [`is_exposed`].
 trait GetAttrs {
   fn get_attrs(&self) -> &Vec<Attribute>;
 }
+
 impl GetAttrs for &Field {
   fn get_attrs(&self) -> &Vec<Attribute> {
     &self.attrs
   }
 }
+
 impl GetAttrs for &Variant {
   fn get_attrs(&self) -> &Vec<Attribute> {
     &self.attrs

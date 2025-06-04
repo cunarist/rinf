@@ -1,9 +1,11 @@
 use heck::{ToShoutySnakeCase, ToSnakeCase};
 use proc_macro::TokenStream;
 use quote::quote;
+use syn::punctuated::Punctuated;
+use syn::token::Comma;
 use syn::{
   Attribute, Data, DataEnum, DataStruct, DeriveInput, Error, Field, Fields,
-  Ident, Index, Token, Variant, parse_macro_input, punctuated::Punctuated,
+  Ident, Index, Result, Variant, parse_macro_input,
 };
 
 static BANNED_LOWER_PREFIX: &str = "rinf";
@@ -270,40 +272,51 @@ fn derive_rust_signal_real(
   TokenStream::from(expanded)
 }
 
-/// Checks if the attributes of the variants / fields are unsupported.
-fn check_invalid_attrs(data: &Data) -> syn::Result<()> {
-  fn check_fields(fields: &Fields) -> syn::Result<()> {
-    match fields {
-      Fields::Named(fields) => check_attrs(&fields.named),
-      Fields::Unnamed(fields) => check_attrs(&fields.unnamed),
-      Fields::Unit => Ok(()),
-    }
+/// Checks if the attributes of the fields are valid for Rinf signals.
+fn check_fields(fields: &Fields) -> Result<()> {
+  match fields {
+    Fields::Named(fields) => check_attrs(&fields.named),
+    Fields::Unnamed(fields) => check_attrs(&fields.unnamed),
+    Fields::Unit => Ok(()),
   }
+}
 
-  fn check_attrs<T: GetAttrs>(
-    items: &Punctuated<T, Token![,]>,
-  ) -> syn::Result<()> {
-    items.iter().try_for_each(|item| {
-      item.get_attrs().iter().try_for_each(|attr| {
-        if !attr.path().is_ident("serde") {
-          return Ok(());
-        }
-        attr.parse_nested_meta(|meta| match meta.path.get_ident() {
-          Some(ident)
-            if ident == "skip_serializing"
-              || ident == "skip_serializing_if"
-              || ident == "skip_deserializing" =>
-          {
+static BANNED_SERDE_ATTRS: [&str; 7] = [
+  "skip_serializing",
+  "skip_serializing_if",
+  "skip_deserializing",
+  "with",
+  "serialize_with",
+  "deserialize_with",
+  "flatten",
+];
+
+/// Checks if the attributes of a field are valid for Rinf signals.
+fn check_attrs<T: GetAttrs>(items: &Punctuated<T, Comma>) -> Result<()> {
+  items.iter().try_for_each(|item| {
+    item.get_attrs().iter().try_for_each(|attr| {
+      if !attr.path().is_ident("serde") {
+        return Ok(());
+      }
+      attr.parse_nested_meta(|meta| match meta.path.get_ident() {
+        Some(ident) => {
+          // Check if the attribute is one of the banned serde attributes
+          if BANNED_SERDE_ATTRS.contains(&ident.to_string().as_str()) {
             Err(meta.error(format!(
-              "`{ident}` is not supported within rinf signal data"
+              "`{ident}` cannot be used on a field of Rinf signal"
             )))
+          } else {
+            Ok(())
           }
-          _ => Ok(()),
-        })
+        }
+        None => Ok(()),
       })
     })
-  }
+  })
+}
 
+/// Checks if the attributes of the variants or fields are unsupported.
+fn check_invalid_attrs(data: &Data) -> Result<()> {
   match data {
     Data::Struct(data) => check_fields(&data.fields),
     Data::Enum(data) => {
@@ -317,7 +330,8 @@ fn check_invalid_attrs(data: &Data) -> syn::Result<()> {
   }
 }
 
-/// Require that all included fields of a struct implement the [`SignalPiece`] trait.
+/// Requires that all included fields of a struct
+/// implement the [`SignalPiece`] trait.
 /// This assists with type-safe development.
 fn get_struct_where_clause(
   data_struct: &DataStruct,
@@ -325,12 +339,15 @@ fn get_struct_where_clause(
   let field_types: Vec<_> = match &data_struct.fields {
     // For named structs (struct-like), extract the field types.
     Fields::Named(all) => {
-      all.named.iter().filter(is_kept).map(|f| &f.ty).collect()
+      all.named.iter().filter(is_exposed).map(|f| &f.ty).collect()
     }
     // For unnamed structs (tuple-like), extract the field types.
-    Fields::Unnamed(all) => {
-      all.unnamed.iter().filter(is_kept).map(|f| &f.ty).collect()
-    }
+    Fields::Unnamed(all) => all
+      .unnamed
+      .iter()
+      .filter(is_exposed)
+      .map(|f| &f.ty)
+      .collect(),
     // For unit-like structs (without any inner data), do nothing.
     Fields::Unit => Vec::new(),
   };
@@ -339,23 +356,27 @@ fn get_struct_where_clause(
   }
 }
 
-/// Require that all included variants of an enum implement the [`SignalPiece`] trait.
+/// Requires that all included variants of an enum
+/// implement the [`SignalPiece`] trait.
 /// This assists with type-safe development.
 fn get_enum_where_clause(data_enum: &DataEnum) -> proc_macro2::TokenStream {
   let variant_types: Vec<_> = data_enum
     .variants
     .iter()
-    .filter(is_kept)
+    .filter(is_exposed)
     .flat_map(|variant| {
       match &variant.fields {
         // For named variants (struct-like), extract the field types.
         Fields::Named(all) => {
-          all.named.iter().filter(is_kept).map(|f| &f.ty).collect()
+          all.named.iter().filter(is_exposed).map(|f| &f.ty).collect()
         }
         // For unnamed variants (tuple-like), extract the field types.
-        Fields::Unnamed(all) => {
-          all.unnamed.iter().filter(is_kept).map(|f| &f.ty).collect()
-        }
+        Fields::Unnamed(all) => all
+          .unnamed
+          .iter()
+          .filter(is_exposed)
+          .map(|f| &f.ty)
+          .collect(),
         // For unit-like variants (without any inner data), do nothing.
         Fields::Unit => Vec::new(),
       }
@@ -376,7 +397,7 @@ fn get_struct_signal_impl(
       let fields = named_fields
         .named
         .iter()
-        .filter(is_kept)
+        .filter(is_exposed)
         .filter_map(|field| field.ident.clone());
       quote! {
         impl rinf::SignalPiece for #name {
@@ -392,7 +413,7 @@ fn get_struct_signal_impl(
         .unnamed
         .iter()
         .enumerate()
-        .filter(is_kept)
+        .filter(is_exposed)
         .map(|(index, _)| Index::from(index))
         .collect();
       quote! {
@@ -420,14 +441,14 @@ fn get_enum_signal_impl(
   data_enum: &DataEnum,
   name: &Ident,
 ) -> proc_macro2::TokenStream {
-  let variants = data_enum.variants.iter().filter(is_kept).map(|variant| {
+  let variants = data_enum.variants.iter().filter(is_exposed).map(|variant| {
     let variant_ident = &variant.ident;
     match &variant.fields {
       Fields::Named(named_fields) => {
         let fields: Vec<Ident> = named_fields
           .named
           .iter()
-          .filter(is_kept)
+          .filter(is_exposed)
           .filter_map(|field| field.ident.clone())
           .collect();
         quote! {
@@ -442,7 +463,7 @@ fn get_enum_signal_impl(
           .unnamed
           .iter()
           .enumerate()
-          .map(|(index, field)| match is_kept(field) {
+          .map(|(index, field)| match is_exposed(field) {
             true => Ident::new(&format!("field_{index}"), variant_ident.span()),
             false => Ident::new("_", variant_ident.span()),
           })
@@ -478,8 +499,8 @@ fn get_enum_signal_impl(
   }
 }
 
-/// Returns `false` if Serde skips `item` during serialization.
-fn is_kept<T: GetAttrs>(item: &T) -> bool {
+/// Returns `false` if Serde skips the field item during serialization.
+fn is_exposed<T: GetAttrs>(item: &T) -> bool {
   !item.get_attrs().iter().any(|attr| {
     if !attr.path().is_ident("serde") {
       return false;
@@ -495,30 +516,35 @@ fn is_kept<T: GetAttrs>(item: &T) -> bool {
   })
 }
 
-/// Helper trait required for [`check_invalid_attrs`] and [`is_kept`].
+/// Helper trait required for [`check_invalid_attrs`] and [`is_exposed`].
 trait GetAttrs {
   fn get_attrs(&self) -> &Vec<Attribute>;
 }
+
 impl GetAttrs for Field {
   fn get_attrs(&self) -> &Vec<Attribute> {
     &self.attrs
   }
 }
+
 impl GetAttrs for &Field {
   fn get_attrs(&self) -> &Vec<Attribute> {
     &self.attrs
   }
 }
+
 impl GetAttrs for Variant {
   fn get_attrs(&self) -> &Vec<Attribute> {
     &self.attrs
   }
 }
+
 impl GetAttrs for &Variant {
   fn get_attrs(&self) -> &Vec<Attribute> {
     &self.attrs
   }
 }
+
 impl GetAttrs for (usize, &Field) {
   fn get_attrs(&self) -> &Vec<Attribute> {
     &self.1.attrs
