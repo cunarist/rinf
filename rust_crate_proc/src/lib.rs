@@ -281,7 +281,7 @@ fn check_fields(fields: &Fields) -> Result<()> {
   }
 }
 
-static BANNED_SERDE_ATTRS: [&str; 8] = [
+static BANNED_SERDE_ATTRS: [&str; 7] = [
   "skip_serializing",
   "skip_serializing_if",
   "skip_deserializing",
@@ -289,7 +289,6 @@ static BANNED_SERDE_ATTRS: [&str; 8] = [
   "serialize_with",
   "deserialize_with",
   "flatten",
-  "transparent",
 ];
 
 /// Checks if the attributes of a field are valid for Rinf signals.
