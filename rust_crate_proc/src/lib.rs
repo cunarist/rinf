@@ -499,26 +499,31 @@ fn is_kept<T: GetAttrs>(item: &T) -> bool {
 trait GetAttrs {
   fn get_attrs(&self) -> &Vec<Attribute>;
 }
+
 impl GetAttrs for Field {
   fn get_attrs(&self) -> &Vec<Attribute> {
     &self.attrs
   }
 }
+
 impl GetAttrs for &Field {
   fn get_attrs(&self) -> &Vec<Attribute> {
     &self.attrs
   }
 }
+
 impl GetAttrs for Variant {
   fn get_attrs(&self) -> &Vec<Attribute> {
     &self.attrs
   }
 }
+
 impl GetAttrs for &Variant {
   fn get_attrs(&self) -> &Vec<Attribute> {
     &self.attrs
   }
 }
+
 impl GetAttrs for (usize, &Field) {
   fn get_attrs(&self) -> &Vec<Attribute> {
     &self.1.attrs
