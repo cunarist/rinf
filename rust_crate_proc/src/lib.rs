@@ -295,7 +295,7 @@ fn check_invalid_attrs(data: &Data) -> syn::Result<()> {
               || ident == "skip_deserializing" =>
           {
             Err(meta.error(format!(
-              "`{ident}` is not supported for a field of Rinf signal"
+              "`{ident}` cannot be used on a field of Rinf signal"
             )))
           }
           _ => Ok(()),
