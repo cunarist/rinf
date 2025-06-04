@@ -281,6 +281,12 @@ fn check_fields(fields: &Fields) -> Result<()> {
   }
 }
 
+static BANNED_SERDE_ATTRS: [&str; 3] = [
+  "skip_serializing",
+  "skip_serializing_if",
+  "skip_deserializing",
+];
+
 /// Checks if the attributes of a field are valid for Rinf signals.
 fn check_attrs<T: GetAttrs>(items: &Punctuated<T, Comma>) -> Result<()> {
   items.iter().try_for_each(|item| {
@@ -289,16 +295,17 @@ fn check_attrs<T: GetAttrs>(items: &Punctuated<T, Comma>) -> Result<()> {
         return Ok(());
       }
       attr.parse_nested_meta(|meta| match meta.path.get_ident() {
-        Some(ident)
-          if ident == "skip_serializing"
-            || ident == "skip_serializing_if"
-            || ident == "skip_deserializing" =>
-        {
-          Err(meta.error(format!(
-            "`{ident}` cannot be used on a field of Rinf signal"
-          )))
+        Some(ident) => {
+          // Check if the attribute is one of the banned serde attributes
+          if BANNED_SERDE_ATTRS.contains(&ident.to_string().as_str()) {
+            Err(meta.error(format!(
+              "`{ident}` cannot be used on a field of Rinf signal"
+            )))
+          } else {
+            Ok(())
+          }
         }
-        _ => Ok(()),
+        None => Ok(()),
       })
     })
   })
