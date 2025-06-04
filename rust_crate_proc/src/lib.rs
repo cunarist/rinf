@@ -331,7 +331,8 @@ fn check_invalid_attrs(data: &Data) -> Result<()> {
   }
 }
 
-/// Require that all included fields of a struct implement the [`SignalPiece`] trait.
+/// Requires that all included fields of a struct
+/// implement the [`SignalPiece`] trait.
 /// This assists with type-safe development.
 fn get_struct_where_clause(
   data_struct: &DataStruct,
@@ -356,7 +357,8 @@ fn get_struct_where_clause(
   }
 }
 
-/// Require that all included variants of an enum implement the [`SignalPiece`] trait.
+/// Requires that all included variants of an enum
+/// implement the [`SignalPiece`] trait.
 /// This assists with type-safe development.
 fn get_enum_where_clause(data_enum: &DataEnum) -> proc_macro2::TokenStream {
   let variant_types: Vec<_> = data_enum
