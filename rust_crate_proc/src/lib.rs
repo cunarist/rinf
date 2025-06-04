@@ -2,9 +2,10 @@ use heck::{ToShoutySnakeCase, ToSnakeCase};
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::punctuated::Punctuated;
+use syn::token::Comma;
 use syn::{
   Attribute, Data, DataEnum, DataStruct, DeriveInput, Error, Field, Fields,
-  Ident, Index, Result, Token, Variant, parse_macro_input,
+  Ident, Index, Result, Variant, parse_macro_input,
 };
 
 static BANNED_LOWER_PREFIX: &str = "rinf";
@@ -281,7 +282,7 @@ fn check_fields(fields: &Fields) -> Result<()> {
 }
 
 /// Checks if the attributes of a field are valid for Rinf signals.
-fn check_attrs<T: GetAttrs>(items: &Punctuated<T, Token![,]>) -> Result<()> {
+fn check_attrs<T: GetAttrs>(items: &Punctuated<T, Comma>) -> Result<()> {
   items.iter().try_for_each(|item| {
     item.get_attrs().iter().try_for_each(|attr| {
       if !attr.path().is_ident("serde") {
