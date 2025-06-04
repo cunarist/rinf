@@ -1,9 +1,10 @@
 use heck::{ToShoutySnakeCase, ToSnakeCase};
 use proc_macro::TokenStream;
 use quote::quote;
+use syn::punctuated::Punctuated;
 use syn::{
   Attribute, Data, DataEnum, DataStruct, DeriveInput, Error, Field, Fields,
-  Ident, Index, Token, Variant, parse_macro_input, punctuated::Punctuated,
+  Ident, Index, Result, Token, Variant, parse_macro_input,
 };
 
 static BANNED_LOWER_PREFIX: &str = "rinf";
@@ -270,40 +271,40 @@ fn derive_rust_signal_real(
   TokenStream::from(expanded)
 }
 
-/// Checks if the attributes of the variants / fields are unsupported.
-fn check_invalid_attrs(data: &Data) -> syn::Result<()> {
-  fn check_fields(fields: &Fields) -> syn::Result<()> {
-    match fields {
-      Fields::Named(fields) => check_attrs(&fields.named),
-      Fields::Unnamed(fields) => check_attrs(&fields.unnamed),
-      Fields::Unit => Ok(()),
-    }
+/// Checks if the attributes of the fields are valid for Rinf signals.
+fn check_fields(fields: &Fields) -> Result<()> {
+  match fields {
+    Fields::Named(fields) => check_attrs(&fields.named),
+    Fields::Unnamed(fields) => check_attrs(&fields.unnamed),
+    Fields::Unit => Ok(()),
   }
+}
 
-  fn check_attrs<T: GetAttrs>(
-    items: &Punctuated<T, Token![,]>,
-  ) -> syn::Result<()> {
-    items.iter().try_for_each(|item| {
-      item.get_attrs().iter().try_for_each(|attr| {
-        if !attr.path().is_ident("serde") {
-          return Ok(());
+/// Checks if the attributes of a field are valid for Rinf signals.
+fn check_attrs<T: GetAttrs>(items: &Punctuated<T, Token![,]>) -> Result<()> {
+  items.iter().try_for_each(|item| {
+    item.get_attrs().iter().try_for_each(|attr| {
+      if !attr.path().is_ident("serde") {
+        return Ok(());
+      }
+      attr.parse_nested_meta(|meta| match meta.path.get_ident() {
+        Some(ident)
+          if ident == "skip_serializing"
+            || ident == "skip_serializing_if"
+            || ident == "skip_deserializing" =>
+        {
+          Err(meta.error(format!(
+            "`{ident}` cannot be used on a field of Rinf signal"
+          )))
         }
-        attr.parse_nested_meta(|meta| match meta.path.get_ident() {
-          Some(ident)
-            if ident == "skip_serializing"
-              || ident == "skip_serializing_if"
-              || ident == "skip_deserializing" =>
-          {
-            Err(meta.error(format!(
-              "`{ident}` cannot be used on a field of Rinf signal"
-            )))
-          }
-          _ => Ok(()),
-        })
+        _ => Ok(()),
       })
     })
-  }
+  })
+}
 
+/// Checks if the attributes of the variants or fields are unsupported.
+fn check_invalid_attrs(data: &Data) -> Result<()> {
   match data {
     Data::Struct(data) => check_fields(&data.fields),
     Data::Enum(data) => {
