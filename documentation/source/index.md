@@ -14,6 +14,7 @@
    running-and-building.md
    messaging.md
    field-types.md
+   field-attributes.md
    tutorial.md
    state-management.md
    error-handling.md

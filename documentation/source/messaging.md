@@ -18,7 +18,7 @@ If you add the optional argument `-w` or `--watch` to the `rinf gen` command, th
 rinf gen --watch
 ```
 
-## Channel Signals
+## Endpoint Signals
 
 The `RustSignal` trait generates a signal stream from Rust to Dart.[^2] Use the `RustSignalBinary` trait to include binary data without the overhead of serialization.
 
@@ -117,36 +117,5 @@ struct Middle {
 #[derive(Serialize, SignalPiece)]
 struct Inner {
   my_field: bool,
-}
-```
-
-## Ignoring fields / variants
-
-To ignore a field or variant, annotate it with `#[serde(skip)]`. This is useful when transferring partially private data because it allows you to specify which data is exposed to Dart. See Serde's documentation on [variant](https://serde.rs/variant-attrs.html) and [field](https://serde.rs/field-attrs.html) attributes for more information on how Serde handles this attribute.
-
-```{code-block} rust
-:caption: Rust
-#[derive(Serialize, RustSignal)]
-struct UpdateMessage {
-  event: String,
-  struct_data: StructData,
-  enum_data: EnumData,
-}
-
-#[derive(Serialize, SignalPiece)]
-struct StructData {
-  my_public_field: bool,
-  #[serde(skip)]
-  my_private_field: bool,
-}
-
-#[derive(Serialize, SignalPiece)]
-enum EnumData {
-  Variant1(i32, #[serde(skip)] i32),
-  Variant2 {
-    my_public_field: bool,
-    #[serde(skip)]
-    my_private_field: bool,
-  },
 }
 ```
