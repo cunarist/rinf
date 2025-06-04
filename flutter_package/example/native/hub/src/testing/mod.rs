@@ -1,7 +1,7 @@
 use crate::signals::{
-  CStyleEnum, ComplexSignalTestResult, List, NewTypeStruct, OtherTypes,
-  PrimitiveTypes, SerdeData, SimpleList, Struct, Tree, TupleStruct, UnitStruct,
-  UnitTestEnd, UnitTestStart,
+  CStyleEnum, ComplexSignalTestResult, List, NewTypeStruct, NotSerializable,
+  OtherTypes, PrimitiveTypes, SerdeData, SimpleList, Struct, Tree, TupleStruct,
+  UnitStruct, UnitTestEnd, UnitTestStart,
 };
 use rinf::{DartSignal, RustSignal};
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
@@ -163,9 +163,10 @@ fn get_complex_signals() -> Vec<SerdeData> {
     "test.\u{10348}.\u{00a2}\u{0939}\u{20ac}\u{d55c}..".to_string(),
   );
 
-  let v5 = SerdeData::TupleVariant(3, 6);
+  let v5 = SerdeData::TupleVariant(3, NotSerializable, 6);
 
   let v6 = SerdeData::StructVariant {
+    ignored: NotSerializable,
     f0: UnitStruct,
     f1: NewTypeStruct(1),
     f2: TupleStruct(2, 3),
