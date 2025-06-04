@@ -1,3 +1,8 @@
+## 8.6.0
+
+- Now `#[serde(skip)]` attributes are supported.
+- Some field attributes from Serde are now treated as syntax errors at compile-time for safer messaging.
+
 ## 8.5.0
 
 - Now `SignalPiece` can be derived on structs with recursive structure.
