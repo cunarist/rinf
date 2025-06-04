@@ -14,8 +14,8 @@ use std::sync::mpsc::channel;
 use std::time::Duration;
 use syn::spanned::Spanned;
 use syn::{
-  Attribute, Expr, File, GenericArgument, Item, ItemEnum, ItemStruct, Lit,
-  PathArguments, Type, TypeArray, TypePath, TypeTuple,
+  Attribute, Expr, Field, File, GenericArgument, Item, ItemEnum, ItemStruct,
+  Lit, PathArguments, Type, TypeArray, TypePath, TypeTuple, Variant,
 };
 
 static GEN_MOD: &str = "signals";
@@ -225,6 +225,7 @@ fn trace_struct(traced: &mut Traced, item: &ItemStruct) {
       let fields: Vec<Format> = unnamed
         .unnamed
         .iter()
+        .filter(is_kept)
         .map(|field| to_type_format(&field.ty))
         .collect();
       if fields.is_empty() {
@@ -239,6 +240,7 @@ fn trace_struct(traced: &mut Traced, item: &ItemStruct) {
       let fields = named
         .named
         .iter()
+        .filter(is_kept)
         .filter_map(|field| {
           field.ident.as_ref().map(|ident| Named {
             name: ident.to_string(),
@@ -264,6 +266,7 @@ fn trace_enum(traced: &mut Traced, item: &ItemEnum) {
   let variants: BTreeMap<u32, Named<VariantFormat>> = item
     .variants
     .iter()
+    .filter(is_kept)
     .map(|variant| {
       let name = variant.ident.to_string();
       let variant_format = match &variant.fields {
@@ -272,6 +275,7 @@ fn trace_enum(traced: &mut Traced, item: &ItemEnum) {
           let fields = unnamed
             .unnamed
             .iter()
+            .filter(is_kept)
             .map(|field| to_type_format(&field.ty))
             .collect::<Vec<_>>();
           if fields.is_empty() {
@@ -286,6 +290,7 @@ fn trace_enum(traced: &mut Traced, item: &ItemEnum) {
           let fields = named
             .named
             .iter()
+            .filter(is_kept)
             .filter_map(|field| {
               field.ident.as_ref().map(|ident| Named {
                 name: ident.to_string(),
@@ -309,6 +314,38 @@ fn trace_enum(traced: &mut Traced, item: &ItemEnum) {
 
   // Save the information about the container.
   traced.registry.insert(type_name, container);
+}
+
+/// Returns `false` if Serde skips `item` during serialization.
+fn is_kept<T: GetAttrs>(item: &T) -> bool {
+  !item.get_attrs().iter().any(|attr| {
+    if !attr.path().is_ident("serde") {
+      return false;
+    }
+    let mut skip = false;
+    let _ = attr.parse_nested_meta(|meta| {
+      if meta.path.is_ident("skip") {
+        skip = true;
+      }
+      Ok(())
+    });
+    skip
+  })
+}
+
+/// Helper trait required for [`is_kept`].
+trait GetAttrs {
+  fn get_attrs(&self) -> &Vec<Attribute>;
+}
+impl GetAttrs for &Field {
+  fn get_attrs(&self) -> &Vec<Attribute> {
+    &self.attrs
+  }
+}
+impl GetAttrs for &Variant {
+  fn get_attrs(&self) -> &Vec<Attribute> {
+    &self.attrs
+  }
 }
 
 /// Checks that the name of newly found signal is usable.

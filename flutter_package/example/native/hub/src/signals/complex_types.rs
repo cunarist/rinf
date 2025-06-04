@@ -14,8 +14,10 @@ pub enum SerdeData {
   OtherTypes(Box<OtherTypes>),
   UnitVariant,
   NewTypeVariant(String),
-  TupleVariant(u32, u64),
+  TupleVariant(u32, #[serde(skip)] NotSerializable, u64),
   StructVariant {
+    #[serde(skip)]
+    ignored: NotSerializable,
     f0: UnitStruct,
     f1: NewTypeStruct,
     f2: TupleStruct,
@@ -107,3 +109,6 @@ pub enum CStyleEnum {
   D,
   E = 10,
 }
+
+#[derive(Default, PartialEq, Clone)]
+pub struct NotSerializable;
