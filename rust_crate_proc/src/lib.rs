@@ -325,12 +325,15 @@ fn get_struct_where_clause(
   let field_types: Vec<_> = match &data_struct.fields {
     // For named structs (struct-like), extract the field types.
     Fields::Named(all) => {
-      all.named.iter().filter(is_kept).map(|f| &f.ty).collect()
+      all.named.iter().filter(is_exposed).map(|f| &f.ty).collect()
     }
     // For unnamed structs (tuple-like), extract the field types.
-    Fields::Unnamed(all) => {
-      all.unnamed.iter().filter(is_kept).map(|f| &f.ty).collect()
-    }
+    Fields::Unnamed(all) => all
+      .unnamed
+      .iter()
+      .filter(is_exposed)
+      .map(|f| &f.ty)
+      .collect(),
     // For unit-like structs (without any inner data), do nothing.
     Fields::Unit => Vec::new(),
   };
@@ -345,17 +348,20 @@ fn get_enum_where_clause(data_enum: &DataEnum) -> proc_macro2::TokenStream {
   let variant_types: Vec<_> = data_enum
     .variants
     .iter()
-    .filter(is_kept)
+    .filter(is_exposed)
     .flat_map(|variant| {
       match &variant.fields {
         // For named variants (struct-like), extract the field types.
         Fields::Named(all) => {
-          all.named.iter().filter(is_kept).map(|f| &f.ty).collect()
+          all.named.iter().filter(is_exposed).map(|f| &f.ty).collect()
         }
         // For unnamed variants (tuple-like), extract the field types.
-        Fields::Unnamed(all) => {
-          all.unnamed.iter().filter(is_kept).map(|f| &f.ty).collect()
-        }
+        Fields::Unnamed(all) => all
+          .unnamed
+          .iter()
+          .filter(is_exposed)
+          .map(|f| &f.ty)
+          .collect(),
         // For unit-like variants (without any inner data), do nothing.
         Fields::Unit => Vec::new(),
       }
@@ -376,7 +382,7 @@ fn get_struct_signal_impl(
       let fields = named_fields
         .named
         .iter()
-        .filter(is_kept)
+        .filter(is_exposed)
         .filter_map(|field| field.ident.clone());
       quote! {
         impl rinf::SignalPiece for #name {
@@ -392,7 +398,7 @@ fn get_struct_signal_impl(
         .unnamed
         .iter()
         .enumerate()
-        .filter(is_kept)
+        .filter(is_exposed)
         .map(|(index, _)| Index::from(index))
         .collect();
       quote! {
@@ -420,14 +426,14 @@ fn get_enum_signal_impl(
   data_enum: &DataEnum,
   name: &Ident,
 ) -> proc_macro2::TokenStream {
-  let variants = data_enum.variants.iter().filter(is_kept).map(|variant| {
+  let variants = data_enum.variants.iter().filter(is_exposed).map(|variant| {
     let variant_ident = &variant.ident;
     match &variant.fields {
       Fields::Named(named_fields) => {
         let fields: Vec<Ident> = named_fields
           .named
           .iter()
-          .filter(is_kept)
+          .filter(is_exposed)
           .filter_map(|field| field.ident.clone())
           .collect();
         quote! {
@@ -442,7 +448,7 @@ fn get_enum_signal_impl(
           .unnamed
           .iter()
           .enumerate()
-          .map(|(index, field)| match is_kept(field) {
+          .map(|(index, field)| match is_exposed(field) {
             true => Ident::new(&format!("field_{index}"), variant_ident.span()),
             false => Ident::new("_", variant_ident.span()),
           })
@@ -478,8 +484,8 @@ fn get_enum_signal_impl(
   }
 }
 
-/// Returns `false` if Serde skips `item` during serialization.
-fn is_kept<T: GetAttrs>(item: &T) -> bool {
+/// Returns `false` if Serde skips the field item during serialization.
+fn is_exposed<T: GetAttrs>(item: &T) -> bool {
   !item.get_attrs().iter().any(|attr| {
     if !attr.path().is_ident("serde") {
       return false;
@@ -495,7 +501,7 @@ fn is_kept<T: GetAttrs>(item: &T) -> bool {
   })
 }
 
-/// Helper trait required for [`check_invalid_attrs`] and [`is_kept`].
+/// Helper trait required for [`check_invalid_attrs`] and [`is_exposed`].
 trait GetAttrs {
   fn get_attrs(&self) -> &Vec<Attribute>;
 }
