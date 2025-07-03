@@ -63,7 +63,7 @@ final subscription = MyDataOutput.rustSignalStream.listen((signalPack) {
 
 // You can also get the latest value received from the stream.
 // This is useful when building and mounting a new widget.
-RustSignalPack<MyDataOutput>? latestSignal = MyDataOutput.latest;
+RustSignalPack<MyDataOutput>? latestSignal = MyDataOutput.latestRustSignal;
 ```
 
 The `DartSignal` trait generates a signal stream from Dart to Rust. Use the `DartSignalBinary` trait to include binary data without the overhead of serialization.
