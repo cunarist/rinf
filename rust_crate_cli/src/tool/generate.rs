@@ -512,6 +512,11 @@ final _{camel_class}StreamController =
   /// such as when a widget is disposed.
   static final rustSignalStream =
       _{}StreamController.stream.asBroadcastStream();
+        
+  /// The latest signal value received from Rust.
+  /// This is updated every time a new signal is received.
+  /// It can be null if no signals have been received yet.
+  static RustSignalPack<{class}>? latest = null;
 "#,
         class, camel_class
       ),
@@ -552,6 +557,7 @@ fn generate_shared_code(
       binary,
     );
     _{camel_class}StreamController.add(rustSignal);
+    {class}.latest = rustSignal;
   }},"#
     );
     code.push_str(&new_code);
