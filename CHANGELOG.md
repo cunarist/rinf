@@ -1,3 +1,7 @@
+## 8.7.0
+
+- Now getting the latest signal value from `rustSignalStream` is possible. This is useful when you're building and mounting a new widget.
+
 ## 8.6.0
 
 - Now `#[serde(skip)]` attributes are supported.

@@ -17,7 +17,7 @@ expect_used = "deny"
 wildcard_imports = "deny"
 
 [dependencies]
-rinf = "8.6.0"
+rinf = "8.7.0"
 serde = { version = "1.0.219", features = ["derive"] }
 tokio = { version = "1.45.0", features = ["rt", "macros", "time"] }
 async-trait = "0.1.87"
