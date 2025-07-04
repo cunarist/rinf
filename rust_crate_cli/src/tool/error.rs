@@ -37,22 +37,22 @@ impl Display for SetupError {
   fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
     match self {
       Self::Io(e) => {
-        write!(f, "Failed to operate on file: {}", e)
+        write!(f, "Failed to operate on file: {e}")
       }
       Self::Yaml(e) => {
-        write!(f, "Failed to parse YAML: {}", e)
+        write!(f, "Failed to parse YAML: {e}")
       }
       Self::Clipboard(e) => {
-        write!(f, "Failed to use clipboard: {}", e)
+        write!(f, "Failed to use clipboard: {e}")
       }
       Self::WatchingFile(e) => {
-        write!(f, "Failed to watch files: {}", e)
+        write!(f, "Failed to watch files: {e}")
       }
       Self::ReflectionModule => {
         write!(f, "Failed to write reflection modules")
       }
       Self::PubConfig(s) => {
-        write!(f, "Invalid `pubspec.yaml` config: {}", s)
+        write!(f, "Invalid `pubspec.yaml` config: {s}")
       }
       Self::BadFilePath(p) => {
         write!(f, "Invalid file path: `{}`", p.display())
@@ -64,10 +64,10 @@ impl Display for SetupError {
         write!(f, "Rust template has already been applied")
       }
       Self::DuplicatedSignal(n) => {
-        write!(f, "Duplicated signals named `{}` were found", n)
+        write!(f, "Duplicated signals named `{n}` were found")
       }
       Self::CodeSyntax(n) => {
-        write!(f, "Invalid syntax in file `{}`", n)
+        write!(f, "Invalid syntax in file `{n}`")
       }
       Self::SubprocessError => {
         write!(f, "A subprocess did not exit successfully")
