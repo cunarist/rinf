@@ -44,7 +44,7 @@ MyDataOutput { my_field: true }.send_signal_to_dart();
 StreamBuilder(
   stream: MyDataOutput.rustSignalStream,
   builder: (context, snapshot) {
-    final signalPack = snapshot.data;
+    RustSignalPack<MyDataOutput>? signalPack = snapshot.data;
     if (signalPack == null) {
       // Return an empty widget.
     }
@@ -60,6 +60,10 @@ StreamBuilder(
 final subscription = MyDataOutput.rustSignalStream.listen((signalPack) {
   MyDataOutput message = signalPack.message;
 })
+
+// You can also get the latest value received from the stream.
+// This is useful when building and mounting a new widget.
+RustSignalPack<MyDataOutput>? latestSignal = MyDataOutput.latestRustSignal;
 ```
 
 The `DartSignal` trait generates a signal stream from Dart to Rust. Use the `DartSignalBinary` trait to include binary data without the overhead of serialization.

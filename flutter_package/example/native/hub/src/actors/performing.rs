@@ -218,8 +218,7 @@ impl PerformingActor {
           }
         }
         format!(
-          "There are {} primes from {} to {}.",
-          prime_count, count_from, count_to,
+          "There are {prime_count} primes from {count_from} to {count_to}.",
         )
       });
       join_handles.push(join_handle);

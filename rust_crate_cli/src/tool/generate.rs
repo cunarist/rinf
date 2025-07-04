@@ -434,7 +434,7 @@ fn generate_class_extension_code(
   extracted_attrs: &BTreeSet<SignalAttribute>,
 ) -> Result<(), SetupError> {
   let snake_class = class.to_snake_case();
-  let class_file = gen_dir.join(GEN_MOD).join(format!("{}.dart", snake_class));
+  let class_file = gen_dir.join(GEN_MOD).join(format!("{snake_class}.dart"));
   let mut code = read_to_string(&class_file)?;
 
   if extracted_attrs.contains(&SignalAttribute::DartSignalBinary) {
@@ -488,7 +488,7 @@ fn generate_class_interface_code(
   extracted_attrs: &BTreeSet<SignalAttribute>,
 ) -> Result<(), SetupError> {
   let snake_class = class.to_snake_case();
-  let class_file = gen_dir.join(GEN_MOD).join(format!("{}.dart", snake_class));
+  let class_file = gen_dir.join(GEN_MOD).join(format!("{snake_class}.dart"));
   let mut code = read_to_string(&class_file)?;
 
   let has_rust_signal = extracted_attrs.contains(&SignalAttribute::RustSignal)
@@ -503,17 +503,21 @@ final _{camel_class}StreamController =
     );
     code.push_str(&new_code);
     code = code.replacen(
-      &format!("class {} {{", class),
+      &format!("class {class} {{"),
       &format!(
-        r#"class {} {{
+        r#"class {class} {{
   /// An async broadcast stream that listens for signals from Rust.
   /// It supports multiple subscriptions.
   /// Make sure to cancel the subscription when it's no longer needed,
   /// such as when a widget is disposed.
   static final rustSignalStream =
-      _{}StreamController.stream.asBroadcastStream();
-"#,
-        class, camel_class
+      _{camel_class}StreamController.stream.asBroadcastStream();
+        
+  /// The latest signal value received from Rust.
+  /// This is updated every time a new signal is received.
+  /// It can be null if no signals have been received yet.
+  static RustSignalPack<{class}>? latestRustSignal = null;
+"#
       ),
       1,
     );
@@ -528,7 +532,7 @@ fn generate_shared_code(
   signal_attrs: &BTreeMap<String, BTreeSet<SignalAttribute>>,
 ) -> Result<(), SetupError> {
   // Write type aliases.
-  let mut code = format!("part of '{}.dart';\n", GEN_MOD);
+  let mut code = format!("part of '{GEN_MOD}.dart';\n");
 
   // Write signal handler.
   code.push_str(
@@ -552,6 +556,7 @@ fn generate_shared_code(
       binary,
     );
     _{camel_class}StreamController.add(rustSignal);
+    {class}.latestRustSignal = rustSignal;
   }},"#
     );
     code.push_str(&new_code);
@@ -575,7 +580,7 @@ fn generate_interface_code(
   }
 
   // Write imports.
-  let top_file = gen_dir.join(GEN_MOD).join(format!("{}.dart", GEN_MOD));
+  let top_file = gen_dir.join(GEN_MOD).join(format!("{GEN_MOD}.dart"));
   let mut top_content = read_to_string(&top_file)?;
   top_content = top_content.replacen(
     "export '../serde/serde.dart';",
@@ -644,8 +649,8 @@ pub fn generate_dart_code(
   // Write the export file.
   let gen_dir_name = gen_dir.clean_file_name()?;
   write(
-    gen_dir.join(format!("{}.dart", gen_dir_name)),
-    format!("export '{}/{}.dart';", GEN_MOD, GEN_MOD),
+    gen_dir.join(format!("{gen_dir_name}.dart")),
+    format!("export '{GEN_MOD}/{GEN_MOD}.dart';"),
   )?;
 
   // Generate Dart interface code for FFI.
@@ -669,13 +674,13 @@ pub fn watch_and_generate_dart_code(
       let event = match event_result {
         Ok(inner) => inner,
         Err(err) => {
-          eprintln!("Watch error: {}", err);
+          eprintln!("Watch error: {err}");
           return;
         }
       };
       let send_result = sender.send(event);
       if let Err(err) = send_result {
-        eprintln!("{}", err);
+        eprintln!("{err}");
       }
     },
     Config::default(),
@@ -698,12 +703,12 @@ pub fn watch_and_generate_dart_code(
           );
           let result = generate_dart_code(root_dir, rinf_config);
           if let Err(err) = result {
-            eprintln!("{}", err);
+            eprintln!("{err}");
           }
         }
       }
       Err(err) => {
-        eprintln!("{}", err);
+        eprintln!("{err}");
         break;
       }
     }
@@ -747,7 +752,7 @@ fn move_directory_contents(
 fn remove_lint_warnings(gen_dir: &Path) -> Result<(), SetupError> {
   write_lint_ignore(&gen_dir.join("serde").join("serde.dart"))?;
   write_lint_ignore(&gen_dir.join("bincode").join("bincode.dart"))?;
-  write_lint_ignore(&gen_dir.join(GEN_MOD).join(format!("{}.dart", GEN_MOD)))?;
+  write_lint_ignore(&gen_dir.join(GEN_MOD).join(format!("{GEN_MOD}.dart")))?;
   Ok(())
 }
 
@@ -755,7 +760,7 @@ fn write_lint_ignore(file_path: &Path) -> Result<(), SetupError> {
   let content = read_to_string(file_path)?;
   write(
     file_path,
-    format!("// ignore_for_file: type=lint, type=warning\n{}", content),
+    format!("// ignore_for_file: type=lint, type=warning\n{content}"),
   )?;
   Ok(())
 }

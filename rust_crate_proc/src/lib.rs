@@ -97,10 +97,10 @@ fn derive_dart_signal_real(
   };
 
   // Collect identifiers and names.
-  let channel_type_ident = Ident::new(&format!("{}Channel", name), name.span());
+  let channel_type_ident = Ident::new(&format!("{name}Channel"), name.span());
   let channel_const_ident =
-    Ident::new(&format!("{}_CHANNEL", upper_snake_name), name.span());
-  let extern_fn_name = &format!("rinf_send_dart_signal_{}", snake_name);
+    Ident::new(&format!("{upper_snake_name}_CHANNEL"), name.span());
+  let extern_fn_name = &format!("rinf_send_dart_signal_{snake_name}");
   let extern_fn_ident = Ident::new(extern_fn_name, name.span());
 
   // Implement methods and extern functions.
@@ -561,8 +561,7 @@ fn create_name_error(ast: DeriveInput) -> TokenStream {
   Error::new_spanned(
     ast.ident,
     format!(
-      "The name of a foreign signal cannot start with `{}`",
-      BANNED_LOWER_PREFIX
+      "The name of a foreign signal cannot start with `{BANNED_LOWER_PREFIX}`"
     ),
   )
   .to_compile_error()
