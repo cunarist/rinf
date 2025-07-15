@@ -1,3 +1,7 @@
+## 8.7.1
+
+- Fixed a bug where non-signal structs were incorrectly included in duplication detection.
+
 ## 8.7.0
 
 - Now getting the latest signal value from `rustSignalStream` is possible. This is useful when you're building and mounting a new widget.
