@@ -374,10 +374,10 @@ fn process_items_in_module(
       }
       Item::Struct(s) => {
         let item_name = s.ident.to_string();
-        check_signal_name(&item_name, traced)?;
         let signal_attrs = extract_signal_attributes(&s.attrs)
           .ok_or(SetupError::CodeSyntax(file_name.to_owned()))?;
         if !signal_attrs.is_empty() {
+          check_signal_name(&item_name, traced)?;
           trace_struct(traced, s);
           traced.signal_attrs.insert(item_name.clone(), signal_attrs);
           let doc_comment = extract_doc_comment(&s.attrs);
@@ -387,10 +387,10 @@ fn process_items_in_module(
       }
       Item::Enum(e) => {
         let item_name = e.ident.to_string();
-        check_signal_name(&item_name, traced)?;
         let signal_attrs = extract_signal_attributes(&e.attrs)
           .ok_or(SetupError::CodeSyntax(file_name.to_owned()))?;
         if !signal_attrs.is_empty() {
+          check_signal_name(&item_name, traced)?;
           trace_enum(traced, e);
           traced.signal_attrs.insert(item_name.clone(), signal_attrs);
           let doc_comment = extract_doc_comment(&e.attrs);
