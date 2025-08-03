@@ -414,11 +414,12 @@ fn visit_rust_files(dir: &Path, traced: &mut Traced) -> Result<(), SetupError> {
   let entries = read_dir(dir)?;
   for entry in entries.filter_map(Result::ok) {
     let entry_path = entry.path();
-    let file_name = entry_path.clean_file_name()?;
     if entry_path.is_dir() {
       // Recurse into subdirectory.
       visit_rust_files(&entry_path, traced)?;
-    } else {
+    } else if entry_path.extension().is_some_and(|ext| ext == "rs") {
+      // This is a Rust file, so process it.
+      let file_name = entry_path.clean_file_name()?;
       let content = read_to_string(&entry_path)?;
       let syntax_tree: File = syn::parse_file(&content)
         .map_err(|_| SetupError::CodeSyntax(file_name.to_owned()))?;
