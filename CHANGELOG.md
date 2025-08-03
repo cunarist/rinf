@@ -1,3 +1,7 @@
+## 8.7.2
+
+- Fixed a bug where non-Rust files were being included in signal detection.
+
 ## 8.7.1
 
 - Fixed a bug where non-signal structs were incorrectly included in duplication detection.
