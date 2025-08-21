@@ -64,7 +64,7 @@ jobs:
 
       - name: Setup Java toolchain (Only Android target)
         if: matrix.target == 'android'
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: "zulu"
           java-version: "17"
