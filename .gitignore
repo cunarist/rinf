@@ -33,6 +33,7 @@ build/
 
 # Others
 *.lock
+!Cargo.lock
 .python-version
 /documentation/dist/
 /documentation/*.egg-info/
