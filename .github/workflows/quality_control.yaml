@@ -70,6 +70,10 @@ jobs:
           cargo clippy --all-features
           cargo clippy --all-features --target wasm32-unknown-unknown
 
+      - name: Check for errors in the CLI crate
+        working-directory: rust_crate_cli/
+        run: cargo clippy
+
       - name: Analyze code
         run: |
           dart analyze flutter_package --fatal-infos
@@ -84,6 +88,7 @@ jobs:
         working-directory: rust_crate_cli/
         run: |
           cargo fmt
+          cargo clippy --fix --allow-dirty
 
       - name: Check if the code has changed
         run: git diff --exit-code
