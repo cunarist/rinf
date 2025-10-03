@@ -25,7 +25,7 @@ pub fn apply_rust_template(
   update_gitignore(root_dir)?;
 
   // Modify `README.md`.
-  update_readme(root_dir).unwrap();
+  update_readme(root_dir);
 
   // Add Dart dependencies.
   Command::new(DART_BIN  )
