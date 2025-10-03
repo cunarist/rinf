@@ -74,12 +74,11 @@ fn extract_doc_comment(attrs: &[Attribute]) -> String {
       // Check if the attribute is a doc comment
       if attr.path().is_ident("doc") {
         // Parse the attribute as a `MetaNameValue`
-        if let syn::Meta::NameValue(meta) = &attr.meta {
-          if let syn::Expr::Lit(lit) = &meta.value {
-            if let syn::Lit::Str(lit_str) = &lit.lit {
-              return Some(lit_str.value().trim().to_owned());
-            }
-          }
+        if let syn::Meta::NameValue(meta) = &attr.meta
+          && let syn::Expr::Lit(lit) = &meta.value
+          && let syn::Lit::Str(lit_str) = &lit.lit
+        {
+          return Some(lit_str.value().trim().to_owned());
         }
       }
       None
@@ -161,15 +160,14 @@ fn to_type_format(ty: &Type) -> Format {
       }
     }
     Type::Array(TypeArray { elem, len, .. }) => {
-      if let Expr::Lit(expr_lit) = len {
-        if let Lit::Int(lit_int) = &expr_lit.lit {
-          if let Ok(size) = lit_int.base10_parse::<usize>() {
-            return Format::TupleArray {
-              content: Box::new(to_type_format(elem)),
-              size,
-            };
-          }
-        }
+      if let Expr::Lit(expr_lit) = len
+        && let Lit::Int(lit_int) = &expr_lit.lit
+        && let Ok(size) = lit_int.base10_parse::<usize>()
+      {
+        return Format::TupleArray {
+          content: Box::new(to_type_format(elem)),
+          size,
+        };
       }
       Format::unknown()
     }
