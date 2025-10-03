@@ -28,7 +28,11 @@ pub fn apply_rust_template(
   update_readme(root_dir)?;
 
   // Add Dart dependencies.
-  Command::new(DART_BIN)
+  Command::new(DART_BIN  )
+
+
+
+  
     .args(["pub", "add", "meta"])
     .output()?
     .capture_err()?;

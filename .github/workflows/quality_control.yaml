@@ -80,6 +80,11 @@ jobs:
           cargo fmt
           cargo clippy --fix --allow-dirty
 
+      - name: Format CLI crate code
+        working-directory: rust_crate_cli/
+        run: |
+          cargo fmt
+
       - name: Check if the code has changed
         run: git diff --exit-code
 
