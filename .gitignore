@@ -16,9 +16,6 @@ migrate_working_dir/
 *.iws
 .idea/
 
-# Visual Studio Code related
-.vscode/
-
 # Flutter/Dart/Pub related
 # Libraries should not include pubspec.lock, per https://dart.dev/guides/libraries/private-files#pubspeclock.
 /pubspec.lock
@@ -29,10 +26,11 @@ build/
 
 # Rust related
 /.cargo/
-/target/
+target/
 
 # Others
 *.lock
+!/rust_crate_cli/Cargo.lock
 .python-version
 /documentation/dist/
 /documentation/*.egg-info/

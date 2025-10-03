@@ -1,13 +1,12 @@
 [workspace]
 resolver = "3"
-members = [
-    "flutter_package/example/native/*",
-    "rust_crate",
-    "rust_crate_cli",
-    "rust_crate_proc",
-]
+# These can depend on each other.
+# We need to override `crates.io` to use local paths.
+members = ["flutter_package/example/native/*", "rust_crate", "rust_crate_proc"]
+# The binary crate doesn't have dependency relationship with others.
+# Also, it should have its own `Cargo.lock`.
+exclude = ["rust_crate_cli"]
 
 [patch.crates-io]
 rinf = { path = "rust_crate" }
-rinf_cli = { path = "rust_crate_cli" }
 rinf_proc = { path = "rust_crate_proc" }
