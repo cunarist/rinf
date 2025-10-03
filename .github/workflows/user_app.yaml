@@ -55,6 +55,8 @@ jobs:
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
 
       - name: Setup Ninja and GTK3 toolchain (Only Linux target)
         if: matrix.target == 'linux'
