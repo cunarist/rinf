@@ -1,3 +1,7 @@
+## 8.8.0
+
+- Windows ARM64 support was added.
+
 ## 8.7.2
 
 - Fixed a bug where non-Rust files were being included in signal detection.

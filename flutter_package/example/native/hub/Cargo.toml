@@ -17,7 +17,7 @@ expect_used = "deny"
 wildcard_imports = "deny"
 
 [dependencies]
-rinf = "8.7.2"
+rinf = "8.8.0"
 serde = { version = "1.0.219", features = ["derive"] }
 tokio = { version = "1.45.0", features = ["rt", "sync", "time", "macros"] }
 tokio_with_wasm = { version = "0.8.5", features = [
