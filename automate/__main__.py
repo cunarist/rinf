@@ -1,35 +1,44 @@
-from os import remove, walk
+"""Automation scripts for Rinf project tasks."""
+
+import logging
+import os
+import subprocess
 from pathlib import Path
-from subprocess import run
 from sys import argv
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 ROOT_DIR = Path(__file__).parent.parent
 COMMAND_ARG = 1
 
 
-def run_subprocess(command: str, cwd: Path):
-    run(command, cwd=cwd, check=True, shell=True)
+def run_subprocess(command: str, cwd: Path) -> None:
+    """Execute a subprocess command in the specified directory."""
+    subprocess.run(command, cwd=cwd, check=True, shell=True)
 
 
-def replace_text_once(file_path: Path, before: str, after: str):
-    with open(file_path, mode="r", encoding="utf8") as file:
+def replace_text_once(file_path: Path, before: str, after: str) -> None:
+    """Replace the first occurrence of text in a file."""
+    with file_path.open(encoding="utf8") as file:
         content: str = file.read()
     content = content.replace(before, after, 1)
-    with open(file_path, mode="w", encoding="utf8") as file:
+    with file_path.open(mode="w", encoding="utf8") as file:
         file.write(content)
 
 
-def search_all_files(dir: Path) -> list[Path]:
+def search_all_files(directory: Path) -> list[Path]:
+    """Recursively search for all files in a directory."""
     all_files: list[Path] = []
-    for root, _, files in walk(dir):
+    for root, _, files in os.walk(directory):
         root_path = Path(root)
-        for file in files:
-            all_files.append(root_path / file)
+        all_files.extend(root_path / file for file in files)
     return all_files
 
 
-def update_cargokit():
-    print("Updating CargoKit...")
+def update_cargokit() -> None:
+    """Update the CargoKit dependency using git subtree."""
+    logger.info("Updating CargoKit...")
     run_subprocess(
         (
             "git subtree pull"
@@ -41,13 +50,14 @@ def update_cargokit():
     )
 
 
-def prepare_test_app():
+def prepare_test_app() -> None:
+    """Set up a test Flutter app for testing purposes."""
     # Prevent side effects.
     file_path = ROOT_DIR / ".gitignore"
-    with open(file_path, mode="r", encoding="utf8") as file:
+    with file_path.open(encoding="utf8") as file:
         content: str = file.read()
     content += "\n/test_app/"
-    with open(file_path, mode="w", encoding="utf8") as file:
+    with file_path.open(mode="w", encoding="utf8") as file:
         file.write(content)
 
     # Initialize a Flutter app.
@@ -65,7 +75,7 @@ def prepare_test_app():
     )
 
     # Use repository Cargo workspace.
-    remove(ROOT_DIR / "test_app" / "Cargo.toml")
+    (ROOT_DIR / "test_app" / "Cargo.toml").unlink()
 
     # Enable the web target, since it's not enabled by default.
     crate_path = ROOT_DIR / "test_app" / "native" / "hub"
@@ -94,13 +104,14 @@ def prepare_test_app():
     )
 
 
-def prepare_user_app():
+def prepare_user_app() -> None:
+    """Set up a user Flutter app with Rinf from the public package registry."""
     # Prevent side effects.
     file_path = ROOT_DIR / ".gitignore"
-    with open(file_path, mode="r", encoding="utf8") as file:
+    with file_path.open(encoding="utf8") as file:
         content: str = file.read()
     content += "\n/user_app/"
-    with open(file_path, mode="w", encoding="utf8") as file:
+    with file_path.open(mode="w", encoding="utf8") as file:
         file.write(content)
 
     # Initialize a Flutter app.
@@ -118,7 +129,7 @@ def prepare_user_app():
     )
 
     # Use repository Cargo workspace.
-    remove(ROOT_DIR / "user_app" / "Cargo.toml")
+    (ROOT_DIR / "user_app" / "Cargo.toml").unlink()
 
     # Enable the web target, since it's not enabled by default.
     crate_path = ROOT_DIR / "user_app" / "native" / "hub"
@@ -152,16 +163,18 @@ def prepare_user_app():
     )
 
 
-def prepare_example_app():
+def prepare_example_app() -> None:
+    """Generate code for the example Flutter app."""
     run_subprocess(
         "rinf gen",
         ROOT_DIR / "flutter_package" / "example",
     )
 
 
-def run_command():
+def run_command() -> None:
+    """Execute the automation command specified in command line arguments."""
     if len(argv) < COMMAND_ARG + 1:
-        print("Automation option is not provided")
+        logger.error("Automation option is not provided")
         return
 
     command = argv[COMMAND_ARG]
@@ -175,7 +188,8 @@ def run_command():
         case "prepare-example-app":
             prepare_example_app()
         case _:
-            print("No such option for automation is available")
+            logger.error("No such option for automation is available")
 
 
-run_command()
+if __name__ == "__main__":
+    run_command()

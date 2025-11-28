@@ -10,7 +10,11 @@ dev = ["ruff", "pyright"]
 members = ["automate", "documentation"]
 
 [tool.ruff.lint]
-select = ["E", "F", "N", "I", "PL"]
+select = ["ALL"]
+ignore = ["TC", "BLE", "S602"]
 
 [tool.pyright]
 typeCheckingMode = "strict"
+
+[tool.ruff.lint.per-file-ignores]
+"documentation/**/*.py" = ["A001"]
