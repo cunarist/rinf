@@ -7,9 +7,9 @@ Pod::Spec.new do |s|
   s.version          = '0.1.0'
   s.summary          = 'Summary'
   s.description      = 'Description'
-  s.homepage         = 'http://cunarist.com'
+  s.homepage         = 'http://cunarist.org'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@cunarist.com' }
+  s.author           = { 'Your Company' => 'email@cunarist.org' }
 
   # This will ensure the source files in Classes/ are included in the native
   # builds of apps using this FFI plugin. Podspec does not support relative
