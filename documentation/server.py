@@ -8,6 +8,8 @@ from typing import override
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
+PORT = 80
+
 
 class RequestHandler(SimpleHTTPRequestHandler):
     """HTTP request handler with additional CORS headers for cross-origin isolation."""
@@ -22,9 +24,9 @@ class RequestHandler(SimpleHTTPRequestHandler):
 def main() -> None:
     """Start the HTTP server for serving documentation files."""
     os.chdir("dist/dirhtml")
-    server_address = ("", 8000)
+    server_address = ("", PORT)
     httpd = HTTPServer(server_address, RequestHandler)
-    logger.info("Serving on http://localhost:8000")
+    logger.info("Serving on http://localhost:%d", PORT)
     httpd.serve_forever()
 
 
