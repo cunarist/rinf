@@ -1,15 +1,15 @@
-"""Simple HTTP server for serving documentation with CORS headers."""
+"""Simple HTTP server with CORS headers for demo Rinf web app."""
 
-import os
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from typing import override
 
 
 class RequestHandler(SimpleHTTPRequestHandler):
-    """HTTP request handler with additional CORS headers for cross-origin isolation."""
+    """Request handler with CORS headers for SharedArrayBuffer support."""
 
     @override
     def end_headers(self) -> None:
+        """Add required headers for cross-origin isolation."""
         self.send_header("cross-origin-opener-policy", "same-origin")
         self.send_header("cross-origin-embedder-policy", "require-corp")
         super().end_headers()
@@ -17,7 +17,6 @@ class RequestHandler(SimpleHTTPRequestHandler):
 
 def main() -> None:
     """Start the HTTP server for serving documentation files."""
-    os.chdir("dist/dirhtml")
     address = ("", 80)
     HTTPServer(address, RequestHandler).serve_forever()
 

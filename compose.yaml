@@ -6,3 +6,11 @@ services:
     ports:
       - "${PORT}:80"
     restart: unless-stopped
+
+  demo:
+    build:
+      context: .
+      dockerfile: demo/Dockerfile
+    ports:
+      - "${PORT_DEMO}:80"
+    restart: unless-stopped
