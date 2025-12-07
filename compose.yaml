@@ -1,8 +1,8 @@
 services:
   documentation:
     build:
-      context: ./documentation
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: documentation/Dockerfile
     ports:
       - "${PORT}:80"
     restart: unless-stopped

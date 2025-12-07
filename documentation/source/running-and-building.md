@@ -33,7 +33,7 @@ To serve the web application[^3]:
 ```{code-block} shell
 :caption: CLI
 rinf wasm
-flutter run --web-header=Cross-Origin-Opener-Policy=same-origin --web-header=Cross-Origin-Embedder-Policy=require-corp
+flutter run --web-header=cross-origin-opener-policy=same-origin --web-header=cross-origin-embedder-policy=require-corp
 ```
 
 To build the optimized release version of the web application:
@@ -48,7 +48,7 @@ When deploying your web app on a web server[^4], ensure that your web server is 
 
 [^4]: Rinf supports hosting a Flutter app at a [non-root location](https://docs.flutter.dev/ui/navigation/url-strategies#hosting-a-flutter-app-at-a-non-root-location). For example, you can place your Flutter app in `https://mywebsite.com/subpath/deeperpath/`.
 
-- [`Cross-Origin-Opener-Policy`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy): `same-origin`
-- [`Cross-Origin-Embedder-Policy`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Embedder-Policy): `require-corp`.
+- [`cross-origin-opener-policy`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/cross-origin-opener-policy): `same-origin`
+- [`cross-origin-embedder-policy`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/cross-origin-embedder-policy): `require-corp`.
 
 Additionally, don't forget to specify the MIME type `application/wasm` for `.wasm` files within the server configuration to ensure optimal performance.

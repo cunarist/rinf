@@ -16,8 +16,8 @@ class RequestHandler(SimpleHTTPRequestHandler):
 
     @override
     def end_headers(self) -> None:
-        self.send_header("Cross-Origin-Opener-Policy", "same-origin")
-        self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
+        self.send_header("cross-origin-opener-policy", "same-origin")
+        self.send_header("cross-origin-embedder-policy", "require-corp")
         super().end_headers()
 
 
