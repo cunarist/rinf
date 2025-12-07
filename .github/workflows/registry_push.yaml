@@ -21,7 +21,7 @@ jobs:
         with:
           context: .
           file: ./demo/Dockerfile
-          tags: registry.cunarist.org/rinf-demo:${{ github.sha }}
+          tags: registry.cunarist.org/rinf-demo:latest
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -42,7 +42,7 @@ jobs:
         with:
           context: .
           file: ./documentation/Dockerfile
-          tags: registry.cunarist.org/rinf-docs:${{ github.sha }}
+          tags: registry.cunarist.org/rinf-docs:latest
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max

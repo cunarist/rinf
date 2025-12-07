@@ -1,0 +1,12 @@
+services:
+  docs:
+    image: registry.cunarist.org/rinf-docs:latest
+    ports:
+      - "${PORT}:80"
+    restart: unless-stopped
+
+  demo:
+    image: registry.cunarist.org/rinf-demo:latest
+    ports:
+      - "${PORT_DEMO}:80"
+    restart: unless-stopped
