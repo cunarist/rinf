@@ -5,7 +5,7 @@ edition = "2024"
 license = "MIT"
 description = "Rust for native business logic, Flutter for flexible and beautiful GUI"
 repository = "https://github.com/cunarist/rinf"
-documentation = "https://rinf.cunarist.com"
+documentation = "https://rinf.cunarist.org"
 include = ["/src/", "/template/"]
 
 [[bin]]

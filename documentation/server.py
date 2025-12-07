@@ -1,12 +1,8 @@
 """Simple HTTP server for serving documentation with CORS headers."""
 
-import logging
 import os
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from typing import override
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 
 class RequestHandler(SimpleHTTPRequestHandler):
@@ -14,18 +10,17 @@ class RequestHandler(SimpleHTTPRequestHandler):
 
     @override
     def end_headers(self) -> None:
-        self.send_header("Cross-Origin-Opener-Policy", "same-origin")
-        self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
+        self.send_header("cross-origin-opener-policy", "same-origin")
+        self.send_header("cross-origin-embedder-policy", "require-corp")
         super().end_headers()
 
 
 def main() -> None:
     """Start the HTTP server for serving documentation files."""
     os.chdir("dist/dirhtml")
-    server_address = ("", 8000)
-    httpd = HTTPServer(server_address, RequestHandler)
-    logger.info("Serving on http://localhost:8000")
-    httpd.serve_forever()
+    address = ("", 80)
+    HTTPServer(address, RequestHandler).serve_forever()
 
 
-main()
+if __name__ == "__main__":
+    main()

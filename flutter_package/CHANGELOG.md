@@ -53,7 +53,7 @@
 
 ## 8.0.0
 
-- To migrate from Rinf version 7, refer to [this section](https://rinf.cunarist.com/upgrading/) in the documentation.
+- To migrate from Rinf version 7, refer to [this section](https://rinf.cunarist.org/upgrading/) in the documentation.
 - Rinf no longer uses Protobuf. It now uses Serde. You should annotate Rust structs to define signal endpoints between Dart and Rust.
 - Fixed an issue with loading the app on the web.
 - Improved documentation in various areas.
@@ -110,7 +110,7 @@
 
 ## 7.0.0
 
-- To migrate from Rinf version 6, please refer to [this section](https://rinf.cunarist.com/upgrading/) in the documentation.
+- To migrate from Rinf version 6, please refer to [this section](https://rinf.cunarist.org/upgrading/) in the documentation.
 - Rinf no longer relies on `tokio`. While it is provided by default in the template, you can now choose whichever async runtime you prefer.
 - The CLI output is now more compact and includes animations.
 - The full `flutter run` command with the necessary arguments can now be obtained by running `rinf server`.
@@ -313,7 +313,7 @@
 
 ## 4.19.1
 
-- Switched to the new official website `rinf.cunarist.com`.
+- Switched to the new official website `rinf.cunarist.org`.
 
 ## 4.19.0
 
