@@ -1,3 +1,7 @@
+## 8.8.1
+
+- Fixed a bug where web compilation was broken.
+
 ## 8.8.0
 
 - Windows ARM64 support was added.

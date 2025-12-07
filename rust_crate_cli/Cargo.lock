@@ -831,7 +831,7 @@ dependencies = [
 
 [[package]]
 name = "rinf_cli"
-version = "8.8.0"
+version = "8.8.1"
 dependencies = [
  "arboard",
  "clap",
