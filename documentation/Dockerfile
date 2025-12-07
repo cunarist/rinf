@@ -25,10 +25,11 @@ WORKDIR /workspace
 COPY flutter_package/ flutter_package/
 COPY rust_crate/ rust_crate/
 COPY rust_crate_proc/ rust_crate_proc/
+COPY rust_crate_cli/ rust_crate_cli/
 COPY Cargo.toml Cargo.toml
 
-# Install Rinf CLI
-RUN cargo install rinf_cli
+# Install Rinf CLI from local source
+RUN cargo install --path rust_crate_cli
 
 # Build Flutter web app
 WORKDIR /workspace/flutter_package/example
