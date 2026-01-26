@@ -26,7 +26,8 @@ public_key: a4c3433798eb2c36edf2b94dbb4dd899d57496ca373a8982d8a792410b7f6445
 """;
     final precompiledBinaries = PrecompiledBinaries.parse(loadYamlNode(yaml));
     final key = HEX.decode(
-        'a4c3433798eb2c36edf2b94dbb4dd899d57496ca373a8982d8a792410b7f6445');
+      'a4c3433798eb2c36edf2b94dbb4dd899d57496ca373a8982d8a792410b7f6445',
+    );
     expect(precompiledBinaries.uriPrefix, 'https://url-prefix');
     expect(precompiledBinaries.publicKey.bytes, key);
   });
@@ -51,7 +52,8 @@ precompiled_binaries:
     final options = CargokitCrateOptions.parse(loadYamlNode(yaml));
     expect(options.precompiledBinaries?.uriPrefix, 'https://url-prefix');
     final key = HEX.decode(
-        'a4c3433798eb2c36edf2b94dbb4dd899d57496ca373a8982d8a792410b7f6445');
+      'a4c3433798eb2c36edf2b94dbb4dd899d57496ca373a8982d8a792410b7f6445',
+    );
     expect(options.precompiledBinaries?.publicKey.bytes, key);
 
     final debugOptions = options.cargo[BuildConfiguration.debug]!;
