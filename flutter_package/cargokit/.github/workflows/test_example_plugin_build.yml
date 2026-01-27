@@ -80,7 +80,7 @@ jobs:
           if [[ $(sysctl hw.optional.arm64) == *"hw.optional.arm64: 1"* ]]; then
             export JAVA_HOME=$JAVA_HOME_17_arm64
           else
-            export JAVA_HOME=$JAVA_HOME_11_X64
+            export JAVA_HOME=$JAVA_HOME_17_X64
           fi
           flutter build apk --${{ matrix.build_mode }} -v
 
