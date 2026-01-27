@@ -749,17 +749,34 @@ fn move_directory_contents(
 }
 
 fn remove_lint_warnings(gen_dir: &Path) -> Result<(), SetupError> {
-  write_lint_ignore(&gen_dir.join("serde").join("serde.dart"))?;
-  write_lint_ignore(&gen_dir.join("bincode").join("bincode.dart"))?;
-  write_lint_ignore(&gen_dir.join(GEN_MOD).join(format!("{GEN_MOD}.dart")))?;
+  // Apply lint ignore to all generated Dart files
+  apply_lint_ignore_recursively(gen_dir)?;
+  Ok(())
+}
+
+fn apply_lint_ignore_recursively(dir: &Path) -> Result<(), SetupError> {
+  if !dir.is_dir() {
+    return Ok(());
+  }
+  for entry_result in read_dir(dir)? {
+    let entry = entry_result?;
+    let path = entry.path();
+    if path.is_dir() {
+      apply_lint_ignore_recursively(&path)?;
+    } else if path.extension().is_some_and(|ext| ext == "dart") {
+      write_lint_ignore(&path)?;
+    }
+  }
   Ok(())
 }
 
 fn write_lint_ignore(file_path: &Path) -> Result<(), SetupError> {
   let content = read_to_string(file_path)?;
-  write(
-    file_path,
-    format!("// ignore_for_file: type=lint, type=warning\n{content}"),
-  )?;
+  if !content.starts_with("// ignore_for_file: type=lint") {
+    write(
+      file_path,
+      format!("// ignore_for_file: type=lint\n{content}"),
+    )?;
+  }
   Ok(())
 }
