@@ -36,10 +36,10 @@ jobs:
       - name: Setup Flutter SDK
         uses: subosito/flutter-action@v2 # Required for the Flutter FFI plugin
         with:
-          channel: "stable"
+          flutter-version: "3.24.0"
 
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@1.88
 
       # https://dart.dev/tools/pub/automated-publishing
 

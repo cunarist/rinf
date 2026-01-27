@@ -39,30 +39,12 @@ class Target {
       android: 'x86_64',
       androidMinSdkVersion: 21,
     ),
-    Target(
-      rust: 'x86_64-pc-windows-msvc',
-      flutter: 'windows-x64',
-    ),
-    Target(
-      rust: 'aarch64-pc-windows-msvc',
-      flutter: 'windows-arm64',
-    ),
-    Target(
-      rust: 'x86_64-unknown-linux-gnu',
-      flutter: 'linux-x64',
-    ),
-    Target(
-      rust: 'aarch64-unknown-linux-gnu',
-      flutter: 'linux-arm64',
-    ),
-    Target(
-      rust: 'x86_64-unknown-linux-gnu',
-      flutter: 'elinux-x64',
-    ),
-    Target(
-      rust: 'aarch64-unknown-linux-gnu',
-      flutter: 'elinux-arm64',
-    ),
+    Target(rust: 'x86_64-pc-windows-msvc', flutter: 'windows-x64'),
+    Target(rust: 'aarch64-pc-windows-msvc', flutter: 'windows-arm64'),
+    Target(rust: 'x86_64-unknown-linux-gnu', flutter: 'linux-x64'),
+    Target(rust: 'aarch64-unknown-linux-gnu', flutter: 'linux-arm64'),
+    Target(rust: 'x86_64-unknown-linux-gnu', flutter: 'elinux-x64'),
+    Target(rust: 'aarch64-unknown-linux-gnu', flutter: 'elinux-arm64'),
     Target(
       rust: 'x86_64-apple-darwin',
       darwinPlatform: 'macosx',
@@ -98,9 +80,11 @@ class Target {
     required String platformName,
     required String darwinAarch,
   }) {
-    return all.firstWhereOrNull((element) => //
-        element.darwinPlatform == platformName &&
-        element.darwinArch == darwinAarch);
+    return all.firstWhereOrNull(
+      (element) => //
+          element.darwinPlatform == platformName &&
+          element.darwinArch == darwinAarch,
+    );
   }
 
   static Target? forRustTriple(String triple) {

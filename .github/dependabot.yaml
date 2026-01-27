@@ -1,17 +1,5 @@
 version: 2
 updates:
-  - package-ecosystem: pub
-    directory: "flutter_package/"
-    schedule:
-      interval: daily
-  - package-ecosystem: pub
-    directory: "flutter_package/example/"
-    schedule:
-      interval: daily
-  - package-ecosystem: cargo
-    directory: "/"
-    schedule:
-      interval: daily
   - package-ecosystem: github-actions
     directory: "/"
     schedule:

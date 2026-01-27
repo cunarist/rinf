@@ -4,8 +4,8 @@ version: 8.8.1
 repository: https://github.com/cunarist/rinf
 
 environment:
-  sdk: ">=3.8.0 <4.0.0"
-  flutter: ">=3.22.0"
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.0"
 
 dependencies:
   flutter:
@@ -14,7 +14,7 @@ dependencies:
   web: ^1.1.0
 
 dev_dependencies:
-  flutter_lints: ^6.0.0
+  flutter_lints: ^5.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
