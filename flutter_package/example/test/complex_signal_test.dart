@@ -10,7 +10,7 @@ Future<void> main() async {
   await initializeRust(assignRustSignal, compiledLibPath: getLibPath());
 
   // Start the test mechanism in Rust.
-  final duration = Duration(milliseconds: 100);
+  const duration = Duration(milliseconds: 100);
   UnitTestStart().sendSignalToRust();
   await Future.delayed(duration);
 

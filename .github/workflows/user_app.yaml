@@ -51,7 +51,7 @@ jobs:
       - name: Setup Flutter SDK
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.22.0"
+          flutter-version: "3.24.0"
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@1.85

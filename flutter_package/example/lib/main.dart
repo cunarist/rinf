@@ -6,7 +6,7 @@ import 'src/bindings/bindings.dart';
 Future<void> main() async {
   await initializeRust(assignRustSignal);
   createActors();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 void createActors() {
@@ -55,7 +55,7 @@ class _MyAppState extends State<MyApp> {
         ),
         useMaterial3: true,
       ),
-      home: MyHomePage(),
+      home: const MyHomePage(),
     );
   }
 }
@@ -66,7 +66,7 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(child: MyColumn()),
+      body: const Center(child: MyColumn()),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // The `sendSignalToRust` method is generated
@@ -140,7 +140,7 @@ class MyColumn extends StatelessWidget {
           // It's when the widget is being built for the first time.
           if (signalPack == null) {
             // Return the initial widget if the snapshot data is null.
-            return Text('Initial value 0');
+            return const Text('Initial value 0');
           }
           final sampleNumberOutput = signalPack.message;
           final currentNumber = sampleNumberOutput.currentNumber;
