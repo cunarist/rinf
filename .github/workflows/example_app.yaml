@@ -68,7 +68,7 @@ jobs:
           flutter-version: "3.24.0"
 
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@1.85
+        uses: dtolnay/rust-toolchain@1.88
         with:
           components: rustfmt
 

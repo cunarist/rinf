@@ -24,7 +24,7 @@ Each Rinf version is compatible with the toolchain versions listed below and new
 
 | Rinf Version | Flutter/Dart Version | Rust Version |
 | ------------ | -------------------- | ------------ |
-| 8.9          | 3.24/3.5             | 1.85         |
+| 8.9          | 3.24/3.5             | 1.88         |
 | 8.8          | N/A                  | N/A          |
 | 8.7          | N/A                  | N/A          |
 | 8.6          | N/A                  | N/A          |
