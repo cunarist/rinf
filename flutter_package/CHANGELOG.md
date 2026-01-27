@@ -1,3 +1,8 @@
+## 8.9.0
+
+- Added toolchain version requirements.
+- This version supports Flutter 3.24/Dart 3.5 and Rust 1.88 or later.
+
 ## 8.8.1
 
 - Fixed a bug where web compilation was broken.
