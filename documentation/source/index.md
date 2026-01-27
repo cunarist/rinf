@@ -9,7 +9,7 @@
    :hidden:
 
    introduction.md
-   installing-components.md
+   installing-toolchains.md
    applying-template.md
    running-and-building.md
    messaging.md

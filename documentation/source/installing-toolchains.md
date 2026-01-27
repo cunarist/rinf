@@ -1,4 +1,4 @@
-# Installing Components
+# Installing Toolchains
 
 [flutter-install-steps]: https://docs.flutter.dev/get-started/install
 
@@ -19,3 +19,18 @@ Flutter from `snap` comes with its own binary linker called `ld`, which is funda
 
 Typically, the Flutter SDK package found in Debian-based Linux distributions' app store (under the name "Flutter") is a `snap` package.
 ```
+
+Each Rinf version is compatible with the toolchain versions listed below and newer.
+
+| Rinf Version | Flutter/Dart Version | Rust Version |
+| ------------ | -------------------- | ------------ |
+| 8.9          | 3.24/3.5             | 1.85         |
+| 8.8          | N/A                  | N/A          |
+| 8.7          | N/A                  | N/A          |
+| 8.6          | N/A                  | N/A          |
+| 8.5          | N/A                  | N/A          |
+| 8.4          | N/A                  | N/A          |
+| 8.3          | N/A                  | N/A          |
+| 8.2          | N/A                  | N/A          |
+| 8.1          | N/A                  | N/A          |
+| 8.0          | N/A                  | 1.85         |
