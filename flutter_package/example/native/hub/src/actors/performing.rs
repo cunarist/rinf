@@ -70,15 +70,15 @@ impl PerformingActor {
       sleep(Duration::from_millis(40)).await;
 
       // Check if the deque is full and await the oldest item if it is.
-      if deque.len() == max_handles {
-        if let Some(join_handle) = deque.pop_front() {
-          let image_info = match join_handle.await {
-            Ok(Some(inner)) => inner,
-            _ => continue,
-          };
-          let _ = self_addr.notify(image_info).await;
-        }
-      }
+      if deque.len() == max_handles
+        && let Some(join_handle) = deque.pop_front()
+      {
+        let image_info = match join_handle.await {
+          Ok(Some(inner)) => inner,
+          _ => continue,
+        };
+        let _ = self_addr.notify(image_info).await;
+      };
 
       // Update the current scale.
       draw_scale *= 1.02;
