@@ -191,8 +191,7 @@ class PrecompileBinaries {
           targetCommitish: null,
           isDraft: false,
           isPrerelease: false,
-          body:
-              'Precompiled binaries for crate $packageName, '
+          body: 'Precompiled binaries for crate $packageName, '
               'crate hash $hash.',
         ),
       );

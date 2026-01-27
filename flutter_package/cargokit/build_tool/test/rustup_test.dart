@@ -44,8 +44,7 @@ void main() {
       switch (args.arguments) {
         case ['toolchain', 'list']:
           return TestRunCommandResult(
-            stdout:
-                'stable-aarch64-apple-darwin (default)\n'
+            stdout: 'stable-aarch64-apple-darwin (default)\n'
                 'nightly-aarch64-apple-darwin\n'
                 'esp\n',
           );
