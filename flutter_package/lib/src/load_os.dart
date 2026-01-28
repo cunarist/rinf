@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ffi';
 import 'dart:typed_data';
 import 'package:ffi/ffi.dart';
+import 'package:rinf/src/platform_utils.dart';
 
 String? libPathOverride;
 
@@ -22,6 +23,8 @@ RustLibrary loadRustLibrary() {
     if (Platform.isLinux) {
       libPath = 'libhub.so';
     } else if (Platform.isAndroid) {
+      libPath = 'libhub.so';
+    } else if (PlatformUtils.isOhos) {
       libPath = 'libhub.so';
     } else if (Platform.isWindows) {
       libPath = 'hub.dll';
@@ -55,7 +58,7 @@ bool useLocalSpaceSymbols() {
   // because of Flutter's `RTLD_LOCAL` behavior.
   // Therefore we cannot use the efficient `RustLibraryGlobal`.
   // - https://github.com/dart-lang/native/issues/923
-  if (Platform.isAndroid) {
+  if (Platform.isAndroid || PlatformUtils.isOhos) {
     return true;
   }
 
