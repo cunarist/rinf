@@ -9,6 +9,7 @@ import 'package:logging/logging.dart';
 import 'android_environment.dart';
 import 'build_cmake.dart';
 import 'build_gradle.dart';
+import 'build_hvigor.dart';
 import 'build_pod.dart';
 import 'logging.dart';
 import 'options.dart';
@@ -73,6 +74,20 @@ class BuildCMakeCommand extends BuildCommand {
   @override
   Future<void> runBuildCommand(CargokitUserOptions options) async {
     final build = BuildCMake(userOptions: options);
+    await build.build();
+  }
+}
+
+class BuildHvigorCommand extends BuildCommand {
+  @override
+  final name = 'build-hvigor';
+
+  @override
+  final description = 'Build openharmony library';
+
+  @override
+  Future<void> runBuildCommand(CargokitUserOptions options) async {
+    final build = BuildHvigor(userOptions: options);
     await build.build();
   }
 }
@@ -247,6 +262,7 @@ Future<void> runMain(List<String> args) async {
       ..addCommand(BuildPodCommand())
       ..addCommand(BuildGradleCommand())
       ..addCommand(BuildCMakeCommand())
+      ..addCommand(BuildHvigorCommand())
       ..addCommand(GenKeyCommand())
       ..addCommand(PrecompileBinariesCommand())
       ..addCommand(VerifyBinariesCommand());
