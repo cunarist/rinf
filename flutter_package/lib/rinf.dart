@@ -3,6 +3,7 @@ library;
 
 import 'dart:typed_data';
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'src/structure.dart';
 import 'src/interface.dart';
 
@@ -21,7 +22,7 @@ Future<void> initializeRust(
   // Add the print delegation endpoint.
   assignRustSignal['RinfOut'] = (messageBytes, binary) {
     final rustReport = utf8.decode(binary);
-    print(rustReport);
+    debugPrint(rustReport, wrapWidth: 1024);
   };
 
   // Prepare the interface with Rust.
