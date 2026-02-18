@@ -1,3 +1,7 @@
+## 8.9.1
+
+- Now Rinf's `debug_print!` macro uses `debugPrint` from Flutter.
+
 ## 8.9.0
 
 - Added toolchain version requirements.
