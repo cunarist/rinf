@@ -1,0 +1,3 @@
+use_precompiled_binaries: false
+verbose_logging: true
+ohos_sdk_home: /Applications/DevEco-Studio.app/Contents/sdk/default/openharmony
