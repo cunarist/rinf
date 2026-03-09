@@ -5,14 +5,14 @@ import 'package:collection/collection.dart';
 import 'util.dart';
 
 class Target {
-  Target({
-    required this.rust,
-    this.flutter,
-    this.android,
-    this.androidMinSdkVersion,
-    this.darwinPlatform,
-    this.darwinArch,
-  });
+  Target(
+      {required this.rust,
+      this.flutter,
+      this.android,
+      this.androidMinSdkVersion,
+      this.darwinPlatform,
+      this.darwinArch,
+      this.ohos});
 
   static final all = [
     Target(
@@ -81,6 +81,21 @@ class Target {
       darwinPlatform: 'iphonesimulator',
       darwinArch: 'x86_64',
     ),
+    Target(
+      rust: 'aarch64-unknown-linux-ohos',
+      flutter: 'ohos-arm64',
+      ohos: 'arm64-v8a',
+    ),
+    Target(
+      rust: 'armv7-unknown-linux-ohos',
+      flutter: 'ohos-arm',
+      ohos: 'armeabi-v7a',
+    ),
+    Target(
+      rust: 'x86_64-unknown-linux-ohos',
+      flutter: 'ohos-x64',
+      ohos: 'x86_64',
+    ),
   ];
 
   static Target? forFlutterName(String flutterName) {
@@ -143,4 +158,5 @@ class Target {
   final int? androidMinSdkVersion;
   final String? darwinPlatform;
   final String? darwinArch;
+  final String? ohos;
 }

@@ -5,6 +5,7 @@ import 'package:path/path.dart' as path;
 import 'android_environment.dart';
 import 'cargo.dart';
 import 'environment.dart';
+import 'ohos_environment.dart';
 import 'options.dart';
 import 'rustup.dart';
 import 'target.dart';
@@ -49,6 +50,8 @@ class BuildEnvironment {
 
   final String? glibcVersion;
 
+  final String? ohosSDKHome;
+
   BuildEnvironment({
     required this.configuration,
     required this.crateOptions,
@@ -61,6 +64,7 @@ class BuildEnvironment {
     this.androidMinSdkVersion,
     this.javaHome,
     this.glibcVersion,
+    this.ohosSDKHome,
   });
 
   static BuildConfiguration parseBuildConfiguration(String value) {
@@ -76,10 +80,12 @@ class BuildEnvironment {
     return buildConfiguration;
   }
 
-  static BuildEnvironment fromEnvironment({required bool isAndroid}) {
-    final buildConfiguration = parseBuildConfiguration(
-      Environment.configuration,
-    );
+  static BuildEnvironment fromEnvironment({
+    required bool isAndroid,
+    String? ohosSDKHome,
+  }) {
+    final buildConfiguration =
+        parseBuildConfiguration(Environment.configuration);
     final manifestDir = Environment.manifestDir;
     final crateOptions = CargokitCrateOptions.load(manifestDir: manifestDir);
     final crateInfo = CrateInfo.load(manifestDir);
@@ -95,6 +101,7 @@ class BuildEnvironment {
       androidMinSdkVersion:
           isAndroid ? int.parse(Environment.minSdkVersion) : null,
       javaHome: isAndroid ? Environment.javaHome : null,
+      ohosSDKHome: ohosSDKHome,
     );
   }
 }
@@ -163,9 +170,7 @@ class RustBuilder {
   }
 
   Future<Map<String, String>> _buildEnvironment() async {
-    if (target.android == null) {
-      return {};
-    } else {
+    if (target.android != null) {
       final sdkPath = environment.androidSdkPath;
       final ndkVersion = environment.androidNdkVersion;
       final minSdkVersion = environment.androidMinSdkVersion;
@@ -189,6 +194,14 @@ class RustBuilder {
         env.installNdk(javaHome: environment.javaHome!);
       }
       return env.buildEnvironment();
+    } else if (target.ohos != null) {
+      final env = OhosEnvironment(
+          targetTempDir: environment.targetTempDir,
+          ohosSDKHome: environment.ohosSDKHome ?? "",
+          target: target);
+      return env.buildEnvironment();
+    } else {
+      return {};
     }
   }
 }

@@ -236,11 +236,13 @@ class CargokitUserOptions {
   CargokitUserOptions({
     required this.usePrecompiledBinaries,
     required this.verboseLogging,
+    this.ohosSDKHome,
   });
 
   CargokitUserOptions._()
       : usePrecompiledBinaries = defaultUsePrecompiledBinaries(),
-        verboseLogging = false;
+        verboseLogging = false,
+        ohosSDKHome = null;
 
   static CargokitUserOptions parse(YamlNode node) {
     if (node is! YamlMap) {
@@ -248,6 +250,7 @@ class CargokitUserOptions {
     }
     bool usePrecompiledBinaries = defaultUsePrecompiledBinaries();
     bool verboseLogging = false;
+    String? ohosSDKHome;
 
     for (final entry in node.nodes.entries) {
       if (entry.key case YamlScalar(value: 'use_precompiled_binaries')) {
@@ -268,16 +271,24 @@ class CargokitUserOptions {
           'Invalid value for "verbose_logging". Must be a boolean.',
           entry.value.span,
         );
+      } else if (entry.key case YamlScalar(value: 'ohos_sdk_home')) {
+        if (entry.value case YamlScalar(value: String value)) {
+          ohosSDKHome = value;
+          continue;
+        }
+        throw SourceSpanException(
+            'Invalid value for "ohos_sdk_home". Must be a string.',
+            entry.value.span);
       } else {
         throw SourceSpanException(
-          'Unknown cargokit option type. Must be "use_precompiled_binaries" or "verbose_logging".',
-          entry.key.span,
-        );
+            'Unknown cargokit option type. Must be "use_precompiled_binaries", "verbose_logging" or "ohos_sdk_home".',
+            entry.key.span);
       }
     }
     return CargokitUserOptions(
       usePrecompiledBinaries: usePrecompiledBinaries,
       verboseLogging: verboseLogging,
+      ohosSDKHome: ohosSDKHome,
     );
   }
 
@@ -305,4 +316,5 @@ class CargokitUserOptions {
 
   final bool usePrecompiledBinaries;
   final bool verboseLogging;
+  final String? ohosSDKHome;
 }

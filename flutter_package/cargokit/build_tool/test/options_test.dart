@@ -69,9 +69,12 @@ precompiled_binaries:
     const yaml = '''
 use_precompiled_binaries: false
 verbose_logging: true
+ohos_sdk_home: /Applications/DevEco-Studio.app/Contents/sdk/default/openharmony
 ''';
     final options = CargokitUserOptions.parse(loadYamlNode(yaml));
     expect(options.usePrecompiledBinaries, false);
     expect(options.verboseLogging, true);
+    expect(options.ohosSDKHome,
+        '/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony');
   });
 }
