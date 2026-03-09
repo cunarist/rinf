@@ -1,3 +1,7 @@
+## 8.10.0
+
+- Added OpenHarmony (OHOS) support.
+
 ## 8.9.1
 
 - Now Rinf's `debug_print!` macro uses `debugPrint` from Flutter.
