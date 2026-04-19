@@ -26,7 +26,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Prepare Rinf XCFramework"
-               scriptText = "set -e&#10;&quot;$SRCROOT/../../tooling/build_spm_xcframework.sh&quot; &quot;$SRCROOT/..&quot; &quot;$SRCROOT/../..&quot; &quot;$PLATFORM_NAME&quot; &quot;$CONFIGURATION&quot; &quot;$ARCHS&quot;&#10;">
+               scriptText = "set -e&#10;if [ -d &quot;$SRCROOT/Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage&quot; ]; then&#10;  &quot;$SRCROOT/../../tooling/build_spm_xcframework.sh&quot; &quot;$SRCROOT/..&quot; &quot;$SRCROOT/../..&quot; &quot;$PLATFORM_NAME&quot; &quot;$CONFIGURATION&quot; &quot;$ARCHS&quot;&#10;fi&#10;">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
@@ -39,6 +39,24 @@
             </ActionContent>
          </ExecutionAction>
       </PreActions>
+      <PostActions>
+         <ExecutionAction
+            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
+            <ActionContent
+               title = "Restore Rinf XCFramework Shim"
+               scriptText = "set -e&#10;if [ -d &quot;$SRCROOT/Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage&quot; ]; then&#10;  &quot;$SRCROOT/../../tooling/restore_shim_xcframeworks.sh&quot; &quot;$SRCROOT/../../..&quot;&#10;fi&#10;">
+               <EnvironmentBuildable>
+                  <BuildableReference
+                     BuildableIdentifier = "primary"
+                     BlueprintIdentifier = "33CC10EC2044A3C60003C045"
+                     BuildableName = "example_app.app"
+                     BlueprintName = "Runner"
+                     ReferencedContainer = "container:Runner.xcodeproj">
+                  </BuildableReference>
+               </EnvironmentBuildable>
+            </ActionContent>
+         </ExecutionAction>
+      </PostActions>
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
