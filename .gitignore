@@ -22,7 +22,12 @@ migrate_working_dir/
 **/doc/api/
 .dart_tool/
 .packages
+.swiftpm/
 build/
+flutter_package/ios/rinf/Binaries/build/
+flutter_package/ios/rinf/Binaries/build-placeholder/
+flutter_package/macos/rinf/Binaries/build/
+flutter_package/macos/rinf/Binaries/build-placeholder/
 
 # Rust related
 /.cargo/

@@ -1,0 +1,4 @@
+module hub {
+  header "hub.h"
+  export *
+}
