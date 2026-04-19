@@ -14,7 +14,7 @@ RustLibrary loadRustLibrary() {
   // Use provided dynamic library path if possible.
   // Otherewise, use the default path.
   final override = libPathOverride;
-  String libPath;
+  String? libPath;
   if (override != null) {
     // Use the override path if provided.
     libPath = override;
@@ -37,14 +37,31 @@ RustLibrary loadRustLibrary() {
     }
   }
 
-  // Load the dynamic library.
-  final lib = DynamicLibrary.open(libPath);
+  // SwiftPM links the Apple plugin statically into the current process rather
+  // than shipping a standalone `rinf.framework`, so fall back to process
+  // symbols when the framework path is absent.
+  final DynamicLibrary lib = _loadDynamicLibrary(libPath);
 
   // Create the FFI wrapper instance.
   if (useLocalSpaceSymbols()) {
     return RustLibraryLocal(lib);
   } else {
     return RustLibraryGlobal(lib);
+  }
+}
+
+DynamicLibrary _loadDynamicLibrary(String? libPath) {
+  if (libPath == null) {
+    return DynamicLibrary.process();
+  }
+
+  try {
+    return DynamicLibrary.open(libPath);
+  } on ArgumentError {
+    if (Platform.isIOS || Platform.isMacOS) {
+      return DynamicLibrary.process();
+    }
+    rethrow;
   }
 }
 

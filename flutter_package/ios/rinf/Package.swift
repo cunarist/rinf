@@ -1,5 +1,9 @@
 // swift-tools-version: 5.9
+import Foundation
 import PackageDescription
+
+let packageRoot = URL(fileURLWithPath: #filePath).deletingLastPathComponent().path
+let hubLibrary = "\(packageRoot)/Binaries/hub.xcframework/ios-arm64/libhub.a"
 
 let package = Package(
     name: "rinf",
@@ -14,7 +18,11 @@ let package = Package(
             name: "rinf",
             dependencies: ["hub"],
             path: "Sources/rinf",
-            publicHeadersPath: "include"
+            publicHeadersPath: "include",
+            linkerSettings: [
+                .unsafeFlags(["-Xlinker", "-force_load", "-Xlinker", hubLibrary]),
+                .linkedFramework("SystemConfiguration"),
+            ]
         ),
         .binaryTarget(
             name: "hub",
