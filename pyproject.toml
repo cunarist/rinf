@@ -4,17 +4,17 @@
 # `uv run automate [command_type]`.
 
 [dependency-groups]
-dev = ["ruff", "pyright"]
+dev = ["ruff", "ty"]
 
 [tool.uv.workspace]
 members = ["automate", "documentation"]
 
+[tool.ty.rules]
+all = "error"
+
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = ["TC", "BLE", "S602"]
-
-[tool.pyright]
-typeCheckingMode = "strict"
 
 [tool.ruff.lint.per-file-ignores]
 "documentation/**/*.py" = ["A001"]

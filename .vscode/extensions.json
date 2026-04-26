@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "rust-lang.rust-analyzer",
+    "charliermarsh.ruff",
+    "astral-sh.ty",
+    "tamasfe.even-better-toml",
+    "dart-code.flutter"
+  ]
+}
