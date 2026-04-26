@@ -106,8 +106,8 @@ jobs:
         with:
           enable-cache: false
 
-      - name: Run Pyright
-        run: uv run pyright
+      - name: Run Ty
+        run: uv run ty check
 
       - name: Run Ruff
         run: uv run ruff check .
