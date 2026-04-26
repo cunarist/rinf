@@ -63,11 +63,11 @@ fn install_wasm_toolchain() -> Result<(), SetupError> {
     .output()?
     .capture_err()?;
   Command::new("cargo")
-    .args(["install", "wasm-pack"])
+    .args(["install", "--locked", "wasm-pack"])
     .output()?
     .capture_err()?;
   Command::new("cargo")
-    .args(["install", "wasm-bindgen-cli"])
+    .args(["install", "--locked", "wasm-bindgen-cli"])
     .output()?
     .capture_err()?;
   Ok(())
