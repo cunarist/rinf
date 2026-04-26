@@ -106,7 +106,7 @@ jobs:
         with:
           enable-cache: false
 
-      - name: Run ty
+      - name: Run Ty
         run: uv run ty check
 
       - name: Run Ruff
