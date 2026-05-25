@@ -109,6 +109,7 @@ fn compile_wasm(
         "-C link-arg=--shared-memory ",
         "-C link-arg=--max-memory=1073741824 ",
         "-C link-arg=--import-memory ",
+        "-C link-arg=--export=__heap_base ",
         "-C link-arg=--export=__wasm_init_tls ",
         "-C link-arg=--export=__tls_size ",
         "-C link-arg=--export=__tls_align ",
