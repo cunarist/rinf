@@ -1,0 +1,130 @@
+# Rinf Agent Skills
+
+## Rust Signal Development
+
+### Adding a New Signal Type
+
+```rust
+use rinf::{SignalPiece, signal};
+
+#[derive(SignalPiece)]
+#[signal]
+pub struct MyData {
+    pub id: u64,
+    pub name: String,
+    pub tags: Vec<String>,
+}
+```
+
+**Rules:**
+- Must derive `SignalPiece` + add `#[signal]` attribute
+- All fields must be `pub`
+- Supported field types: primitives, String, Vec<T: SignalPiece>, Option<T: SignalPiece>, enum (C-style or unit-only)
+- **Not supported:** `#[serde(with = "...")]`, custom serializers, generic types
+- Recursive types supported via `Option<Box<T>>` pattern
+
+### Post-Add Checklist
+
+- [ ] Run `cargo clippy --all-targets` — must pass
+- [ ] Run `rinf gen` in example project — verify Dart code compiles
+- [ ] Test on target platform(s): `flutter run -d <platform>`
+- [ ] If web target: verify no i64 fields (known limitation #672)
+
+## Code Generation
+
+### Running `rinf gen`
+
+```bash
+cd flutter_package/example
+rinf gen --input ../rust/src/lib.rs --output lib/src/generated/signals.dart
+```
+
+**Common issues:**
+- Reads `.npmrc`/`package.json` — add to `.rinfignore` if present (#630)
+- `--watch` causes perpetual changes — avoid until #682 fixed
+- Extra curly brace in output — check for trailing commas (#601)
+- Version mismatch — ensure `rinf` version in pubspec matches CLI version (#565)
+
+### Generated Code Review
+
+Check for:
+1. Linter warnings (Dart analyzer) — fix via `// ignore:` or Rust side
+2. Enum exhaustiveness — Dart doesn't have sealed classes, add fallback case (#638)
+3. i64 on web — replace with `String` or `double` for cross-platform types
+
+## Platform Build Troubleshooting
+
+### Android / Gradle
+
+```bash
+# Common error: "cannot exec"
+# Fix: Ensure gradle wrapper is up to date
+cd flutter_package/example/android
+./gradlew wrapper --gradle-version 8.7
+```
+
+### iOS / macOS
+
+```bash
+# Pod install after adding new Rust dependency
+cd flutter_package/example/ios
+pod install --repo-update
+```
+
+### Linux
+
+```bash
+# Missing librust.so — check CMake paths
+cd flutter_package/example/linux
+rm -rf build/
+flutter run -d linux
+```
+
+### Windows ARM64
+
+- Requires VS2022 17.8+ with ARM64 build tools
+- Cargokit build targets updated in #650
+
+### Web (wasm)
+
+```bash
+# Ensure wasm32 target installed
+rustup target add wasm32-unknown-unknown
+
+# Build
+cd flutter_package/example
+flutter build web --wasm
+```
+
+### ohos (HarmonyOS)
+
+```bash
+# Requires hvigor, ohos SDK
+# Build directory resolution: see PR #678
+cd flutter_package/example/ohos
+hvigor build
+```
+
+## CI/CD
+
+### Fixing CI Failures
+
+1. **Clippy errors** — `cargo clippy --fix --allow-dirty` then review changes
+2. **Ruff errors** — `ruff check --fix` for Python files
+3. **Dart analyzer** — `dart analyze` in flutter_package/
+4. **GitHub Actions** — Check workflow files for deprecated runners/actions
+
+### Dependabot PRs
+
+- Minor version bumps: Auto-approve if CI passes
+- Major version bumps: Manual review required, check breaking changes
+- Rust deps: Verify `cargo test` + `cargo clippy` after merge
+
+## Documentation
+
+### Updating Guides
+
+- Guides live in `documentation/`
+- Follow existing structure and tone
+- Update `CHANGELOG.md` for user-facing changes
+- Sync version numbers in `pubspec.yaml` + `Cargo.toml`

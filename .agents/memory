@@ -1,0 +1,119 @@
+# Rinf Memory
+
+## Project Overview
+
+**Rinf** — Rust for native business logic, Flutter for flexible and beautiful GUI.
+A bridge library enabling Flutter/Dart apps to call Rust code seamlessly across platforms.
+
+- **Repo:** https://github.com/cunarist/rinf
+- **Version:** 8.10.0 (as of 2026-06)
+- **License:** MIT
+- **Dart SDK:** >=3.5.0 <4.0.0 | **Flutter:** >=3.24.0
+- **Author:** Danny Kim (temeddix) — sole maintainer, ~2257 commits
+
+## Architecture
+
+### Crate Structure (Cargo Workspace)
+
+```
+rinf/
+├── rust_crate/        # Core library — SignalPiece trait, macros, channel, interface
+├── rust_crate_proc/   # Procedural macros — derive macros for SignalPiece
+├── rust_crate_cli/    # CLI tool — `rinf gen`, project scaffolding (separate Cargo.lock)
+└── flutter_package/   # Flutter plugin — FFI bindings, Dart API, platform channels
+    └── example/       # Example app with native/ subdirectory for Rust code
+```
+
+### Key Concepts
+
+- **SignalPiece** — Core trait. Types that can cross the Dart↔Rust boundary derive this.
+  - Recursive data structures supported (issue #615)
+  - `Vec<T>` where `T: SignalPiece` supported (issue #597)
+  - Serde attributes: `skip` respected (#617), `with` banned (#618, #580)
+  - Enum generation compiles correctly (issue #666 — was a bug)
+- **Code Generation** — `rinf gen` command generates Dart code from Rust `#[signal]` annotated structs
+  - `--watch` flag has bug causing perpetual changes (#682)
+  - Respects Rinf version from package manifest (#565)
+- **Cargokit** — Build system integration for Flutter native assets
+  - Supports: Android, iOS, macOS, Linux, Windows, Web, ohos (HarmonyOS)
+  - OHOS support added in PR #665
+  - OHOS build directory resolution fixed (#678)
+  - Windows ARM64 support added (#650)
+- **Platform Support**
+  - Native: Android, iOS, macOS, Linux (x86_64), Windows (x86_64 + ARM64)
+  - Web: wasm-bindgen based (i64 fields silently fail on web — #672)
+  - ohos: HarmonyOS NEXT support (PR #665, fixes in #678)
+
+### Interface Layer
+
+- `interface_os.rs` — OS-native FFI (C bindings via `uniffi`-style approach)
+- `interface_web.rs` — WebAssembly interface via wasm-bindgen
+- `channel.rs` — Internal message passing between Dart and Rust
+- `shutdown.rs` — Lifecycle management (`finalizeRust`)
+
+## Dependencies
+
+- **Rust:** serde, serde_json, tokio, reqwest, bevy_ecs, wasm-bindgen
+- **Dart/Flutter:** flutter, collection, meta, flutter_lints
+- **CLI:** clap, serde, serde_generate, cargo metadata
+- **Python:** automate/ module for repo automation
+- **CI/CD:** GitHub Actions, Docker, dependabot (47 PRs)
+
+## Build & CI
+
+- **Rust:** Clippy strict mode, ALL Ruff rules for Python (#652)
+- **CI Workflows:**
+  - Build test (all platforms)
+  - Docs generation + hosting
+  - Demo container
+  - Linting (Clippy, Ruff, Dart analyzer)
+- **Docker:** Containerized docs and demo (#653)
+- **Python Type Checking:** Uses Ty (#676)
+
+## Known Issues & Patterns
+
+### Recurring Bug Patterns
+
+| Pattern | Issues |
+|---------|--------|
+| Code gen produces invalid Dart | #600, #601, #632, #666 |
+| `rinf gen` reads unrelated files | #630, #682 |
+| Build failures on specific platforms | #579, #605, #647, #649 |
+| Serialization edge cases | #597, #613, #619, #672 |
+| Enum/type mapping between Rust↔Dart | #638, #666 |
+
+### Active Concerns (Open Issues)
+
+- **#682** — `rinf gen --watch` perpetual changes (critical)
+- **#672** — Web: i64 fields silently fail
+- **#641** — Dart Native Assets support request (PR #681 open)
+- **#637** — HarmonyOS NEXT support (partially done via #665)
+- **#635** — Consider switching away from `serde_yml`
+- **#620** — Don't assume rustup installed
+- **#581** — Docs need Rust initialization guide
+
+### Closed & Resolved
+
+- OHOS support added (#665 + #678)
+- Windows ARM64 build fixed (#650)
+- Recursive SignalPiece fixed (#615, #613)
+- Serde `skip` attribute respected (#617)
+- Clippy/Ruff strict mode enabled (#652, #644)
+- Docs/demo containerized (#653)
+
+## Milestones
+
+| Version | Key Changes |
+|---------|-------------|
+| rinf 8.x | Current major. SignalPiece redesign, recursive types, strict linting |
+| OHOS | Added HarmonyOS platform support |
+| Web i64 | Known limitation on wasm target |
+| Native Assets | PR #681 pending — macOS/iOS native asset support |
+
+## Development Conventions
+
+- Commit messages: Conventional commit style (`feat:`, `fix:`, `chore:`) + descriptive English/Korean
+- PR review: Self-review + Clippy check mandatory
+- Dependabot: Auto-merge for minor deps, manual for major
+- Testing: Build tests per platform, no unit test suite yet
+- Documentation: README, CHANGELOG, guides in `documentation/`
