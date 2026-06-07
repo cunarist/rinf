@@ -18,8 +18,12 @@ Rinf adopted a no-`unwrap`/`expect` posture because panic behavior is especially
 
 For signal transport, a bad message should be dropped rather than killing the runtime thread. This is a deliberate reliability tradeoff: bridge errors are reported, but application lifecycles should remain intact.
 
-## Single-Thread Runtime Default
+## Runtime Ownership
 
-The default Rust async runtime favors a current-thread model. Flutter already owns an event-driven UI runtime, and a single Rust runtime thread is usually enough for bridge orchestration while using less memory.
+Rinf moved its internal signal transport away from Tokio channels so the framework is not tied to one async runtime. The template still uses Tokio by default, and currently binds the sample Rust entry point with `#[tokio::main(flavor = "current_thread")]`, but users can choose a different runtime if they keep the Dart shutdown future wired into their main function.
 
-Multi-worker Rust execution is available when a user opts into it, but it raises platform complexity. On WASM in particular, shared memory and atomics turn a normal build into a header/toolchain-sensitive build.
+The earlier single-thread default was deliberate: Flutter already owns an event-driven UI runtime, and a current-thread Rust runtime is usually enough for bridge orchestration while using less memory. Multi-threaded or blocking work should be an explicit application/runtime choice, especially on WASM where shared memory and atomics make the build and server headers much more sensitive.
+
+## Symbol Namespacing
+
+Rinf added a `rinf` prefix to exported symbols and moved `store_dart_post_cobject` setup into Rust to avoid symbol conflicts between multiple Flutter packages. User signal names beginning with `rinf` remain reserved; generator validation should only apply that reserved-name rule to actual signal types, not every Rust struct discovered while scanning source.

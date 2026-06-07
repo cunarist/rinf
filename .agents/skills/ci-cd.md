@@ -7,9 +7,10 @@ Use this skill when fixing failing checks, workflows, or dependency automation.
 Triage in this order unless the failure is obviously platform-specific:
 
 1. Rust clippy.
-2. Python lint/type checks.
-3. Dart analyzer.
-4. Platform build workflows.
+2. Ruff for Python lint failures.
+3. Ty for Python type-check failures, when Python automation is involved.
+4. Dart analyzer.
+5. Platform build workflows.
 
 Generated bindings can affect both Rust and Dart checks, so regenerate before chasing analyzer noise that may come from stale Dart output.
 
@@ -28,8 +29,9 @@ If signal definitions or generator behavior changed, run `rinf gen` for the exam
 
 - Rust warnings are treated strictly in CI.
 - Formatting workflows may apply automated fixes and then require a clean diff.
-- Python automation uses both type checking and linting.
+- Python automation uses Ruff plus Ty.
 - Web build failures often come from wasm toolchain or header assumptions, not Dart analyzer issues.
+- The CLI crate is intentionally checked/installed with its own lock file in some workflows; do not assume workspace lock behavior covers CLI installation.
 
 ## Dependabot
 

@@ -26,6 +26,8 @@ If generation output looks inconsistent with the current Rust code, check CLI/pa
 - Missing Dart stream/latest field: use the Rust-to-Dart signal derive for endpoint types.
 - Malformed Dart with extra braces: simplify trailing-comma or enum/struct edge cases until there is a small reproducer.
 - Generator reads unrelated files: ignore package-manager or build metadata rather than reshaping valid signals.
+- Reserved-name errors on ordinary helper structs: signal-name validation should only apply to actual signal endpoint/piece types.
+- Wrong Dart casing: verify behavior against `serde-reflection`/`serde-generate` case conversion before adding local conversion rules.
 
 ## Review Generated Dart
 
@@ -33,10 +35,12 @@ Check that Dart analyzer passes, Rust-to-Dart assignment contains every endpoint
 
 For enum output, keep an eye on fallback behavior. Dart exhaustiveness has historically been a source of generated-code bugs.
 
-For web, inspect signal schemas for large integer fields even if generation succeeds.
+For web, inspect and test signal schemas with 64-bit or wider integer fields even if generation succeeds.
 
 ## Updating Generation Logic
 
 When adding support for a new Rust type shape, update the trait capability, proc-macro validation, generator type mapping, and an example signal together. Then regenerate and analyze the Flutter example before considering the change complete.
 
 Be careful around binary versus non-binary Rust-to-Dart signal attribute handling. Generate examples of both paths before refactoring shared extraction logic.
+
+Keep path handling structured. Past fixes covered nested folders, configured crates, custom generated-output paths, offline commands, and `pubspec.yaml` discovery; avoid string path rewrites that only work from one working directory.

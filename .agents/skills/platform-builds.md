@@ -28,13 +28,21 @@ If the library cannot be found, verify the actual built artifact path and use th
 
 Windows ARM64 support came from targeted external work. When touching platform lists, Cargokit, or native loading, keep ARM64 assumptions in review even if you cannot build it locally.
 
+Windows build scripts have failed on paths from different drives and on argument escaping. Prefer explicit drive-aware shell behavior and quoted structured paths.
+
+## eLinux
+
+eLinux support exists as a platform surface. When editing package platform lists, generated plugin metadata, or Cargokit target handling, preserve eLinux entries unless intentionally removing support.
+
 ## Web and WASM
 
 Web builds are the most toolchain-sensitive path. Confirm the wasm target, nightly/std build requirements, wasm-pack behavior, and shared-memory flags before changing application code.
 
 Shared-memory WASM requires COOP/COEP headers. Use the project server helper or pass equivalent Flutter web headers during local runs.
 
-Large integer signal fields are a known web hazard. Replace them with strings or doubles for cross-platform schemas.
+64-bit or wider integer signal fields need explicit web testing. Replace them with strings when exact precision matters across the JavaScript boundary.
+
+Recent wasm failures were fixed by installing wasm-pack with the right toolchain and explicitly exporting `__heap_base` for wasm-bindgen thread preparation. Check linker/toolchain behavior before changing bridge semantics.
 
 ## Shutdown and Hot Restart
 

@@ -22,4 +22,8 @@ Treat `None` from `recv()` as "this receiver was superseded," not as a decoded s
 
 ## Web-Safe Signal Design
 
-Even when Rust trait support exists for large integer types, web/WASM is a practical boundary. Avoid `i64`-style fields in cross-platform signals; use strings or doubles for IDs, counters, and timestamps that must work on web.
+Even when Rust trait support exists for 64-bit and wider integer types, web/WASM is a practical boundary because values cross JavaScript and generated Dart code. Test those schemas on web; prefer strings for exact IDs, counters, and timestamps that must retain full precision.
+
+## Stream State
+
+Rust-to-Dart streams now retain a latest value so newly mounted Dart widgets can read the most recent signal without waiting for the next emission. When changing generated stream/controller code, preserve both broadcast/listen behavior and latest-value initialization semantics.

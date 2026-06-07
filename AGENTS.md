@@ -23,7 +23,7 @@
 
 ## Gotchas
 
-- Web: no i64 in signals (use String/double)
+- Web: test 64-bit/wide integer signals explicitly; use String for exact IDs/timestamps if JS precision matters
 - `rinf gen --watch` is broken (#682) — don't use it
 - Serde `with` attribute is banned on signals
 - Recursive types: use `Option<Box<T>>` pattern

@@ -10,7 +10,7 @@ Cargokit updates have a long history and should preserve upstream context. Avoid
 
 - Early Cargokit, Xcode, and CI work established much of the platform-build foundation.
 - Windows ARM64 support came through external platform expertise and should be kept covered when touching Cargokit or target lists.
-- Dart Native Assets work has existed as external exploration; review it as an integration direction, not as established behavior unless it has been merged.
+- eLinux and ohos support came through targeted platform work; treat them as platform surfaces to preserve even when local coverage is unavailable.
 - File-based endpoint and Dart analyzer fixes are recurring examples of contributor-driven polish.
 
 ## Style

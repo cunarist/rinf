@@ -17,7 +17,7 @@ Prefer primitives, strings, options, boxes, arrays, vectors, sets, maps, unit, s
 
 Use `Option<Box<T>>` for recursive structures. The nullable edge is the important part; direct recursion will not give the generator a finite type shape.
 
-For web-safe cross-platform signals, avoid large integer fields such as `i64`. Use `String` for exact IDs/timestamps or `double` only when precision loss is acceptable.
+For web-safe cross-platform signals, explicitly test 64-bit and wider integer fields. Use `String` for exact IDs/timestamps or `double` only when precision loss is acceptable.
 
 ## Serde Attributes
 
@@ -28,6 +28,8 @@ Do not use custom serde transforms, `flatten`, or one-sided skip attributes on s
 ## Receiver Pattern
 
 Only the newest Dart-signal receiver is active. If `recv()` returns `None`, stop that task or reacquire the receiver; it was superseded by a newer clone.
+
+Rust-to-Dart streams retain the latest received value. When adding endpoint types, verify generated Dart exposes both stream listening and latest-value access for Rust-to-Dart signals.
 
 ## Checklist
 
