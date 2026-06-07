@@ -2,73 +2,61 @@
 
 ## Project Overview
 
-**Rinf** — Rust for native business logic, Flutter for flexible and beautiful GUI.
-A bridge library enabling Flutter/Dart apps to call Rust code seamlessly across platforms.
+**Rinf** — "Rust in Flutter". Rust for native business logic, Flutter for GUI.
+Cross-platform bridge via FFI (native) and wasm-bindgen (web).
 
 - **Repo:** https://github.com/cunarist/rinf
-- **Version:** 8.10.0 (as of 2026-06)
+- **Current Version:** 8.10.0 (2026-03-09)
 - **License:** MIT
-- **Dart SDK:** >=3.5.0 <4.0.0 | **Flutter:** >=3.24.0
 - **Author:** Danny Kim (temeddix) — sole maintainer, ~2257 commits
+- **Started:** 2022-04-11 (cargokit fork), 2023-07 rinf as own project
+- **Dart SDK:** >=3.5.0 <4.0.0 | **Flutter:** >=3.24.0
 
 ## Architecture
 
-### Crate Structure (Cargo Workspace)
-
 ```
 rinf/
-├── rust_crate/        # Core library — SignalPiece trait, macros, channel, interface
-├── rust_crate_proc/   # Procedural macros — derive macros for SignalPiece
-├── rust_crate_cli/    # CLI tool — `rinf gen`, project scaffolding (separate Cargo.lock)
-└── flutter_package/   # Flutter plugin — FFI bindings, Dart API, platform channels
-    └── example/       # Example app with native/ subdirectory for Rust code
+├── rust_crate/        # Core — SignalPiece trait, channel, interface, macros
+├── rust_crate_proc/   # Proc macros — derive SignalPiece
+├── rust_crate_cli/    # CLI — `rinf gen`, scaffolding (separate Cargo.lock)
+└── flutter_package/   # Flutter plugin — FFI bindings, platform channels
+    ├── cargokit/      # Vendored build system (Android/iOS/macOS/Windows/Linux/ohos)
+    └── example/       # Example app with native/Rust code
 ```
 
-### Key Concepts
+### Core Concepts
 
-- **SignalPiece** — Core trait. Types that can cross the Dart↔Rust boundary derive this.
-  - Recursive data structures supported (issue #615)
-  - `Vec<T>` where `T: SignalPiece` supported (issue #597)
-  - Serde attributes: `skip` respected (#617), `with` banned (#618, #580)
-  - Enum generation compiles correctly (issue #666 — was a bug)
-- **Code Generation** — `rinf gen` command generates Dart code from Rust `#[signal]` annotated structs
-  - `--watch` flag has bug causing perpetual changes (#682)
-  - Respects Rinf version from package manifest (#565)
-- **Cargokit** — Build system integration for Flutter native assets
-  - Supports: Android, iOS, macOS, Linux, Windows, Web, ohos (HarmonyOS)
-  - OHOS support added in PR #665
-  - OHOS build directory resolution fixed (#678)
-  - Windows ARM64 support added (#650)
-- **Platform Support**
-  - Native: Android, iOS, macOS, Linux (x86_64), Windows (x86_64 + ARM64)
-  - Web: wasm-bindgen based (i64 fields silently fail on web — #672)
-  - ohos: HarmonyOS NEXT support (PR #665, fixes in #678)
+- **SignalPiece** — Types that cross Dart↔Rust. Derive + `#[signal]` attribute.
+  - Supported: primitives, String, Vec<T: SignalPiece>, Option<T: SignalPiece>, enums
+  - Recursive via `Option<Box<T>>` (added 2025-06, PR #615)
+  - `#[serde(skip)]` respected (PR #617)
+  - `#[serde(with = "...")]` banned (PR #618)
+- **`rinf gen`** — CLI generates Dart code from Rust `#[signal]` structs
+  - `--watch` broken — perpetual changes (#682)
+  - Must match rinf version in pubspec (#565)
+- **Cargokit** — Handles platform build integration (vendored, updated separately)
+  - Platforms: Android, iOS, macOS, Linux, Windows, Web, ohos (HarmonyOS)
+- **interface_os.rs** — Native FFI (C bindings)
+- **interface_web.rs** — WASM via wasm-bindgen
 
-### Interface Layer
+## Version History (Key Milestones)
 
-- `interface_os.rs` — OS-native FFI (C bindings via `uniffi`-style approach)
-- `interface_web.rs` — WebAssembly interface via wasm-bindgen
-- `channel.rs` — Internal message passing between Dart and Rust
-- `shutdown.rs` — Lifecycle management (`finalizeRust`)
+| Period | Version | What Happened |
+|--------|---------|---------------|
+| 2022-04 ~ 2023-06 | — | cargokit fork, Flutter plugin infrastructure |
+| 2023-07 ~ 09 | 3.x | rinf 시작. Protobuf 기반 메시지, CLI `template`/`generate` 명령어 |
+| 2023-10 ~ 2024-03 | 4.x ~ 5.x | SignalPiece trait 도입, multicore parallelism (`spawn_blocking`), debug_print, panic backtrace |
+| 2024-04 ~ 07 | 6.x | `initializeRust`/`finalizeRust` lifecycle, `RinfError` 타입, no-unwrap 정책, Bevy feature |
+| 2024-08 ~ 2025-06 | 7.x ~ 8.x | eLinux 실험적 지원, Android Flutter 3.24 호환, recursive SignalPiece, Serde skip/with 제어 |
+| 2025-07 ~ 2026-03 | 8.8 ~ 8.10 | Windows ARM64 (#650), docs/demo 컨테이너화 (#653), ohos/HarmonyOS 지원 (#665), Rust 1.88 지원, Ruff ALL rules |
 
 ## Dependencies
 
 - **Rust:** serde, serde_json, tokio, reqwest, bevy_ecs, wasm-bindgen
-- **Dart/Flutter:** flutter, collection, meta, flutter_lints
-- **CLI:** clap, serde, serde_generate, cargo metadata
-- **Python:** automate/ module for repo automation
-- **CI/CD:** GitHub Actions, Docker, dependabot (47 PRs)
-
-## Build & CI
-
-- **Rust:** Clippy strict mode, ALL Ruff rules for Python (#652)
-- **CI Workflows:**
-  - Build test (all platforms)
-  - Docs generation + hosting
-  - Demo container
-  - Linting (Clippy, Ruff, Dart analyzer)
-- **Docker:** Containerized docs and demo (#653)
-- **Python Type Checking:** Uses Ty (#676)
+- **Dart:** flutter, collection, meta, flutter_lints
+- **CLI:** clap, serde, serde_generate, cargo_metadata
+- **Python:** automate/ — Ty type checker (#676), Ruff ALL rules (#652)
+- **CI:** GitHub Actions, Docker, dependabot (47 PRs)
 
 ## Known Issues & Patterns
 
@@ -78,42 +66,42 @@ rinf/
 |---------|--------|
 | Code gen produces invalid Dart | #600, #601, #632, #666 |
 | `rinf gen` reads unrelated files | #630, #682 |
-| Build failures on specific platforms | #579, #605, #647, #649 |
+| Build failures per platform | #579, #605, #647, #649 |
 | Serialization edge cases | #597, #613, #619, #672 |
-| Enum/type mapping between Rust↔Dart | #638, #666 |
+| Enum/type mapping Rust↔Dart | #638, #666 |
 
-### Active Concerns (Open Issues)
+### Active (Open Issues)
 
 - **#682** — `rinf gen --watch` perpetual changes (critical)
-- **#672** — Web: i64 fields silently fail
-- **#641** — Dart Native Assets support request (PR #681 open)
-- **#637** — HarmonyOS NEXT support (partially done via #665)
-- **#635** — Consider switching away from `serde_yml`
+- **#672** — Web: i64 fields silently fail deserialization
+- **#641** — Dart Native Assets support (PR #681 open by robertmsale)
+- **#638** — Exhaustive enum matching in Dart
+- **#637** — HarmonyOS NEXT (partial via #665)
+- **#635** — Switch away from `serde_yml`
 - **#620** — Don't assume rustup installed
-- **#581** — Docs need Rust initialization guide
+- **#581** — Docs: guide Rust initialization
+- **#565** — `rinf gen` respect version in manifest
 
-### Closed & Resolved
+### Resolved Highlights
 
-- OHOS support added (#665 + #678)
-- Windows ARM64 build fixed (#650)
-- Recursive SignalPiece fixed (#615, #613)
-- Serde `skip` attribute respected (#617)
-- Clippy/Ruff strict mode enabled (#652, #644)
+- OHOS support (#665 + #678)
+- Windows ARM64 (#650)
+- Recursive SignalPiece (#615, #613)
+- Serde skip respected (#617)
+- Clippy strict + Ruff ALL (#652, #644)
 - Docs/demo containerized (#653)
+- Ty for Python (#676)
 
-## Milestones
+## Build & CI
 
-| Version | Key Changes |
-|---------|-------------|
-| rinf 8.x | Current major. SignalPiece redesign, recursive types, strict linting |
-| OHOS | Added HarmonyOS platform support |
-| Web i64 | Known limitation on wasm target |
-| Native Assets | PR #681 pending — macOS/iOS native asset support |
+- **Rust:** Clippy strict, ALL Ruff rules for Python
+- **Workflows:** Build test (all platforms), docs gen+host, demo container, linting
+- **Docker:** Containerized docs + demo (#653)
+- **wasm-pack:** nightly required for some builds (#678)
 
-## Development Conventions
+## Dev Conventions
 
-- Commit messages: Conventional commit style (`feat:`, `fix:`, `chore:`) + descriptive English/Korean
-- PR review: Self-review + Clippy check mandatory
-- Dependabot: Auto-merge for minor deps, manual for major
-- Testing: Build tests per platform, no unit test suite yet
-- Documentation: README, CHANGELOG, guides in `documentation/`
+- Commits: `feat:`, `fix:`, `chore:` + English/Korean
+- PR: self-review + Clippy mandatory
+- Dependabot: minor auto if CI green, major manual review
+- Tests: build tests per platform (no unit test suite yet)
