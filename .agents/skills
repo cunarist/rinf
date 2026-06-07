@@ -105,6 +105,26 @@ cd flutter_package/example/ohos
 hvigor build
 ```
 
+## Cargokit Updates
+
+Cargokit is vendored under `flutter_package/cargokit/`. It's periodically synced from upstream.
+
+```bash
+# Use the update script (historical pattern)
+./scripts/update_cargokit.sh
+```
+
+**History of Cargokit integration:**
+- Originally forked (2022), then subtree'd, then vendored with update script
+- Key sync PRs: #65 (shell perms), #53 (Windows drive change), #65, #166, #320, #663
+- Pattern: Create `cargokit-update` branch → merge upstream → PR as `cunarist/cargokit-update`
+
+**When updating:**
+1. Check upstream `cunarist/cargokit` for recent changes
+2. Sync via subtree or manual merge
+3. Ensure no squash of upstream history (#422c0ca1 lesson)
+4. Test on affected platforms before merging
+
 ## CI/CD
 
 ### Fixing CI Failures
@@ -119,12 +139,62 @@ hvigor build
 - Minor version bumps: Auto-approve if CI passes
 - Major version bumps: Manual review required, check breaking changes
 - Rust deps: Verify `cargo test` + `cargo clippy` after merge
+- 47 dependabot PRs historically — mostly straightforward bumps
 
 ## Documentation
 
 ### Updating Guides
 
-- Guides live in `documentation/`
+- Guides live in `documentation/` (32 files)
 - Follow existing structure and tone
 - Update `CHANGELOG.md` for user-facing changes
 - Sync version numbers in `pubspec.yaml` + `Cargo.toml`
+
+### Containerized Docs
+
+- Docs are now containerized (PR #653)
+- Domain: `cunarist.org`
+- Build includes example web app
+
+## Version Bumping
+
+### Process
+
+1. Update `pubspec.yaml` version
+2. Update `Cargo.toml` version in `rust_crate/` and `rust_crate_cli/`
+3. Update `CHANGELOG.md`
+4. Commit as `Version X.Y.Z`
+5. Tag: `git tag vX.Y.Z`
+6. Push: `git push origin main vX.Y.Z`
+
+### Version History Pattern
+
+| Major | Period | Key Change |
+|-------|--------|------------|
+| 1.x | 2023-07 | Initial release, Protobuf |
+| 2.x | 2023-07~08 | Early fixes, Cargokit integration |
+| 3.x | 2023-08~09 | Proto resource system, CLI |
+| 4.x | 2023-09~2024-01 | SignalPiece, framework identity |
+| 5.x | 2024-01 | Multicore parallelism |
+| 6.x | 2024-01~2024-09 | Event-driven, lifecycle, Bevy |
+| 7.x | 2024-09~2025-04 | eLinux, Rust bump, templates |
+| 8.x | 2025-04~now | Derive overhaul, Windows ARM64, ohos |
+
+## Project Structure
+
+```
+rinf/
+├── automate/          # Python scripts (Ty + Ruff)
+├── demo/              # Containerized demo
+├── documentation/     # 32 guide files
+├── flutter_package/   # 265 files — Flutter plugin + cargokit + example
+├── rust_crate/        # 12 files — core SignalPiece, interface
+├── rust_crate_cli/    # 21 files — rinf CLI tool
+├── rust_crate_proc/   # 2 files — proc macros
+├── .github/           # 10 files — workflows + templates
+└── .vscode/           # Dev settings
+```
+
+- **flutter_package/** dominates (265/336 files) — most work happens here
+- **rust_crate/** is small but critical — core type system
+- **rust_crate_cli/** has separate `Cargo.lock` — decoupled from main Rust crate

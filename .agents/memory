@@ -11,6 +11,46 @@ Cross-platform bridge via FFI (native) and wasm-bindgen (web).
 - **Author:** Danny Kim (temeddix) — sole maintainer, ~2257 commits
 - **Started:** 2022-04-11 (cargokit fork), 2023-07 rinf as own project
 - **Dart SDK:** >=3.5.0 <4.0.0 | **Flutter:** >=3.24.0
+- **Total tags:** 219 | **PRs:** 300+ | **Issues:** 98
+
+## Repository Evolution
+
+### Phase 1 — Genesis (2022-04 ~ 2023-06) · 14 commits
+- Forked from `cargokit`; focused on build system infrastructure
+- NDK/Gradle compatibility fixes, cross-platform setup
+- Pre-versioned — no tags yet
+
+### Phase 2 — Protobuf Era (2023-07 ~ 2023-09) · v1.0.0 → v3.0.0
+- **v1.0.0** (2023-07-09): Official rinf launch, Protobuf-based messaging
+- CLI `template`/`generate` commands for code scaffolding
+- `.proto` file-driven endpoint system; file-based resource mapping
+- Early contributor PRs (bookshiyi, wheregmis): Cargokit subtree, Xcode, CI
+- Peak activity: 267 main commits in July 2023 alone
+
+### Phase 3 — SignalPiece Revolution (2023-10 ~ 2024-07) · v4.0.0 → v6.x
+- **v4.0.0** (2023-09-16): SignalPiece trait introduced — replacing Protobuf with native Rust derives
+  - `#[derive(SignalPiece)]` + `#[signal]` attribute
+  - Landing page revamp, framework identity (`"this as framework"`)
+- **v5.0.0** (2024-01-08): `spawn_blocking` multicore parallelism, `debug_print`, panic backtrace
+- **v6.0.0** (2024-01-22): Event-driven system, `RinfError` type, `initializeRust`/`finalizeRust` lifecycle, no-unwrap policy
+- **Biggest gap:** No main commits Apr–May 2024 (likely real-life break)
+
+### Phase 4 — Hardening & Expansion (2024-08 ~ 2025-06) · v7.0.0 → v8.7.x
+- **v7.0.0** (2024-09-21): eLinux experimental support, Rust version bump, template overhaul, async runtime guides
+- **v8.0.0** (2025-04-02): Major derive overhaul (`derive-signals`), Rust signal instance borrowing, serde_generate upgrade
+- Recursive SignalPiece via `Option<Box<T>>` (PR #615)
+- Serde attribute control: `#[serde(skip)]` respected (PR #617), `#[serde(with = "...")]` banned (PR #618)
+- Windows ARM64 support (PR #650 by ONEUI8)
+- Docs/demo containerized (PR #653)
+- Clippy strict mode + Ruff ALL rules (PR #644, #652)
+- Ty for Python type checking (PR #676)
+
+### Phase 5 — Current (2025-07 ~ 2026-06) · v8.8 ~ v8.10
+- **v8.8.0** (2025-07): Windows ARM64 merge, strict linters
+- **v8.9.0** (2025-10): Cargokit update, lower requirements
+- **v8.10.0** (2026-03-09): HarmonyOS/ohos support (PR #665), wasm-pack nightly fix
+- Activity slowed: ~6 main commits/month — maintenance/stabilization phase
+- Rust toolchain: 1.88 minimum
 
 ## Architecture
 
@@ -39,16 +79,27 @@ rinf/
 - **interface_os.rs** — Native FFI (C bindings)
 - **interface_web.rs** — WASM via wasm-bindgen
 
-## Version History (Key Milestones)
+### Commit Activity
 
-| Period | Version | What Happened |
-|--------|---------|---------------|
-| 2022-04 ~ 2023-06 | — | cargokit fork, Flutter plugin infrastructure |
-| 2023-07 ~ 09 | 3.x | rinf 시작. Protobuf 기반 메시지, CLI `template`/`generate` 명령어 |
-| 2023-10 ~ 2024-03 | 4.x ~ 5.x | SignalPiece trait 도입, multicore parallelism (`spawn_blocking`), debug_print, panic backtrace |
-| 2024-04 ~ 07 | 6.x | `initializeRust`/`finalizeRust` lifecycle, `RinfError` 타입, no-unwrap 정책, Bevy feature |
-| 2024-08 ~ 2025-06 | 7.x ~ 8.x | eLinux 실험적 지원, Android Flutter 3.24 호환, recursive SignalPiece, Serde skip/with 제어 |
-| 2025-07 ~ 2026-03 | 8.8 ~ 8.10 | Windows ARM64 (#650), docs/demo 컨테이너화 (#653), ohos/HarmonyOS 지원 (#665), Rust 1.88 지원, Ruff ALL rules |
+| Year | All Commits | Main Branch | Phase |
+|------|------------|-------------|-------|
+| 2022 | 14 | 1 | Genesis (pre-v1) |
+| 2023 | 1112 | 660 | Protobuf → SignalPiece |
+| 2024 | 964 | 312 | Hardening (v5-v7) |
+| 2025 | 667 | 130 | Expansion (v8) |
+| 2026 | 27 | 13 | Maintenance |
+
+**Peak month:** July 2023 (267 main commits) — launch sprint
+**Longest gap:** April–May 2024 (zero main commits)
+
+### Top Commit Patterns (across all branches)
+1. `Organize code` (66) — frequent refactoring passes
+2. `Update test file` (28)
+3. `Update docs` (20)
+4. `Fix a typo` (19)
+5. `Fix a sentence` (18)
+6. `Add a todo comment` (18) — lots of planned-but-not-yet-done items
+7. `Improve comments` (14), `Fix a comment` (15)
 
 ## Dependencies
 
