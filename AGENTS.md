@@ -7,7 +7,7 @@
 
 ## Rules
 
-- Read `.agents/memory` and `.agents/skills` before acting
+- Read `.agents/memory/INDEX.md` and `.agents/skills/INDEX.md` before acting
 - **Actively maintain** memory and skills:
   - Create, update, or delete them whenever you learn something new
   - Even without explicit user command — if it matters, persist it
@@ -17,7 +17,7 @@
 ## Workflow
 
 - **Signal changes:** Add `#[derive(SignalPiece)]` + `#[signal]`, run `rinf gen`, test target platform
-- **Platform build issue:** Check `.agents/skills` → Platform Build Troubleshooting section
+- **Platform build issue:** Check `.agents/skills/INDEX.md` → Platform Build Troubleshooting section
 - **CI failure:** Clippy → Ruff → Dart analyzer, in that order
 - **Dependabot PR:** Minor = auto-approve if CI green; Major = manual review
 
