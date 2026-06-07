@@ -79,6 +79,108 @@ rinf/
 - **interface_os.rs** — Native FFI (C bindings)
 - **interface_web.rs** — WASM via wasm-bindgen
 
+## Source-Level Architecture Notes
+
+### Workspace and Versioning
+
+- Root `Cargo.toml` uses `resolver = "3"` and includes `flutter_package/example/native/*`, `rust_crate`, and `rust_crate_proc`.
+- `rust_crate_cli` is deliberately excluded from the workspace so it owns a separate `Cargo.lock`; install it with `cargo install --path rust_crate_cli`.
+- `[patch.crates-io]` redirects `rinf` and `rinf_proc` to local paths for example/native workspace builds.
+- Current published versions in source are `rinf` 8.10.0, `rinf_proc` 8.10.0, `rinf_cli` 8.10.0, Flutter package 8.10.0.
+- Rust crate has `rust-version = "1.88"` and edition 2024. CI uses Flutter 3.24.0 and Rust 1.88 for repository checks.
+- Note: `rust_crate/Cargo.toml` currently depends on `rinf_proc = { version = "8.9.1" }`; local workspace patch hides this in-repo, but publication/version-bump work should verify this is intentional.
+
+### `rust_crate/src/lib.rs` Public Surface
+
+- Internal modules: `channel`, `error`, `macros`, `shutdown`, `signal_trait`, `traits`, plus platform-selected `interface_os`/`interface_web`.
+- Public API re-exports:
+  - channel: `signal_channel`, `SignalSender`, `SignalReceiver`
+  - lifecycle/interface: `start_rust_logic`, `send_rust_signal`, `DartSignalPack`
+  - shutdown: `dart_shutdown`
+  - traits: `DartSignal`, `DartSignalBinary`, `RustSignal`, `RustSignalBinary`, `SignalPiece`
+  - proc macros with the same trait names from `rinf_proc`
+  - hidden bincode helpers `serialize`/`deserialize` for generated macro code.
+- `write_interface!()` emits `rinf_start_rust_logic_extern`; user `hub` crate must define `main` in scope and call the macro once at crate root.
+- `debug_print!()` sends endpoint `RinfOut` with UTF-8 report in binary bytes in debug builds; if no Dart isolate/bindings exist, it falls back to `println!`.
+
+### Signal Traits and Supported Types
+
+- `RustSignal`/`RustSignalBinary` require `serde::Serialize` and expose `send_signal_to_dart`.
+- `DartSignal`/`DartSignalBinary` require `for<'a> Deserialize<'a>` and expose `get_dart_signal_receiver() -> SignalReceiver<DartSignalPack<Self>>`.
+- `SignalPiece` is a compile-time capability marker; `be_signal_piece()` is a no-op used by proc-macro generated checks.
+- Built-in `SignalPiece` impls cover signed/unsigned ints through 128-bit, floats, bool, char, `String`, `&str`, `Box<T>`, `Option<T>`, arrays, `Vec<T>`, `HashSet`, `BTreeSet`, `HashMap<K,V>`, `BTreeMap<K,V>`, unit and tuples up to arity 4.
+- Web remains a practical limitation for `i64`/large integer signal fields even though Rust trait support exists; use `String` or `double` for cross-platform web-safe IDs/timestamps.
+
+### Channel Semantics
+
+- `SignalSender<T>` and `SignalReceiver<T>` share an `Arc<Mutex<SignalChannel<T>>>` containing a FIFO `VecDeque`, one stored `Waker`, and an active receiver id.
+- Cloning a receiver makes the clone the active receiver and wakes the previous receiver; previous receivers resolve `recv()` to `None`.
+- `recv()` returns `impl Future<Output = Option<T>>`; consumers must handle `None` as "receiver superseded" rather than as a decoded signal.
+- Queue entries are not broadcast among receivers. For Dart-to-Rust signals, calling `get_dart_signal_receiver()` in multiple tasks means only the newest clone remains live.
+
+### Native Interface (`interface_os.rs`)
+
+- Dart registers `NativeApi.postCObject` and a send port via `rinf_prepare_isolate_extern`; Rust stores an `allo_isolate::Isolate` in `DART_ISOLATE`.
+- `start_rust_logic_real` installs a debug panic hook, prepares an `os_thread_local::ThreadLocal<ShutdownDropper>`, then spawns a Rust thread for the user main function.
+- Hot restart/reopen handling: spawned thread sets `dart_stopped`, clears `dart_stopped` and `rust_stopped`, runs user main, then sets `rust_stopped`.
+- `rinf_stop_rust_logic_extern` sets `dart_stopped` and blocks until `rust_stopped`.
+- Rust-to-Dart payload is posted as `[endpoint, messageBytesOrNull, binaryOrNull]`; empty vectors are sent as Dart null because `ZeroCopyBuffer` over empty vectors can panic. Dart reconstructs empty `Uint8List`.
+
+### Web Interface (`interface_web.rs` and Flutter web loader)
+
+- `start_rust_logic_real` runs the user main function synchronously in the JavaScript environment; there is no blocking shutdown mechanism on web.
+- Rust-to-Dart calls JS function `rinfBindings.rinf_send_rust_signal_extern(endpoint, messageBytes, binary)` via `wasm_bindgen(catch)`. Failure maps to `AppError::NoBindings`, commonly seen in workers before globals exist.
+- Flutter `load_web.dart` creates `globalThis.rinfBindings`, injects a module script for `pkg/hub.js` unless `compiledLibPath` overrides it, imports `wasmBindings`, awaits `init()`, then calls `completeRinfLoad`.
+- `interface_web.dart` registers `rinf_send_rust_signal_extern` on `rinfBindings`; it calls `assignRustSignal[endpoint]!(messageBytes, binary)`.
+- `startRustLogicReal()` skips invoking `rinf_start_rust_logic_extern` if `wasAlreadyLoaded`, supporting hot restart.
+
+### Dart Native Interface (`flutter_package/lib/src/load_os.dart`)
+
+- Default dynamic library names:
+  - Linux/Android/ohos: `libhub.so`
+  - Windows: `hub.dll`
+  - iOS/macOS: `rinf.framework/rinf`
+- `compiledLibPath` in `initializeRust` overrides dynamic library path before `rustLibrary` is used.
+- `RustLibraryGlobal` uses `@Native` for fixed symbols (`start`, `stop`, `prepareIsolate`) when symbols are global, but still looks up dynamic Dart-signal endpoints and caches them.
+- `RustLibraryLocal` uses `DynamicLibrary.lookupFunction` for all fixed and dynamic symbols. Android and ohos always use local symbols; Linux tests use local symbols when `FLUTTER_TEST` exists.
+- Dart-to-Rust native send allocates and copies `messageBytes` and `binary` with `malloc`, calls the endpoint symbol, then frees both allocations.
+
+### Proc Macro Behavior (`rust_crate_proc/src/lib.rs`)
+
+- Derives provided: `SignalPiece`, `DartSignal`, `DartSignalBinary`, `RustSignal`, `RustSignalBinary`.
+- All foreign signal type names are rejected if their lowercase form starts with `rinf`; this avoids collisions with framework-reserved endpoints like `RinfOut`.
+- Generic signal types are rejected with `A foreign signal type cannot be generic`.
+- Banned serde field attributes: `skip_serializing`, `skip_serializing_if`, `skip_deserializing`, `with`, `serialize_with`, `deserialize_with`, `flatten`.
+- `#[serde(skip)]` is supported and removes the field/variant from compile-time `SignalPiece` checks and generation tracing.
+- `DartSignal*` derives create:
+  - lazy static `(SignalSender<DartSignalPack<T>>, SignalReceiver<DartSignalPack<T>>)`
+  - `get_dart_signal_receiver()` returning a clone of the receiver
+  - native extern `rinf_send_dart_signal_<snake_type>` or wasm export with the same name
+  - bincode deserialize path that logs `CannotDecodeMessage` via `debug_print!` and drops invalid messages.
+- `RustSignal*` derives bincode serialize `self`, then call `send_rust_signal(type_name, message_bytes, binary)`; serialization and transport errors are logged and swallowed.
+
+### CLI Internals (`rust_crate_cli`)
+
+- Binary entry is `rust_crate_cli/src/bin/main.rs` (not `src/main.rs`); it delegates to `rinf_cli::run_command()` and prints red `Error: ...` on failure.
+- Commands in `src/tool/entry.rs`: `config`, `template`, `gen [--watch]`, `wasm [--release]`, `server [--release]`.
+- CLI refuses to run in package directories where `pubspec.yaml` has `publish_to` other than `none`; missing/unreadable `publish_to` is treated as a Flutter app project.
+- `RinfConfig` is loaded from `pubspec.yaml` key `rinf`; defaults are `gen_input_crates: ["hub"]` and `gen_output_dir: "lib/src/bindings"`.
+- `template` copies embedded files from `rust_crate_cli/template`, strips `.template` suffixes, appends Rust/generated entries to `.gitignore`, appends README guidance, runs `dart pub add meta`, `dart pub add tuple`, rewrites `lib/main.dart` to import Rinf/bindings and call `await initializeRust(assignRustSignal)`, runs `cargo fmt`, then `rinf gen`.
+- `gen` recursively parses `native/<crate>/src/**/*.rs` with `syn`, traces structs/enums with signal derives into `serde_reflection` formats, deletes/recreates the output dir, installs serde/bincode Dart runtimes, writes generated Dart classes, adds stream/latest-signal helpers and `sendSignalToRust` extensions, then writes `signal_handlers.dart` and top-level export.
+- Type generation maps `Box<T>` to `T`, `Option<T>` to nullable option, `Vec`/sets to sequences, maps to `Format::Map`, arrays with literal length to tuple arrays, tuples to Dart tuple/format equivalents, and unknown paths to type names.
+- Generation collects doc comments into generated Dart comments and ignores `#[serde(skip)]` fields/variants.
+- Known source wart: in `extract_signal_attributes`, `"RustSignal"` currently maps to `SignalAttribute::RustSignalBinary`; this makes regular `RustSignal` classes treated as Rust-signal-capable, but source readers should verify binary/non-binary handling before changing that logic.
+- `gen --watch` uses `notify` recursive watches on `native/<crate>` and regenerates on any `.rs` event. It is known broken (#682) and should be avoided.
+- `wasm` installs nightly, `rust-src`, `wasm32-unknown-unknown`, `wasm-pack`, and `wasm-bindgen-cli` when internet is reachable, then runs `wasm-pack build native/hub --target web --out-dir web/pkg --out-name hub --no-typescript` with nightly, `-Zbuild-std=std,panic_abort`, atomics/shared-memory flags, 1 GiB max memory, imported memory, and TLS exports.
+- `server` copies to clipboard a `flutter run` command with COOP/COEP headers required for shared-memory wasm.
+
+### CI Details From Current Workflows
+
+- `quality_control.yaml` sets `RUSTFLAGS=-D warnings`, installs CLI from `rust_crate_cli`, runs `rinf gen` in `flutter_package/example`, then clippy for debug/release native, debug/release wasm target, all features in `rust_crate`, and CLI clippy.
+- Dart analysis command is `dart analyze flutter_package --fatal-infos`; formatting check runs `dart format .`, `cargo fmt`, and `cargo clippy --fix --allow-dirty`, then requires `git diff --exit-code`.
+- Python checks are `uv run ty check` then `uv run ruff check .`.
+- Example/test/user app workflows build Android, web, Linux, Windows, macOS, and iOS no-codesign; web path runs `rinf wasm --release` before `flutter build web`.
+
 ### Commit Activity
 
 | Year | All Commits | Main Branch | Phase |
