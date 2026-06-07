@@ -17,7 +17,7 @@
 ## Workflow
 
 - **Signal changes:** Add `#[derive(SignalPiece)]` + `#[signal]`, run `rinf gen`, test target platform
-- **Platform build issue:** Check `.agents/skills/INDEX.md` → Platform Build Troubleshooting section
+- **Platform build issue:** Check `.agents/skills/platform-builds.md`
 - **CI failure:** Clippy → Ruff → Dart analyzer, in that order
 - **Dependabot PR:** Minor = auto-approve if CI green; Major = manual review
 
