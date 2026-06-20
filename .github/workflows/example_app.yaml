@@ -111,7 +111,7 @@ jobs:
       - name: Build the example app
         if: matrix.target == 'windows'
         working-directory: flutter_package/example/
-        run: # Clean CMake cache and build artifacts to prevent VS generator conflicts
+        run: |
           $buildDir = "build/windows"
           if (Test-Path $buildDir) {
             Remove-Item "$buildDir/CMakeCache.txt" -Force -ErrorAction SilentlyContinue
