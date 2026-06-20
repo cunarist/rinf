@@ -113,9 +113,16 @@ jobs:
         if: matrix.target == 'windows'
         working-directory: test_app/
         run: |
-          # Clean any potential CMake cache that might force old VS generator
-          if (Test-Path "build/windows/CMakeCache.txt") { Remove-Item "build/windows/CMakeCache.txt" -Force }
-          if (Test-Path "build/windows/CMakeFiles") { Remove-Item "build/windows/CMakeFiles" -Recurse -Force }
+          # Clean CMake cache and build artifacts to prevent VS generator conflicts
+          $buildDir = "build/windows"
+          if (Test-Path $buildDir) {
+            Remove-Item "$buildDir/CMakeCache.txt" -Force -ErrorAction SilentlyContinue
+            Remove-Item "$buildDir/CMakeFiles" -Recurse -Force -ErrorAction SilentlyContinue
+            Remove-Item "$buildDir/*.cmake" -Force -ErrorAction SilentlyContinue
+            Remove-Item "$buildDir/cmake_install.cmake" -Force -ErrorAction SilentlyContinue
+          }
+          # Specify Visual Studio 2022 generator explicitly to avoid generator conflicts
+          $env:CMAKE_GENERATOR="Visual Studio 17 2022"
           flutter build windows --verbose
 
       - name: Build the example app
