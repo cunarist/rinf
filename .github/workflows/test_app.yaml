@@ -1,142 +1,140 @@
-1|# Verify that the app build works as intended
-2|# when utilizing the code inside the repository.
-3|name: Test App
-4|
-5|on:
-6|  push:
-7|    branches:
-8|      - main
-9|    paths-ignore:
-10|      - "**.md"
-11|  pull_request:
-12|    paths-ignore:
-13|      - "**.md"
-14|  workflow_dispatch:
-15|
-16|concurrency:
-17|  # Cancels the workflow
-18|  # when another event in the same context happens.
-19|  # If it's a PR, context is the pull request number.
-20|  # Otherwise, it uses the Git reference(branch or tag name).
-21|  group: >
-22|    ${{ github.workflow }}
-23|    ${{ github.event.pull_request.number || github.ref }}
-24|  cancel-in-progress: true
-25|
-26|jobs:
-27|  build:
-28|    name: ${{ matrix.os }} / ${{ matrix.target }}
-29|    runs-on: ${{ matrix.os }}
-30|    strategy:
-31|      fail-fast: false # Important
-32|      matrix:
-33|        os: [ubuntu-latest, windows-2025, macos-latest]
-34|        target: [android, web] # On all platforms
-35|        include:
-36|          # Specify targets for each platform
-37|          - os: ubuntu-latest
-38|            target: linux
-39|          - os: windows-2025
-40|            target: windows
-41|          - os: macos-latest
-42|            target: macos
-43|          - os: macos-latest
-44|            target: ios
-45|
-46|    steps:
-47|      - name: Checkout repository
-48|        uses: actions/checkout@v6
-49|        with:
-50|          submodules: true
-51|
-52|      - name: Cache dependencies
-53|        uses: actions/cache@v5
-54|        with:
-55|          path: |
-56|            ~/.cargo/registry
-57|            target
-58|            ~/.pub-cache
-59|          key: >
-60|            ${{ matrix.os }}-${{ matrix.target }}
-61|            ${{ hashFiles('**/Cargo.toml', '**/pubspec.yaml') }}
-62|          restore-keys: |
-63|            ${{ matrix.os }}-${{ matrix.target }}
-64|            ${{ matrix.os }}
-65|
-66|      - name: Setup Flutter SDK
-67|        uses: subosito/flutter-action@v2
-68|        with:
-69|          flutter-version: "3.27.4"
-70|
-71|      - name: Setup Rust toolchain
-72|        uses: dtolnay/rust-toolchain@1.91
-73|        with:
-74|          components: rustfmt
-75|
-76|      - name: Setup Ninja and GTK3 toolchain (Only Linux target)
-77|        if: matrix.target == 'linux'
-78|        run: |
-79|          sudo apt-get update -y
-80|          sudo apt-get install -y ninja-build libgtk-3-dev
-81|
-82|      - name: Setup Java toolchain (Only Android target)
-83|        if: matrix.target == 'android'
-84|        uses: actions/setup-java@v5
-85|        with:
-86|          distribution: "zulu"
-87|          java-version: "17"
-88|
-89|      - name: Install the Python environment manager
-90|        uses: astral-sh/setup-uv@v7
-91|        with:
-92|          enable-cache: false
-93|
-94|      - name: Install the CLI tool
-95|        run: cargo install --path rust_crate_cli
-96|
-97|      - name: Prepare a Flutter app for testing
-98|        run: uv run automate prepare-test-app
-99|
-100|      - name: Build the example app
-101|        if: matrix.target == 'linux'
-102|        working-directory: test_app/
-103|        run: flutter build linux --verbose
-104|
-105|      - name: Build the example app
-106|        if: matrix.target == 'android'
-107|        working-directory: test_app/
-108|        run: |
-109|          flutter build apk --verbose
-110|          flutter build appbundle --verbose
-111|
-112|      - name: Build the example app
-113|        if: matrix.target == 'windows'
-114|        working-directory: test_app/
-115|        run: |
-116|          # Clean CMake cache and build artifacts to prevent VS generator conflicts
-117|          $buildDir = "build/windows"
-118|          if (Test-Path $buildDir) {
-119|            Remove-Item "$buildDir/CMakeCache.txt" -Force -ErrorAction SilentlyContinue
-120|            Remove-Item "$buildDir/CMakeFiles" -Recurse -Force -ErrorAction SilentlyContinue
-121|            Remove-Item "$buildDir/*.cmake" -Force -ErrorAction SilentlyContinue
-122|            Remove-Item "$buildDir/cmake_install.cmake" -Force -ErrorAction SilentlyContinue
-123|          }
-124|          flutter build windows --verbose
-125|
-126|      - name: Build the example app
-127|        if: matrix.target == 'macos'
-128|        working-directory: test_app/
-129|        run: flutter build macos --verbose
-130|
-131|      - name: Build the example app
-132|        if: matrix.target == 'ios'
-133|        working-directory: test_app/
-134|        run: flutter build ios --verbose --no-codesign
-135|
-136|      - name: Build the example app
-137|        if: matrix.target == 'web'
-138|        working-directory: test_app/
-139|        run: |
-140|          rinf wasm --release
-141|          flutter build web --verbose
-142|
+# Verify that the app build works as intended
+# when utilizing the code inside the repository.
+name: Test App
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+  workflow_dispatch:
+
+concurrency:
+  # Cancels the workflow
+  # when another event in the same context happens.
+  # If it's a PR, context is the pull request number.
+  # Otherwise, it uses the Git reference(branch or tag name).
+  group: >
+    ${{ github.workflow }}
+    ${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ${{ matrix.os }} / ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false # Important
+      matrix:
+        os: [ubuntu-latest, windows-2025, macos-latest]
+        target: [android, web] # On all platforms
+        include:
+          # Specify targets for each platform
+          - os: ubuntu-latest
+            target: linux
+          - os: windows-2025
+            target: windows
+          - os: macos-latest
+            target: macos
+          - os: macos-latest
+            target: ios
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          submodules: true
+
+      - name: Cache dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cargo/registry
+            target
+            ~/.pub-cache
+          key: >
+            ${{ matrix.os }}-${{ matrix.target }}
+            ${{ hashFiles('**/Cargo.toml', '**/pubspec.yaml') }}
+          restore-keys: |
+            ${{ matrix.os }}-${{ matrix.target }}
+            ${{ matrix.os }}
+
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.27.4"
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@1.91
+        with:
+          components: rustfmt
+
+      - name: Setup Ninja and GTK3 toolchain (Only Linux target)
+        if: matrix.target == 'linux'
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ninja-build libgtk-3-dev
+
+      - name: Setup Java toolchain (Only Android target)
+        if: matrix.target == 'android'
+        uses: actions/setup-java@v5
+        with:
+          distribution: "zulu"
+          java-version: "17"
+
+      - name: Install the Python environment manager
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: false
+
+      - name: Install the CLI tool
+        run: cargo install --path rust_crate_cli
+
+      - name: Prepare a Flutter app for testing
+        run: uv run automate prepare-test-app
+
+      - name: Build the example app
+        if: matrix.target == 'linux'
+        working-directory: test_app/
+        run: flutter build linux --verbose
+
+      - name: Build the example app
+        if: matrix.target == 'android'
+        working-directory: test_app/
+        run: |
+          flutter build apk --verbose
+          flutter build appbundle --verbose
+
+      - name: Build the example app
+        if: matrix.target == 'windows'
+        working-directory: test_app/
+        run: # Clean CMake cache and build artifacts to prevent VS generator conflicts
+          $buildDir = "build/windows"
+          if (Test-Path $buildDir) {
+            Remove-Item "$buildDir/CMakeCache.txt" -Force -ErrorAction SilentlyContinue
+            Remove-Item "$buildDir/CMakeFiles" -Recurse -Force -ErrorAction SilentlyContinue
+            Remove-Item "$buildDir/*.cmake" -Force -ErrorAction SilentlyContinue
+            Remove-Item "$buildDir/cmake_install.cmake" -Force -ErrorAction SilentlyContinue
+          }
+          flutter build windows --verbose
+
+      - name: Build the example app
+        if: matrix.target == 'macos'
+        working-directory: test_app/
+        run: flutter build macos --verbose
+
+      - name: Build the example app
+        if: matrix.target == 'ios'
+        working-directory: test_app/
+        run: flutter build ios --verbose --no-codesign
+
+      - name: Build the example app
+        if: matrix.target == 'web'
+        working-directory: test_app/
+        run: |
+          rinf wasm --release
+          flutter build web --verbose
