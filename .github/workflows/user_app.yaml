@@ -15,17 +15,17 @@
 15|    strategy:
 16|      fail-fast: false # Important
 17|      matrix:
-18|        runner: [ubuntu, windows, macos]
+18|        os: [ubuntu-latest, windows-2025, macos-latest]
 19|        target: [android, web] # On all platforms
 20|        include:
 21|          # Specify targets for each platform
-22|          - runner: ubuntu
+22|          - os: ubuntu-latest
 23|            target: linux
-24|          - runner: windows
+24|          - os: windows-2025
 25|            target: windows
-26|          - runner: macos
+26|          - os: macos-latest
 27|            target: macos
-28|          - runner: macos
+28|          - os: macos-latest
 29|            target: ios
 30|
 31|    steps:
