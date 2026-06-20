@@ -120,9 +120,9 @@ jobs:
             Remove-Item "$buildDir/*.cmake" -Force -ErrorAction SilentlyContinue
             Remove-Item "$buildDir/cmake_install.cmake" -Force -ErrorAction SilentlyContinue
           }
-          # Specify Visual Studio 2022 generator explicitly to avoid generator conflicts
-          $env:CMAKE_GENERATOR="Visual Studio 17 2022"
-          flutter build windows --verbose
+          # Specify Visual Studio 2026 generator explicitly to avoid generator conflicts
+          $env:CMAKE_GENERATOR="Visual Studio 18 2026"
+          flutter build windows --verbose --cmake-define=CMAKE_GENERATOR="Visual Studio 18 2026"
 
       - name: Build the example app
         if: matrix.target == 'macos'
