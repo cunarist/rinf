@@ -1,126 +1,127 @@
-# Verify that the documentation steps function as intended
-# when users utilize released versions
-# instead of the code from the repository.
-name: User App
-
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: "*/30 * * * *"
-
-jobs:
-  build:
-    name: ${{ matrix.runner }} / ${{ matrix.target }}
-    runs-on: ${{ matrix.runner == "windows" && "windows-2025" || format("{0}-latest", matrix.runner) }}
-    strategy:
-      fail-fast: false # Important
-      matrix:
-        runner: [ubuntu, windows, macos]
-        target: [android, web] # On all platforms
-        include:
-          # Specify targets for each platform
-          - runner: ubuntu
-            target: linux
-          - runner: windows
-            target: windows
-          - runner: macos
-            target: macos
-          - runner: macos
-            target: ios
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          submodules: true
-
-      - name: Cache dependencies
-        uses: actions/cache@v5
-        with:
-          path: |
-            ~/.cargo/registry
-            target
-            ~/.pub-cache
-          key: >
-            ${{ matrix.runner }}-${{ matrix.target }}
-            ${{ hashFiles('**/Cargo.toml', '**/pubspec.yaml') }}
-          restore-keys: |
-            ${{ matrix.runner }}-${{ matrix.target }}
-            ${{ matrix.runner }}
-
-      - name: Setup Flutter SDK
-        uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
-
-      - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt
-
-      - name: Setup Ninja and GTK3 toolchain (Only Linux target)
-        if: matrix.target == 'linux'
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y ninja-build libgtk-3-dev
-
-      - name: Setup Java toolchain (Only Android target)
-        if: matrix.target == 'android'
-        uses: actions/setup-java@v5
-        with:
-          distribution: "zulu"
-          java-version: "17"
-
-      - name: Install the Python environment manager
-        uses: astral-sh/setup-uv@v7
-        with:
-          enable-cache: false
-
-      - name: Install the CLI tool
-        run: cargo install rinf_cli
-
-      - name: Prepare a Flutter app for testing
-        run: uv run automate prepare-user-app
-
-      - name: Build the example app
-        if: matrix.target == 'linux'
-        working-directory: user_app/
-        run: flutter build linux --verbose
-
-      - name: Build the example app
-        if: matrix.target == 'android'
-        working-directory: user_app/
-        run: |
-          flutter build apk --verbose
-          flutter build appbundle --verbose
-
-      - name: Build the example app
-        if: matrix.target == 'windows'
-        working-directory: user_app/
-        run: |
-          # Clean CMake cache and build artifacts to prevent VS generator conflicts
-          $buildDir = "build/windows"
-          if (Test-Path $buildDir) {
-            Remove-Item "$buildDir/CMakeCache.txt" -Force -ErrorAction SilentlyContinue
-            Remove-Item "$buildDir/CMakeFiles" -Recurse -Force -ErrorAction SilentlyContinue
-            Remove-Item "$buildDir/*.cmake" -Force -ErrorAction SilentlyContinue
-            Remove-Item "$buildDir/cmake_install.cmake" -Force -ErrorAction SilentlyContinue
-          }
-          flutter build windows --verbose
-
-      - name: Build the example app
-        if: matrix.target == 'macos'
-        working-directory: user_app/
-        run: flutter build macos --verbose
-
-      - name: Build the example app
-        if: matrix.target == 'ios'
-        working-directory: user_app/
-        run: flutter build ios --verbose --no-codesign
-
-      - name: Build the example app
-        if: matrix.target == 'web'
-        working-directory: user_app/
-        run: |
-          rinf wasm --release
-          flutter build web --verbose
+1|# Verify that the documentation steps function as intended
+2|# when users utilize released versions
+3|# instead of the code from the repository.
+4|name: User App
+5|
+6|on:
+7|  workflow_dispatch:
+8|  schedule:
+9|    - cron: "*/30 * * * *"
+10|
+11|jobs:
+12|  build:
+13|    name: ${{ matrix.os }} / ${{ matrix.target }}
+14|    runs-on: ${{ matrix.os }}
+15|    strategy:
+16|      fail-fast: false # Important
+17|      matrix:
+18|        runner: [ubuntu, windows, macos]
+19|        target: [android, web] # On all platforms
+20|        include:
+21|          # Specify targets for each platform
+22|          - runner: ubuntu
+23|            target: linux
+24|          - runner: windows
+25|            target: windows
+26|          - runner: macos
+27|            target: macos
+28|          - runner: macos
+29|            target: ios
+30|
+31|    steps:
+32|      - name: Checkout repository
+33|        uses: actions/checkout@v6
+34|        with:
+35|          submodules: true
+36|
+37|      - name: Cache dependencies
+38|        uses: actions/cache@v5
+39|        with:
+40|          path: |
+41|            ~/.cargo/registry
+42|            target
+43|            ~/.pub-cache
+44|          key: >
+45|            ${{ matrix.os }}-${{ matrix.target }}
+46|            ${{ hashFiles('**/Cargo.toml', '**/pubspec.yaml') }}
+47|          restore-keys: |
+48|            ${{ matrix.os }}-${{ matrix.target }}
+49|            ${{ matrix.os }}
+50|
+51|      - name: Setup Flutter SDK
+52|        uses: subosito/flutter-action@v2
+53|        with:
+54|          channel: "stable"
+55|
+56|      - name: Setup Rust toolchain
+57|        uses: dtolnay/rust-toolchain@stable
+58|        with:
+59|          components: rustfmt
+60|
+61|      - name: Setup Ninja and GTK3 toolchain (Only Linux target)
+62|        if: matrix.target == 'linux'
+63|        run: |
+64|          sudo apt-get update -y
+65|          sudo apt-get install -y ninja-build libgtk-3-dev
+66|
+67|      - name: Setup Java toolchain (Only Android target)
+68|        if: matrix.target == 'android'
+69|        uses: actions/setup-java@v5
+70|        with:
+71|          distribution: "zulu"
+72|          java-version: "17"
+73|
+74|      - name: Install the Python environment manager
+75|        uses: astral-sh/setup-uv@v7
+76|        with:
+77|          enable-cache: false
+78|
+79|      - name: Install the CLI tool
+80|        run: cargo install rinf_cli
+81|
+82|      - name: Prepare a Flutter app for testing
+83|        run: uv run automate prepare-user-app
+84|
+85|      - name: Build the example app
+86|        if: matrix.target == 'linux'
+87|        working-directory: user_app/
+88|        run: flutter build linux --verbose
+89|
+90|      - name: Build the example app
+91|        if: matrix.target == 'android'
+92|        working-directory: user_app/
+93|        run: |
+94|          flutter build apk --verbose
+95|          flutter build appbundle --verbose
+96|
+97|      - name: Build the example app
+98|        if: matrix.target == 'windows'
+99|        working-directory: user_app/
+100|        run: |
+101|          # Clean CMake cache and build artifacts to prevent VS generator conflicts
+102|          $buildDir = "build/windows"
+103|          if (Test-Path $buildDir) {
+104|            Remove-Item "$buildDir/CMakeCache.txt" -Force -ErrorAction SilentlyContinue
+105|            Remove-Item "$buildDir/CMakeFiles" -Recurse -Force -ErrorAction SilentlyContinue
+106|            Remove-Item "$buildDir/*.cmake" -Force -ErrorAction SilentlyContinue
+107|            Remove-Item "$buildDir/cmake_install.cmake" -Force -ErrorAction SilentlyContinue
+108|          }
+109|          flutter build windows --verbose
+110|
+111|      - name: Build the example app
+112|        if: matrix.target == 'macos'
+113|        working-directory: user_app/
+114|        run: flutter build macos --verbose
+115|
+116|      - name: Build the example app
+117|        if: matrix.target == 'ios'
+118|        working-directory: user_app/
+119|        run: flutter build ios --verbose --no-codesign
+120|
+121|      - name: Build the example app
+122|        if: matrix.target == 'web'
+123|        working-directory: user_app/
+124|        run: |
+125|          rinf wasm --release
+126|          flutter build web --verbose
+127|
