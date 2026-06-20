@@ -30,13 +30,13 @@ jobs:
     strategy:
       fail-fast: false # Important
       matrix:
-        os: [ubuntu-latest, windows-2025, macos-latest]
+        os: [ubuntu-latest, windows-2022, macos-latest]
         target: [android, web] # On all platforms
         include:
           # Specify targets for each platform
           - os: ubuntu-latest
             target: linux
-          - os: windows-2025
+          - os: windows-2022
             target: windows
           - os: macos-latest
             target: macos
