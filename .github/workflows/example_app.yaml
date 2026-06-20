@@ -111,7 +111,11 @@ jobs:
       - name: Build the example app
         if: matrix.target == 'windows'
         working-directory: flutter_package/example/
-        run: flutter build windows --verbose
+        run: |
+          # Clean any potential CMake cache that might force old VS generator
+          if (Test-Path "build/windows/CMakeCache.txt") { Remove-Item "build/windows/CMakeCache.txt" -Force }
+          if (Test-Path "build/windows/CMakeFiles") { Remove-Item "build/windows/CMakeFiles" -Recurse -Force }
+          flutter build windows --verbose
 
       - name: Build the example app
         if: matrix.target == 'macos'
