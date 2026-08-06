@@ -30,6 +30,14 @@ Windows ARM64 support came from targeted external work. When touching platform l
 
 Windows build scripts have failed on paths from different drives and on argument escaping. Prefer explicit drive-aware shell behavior and quoted structured paths.
 
+When upgrading Rust toolchain versions, Windows CI may fail due to CMake cache conflicts with Visual Studio generator versions. The fix requires comprehensive cleanup of CMake cache files and explicit generator specification:
+
+- Clean `CMakeCache.txt`, `CMakeFiles/`, `*.cmake`, and `cmake_install.cmake` in the build directory
+- Set `CMAKE_GENERATOR="Visual Studio 17 2022"` environment variable before building
+- Use `-ErrorAction SilentlyContinue` on PowerShell Remove-Item commands to handle missing files gracefully
+
+This pattern should be applied to all Windows build steps in CI workflows.
+
 ## eLinux
 
 eLinux support exists as a platform surface. When editing package platform lists, generated plugin metadata, or Cargokit target handling, preserve eLinux entries unless intentionally removing support.

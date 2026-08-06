@@ -24,22 +24,22 @@ concurrency:
 
 jobs:
   build:
-    name: ${{ matrix.runner }} / ${{ matrix.target }}
-    runs-on: ${{ matrix.runner }}-latest
+    name: ${{ matrix.os }} / ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false # Important
       matrix:
-        runner: [ubuntu, windows, macos]
+        os: [ubuntu-latest, windows-2022, macos-latest]
         target: [android, web] # On all platforms
         include:
           # Specify targets for each platform
-          - runner: ubuntu
+          - os: ubuntu-latest
             target: linux
-          - runner: windows
+          - os: windows-2022
             target: windows
-          - runner: macos
+          - os: macos-latest
             target: macos
-          - runner: macos
+          - os: macos-latest
             target: ios
 
     steps:
@@ -56,19 +56,19 @@ jobs:
             target
             ~/.pub-cache
           key: >
-            ${{ matrix.runner }}-${{ matrix.target }}
+            ${{ matrix.os }}-${{ matrix.target }}
             ${{ hashFiles('**/Cargo.toml', '**/pubspec.yaml') }}
           restore-keys: |
-            ${{ matrix.runner }}-${{ matrix.target }}
-            ${{ matrix.runner }}
+            ${{ matrix.os }}-${{ matrix.target }}
+            ${{ matrix.os }}
 
       - name: Setup Flutter SDK
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.24.0"
+          flutter-version: "3.27.4"
 
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@1.88
+        uses: dtolnay/rust-toolchain@1.91
         with:
           components: rustfmt
 
@@ -111,7 +111,15 @@ jobs:
       - name: Build the example app
         if: matrix.target == 'windows'
         working-directory: flutter_package/example/
-        run: flutter build windows --verbose
+        run: |
+          $buildDir = "build/windows"
+          if (Test-Path $buildDir) {
+            Remove-Item "$buildDir/CMakeCache.txt" -Force -ErrorAction SilentlyContinue
+            Remove-Item "$buildDir/CMakeFiles" -Recurse -Force -ErrorAction SilentlyContinue
+            Remove-Item "$buildDir/*.cmake" -Force -ErrorAction SilentlyContinue
+            Remove-Item "$buildDir/cmake_install.cmake" -Force -ErrorAction SilentlyContinue
+          }
+          flutter build windows --verbose
 
       - name: Build the example app
         if: matrix.target == 'macos'
