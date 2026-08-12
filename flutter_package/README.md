@@ -1,3 +1,9 @@
+> 🙋 Looking for a New Maintainer
+>
+> We are currently unable to dedicate as much time as this project deserves. We're looking for someone to take over as the new maintainer with full authority over the API design and build system going forward.
+>
+> If you're interested, please reach out at cunarist@gmail.com.
+
 # Rinf: Rust in Flutter
 
 [![Pub Version](https://img.shields.io/pub/v/rinf)](https://pub.dev/packages/rinf)
