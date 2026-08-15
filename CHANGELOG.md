@@ -1,3 +1,7 @@
+## 8.10.1
+
+- Now the CLI installs WebAssembly toolchain executables with `--locked`.
+
 ## 8.10.0
 
 - Added OpenHarmony (OHOS) support.
