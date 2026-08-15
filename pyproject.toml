@@ -14,7 +14,7 @@ all = "error"
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["TC", "BLE", "S602"]
+ignore = ["TC", "BLE", "CPY", "S602"]
 
 [tool.ruff.lint.per-file-ignores]
 "documentation/**/*.py" = ["A001"]
