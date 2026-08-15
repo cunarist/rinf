@@ -20,7 +20,7 @@ Rinf is a framework for creating beautiful and performant cross-platform Rust ap
 
 ## 📖 Documentation
 
-Visit the [documentation](https://rinf.cunarist.org) to learn everything about using this framework. You can also explore the [example code](https://github.com/cunarist/rinf/tree/main/flutter_package/example).
+Visit the [documentation](https://cunarist.github.io/rinf/) to learn everything about using this framework. You can also explore the [example code](https://github.com/cunarist/rinf/tree/main/flutter_package/example).
 
 ## 🖥️ Platform Support
 

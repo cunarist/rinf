@@ -4,10 +4,8 @@
 
 Rinf enables building cross-platform Rust apps, combining it with Flutter's UI ecosystem.
 
-```{eval-rst}
-.. raw:: html
-   :file: _templates/icon_pair.html
-```
+![Flutter Icon](_static/flutter_icon.svg){width=60px}
+![Rust Icon](_static/rust_icon.png){width=60px}
 
 ## Design
 

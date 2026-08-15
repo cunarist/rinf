@@ -15,6 +15,7 @@ release = "8.10.0"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = ["myst_parser"]
+myst_enable_extensions = ["attrs_inline"]
 source_suffix = {".md": "markdown"}
 templates_path = ["_templates"]
 exclude_patterns = []
@@ -26,5 +27,6 @@ html_theme = "furo"
 html_title = "Rinf"
 html_favicon = "_static/logo.png"
 html_static_path = ["_static"]
+html_extra_path = ["_extra"]
 html_show_sphinx = False
 html_show_sourcelink = False

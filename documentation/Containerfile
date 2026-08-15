@@ -4,8 +4,8 @@ FROM debian:bookworm-slim AS flutter-builder
 # Install dependencies
 RUN apt-get update
 RUN apt-get install -y \
-    curl git unzip xz-utils zip libglu1-mesa \
-    build-essential pkg-config libssl-dev
+  curl git unzip xz-utils zip libglu1-mesa \
+  build-essential pkg-config libssl-dev
 
 # Install Flutter
 ENV FLUTTER_HOME=/opt/flutter
@@ -32,10 +32,14 @@ COPY Cargo.toml Cargo.toml
 RUN cargo install --path rust_crate_cli
 
 # Build Flutter web app
+# Disable the Flutter service worker, because it would take over
+# the app's scope and drop the cross-origin isolation headers
+# that `coi-serviceworker.js` attaches on GitHub Pages.
+ARG BASE_HREF="/_static/web_app/"
 WORKDIR /workspace/flutter_package/example
 RUN rinf gen
 RUN rinf wasm --release
-RUN flutter build web --release --base-href="/_static/web_app/"
+RUN flutter build web --release --base-href="${BASE_HREF}" --pwa-strategy=none
 
 # Build documentation and serve
 FROM python:3.13-slim
@@ -48,8 +52,8 @@ COPY documentation/ .
 
 # Copy built web app from flutter-builder stage
 COPY --from=flutter-builder \
-    /workspace/flutter_package/example/build/web \
-    source/_static/web_app/
+  /workspace/flutter_package/example/build/web \
+  source/_static/web_app/
 
 # Install dependencies
 RUN pip install --no-cache-dir .
@@ -60,5 +64,5 @@ RUN sphinx-build -b dirhtml source dist/dirhtml
 # Expose port 80
 EXPOSE 80
 
-# Run the server
-CMD ["python", "server.py"]
+# Serve without extra headers, exactly as GitHub Pages does
+CMD ["python", "-m", "http.server", "80", "--directory", "dist/dirhtml"]

@@ -38,7 +38,7 @@ eLinux support exists as a platform surface. When editing package platform lists
 
 Web builds are the most toolchain-sensitive path. Confirm the wasm target, nightly/std build requirements, wasm-pack behavior, and shared-memory flags before changing application code.
 
-Shared-memory WASM requires COOP/COEP headers. Use the project server helper or pass equivalent Flutter web headers during local runs.
+Shared-memory WASM requires COOP/COEP headers. Pass them as Flutter web headers during local runs. The published documentation cannot set headers, so it attaches them from `documentation/source/_extra/coi-serviceworker.js` instead.
 
 64-bit or wider integer signal fields need explicit web testing. Replace them with strings when exact precision matters across the JavaScript boundary.
 

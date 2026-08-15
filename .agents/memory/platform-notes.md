@@ -2,7 +2,7 @@
 
 ## Web and WASM
 
-Web builds are sensitive because Rinf relies on WASM features that require nightly/std build support plus shared-memory-related flags. Shared memory also requires COOP/COEP headers at runtime; using the project server helper avoids missing those headers during local testing.
+Web builds are sensitive because Rinf relies on WASM features that require nightly/std build support plus shared-memory-related flags. Shared memory also requires COOP/COEP headers at runtime; pass them as Flutter web headers during local runs.
 
 The web path crosses JavaScript and generated Dart boundaries. Rinf supports 64-bit integer formats in the Rust/generator layer, but web schemas with 64-bit or wider integer fields should be tested explicitly; use strings for exact IDs, counters, or timestamps when JavaScript number precision would be risky.
 
