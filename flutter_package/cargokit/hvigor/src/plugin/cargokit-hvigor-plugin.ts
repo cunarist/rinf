@@ -68,9 +68,17 @@ function registerCargokitTask(
         "libs",
         targetName,
       );
-      const buildDir = resolve(dir, "build");
-
       const rootNodeDirPath = node.getParentNode()?.nodeDir.filePath;
+      // <project>/build/rinf/build/build_tool
+      // Avoid cannot operate on packages inside the cache.
+      const buildDir = resolve(
+        rootNodeDirPath,
+        "..",
+        "build",
+        "rinf",
+        "build",
+        "build_tool",
+      );
 
       if (!rootNodeDirPath) {
         throw new Error("rootNodeDirPath is required");
@@ -86,17 +94,18 @@ function registerCargokitTask(
         env: {
           ...process.env,
           CARGOKIT_ROOT_PROJECT_DIR: rootNodeDirPath,
-          CARGOKIT_TOOL_TEMP_DIR: `${buildDir}/build_tool`,
+          CARGOKIT_TOOL_TEMP_DIR: buildDir,
           CARGOKIT_TARGET_PLATFORMS: PLATFORMS.join(","),
           CARGOKIT_MANIFEST_DIR: cargokitManifestPath,
           CARGOKIT_CONFIGURATION: "release",
-          CARGOKIT_TARGET_TEMP_DIR: `${buildDir}/cargokit`,
+          CARGOKIT_TARGET_TEMP_DIR: `${resolve(dir, "build", "cargokit")}`,
           CARGOKIT_OUTPUT_DIR: outputDir,
         },
       });
 
       if (result.status !== 0) {
-        throw new Error(`cargokitTask failed with status ${result.status}`);
+        throw new Error(`cargokitTask failed with status ${result.status}
+stderr: ${result.stderr ? `${result.stderr.toString()}` : ""}`);
       }
     },
     dependencies: [`${targetName}@ProcessLibs`],
