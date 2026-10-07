@@ -25,7 +25,10 @@ concurrency:
 jobs:
   build:
     name: ${{ matrix.runner }} / ${{ matrix.target }}
-    runs-on: ${{ matrix.runner }}-latest
+    # Flutter 3.24 needs Visual Studio 2019 or 2022.
+    runs-on: >-
+      ${{ matrix.runner == 'windows' && 'windows-2022'
+      || format('{0}-latest', matrix.runner) }}
     strategy:
       fail-fast: false # Important
       matrix:
