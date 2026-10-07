@@ -1,6 +1,9 @@
-# Code Generation
+---
+name: code-generation
+description: Run `rinf gen` and diagnose generated Dart binding problems such as malformed output, wrong casing, path issues, and CLI version skew. Use for any `rinf gen` or generator-logic work.
+---
 
-Use this skill for `rinf gen` and generated Dart binding problems.
+# Code Generation
 
 ## Running Generation
 

@@ -4,6 +4,8 @@
 
 Whenever upgrading Rinf, please ensure that the Rinf versions in `pubspec.yaml` and `native/hub/Cargo.toml` are identical.
 
+A minor upgrade can raise the minimum Flutter or Rust version. Check the toolchain table in [Installing Toolchains](installing-toolchains.md), and run `rustup update` if your Rust is older. For example, Rinf 8.11 requires Rust 1.91.
+
 ## Migrating from 6 to 7
 
 The overall usage remains the same, but some changes have been made to the API to improve code readability and flexibility.

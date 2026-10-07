@@ -1,6 +1,9 @@
-# CI/CD
+---
+name: ci-cd
+description: Triage failing CI checks in order (Clippy, Ruff, Ty, Dart analyzer, platform builds), run local checks, and handle Dependabot PRs. Use when fixing failing checks, workflows, or dependency automation.
+---
 
-Use this skill when fixing failing checks, workflows, or dependency automation.
+# CI/CD
 
 ## Failure Order
 

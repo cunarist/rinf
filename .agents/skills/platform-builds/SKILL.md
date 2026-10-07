@@ -1,6 +1,9 @@
-# Platform Builds
+---
+name: platform-builds
+description: Troubleshoot Android, ohos, Apple, Linux, Windows, eLinux, and web/WASM builds, native library loading, and shutdown lifecycle. Use when a platform build, load, or lifecycle path fails.
+---
 
-Use this skill when a platform build, load, or lifecycle path fails.
+# Platform Builds
 
 ## Triage Order
 
