@@ -23,7 +23,7 @@ concurrency:
 jobs:
   build:
     name: build-site
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -68,7 +68,7 @@ jobs:
 
   deploy:
     name: deploy-site
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: build
     environment:
       name: github-pages
