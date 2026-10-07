@@ -30,18 +30,19 @@ jobs:
     strategy:
       fail-fast: false # Important
       matrix:
-        # Flutter 3.24 needs Visual Studio 2019 or 2022.
-        runner: [ubuntu-latest, windows-2022, macos-latest]
+        # Flutter 3.24 needs Visual Studio 2019 or 2022,
+        # while `windows-2025` only has Visual Studio 2026.
+        runner: [ubuntu-24.04, windows-2022, macos-26]
         target: [android, web] # On all platforms
         include:
           # Specify targets for each platform
-          - runner: ubuntu-latest
+          - runner: ubuntu-24.04
             target: linux
           - runner: windows-2022
             target: windows
-          - runner: macos-latest
+          - runner: macos-26
             target: macos
-          - runner: macos-latest
+          - runner: macos-26
             target: ios
 
     steps:

@@ -20,4 +20,4 @@ Examples of breakage that came from outside the repository:
 - Gradle 9 removed `project.exec`, breaking the vendored Cargokit plugin, and
   upstream Cargokit is archived.
 
-See [[external-prs-are-platform-risk]].
+See [[external-prs-are-platform-risk]] and [[pin-exact-versions]].

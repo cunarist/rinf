@@ -22,7 +22,7 @@ on:
 jobs:
   upload:
     name: upload-all
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       id-token: write # Required for authentication using OIDC for `pub.dev`
 
