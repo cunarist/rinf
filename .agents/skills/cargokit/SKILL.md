@@ -1,6 +1,9 @@
-# Cargokit
+---
+name: cargokit
+description: Update or review vendored Cargokit while preserving upstream history and covering every affected platform. Use when syncing Cargokit or reviewing a PR that touches it.
+---
 
-Use this skill when updating or reviewing vendored Cargokit changes.
+# Cargokit
 
 ## Principles
 

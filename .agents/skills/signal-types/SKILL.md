@@ -1,6 +1,9 @@
-# Signal Types
+---
+name: signal-types
+description: Add or change signal DTOs, signal derives, serde attributes, and receiver or stream usage. Use when adding or changing a type that crosses the Dart/Rust boundary.
+---
 
-Use this skill when adding or changing a type that crosses the Dart/Rust boundary.
+# Signal Types
 
 ## Core Rules
 
