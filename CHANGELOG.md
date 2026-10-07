@@ -1,3 +1,8 @@
+## 8.11.0
+
+- Added Gradle 9 support for Android builds.
+- This version supports Flutter 3.24/Dart 3.5 and Rust 1.91 or later.
+
 ## 8.10.1
 
 - Now the CLI installs WebAssembly toolchain executables with `--locked`.
