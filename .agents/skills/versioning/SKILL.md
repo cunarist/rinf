@@ -1,6 +1,9 @@
-# Versioning
+---
+name: versioning
+description: Bump release versions across packages and crates without hidden proc-macro mismatches or accidental toolchain requirement bumps. Use for release version bumps and publish preparation.
+---
 
-Use this skill for release version bumps and publish preparation.
+# Versioning
 
 ## Release Flow
 
