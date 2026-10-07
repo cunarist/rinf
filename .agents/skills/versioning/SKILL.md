@@ -25,7 +25,7 @@ The CLI crate is separated from the main workspace and has lock-file-sensitive i
 
 ## Toolchain Requirements
 
-Current public requirements are Rust 1.88 for the Rust crate and Dart SDK `>=3.5.0 <4.0.0` for the Flutter package. History includes reverted bumps to keep these requirements clear, so do not introduce newer Rust or Dart syntax just because CI happens to use a newer toolchain.
+Current public requirements are Rust 1.91 for the Rust crate and Dart SDK `>=3.5.0 <4.0.0` for the Flutter package. History includes reverted bumps to keep these requirements clear, so do not introduce newer Rust or Dart syntax just because CI happens to use a newer toolchain.
 
 ## Release Notes
 
