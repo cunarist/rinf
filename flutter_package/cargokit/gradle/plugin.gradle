@@ -13,6 +13,7 @@ class CargoKitExtension {
 
 abstract class CargoKitBuildTask extends DefaultTask {
     // `project.exec` wont working in Gradle 9
+    // https://docs.gradle.org/current/userguide/upgrading_major_version_9.html#removal_of_project_exec_project_javaexec_and_script_level_counterparts
     // Migrate to Dependency Injection for ExecOperations
     @Inject
     abstract ExecOperations getExecOperations()
@@ -62,12 +63,12 @@ abstract class CargoKitBuildTask extends DefaultTask {
         def rootProjectDir = project.rootProject.projectDir
 
         if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
-            execOperations {
+            execOperations.exec {
                 commandLine 'chmod', '+x', path
             }
         }
 
-        execOperations {
+        execOperations.exec {
             executable path
             args "build-gradle"
             environment "CARGOKIT_ROOT_PROJECT_DIR", rootProjectDir
