@@ -26,21 +26,23 @@ concurrency:
 jobs:
   build:
     name: ${{ matrix.runner }} / ${{ matrix.target }}
-    runs-on: ${{ matrix.runner }}-latest
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false # Important
       matrix:
-        runner: [ubuntu, windows, macos]
+        # Flutter 3.24 needs Visual Studio 2019 or 2022,
+        # while `windows-2025` only has Visual Studio 2026.
+        runner: [ubuntu-24.04, windows-2022, macos-26]
         target: [android, web] # On all platforms
         include:
           # Specify targets for each platform
-          - runner: ubuntu
+          - runner: ubuntu-24.04
             target: linux
-          - runner: windows
+          - runner: windows-2022
             target: windows
-          - runner: macos
+          - runner: macos-26
             target: macos
-          - runner: macos
+          - runner: macos-26
             target: ios
 
     steps:
@@ -69,7 +71,7 @@ jobs:
           flutter-version: "3.24.0"
 
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@1.88
+        uses: dtolnay/rust-toolchain@1.91
         with:
           components: rustfmt
 

@@ -1,3 +1,9 @@
+> 🙋 Looking for a New Maintainer
+>
+> We are currently unable to dedicate as much time as this project deserves. We're looking for someone to take over as the new maintainer with full authority over the API design and build system going forward.
+>
+> If you're interested, please reach out at cunarist@gmail.com.
+
 # Rinf: Rust in Flutter
 
 [![Pub Version](https://img.shields.io/pub/v/rinf)](https://pub.dev/packages/rinf)
@@ -14,7 +20,7 @@ Rinf is a framework for creating beautiful and performant cross-platform Rust ap
 
 ## 📖 Documentation
 
-Visit the [documentation](https://rinf.cunarist.org) to learn everything about using this framework. You can also explore the [example code](https://github.com/cunarist/rinf/tree/main/flutter_package/example).
+Visit the [documentation](https://cunarist.github.io/rinf/) to learn everything about using this framework. You can also explore the [example code](https://github.com/cunarist/rinf/tree/main/flutter_package/example).
 
 ## 🖥️ Platform Support
 

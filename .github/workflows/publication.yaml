@@ -22,7 +22,7 @@ on:
 jobs:
   upload:
     name: upload-all
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       id-token: write # Required for authentication using OIDC for `pub.dev`
 
@@ -39,7 +39,7 @@ jobs:
           flutter-version: "3.24.0"
 
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@1.88
+        uses: dtolnay/rust-toolchain@1.91
 
       # https://dart.dev/tools/pub/automated-publishing
 
