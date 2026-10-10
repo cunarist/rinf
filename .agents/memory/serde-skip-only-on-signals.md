@@ -10,3 +10,7 @@ Custom serde behavior such as `with`, custom serialize/deserialize functions,
 generator cannot faithfully reproduce those transformations in Dart, so the
 project catches them at compile time instead of allowing silent wire-format
 drift.
+
+Rationale: `rinf gen` is static analysis, so it cannot see logic behind `serde(with)` and similar (#580). A contributor's PR supported only `skip` on purpose: handling skip_serializing, skip_deserializing and skip_serializing_if "quickly leads to implementation complexity and user confusion" (#617). The rest became compile errors in #618 (merged 2025-06-04); before that they compiled but failed at runtime.
+
+Evidence: #580, #617, #618

@@ -17,3 +17,7 @@ atomics make the build and server headers much more sensitive
 ([[wasm-shared-memory-headers]]).
 
 See [[cooperative-shutdown]].
+
+Origin: early issues asked not to spawn threads per task or use multithreading by default, so bridge tasks run on one thread with channels and the template's Tokio runtime is current-thread (#21, #73; worker pools removed in 50d9f169). Only the hub crate links into the binary. On web, async runtimes do not yield to JavaScript.
+
+Evidence: #21, #73, commit 50d9f169

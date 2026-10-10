@@ -19,3 +19,7 @@ Areas that came from contributors and must be kept covered:
   contributor-driven polish.
 
 See [[cargokit-preserve-upstream-history]].
+
+Policy details: Cargokit changes used to go upstream first and are now patched in place ([[cargokit-preserve-upstream-history]]); new platforms are labelled experimental and the contributor is asked to help stabilise them ([[ohos-support-is-experimental]]). Contributors carry their own platform validation.
+
+Evidence: #435, #665

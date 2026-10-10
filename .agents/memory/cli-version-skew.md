@@ -17,3 +17,9 @@ installed with its own lock file in some CI workflows; do not assume workspace
 lock behavior covers CLI installation.
 
 See [[proc-macro-version-hidden-by-patching]].
+
+Typical report: after bumping only `pubspec.yaml` (7.3.0, 7.3.1) Rinf stops working on every platform and `main` is never executed; it works once `native/hub/Cargo.toml` is bumped to the same version (#521, #543; one reporter git-bisected before finding it). 7.3.0 changed who calls `store_dart_post_cobject` ([[store-dart-post-cobject-called-from-rust]]). A stale CLI against a newer crate gives compile errors such as `no SharedCell in the root`, or `Option<Vec<_>>` mismatches with old generated files; the fix is `cargo update`, reinstall the CLI, `flutter pub upgrade`, rerun generation (#411).
+
+The maintainer called a version-mismatch message "definitely a good idea" but no such check exists in `rust_crate_cli/src`; `documentation/source/upgrading.md` is the only guard. First question for any "nothing works after upgrade" report: are pubspec, Cargo.toml and the installed CLI identical? Since 8.0 the CLI is the separate `rinf_cli` crate (5d36c8d1).
+
+Evidence: #411, #521, #543, commits a1df9707, 5d36c8d1
