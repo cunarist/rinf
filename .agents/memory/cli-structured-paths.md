@@ -8,4 +8,6 @@ path handling over string paths, preserve support for configured crates and
 nested signal modules, and verify `pubspec.yaml` discovery before changing
 command working-directory logic.
 
-See [[windows-path-hazards]].
+See [[windows-path-hazards]]. PR #156 (4.1.4) made the CLI honor `PUB_CACHE` on Windows, since the pub cache is not always under the default user directory.
+
+Evidence: #156

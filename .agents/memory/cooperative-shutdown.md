@@ -10,3 +10,9 @@ otherwise allowed to keep running. On web, finalization is effectively a no-op,
 so web behavior is no proof that native shutdown is correct.
 
 See [[runtime-agnostic-transport]].
+
+History: tokio threads once stayed alive as a windowless process after the window closed (2.4.0); `ensureFinalized()` arrived in 4.11.0 because Rust sending after the Dart VM is gone caused memory errors. On web, hot restart once spawned `main` twice until an `IS_MAIN_STARTED` guard (4.11.0). API churn since then is in [[finalize-rust-api-history]], and mobile reopen behavior in [[mobile-reopen-needs-channel-recreation]].
+
+Symptom behind `ensureFinalized()`: macOS logged `virtual_memory_posix.cc: error: mmap failed: 22` after closing the example app because tokio kept posting a signal every 20 ms after the Dart VM shut down (#178). PR #185 fixed it, wired in the example through `AppLifecycleListener(onExitRequested: ...)` awaiting `ensureFinalized()` then returning `AppExitResponse.exit`.
+
+Evidence: #178, #185, commits 64648013, 2143821a, a1f06684, 19b78445; CHANGELOG 2.4.0, 2.5.0, 4.11.0
