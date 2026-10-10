@@ -1,5 +1,5 @@
 ---
-description: Rinf patches its vendored Cargokit directly because upstream is unmaintained; keep upstream history intact when syncing and keep local edits small and documented
+description: Rinf patches its vendored Cargokit directly because upstream is archived; keep upstream history intact when syncing and keep local edits small and documented
 ---
 
 Cargokit is vendored under `flutter_package/cargokit` via git subtree. Until 2026 the policy was upstream first: send changes to irondash/cargokit and pull them in, bypassing only when upstream review stalled about a month (eLinux #435, Android x86 #437, rustup assumption #620). That is no longer current. The upstream author said (irondash/cargokit#115) that no more work is planned and that Cargokit is obsolete with Dart native assets.

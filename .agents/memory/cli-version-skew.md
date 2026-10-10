@@ -22,4 +22,6 @@ Typical report: after bumping only `pubspec.yaml` (7.3.0, 7.3.1) Rinf stops work
 
 The maintainer called a version-mismatch message "definitely a good idea" but no such check exists in `rust_crate_cli/src`; `documentation/source/upgrading.md` is the only guard. First question for any "nothing works after upgrade" report: are pubspec, Cargo.toml and the installed CLI identical? Since 8.0 the CLI is the separate `rinf_cli` crate (5d36c8d1).
 
-Evidence: #411, #521, #543, commits a1df9707, 5d36c8d1
+Users upgrading one side also see `no SharedCell in rinf` or `mismatched types Option<Vec<_>>`; the fix is the same version in `pubspec.yaml` and `Cargo.toml`, a fresh `cargo install rinf`, and rerunning generation. Pinning an old crate by git tag can hit crates.io lacking that version (#371).
+
+Evidence: #371, #411, #521, #543, commits a1df9707, 5d36c8d1
