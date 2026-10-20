@@ -1,0 +1,6 @@
+# Docker BuildKit ignores `.containerignore`, so it reads this file instead.
+# Keep these rules in sync with `/.containerignore`, which Podman reads.
+.git/
+**/target/
+**/dist/
+**/build/
