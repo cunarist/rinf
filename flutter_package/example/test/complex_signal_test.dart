@@ -39,12 +39,8 @@ Future<void> main() async {
 /// Cargo is asked for its target directory,
 /// which can be changed by `CARGO_TARGET_DIR` or Cargo config files.
 String getLibPath() {
-  final metadata = Process.runSync('cargo', [
-    'metadata',
-    '--format-version',
-    '1',
-    '--no-deps',
-  ], runInShell: true);
+  const args = ['metadata', '--format-version', '1', '--no-deps'];
+  final metadata = Process.runSync('cargo', args, runInShell: true);
   final targetDir =
       jsonDecode(metadata.stdout as String)['target_directory'] as String;
   if (Platform.isMacOS) {
