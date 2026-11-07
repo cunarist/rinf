@@ -28,6 +28,7 @@ Writing tests that pass signals between Dart and Rust requires a few extra lines
 
 ```{code-block} dart
 :caption: test/custom_test.dart
+import 'dart:convert';
 import 'dart:io';
 import 'package:test/test.dart';
 import 'package:rinf/rinf.dart';
@@ -44,15 +45,20 @@ void main() async {
 }
 
 
-/// Gets the expected path of the dynamic library file.
-/// The path should reflect the project folder structure.
+/// Gets the path of the dynamic library file.
+/// Cargo is asked for its target directory,
+/// which can be changed by `CARGO_TARGET_DIR` or Cargo config files.
 String getLibPath() {
+  const args = ['metadata', '--format-version', '1', '--no-deps'];
+  final metadata = Process.runSync('cargo', args, runInShell: true);
+  final targetDir =
+      jsonDecode(metadata.stdout as String)['target_directory'] as String;
   if (Platform.isMacOS) {
-    return 'target/debug/libhub.dylib';
+    return '$targetDir/debug/libhub.dylib';
   } else if (Platform.isLinux) {
-    return 'target/debug/libhub.so';
+    return '$targetDir/debug/libhub.so';
   } else if (Platform.isWindows) {
-    return 'target/debug/hub.dll';
+    return '$targetDir/debug/hub.dll';
   } else {
     throw UnsupportedError('This operating system is not for tests');
   }
