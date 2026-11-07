@@ -1,4 +1,5 @@
 // Import the test package and Counter class
+import 'dart:convert';
 import 'dart:io';
 import 'package:test/test.dart';
 import 'package:rinf/rinf.dart';
@@ -34,15 +35,24 @@ Future<void> main() async {
   await UnitTestEnd.rustSignalStream.first;
 }
 
-/// Gets the expected path of the dynamic library file.
-/// The path should reflect the project folder structure.
+/// Gets the path of the dynamic library file.
+/// Cargo is asked for its target directory,
+/// which can be changed by `CARGO_TARGET_DIR` or Cargo config files.
 String getLibPath() {
+  final metadata = Process.runSync('cargo', [
+    'metadata',
+    '--format-version',
+    '1',
+    '--no-deps',
+  ], runInShell: true);
+  final targetDir =
+      jsonDecode(metadata.stdout as String)['target_directory'] as String;
   if (Platform.isMacOS) {
-    return '../../target/debug/libhub.dylib';
+    return '$targetDir/debug/libhub.dylib';
   } else if (Platform.isLinux) {
-    return '../../target/debug/libhub.so';
+    return '$targetDir/debug/libhub.so';
   } else if (Platform.isWindows) {
-    return '../../target/debug/hub.dll';
+    return '$targetDir/debug/hub.dll';
   } else {
     throw UnsupportedError('This operating system is not for tests');
   }
