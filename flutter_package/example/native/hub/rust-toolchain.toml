@@ -1,0 +1,22 @@
+[toolchain]
+channel = "1.91.0"
+targets = [
+  "armv7-linux-androideabi",
+  "aarch64-linux-android",
+  "i686-linux-android",
+  "x86_64-linux-android",
+  "aarch64-apple-ios",
+  "aarch64-apple-ios-sim",
+  "x86_64-apple-ios",
+  "aarch64-pc-windows-msvc",
+  "x86_64-pc-windows-msvc",
+  "aarch64-unknown-linux-gnu",
+  "riscv64gc-unknown-linux-gnu",
+  "x86_64-unknown-linux-gnu",
+  "aarch64-unknown-linux-ohos",
+  "armv7-unknown-linux-ohos",
+  "x86_64-unknown-linux-ohos",
+  "aarch64-apple-darwin",
+  "x86_64-apple-darwin",
+  "wasm32-unknown-unknown",
+]

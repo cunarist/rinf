@@ -48,14 +48,15 @@ Future<void> loadJsFile() async {
   // This will load the webassembly module.
   final scriptElement = HTMLScriptElement();
   scriptElement.type = 'module';
-  scriptElement.innerHTML = '''
+  scriptElement.innerHTML =
+      '''
 import init, * as wasmBindings from "$fullUrl";
 globalThis.wasmBindings = wasmBindings;
 await init();
 rinfBindings.completeRinfLoad();
 delete rinfBindings.completeRinfLoad;
 '''
-      .toJS;
+          .toJS;
   document.head!.append(scriptElement);
 
   // Await for the module to load.
