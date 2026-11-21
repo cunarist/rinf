@@ -689,13 +689,26 @@ pub fn watch_and_generate_dart_code(
     watcher.watch(&source_dir, RecursiveMode::Recursive)?;
   }
 
+  let gen_dir = root_dir.join(rinf_config.gen_output_dir.clone());
+  let gen_dir_canonical = gen_dir.canonicalize().ok();
+
   loop {
     // Sleep briefly to avoid busy looping.
     std::thread::sleep(Duration::from_millis(100));
     // Block until an event is received.
     match receiver.recv() {
       Ok(event) => {
-        if should_regenerate(&event) {
+        let is_generated = event.paths.iter().any(|path| {
+          if let Some(parent) = path.parent() {
+            if let Ok(path_canonical) = path.canonicalize() {
+              if let Some(gen_dir_path) = &gen_dir_canonical {
+                return path_canonical.starts_with(gen_dir_path);
+              }
+            }
+          }
+          false
+        });
+        if !is_generated && should_regenerate(&event) {
           dimmedln!(
             "Change detected in file `{}`",
             event.paths[0].clean_file_name()?
