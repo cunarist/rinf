@@ -1,8 +1,6 @@
-> 🙋 Looking for a New Maintainer
+> 🛠️ Rinf is now in maintenance mode
 >
-> We are currently unable to dedicate as much time as this project deserves. We're looking for someone to take over as the new maintainer with full authority over the API design and build system going forward.
->
-> If you're interested, please reach out at cunarist@gmail.com.
+> Rinf will keep receiving bug fixes and compatibility updates, but no major new features are planned. Flutter played a big role in giving Rust apps a UI while Rust's own UI ecosystem was still maturing, but that is changing. Depending on your requirements, consider Rust-oriented solutions like [GPUI](https://www.gpui.rs), [Slint](https://slint.dev), or [Tauri](https://tauri.app).
 
 # Rinf: Rust in Flutter
 
